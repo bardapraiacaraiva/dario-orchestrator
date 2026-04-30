@@ -3,11 +3,9 @@ name: Validate Skills & Orchestrator
 on:
   push:
     branches: [master]
-    paths:
-      - 'skills/**'
-      - 'orchestrator/**'
   pull_request:
     branches: [master]
+  workflow_dispatch:
 
 jobs:
   validate:
