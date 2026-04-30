@@ -1,0 +1,155 @@
+# Eval Baseline — Gold Standard Test Cases
+# LUCAS Quality Scorer — Calibration Reference
+# Created: 2026-04-27 | Version: 1.0
+#
+# Purpose: Calibrate auto-scoring by providing known-good examples
+# with pre-assigned human scores. Run periodically to check scorer drift.
+# If auto-score deviates >15 points from baseline, recalibrate rubric.
+
+version: "1.0"
+last_calibrated: "2026-04-27"
+calibrated_by: "barda"
+drift_threshold: 15  # max acceptable deviation from baseline score
+
+test_cases:
+
+  # === TOP SKILLS (expected score 85-95) ===
+
+  - id: "EVAL-001"
+    skill: "dario-brand"
+    domain: "restaurant"
+    project: "mar-brasa"
+    task_description: "Brand positioning for seafood+grill restaurant in Cascais. Define archetype, Kapferer Prism, messaging hierarchy, tone of voice, differentiation vs competitors."
+    expected_output_signals:
+      - mentions "Mar & Brasa" by name (specificity)
+      - archetype justified with competitive analysis (not generic selection)
+      - Kapferer Prism has 6 facets specific to restaurant (not template)
+      - tone guidelines include specific do/don't with word examples
+      - SB7 framework with customer as hero
+      - 3+ differentiators grounded in local market
+    expected_score: 92
+    dimensions: {specificity: 20, actionability: 18, completeness: 18, accuracy: 18, tone: 18}
+    notes: "Reference output from Mar & Brasa simulation. The gold standard for brand skills."
+
+  - id: "EVAL-002"
+    skill: "seo-local"
+    domain: "restaurant"
+    project: "mar-brasa"
+    task_description: "Local SEO setup for restaurant in Cascais: GBP optimization, NAP consistency, citation sources PT, review strategy, Restaurant schema JSON-LD."
+    expected_output_signals:
+      - GBP description with keywords (under 750 chars)
+      - NAP format defined with +351 and no abbreviations
+      - 15+ PT citation sources (TripAdvisor, TheFork, Zomato, Google Maps)
+      - review strategy phased with specific targets
+      - JSON-LD schema code blocks (not just descriptions)
+      - competitor analysis for Cascais specifically
+    expected_score: 91
+    dimensions: {specificity: 18, actionability: 20, completeness: 18, accuracy: 17, tone: 18}
+
+  - id: "EVAL-003"
+    skill: "dario-story-circle"
+    domain: "restaurant"
+    project: "mar-brasa"
+    task_description: "Brand origin story using Dan Harmon Story Circle. Output: full origin narrative, about page copy, short bio for social."
+    expected_output_signals:
+      - 8-beat Story Circle structure visible
+      - origin story specific to founders/concept (not generic)
+      - about page copy publishable as-is
+      - short bio version for GBP/social (under 160 chars)
+      - tone matches brand brief (if available)
+    expected_score: 90
+    dimensions: {specificity: 18, actionability: 18, completeness: 18, accuracy: 18, tone: 18}
+
+  # === MID-TIER SKILLS (expected score 75-85) ===
+
+  - id: "EVAL-004"
+    skill: "dario-diagnose"
+    domain: "agency"
+    project: "generic-agency"
+    task_description: "Holistic diagnostic for a digital agency website. Identify CRITICO/IMPORTANTE/OTIMIZACAO issues across performance, SEO, security, content, and legal compliance."
+    expected_output_signals:
+      - CRITICO/IMPORTANTE/OTIMIZACAO triage clear
+      - 4-milestone roadmap with timeframes
+      - specific URLs and pages referenced (not abstract)
+      - PT legal compliance checked (RGPD, livro reclamacoes)
+      - accessibility dimension included
+    expected_score: 84
+    dimensions: {specificity: 16, actionability: 18, completeness: 16, accuracy: 18, tone: 16}
+    notes: "Diagnose sometimes misses legal/accessibility. Watch for this."
+
+  - id: "EVAL-005"
+    skill: "dario-wp-audit"
+    domain: "any"
+    project: "generic-wordpress"
+    task_description: "Full WordPress audit: performance, security, SEO, content, plugin health, theme quality, mobile, accessibility, PT compliance."
+    expected_output_signals:
+      - 9 categories scored
+      - plugin list with bloat assessment
+      - specific code/config fixes (not just "improve performance")
+      - PT-specific checks (RGPD cookie banner, Livro Reclamacoes)
+      - overall score with TIER classification
+    expected_score: 82
+    dimensions: {specificity: 16, actionability: 16, completeness: 18, accuracy: 16, tone: 16}
+    notes: "Plugin recommendations sometimes too generic. Should name specific alternatives."
+
+  # === WEAK SKILLS (expected score 60-75, may need revision) ===
+
+  - id: "EVAL-006"
+    skill: "dario-offer"
+    domain: "agency"
+    project: "generic-agency"
+    task_description: "Create Grand Slam Offer for SEO services package. Use Hormozi value equation, 4-part formula, 3 pricing tiers, bonuses, guarantee."
+    expected_output_signals:
+      - value equation with specific dream outcome (not generic "grow your business")
+      - pricing tiers with real numbers for PT market
+      - bonuses that add perceived value (not just "free consultation")
+      - guarantee with specific terms (not vague "satisfaction guaranteed")
+      - competitor price comparison
+    expected_score: 72
+    dimensions: {specificity: 12, actionability: 16, completeness: 16, accuracy: 14, tone: 14}
+    notes: "Known weakness: value equations often generic without market-specific pricing data. RAG enrichment needed."
+
+  - id: "EVAL-007"
+    skill: "dario-financial-model"
+    domain: "agency"
+    project: "generic-agency"
+    task_description: "Build 12-month P&L forecast for digital agency. Include revenue by stream, COGS, OpEx breakdown, 3 scenarios, PT tax implications."
+    expected_output_signals:
+      - 12-month table with monthly breakdown
+      - revenue streams separated (web dev, SEO, ads, consulting)
+      - PT-specific taxes (IVA 23%, IRC 21%, SS 23.75%)
+      - 3 scenarios with different assumptions
+      - break-even point calculated
+    expected_score: 74
+    dimensions: {specificity: 14, actionability: 14, completeness: 16, accuracy: 16, tone: 14}
+    notes: "Known weakness: missing PT market benchmarks. Should cross-reference RAG for industry averages."
+
+  # === CROSS-DIVISION (DIVA) ===
+
+  - id: "EVAL-008"
+    skill: "diva-budget"
+    domain: "architecture"
+    project: "generic-renovation"
+    task_description: "Construction budget for T3 apartment renovation in Lisboa. ProNIC prices, IVA analysis (6% rehab vs 23%), breakdown by chapter."
+    expected_output_signals:
+      - ProNIC chapter breakdown (demolition, structure, masonry, MEP, finishes, carpentry)
+      - cost per m2 for Lisboa market
+      - IVA analysis (6% reabilitacao urbana vs 23% standard)
+      - 3 scenarios (economico, recomendado, premium)
+      - contingency percentage (10-15%)
+    expected_score: 85
+    dimensions: {specificity: 18, actionability: 16, completeness: 18, accuracy: 16, tone: 17}
+
+# === CALIBRATION INSTRUCTIONS ===
+#
+# To calibrate:
+# 1. Run each test case through its skill
+# 2. Score output using lucas-quality rubric
+# 3. Compare auto-score vs expected_score
+# 4. If deviation > drift_threshold (15 points):
+#    a. Check which dimension drifted most
+#    b. Adjust rubric heuristics for that dimension
+#    c. Re-run and verify drift reduced
+# 5. Update last_calibrated date
+#
+# Schedule: Monthly via knowledge_refresh routine (Sunday 3am)

@@ -1,0 +1,75 @@
+# =============================================================================
+# DARIO Orchestrator — Whitelist .gitignore
+# =============================================================================
+# Strategy: ignore EVERYTHING, then un-ignore the product (orchestrator + skills)
+# This protects credentials, sessions, history, and personal data.
+# =============================================================================
+
+# --- Ignore everything by default ---
+*
+
+# --- Allow .gitignore itself ---
+!.gitignore
+
+# --- Allow GitHub Actions ---
+!.github/
+!.github/**
+
+# --- Allow README ---
+!README.md
+
+# --- Allow orchestrator (the product) ---
+!orchestrator/
+!orchestrator/install.sh
+!orchestrator/orch
+!orchestrator/*.py
+!orchestrator/*.html
+!orchestrator/.license
+!orchestrator/tasks/
+!orchestrator/tasks/templates/
+!orchestrator/tasks/templates/**
+!orchestrator/quality/
+!orchestrator/quality/domain-playbooks.yaml
+!orchestrator/quality/eval-baseline.yaml
+
+# --- Exclude orchestrator personal/generated data ---
+orchestrator/company.yaml
+orchestrator/last_pulse.yaml
+orchestrator/notifications.yaml
+orchestrator/open-dashboard.bat
+orchestrator/tasks/active/
+orchestrator/tasks/done/
+orchestrator/audit/
+orchestrator/budgets/
+
+# --- Allow all skills ---
+!skills/
+!skills/*/
+!skills/*/SKILL.md
+
+# --- Exclude external cloned repos inside skills ---
+skills/a360-framework-lite/
+
+# --- Exclude everything else (explicit) ---
+.credentials.json
+settings.json
+settings.local.json
+history.jsonl
+projects/
+sessions/
+session-env/
+cache/
+debug/
+file-history/
+paste-cache/
+plans/
+plugins/
+shell-snapshots/
+tasks/
+telemetry/
+backups/
+agent-memory/
+agents/
+commands/
+mcp-needs-auth-cache.json
+policy-limits.json

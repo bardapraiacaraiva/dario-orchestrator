@@ -1,0 +1,474 @@
+#!/usr/bin/env python3
+"""
+ORCH CLI — Orchestrator OS Command Line Interface
+The single entry point for the entire DARIO Orchestrator system.
+
+Usage:
+  orch status              System health overview
+  orch tasks               List active tasks
+  orch tasks create        Create a new task
+  orch budget              Budget report
+  orch budget add          Add tokens
+  orch quality             Quality dashboard
+  orch skills              List all skills
+  orch run <skill>         Execute a skill
+  orch pulse               Run one heartbeat pulse
+  orch auto                Start autopilot
+  orch logs                View audit trail
+  orch dashboard           Generate and open dashboard
+  orch license             Show license status
+  orch services            Show running services
+  orch config              Show/edit configuration
+  orch help                Show this help
+"""
+
+import os
+import sys
+import yaml
+import glob
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+# === PATHS ===
+HOME = Path.home()
+ORCH = HOME / ".claude" / "orchestrator"
+SKILLS = HOME / ".claude" / "skills"
+TASKS_ACTIVE = ORCH / "tasks" / "active"
+TASKS_DONE = ORCH / "tasks" / "done"
+AUDIT = ORCH / "audit"
+BUDGETS = ORCH / "budgets"
+QUALITY = ORCH / "quality"
+COMPANY = ORCH / "company.yaml"
+
+# === COLORS ===
+CYAN = "\033[96m"
+GREEN = "\033[92m"
+YELLOW = "\033[93m"
+RED = "\033[91m"
+DIM = "\033[90m"
+BOLD = "\033[1m"
+RESET = "\033[0m"
+
+def c(text, color): return f"{color}{text}{RESET}"
+def header(text): return f"\n  {BOLD}{CYAN}{text}{RESET}\n"
+def divider(): return f"  {DIM}{'─'*60}{RESET}"
+
+def load_yaml(path):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return yaml.safe_load(f) or {}
+    except:
+        return {}
+
+# ═══════════════════════════════════════════════════════════
+# STATUS — System overview
+# ═══════════════════════════════════════════════════════════
+def cmd_status():
+    print(header("ORCHESTRATOR OS — System Status"))
+
+    # Tasks
+    tasks = list(TASKS_ACTIVE.glob("*.yaml")) if TASKS_ACTIVE.exists() else []
+    done = list(TASKS_DONE.glob("*.yaml")) if TASKS_DONE.exists() else []
+    task_data = [load_yaml(f) for f in tasks]
+    active = sum(1 for t in task_data if t.get("status") in ("todo", "in_progress"))
+    blocked = sum(1 for t in task_data if t.get("status") == "blocked")
+
+    print(f"  {c('TASKS', BOLD)}      {len(tasks)} active | {len(done)} done | {blocked} blocked")
+
+    # Budget
+    month = datetime.now().strftime("%Y-%m")
+    budget = load_yaml(BUDGETS / f"{month}.yaml")
+    pct = budget.get("percentage", 0)
+    if isinstance(pct, str): pct = float(pct)
+    color = GREEN if pct < 80 else YELLOW if pct < 95 else RED
+    print(f"  {c('BUDGET', BOLD)}     {c(f'{pct:.1f}%', color)} ({budget.get('total_tokens_used',0):,} / {budget.get('limit',50000000):,})")
+
+    # Quality
+    qm = load_yaml(QUALITY / "skill-metrics.yaml")
+    avg = qm.get("global_avg_quality", 0) or 0
+    print(f"  {c('QUALITY', BOLD)}    {c(f'{avg:.1f}/100', CYAN)}")
+
+    # Skills
+    skill_count = sum(1 for d in SKILLS.iterdir() if d.is_dir() and (d / "SKILL.md").exists()) if SKILLS.exists() else 0
+    print(f"  {c('SKILLS', BOLD)}     {skill_count} installed")
+
+    # Company
+    comp = load_yaml(COMPANY)
+    agents = len(comp.get("agents", {}))
+    workers = len(comp.get("workers", {}))
+    print(f"  {c('COMPANY', BOLD)}    {agents} agents + {workers} workers = {agents+workers} entities")
+
+    # Pulse
+    pulse = load_yaml(ORCH / "last_pulse.yaml")
+    pt = pulse.get("pulse_time", "never")
+    if isinstance(pt, str) and "T" in pt: pt = pt[:16].replace("T", " ")
+    print(f"  {c('PULSE', BOLD)}      Last: {pt}")
+
+    # License
+    lic_path = ORCH / ".license"
+    if lic_path.exists():
+        lic = load_yaml(lic_path)
+        tier = lic.get("tier", "?")
+        status = lic.get("status", "?")
+        exp = lic.get("expires_at")
+        exp_str = exp[:10] if exp else "never"
+        print(f"  {c('LICENSE', BOLD)}    {c(tier.upper(), CYAN)} ({status}) — expires {exp_str}")
+
+    # Services
+    print(f"\n  {c('SERVICES', BOLD)}")
+    check_service("RAG Engine", "localhost", 8420)
+    print(f"    {c('●', GREEN)} Orchestrator   {c('company.yaml', DIM)}")
+    print(f"    {c('●', GREEN)} Budget Tracker  {c('budget_tracker.py', DIM)}")
+    print(f"    {c('●', GREEN)} Dashboard Gen   {c('generate_dashboard.py', DIM)}")
+
+    print(divider())
+    print(f"  {DIM}Run 'orch help' for all commands{RESET}\n")
+
+def check_service(name, host, port):
+    import socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(1)
+        s.connect((host, port))
+        s.close()
+        print(f"    {c('●', GREEN)} {name}    {c(f'{host}:{port}', DIM)}")
+    except:
+        print(f"    {c('●', RED)} {name}    {c(f'{host}:{port} DOWN', RED)}")
+
+# ═══════════════════════════════════════════════════════════
+# TASKS — Task management
+# ═══════════════════════════════════════════════════════════
+def cmd_tasks(args):
+    if args and args[0] == "create":
+        return cmd_tasks_create(args[1:])
+
+    print(header("Tasks"))
+
+    if not TASKS_ACTIVE.exists():
+        print(f"  {DIM}No tasks found.{RESET}\n")
+        return
+
+    tasks = []
+    for f in sorted(TASKS_ACTIVE.glob("*.yaml")):
+        t = load_yaml(f)
+        if t: tasks.append(t)
+
+    if not tasks:
+        print(f"  {DIM}No active tasks.{RESET}\n")
+        return
+
+    # Header
+    print(f"  {DIM}{'ID':<12} {'Title':<35} {'Status':<14} {'Assignee':<20} {'Priority'}{RESET}")
+    print(f"  {DIM}{'─'*12} {'─'*35} {'─'*14} {'─'*20} {'─'*8}{RESET}")
+
+    status_colors = {"todo": CYAN, "in_progress": YELLOW, "in_review": "\033[95m", "done": GREEN, "blocked": RED, "backlog": DIM}
+
+    for t in tasks:
+        tid = t.get("id", "?")[:11]
+        title = t.get("title", "?")[:34]
+        status = t.get("status", "?")
+        assignee = (t.get("assignee") or "—")[:19]
+        priority = t.get("priority", "—")
+        sc = status_colors.get(status, DIM)
+        print(f"  {c(tid, CYAN):<23} {title:<35} {c(status, sc):<25} {DIM}{assignee:<20}{RESET} {priority}")
+
+    print(f"\n  {DIM}{len(tasks)} tasks{RESET}\n")
+
+def cmd_tasks_create(args):
+    print(header("Create Task"))
+    title = input(f"  {CYAN}Title:{RESET} ").strip()
+    if not title: print(f"  {RED}Cancelled.{RESET}"); return
+    project = input(f"  {CYAN}Project:{RESET} ").strip() or "general"
+    priority = input(f"  {CYAN}Priority (critical/high/medium/low):{RESET} ").strip() or "medium"
+    skill = input(f"  {CYAN}Skill:{RESET} ").strip() or None
+
+    # Generate ID
+    prefix = project[:3].upper()
+    existing = list(TASKS_ACTIVE.glob(f"{prefix}-*.yaml"))
+    num = len(existing) + 1
+    task_id = f"{prefix}-{num:03d}"
+
+    task = {
+        "id": task_id, "title": title, "description": title,
+        "project": project, "status": "todo", "priority": priority,
+        "assignee": None, "assigned_by": None,
+        "parent": None, "children": [], "depends_on": [], "blocks": [],
+        "execution_policy": "default", "estimated_tokens": 5000,
+        "actual_tokens": None, "skill": skill, "squad": None,
+        "division": "dario", "tags": [],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "checked_out_at": None, "completed_at": None,
+        "reviewed_by": None, "approved_by": None,
+        "completion_comment": None, "revision_count": 0,
+        "revision_max_loops": 3, "blocked_reason": None, "watchers": [],
+        "notes": []
+    }
+
+    TASKS_ACTIVE.mkdir(parents=True, exist_ok=True)
+    path = TASKS_ACTIVE / f"{task_id}.yaml"
+    with open(path, "w", encoding="utf-8") as f:
+        yaml.dump(task, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+
+    print(f"\n  {GREEN}✓{RESET} Task {c(task_id, CYAN)} created: {title}\n")
+
+# ═══════════════════════════════════════════════════════════
+# BUDGET — Financial tracking
+# ═══════════════════════════════════════════════════════════
+def cmd_budget(args):
+    script = ORCH / "budget_tracker.py"
+    if args and args[0] == "add":
+        subprocess.run([sys.executable, str(script), "--add-tokens"] + args[1:])
+    else:
+        subprocess.run([sys.executable, str(script), "--report"])
+
+# ═══════════════════════════════════════════════════════════
+# QUALITY — Quality dashboard
+# ═══════════════════════════════════════════════════════════
+def cmd_quality():
+    print(header("Quality Dashboard"))
+
+    qm = load_yaml(QUALITY / "skill-metrics.yaml")
+    avg = qm.get("global_avg_quality", 0) or 0
+    skills = qm.get("skills", {})
+
+    print(f"  Global Average: {c(f'{avg:.1f}/100', CYAN)}")
+    print(f"  Skills Scored: {len(skills)}\n")
+
+    if skills:
+        print(f"  {DIM}{'Skill':<25} {'Score':<8} {'Executions':<12} {'Tier':<6} {'Revision%'}{RESET}")
+        print(f"  {DIM}{'─'*25} {'─'*8} {'─'*12} {'─'*6} {'─'*10}{RESET}")
+
+        for name, data in sorted(skills.items(), key=lambda x: (x[1].get("avg_quality_score") or 0) if isinstance(x[1], dict) else 0, reverse=True):
+            if not isinstance(data, dict): continue
+            score = data.get("avg_quality_score") or 0
+            execs = data.get("total_executions", 0)
+            tier = data.get("tier", "?")
+            rev = data.get("revision_rate") or 0
+            sc = GREEN if score >= 85 else YELLOW if score >= 70 else RED if score > 0 else DIM
+            print(f"  {name:<25} {c(f'{score:.0f}', sc):<19} {execs:<12} {tier:<6} {rev*100:.0f}%")
+
+    print()
+
+# ═══════════════════════════════════════════════════════════
+# SKILLS — Skill inventory
+# ═══════════════════════════════════════════════════════════
+def cmd_skills(args):
+    print(header("Skills Inventory"))
+
+    counts = {"dario": [], "diva": [], "lucas": [], "seo": [], "a360": [], "other": []}
+
+    if SKILLS.exists():
+        for d in sorted(SKILLS.iterdir()):
+            if d.is_dir() and (d / "SKILL.md").exists():
+                name = d.name
+                if name.startswith("dario"): counts["dario"].append(name)
+                elif name.startswith("diva"): counts["diva"].append(name)
+                elif name.startswith("lucas"): counts["lucas"].append(name)
+                elif name.startswith("seo"): counts["seo"].append(name)
+                elif "a360" in name: counts["a360"].append(name)
+                else: counts["other"].append(name)
+
+    detail = args and args[0] == "-v" if args else False
+
+    for group, skills in counts.items():
+        if not skills: continue
+        color = {"dario": CYAN, "diva": "\033[95m", "lucas": GREEN, "seo": YELLOW, "a360": "\033[96m"}.get(group, DIM)
+        print(f"  {c(group.upper(), color)} ({len(skills)})")
+        if detail:
+            for s in skills:
+                print(f"    /{s}")
+        print()
+
+    total = sum(len(v) for v in counts.values())
+    print(f"  {c(f'Total: {total} skills', BOLD)}\n")
+
+# ═══════════════════════════════════════════════════════════
+# LOGS — Audit trail viewer
+# ═══════════════════════════════════════════════════════════
+def cmd_logs(args):
+    print(header("Audit Trail"))
+
+    if not AUDIT.exists():
+        print(f"  {DIM}No audit logs found.{RESET}\n")
+        return
+
+    files = sorted(AUDIT.glob("*.yaml"), reverse=True)
+    if args and args[0].isdigit():
+        files = files[:int(args[0])]
+    else:
+        files = files[:3]
+
+    for f in files:
+        print(f"  {c(f.stem, BOLD)}")
+        data = load_yaml(f)
+        if isinstance(data, list):
+            for entry in data[-10:]:
+                if isinstance(entry, dict):
+                    ts = str(entry.get("timestamp", ""))[:16]
+                    actor = entry.get("actor", "?")
+                    action = entry.get("action", "?")
+                    details = str(entry.get("details", ""))[:60]
+                    print(f"    {DIM}{ts}{RESET} {c(actor, CYAN)} {action} {DIM}{details}{RESET}")
+        print()
+
+# ═══════════════════════════════════════════════════════════
+# DASHBOARD — Generate and open
+# ═══════════════════════════════════════════════════════════
+def cmd_dashboard():
+    dashboard_dir = ORCH / "dashboard"
+    if dashboard_dir.exists() and (dashboard_dir / "package.json").exists():
+        print(f"  {CYAN}Starting SaaS dashboard...{RESET}")
+        print(f"  {DIM}Dashboard: http://localhost:3000{RESET}")
+        print(f"  {DIM}Press Ctrl+C to stop{RESET}\n")
+        # Check if node_modules exists
+        if not (dashboard_dir / "node_modules").exists():
+            print(f"  {YELLOW}Installing dependencies (first run)...{RESET}")
+            subprocess.run(["npm", "install"], cwd=str(dashboard_dir))
+        subprocess.run(["npm", "run", "dev"], cwd=str(dashboard_dir))
+    else:
+        # Fallback to static HTML dashboard
+        script = ORCH / "generate_dashboard.py"
+        if script.exists():
+            subprocess.run([sys.executable, str(script)])
+        else:
+            print(f"  {RED}Dashboard not found. Install with: npx orchestrator-ai-framework init --license YOUR-KEY{RESET}")
+
+# ═══════════════════════════════════════════════════════════
+# LICENSE — Show license info
+# ═══════════════════════════════════════════════════════════
+def cmd_license():
+    script = ORCH / "license.js"
+    if script.exists():
+        subprocess.run(["node", str(script), "status"])
+    else:
+        lic = load_yaml(ORCH / ".license")
+        if lic:
+            print(header("License"))
+            for k, v in lic.items():
+                print(f"  {k:<20} {v}")
+            print()
+
+# ═══════════════════════════════════════════════════════════
+# SERVICES — Running services
+# ═══════════════════════════════════════════════════════════
+def cmd_services():
+    print(header("Services"))
+    check_service("RAG Engine", "localhost", 8420)
+    check_service("License API", "orchestrator-ai-three.vercel.app", 443)
+    print(f"    {c('●', GREEN)} Orchestrator   {c(str(COMPANY), DIM)}")
+    print(f"    {c('●', GREEN)} Budget Tracker  {c(str(ORCH / 'budget_tracker.py'), DIM)}")
+    print(f"    {c('●', GREEN)} Dashboard Gen   {c(str(ORCH / 'generate_dashboard.py'), DIM)}")
+    print()
+
+# ═══════════════════════════════════════════════════════════
+# CONFIG — Show configuration
+# ═══════════════════════════════════════════════════════════
+def cmd_config():
+    print(header("Configuration"))
+    comp = load_yaml(COMPANY)
+    company = comp.get("company", {})
+    print(f"  Company:    {company.get('name', '?')}")
+    print(f"  Owner:      {company.get('owner', '?')}")
+    print(f"  Budget:     {company.get('budget', {}).get('monthly_limit_tokens', 0):,} tokens/month")
+    print(f"  Alert:      {company.get('budget', {}).get('alert_threshold', 0)*100:.0f}%")
+    print(f"  Hard Stop:  {company.get('budget', {}).get('auto_pause_threshold', 0)*100:.0f}%")
+
+    policies = comp.get("execution_policies", {})
+    if policies:
+        print(f"\n  {c('Execution Policies:', BOLD)}")
+        for name, pol in policies.items():
+            sla = pol.get("sla_hours", "?")
+            review = "review" if pol.get("review_required") else ""
+            approval = "approval" if pol.get("approval_required") else ""
+            gates = " + ".join(filter(None, [review, approval])) or "none"
+            print(f"    {name:<16} SLA: {sla}h  Gates: {gates}")
+    print()
+
+# ═══════════════════════════════════════════════════════════
+# HELP
+# ═══════════════════════════════════════════════════════════
+def cmd_help():
+    print(f"""
+  {BOLD}{CYAN}ORCHESTRATOR OS{RESET} — Command Line Interface
+
+  {BOLD}System{RESET}
+    orch status            System health overview
+    orch services          Show running services
+    orch config            Show configuration
+    orch dashboard         Generate & open live dashboard
+    orch license           Show license status
+    orch help              Show this help
+
+  {BOLD}Tasks{RESET}
+    orch tasks             List active tasks
+    orch tasks create      Create a new task interactively
+
+  {BOLD}Finance{RESET}
+    orch budget            Budget report
+    orch budget add <N> --project <P> --skill <S>
+
+  {BOLD}Intelligence{RESET}
+    orch quality           Quality scores dashboard
+    orch skills            List all skills (add -v for detail)
+    orch logs [N]          View last N days of audit trail
+
+  {BOLD}Services{RESET}
+    orch start <service>   Start a service (rag, dashboard, all)
+    orch stop <service>    Stop a service
+    orch restart <service> Restart a service
+    orch health            Health check all services
+
+  {BOLD}Execution{RESET}
+    orch pulse             Run one heartbeat pulse
+    orch auto              Start autopilot mode
+
+  {DIM}All data is read live from ~/.claude/orchestrator/{RESET}
+""")
+
+# ═══════════════════════════════════════════════════════════
+# MAIN
+# ═══════════════════════════════════════════════════════════
+def main():
+    args = sys.argv[1:]
+
+    if not args:
+        cmd_status()
+        return
+
+    cmd = args[0]
+    rest = args[1:]
+
+    commands = {
+        "status": lambda: cmd_status(),
+        "tasks": lambda: cmd_tasks(rest),
+        "budget": lambda: cmd_budget(rest),
+        "quality": lambda: cmd_quality(),
+        "skills": lambda: cmd_skills(rest),
+        "logs": lambda: cmd_logs(rest),
+        "dashboard": lambda: cmd_dashboard(),
+        "license": lambda: cmd_license(),
+        "services": lambda: cmd_services(),
+        "start": lambda: subprocess.run([sys.executable, str(ORCH / "process_manager.py"), "start"] + rest),
+        "stop": lambda: subprocess.run([sys.executable, str(ORCH / "process_manager.py"), "stop"] + rest),
+        "restart": lambda: subprocess.run([sys.executable, str(ORCH / "process_manager.py"), "restart"] + rest),
+        "health": lambda: subprocess.run([sys.executable, str(ORCH / "process_manager.py"), "health"]),
+        "skill": lambda: subprocess.run([sys.executable, str(ORCH / "skill_store.py")] + rest),
+        "install": lambda: subprocess.run([sys.executable, str(ORCH / "skill_store.py"), "create"] + rest),
+        "search": lambda: subprocess.run([sys.executable, str(ORCH / "skill_store.py"), "search"] + rest),
+        "verify": lambda: subprocess.run([sys.executable, str(ORCH / "skill_store.py"), "verify"]),
+        "config": lambda: cmd_config(),
+        "help": lambda: cmd_help(),
+        "pulse": lambda: print(f"  {CYAN}Run in Claude Code:{RESET} /lucas-heartbeat"),
+        "auto": lambda: print(f"  {CYAN}Run in Claude Code:{RESET} /loop /lucas-autopilot"),
+    }
+
+    if cmd in commands:
+        commands[cmd]()
+    else:
+        print(f"  {RED}Unknown command: {cmd}{RESET}")
+        print(f"  Run {CYAN}orch help{RESET} for available commands.")
+
+if __name__ == "__main__":
+    main()

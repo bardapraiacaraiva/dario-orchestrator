@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DARIO Orchestrator — Agent Command Center</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e1a;--surface:#111827;--card:#1a2235;--border:#2a3a5a;--text:#f0f4ff;--dim:#8896b3;--cyan:#00e5ff;--green:#00e676;--amber:#ffab00;--red:#ff5252;--purple:#b388ff;--blue:#448aff}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text)}
+
+/* === HEADER === */
+.header{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(17,24,39,.9),rgba(10,14,26,.95));backdrop-filter:blur(10px);z-index:10;position:relative}
+.logo{font-size:18px;font-weight:800;letter-spacing:.02em}
+.logo span{color:var(--cyan);text-shadow:0 0 20px rgba(0,229,255,.5)}
+.hdr-badges{display:flex;gap:14px;align-items:center;font-size:12px}
+.hdr-badge{padding:4px 12px;border-radius:12px;font-weight:600;font-size:11px;display:flex;align-items:center;gap:6px}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* === MAIN LAYOUT === */
+.main{display:grid;grid-template-columns:200px 1fr 380px;height:calc(100vh - 84px);gap:0}
+@media(max-width:1400px){.main{grid-template-columns:180px 1fr 300px}}
+@media(max-width:1200px){.main{grid-template-columns:160px 1fr 240px}}
+
+/* === LEFT PANEL === */
+.panel-left{border-right:1px solid var(--border);overflow-y:auto;padding:12px 8px;background:rgba(17,24,39,.4)}
+.panel-left::-webkit-scrollbar{width:4px}
+.panel-left::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.panel-title{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:12px;font-weight:700}
+.tree-node{display:flex;align-items:center;gap:6px;padding:4px 0;cursor:pointer;font-size:12px;transition:all .15s;position:relative}
+.tree-node:hover{color:var(--cyan)}
+.tree-node.active{color:var(--cyan);text-shadow:0 0 8px rgba(0,229,255,.3)}
+.tree-indent{display:inline-block;width:16px;flex-shrink:0}
+.tree-branch{color:var(--border);font-size:11px;flex-shrink:0;width:16px;text-align:center}
+.node-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .3s}
+.dot-active{background:var(--green);box-shadow:0 0 8px var(--green);animation:breathe 2s ease-in-out infinite}
+.dot-idle{background:var(--cyan);box-shadow:0 0 4px rgba(0,229,255,.3)}
+.dot-off{background:#4a5568}
+.node-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.node-badge{font-size:9px;color:var(--dim);background:rgba(255,255,255,.05);padding:1px 6px;border-radius:6px;margin-left:auto;flex-shrink:0}
+.tree-group{overflow:hidden;transition:max-height .3s ease}
+.tree-toggle{cursor:pointer;user-select:none}
+.tree-toggle .arrow{display:inline-block;transition:transform .2s;font-size:9px;color:var(--dim);margin-right:2px}
+.tree-toggle.collapsed .arrow{transform:rotate(-90deg)}
+.tree-toggle.collapsed+.tree-group{max-height:0!important;padding:0}
+
+@keyframes breathe{0%,100%{box-shadow:0 0 4px var(--green)}50%{box-shadow:0 0 12px var(--green),0 0 24px rgba(0,230,118,.2)}}
+
+/* === CENTER PANEL === */
+.panel-center{position:relative;overflow:hidden;background:radial-gradient(ellipse at center,rgba(0,229,255,.03) 0%,rgba(0,229,255,.01) 40%,transparent 70%),repeating-conic-gradient(rgba(255,255,255,.01) 0deg 1deg,transparent 1deg 30deg),radial-gradient(circle at center,transparent 20%,rgba(42,58,90,.15) 21%,transparent 22%,transparent 40%,rgba(42,58,90,.1) 41%,transparent 42%,transparent 60%,rgba(42,58,90,.08) 61%,transparent 62%,transparent 80%,rgba(42,58,90,.05) 81%,transparent 82%)}
+.orch-map{width:100%;height:100%;position:relative}
+
+/* SVG connections */
+.orch-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.conn-line{stroke:var(--border);stroke-width:1;stroke-dasharray:6 4;opacity:.5}
+.conn-line.active{stroke:var(--cyan);opacity:.7;stroke-dasharray:6 4;animation:dashFlow 1.5s linear infinite}
+@keyframes dashFlow{to{stroke-dashoffset:-20}}
+
+/* Nodes */
+.map-node{position:absolute;transform:translate(-50%,-50%);cursor:pointer;text-align:center;transition:all .3s;z-index:2}
+.map-node:hover{z-index:10;transform:translate(-50%,-50%) scale(1.12)}
+.node-circle{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;margin:0 auto;position:relative;transition:all .3s}
+.node-circle::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid transparent;transition:all .3s}
+.map-node:hover .node-circle::after{border-color:var(--cyan);box-shadow:0 0 16px rgba(0,229,255,.3)}
+.node-name{font-size:9px;margin-top:4px;color:var(--dim);white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis}
+.node-count{font-size:8px;color:var(--amber);margin-top:1px}
+
+/* CEO node */
+.node-ceo .node-circle{width:64px;height:64px;background:linear-gradient(135deg,#0a0e1a,#1a2235);border:2px solid var(--cyan);color:var(--cyan);font-size:14px;box-shadow:0 0 30px rgba(0,229,255,.25),inset 0 0 20px rgba(0,229,255,.05);animation:ceoGlow 3s ease-in-out infinite}
+@keyframes ceoGlow{0%,100%{box-shadow:0 0 20px rgba(0,229,255,.2),inset 0 0 15px rgba(0,229,255,.05)}50%{box-shadow:0 0 40px rgba(0,229,255,.4),inset 0 0 25px rgba(0,229,255,.1)}}
+
+/* VP nodes */
+.node-vp .node-circle{width:48px;height:48px;background:linear-gradient(135deg,#1a1040,#1a2235);border:2px solid var(--purple);color:var(--purple);font-size:11px;box-shadow:0 0 16px rgba(179,136,255,.2)}
+
+/* Director nodes */
+.node-dir .node-circle{width:36px;height:36px;background:var(--card);border:1.5px solid var(--border);color:var(--text);font-size:9px}
+.node-dir.has-tasks .node-circle{border-color:var(--green);box-shadow:0 0 10px rgba(0,230,118,.2);animation:dirPulse 2.5s ease-in-out infinite}
+@keyframes dirPulse{0%,100%{box-shadow:0 0 6px rgba(0,230,118,.15)}50%{box-shadow:0 0 14px rgba(0,230,118,.3)}}
+
+/* Heartbeat wave */
+.heartbeat-wave{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-radius:50%;border:1px solid var(--cyan);opacity:0;pointer-events:none;z-index:1}
+.heartbeat-wave.animate{animation:hbWave 3s ease-out forwards}
+@keyframes hbWave{0%{width:0;height:0;opacity:.6;border-width:2px}100%{width:800px;height:800px;opacity:0;border-width:0.5px}}
+
+/* Task dot */
+.task-dot{position:absolute;width:6px;height:6px;border-radius:50%;z-index:5;pointer-events:none}
+.task-dot.dispatch{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.task-dot.success{background:var(--green);box-shadow:0 0 10px var(--green)}
+.task-dot.revision{background:var(--red);box-shadow:0 0 10px var(--red)}
+
+/* Tooltip */
+.tooltip{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:11px;z-index:20;pointer-events:none;opacity:0;transition:opacity .15s;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:220px}
+.tooltip.show{opacity:1}
+.tooltip .tt-title{font-weight:700;color:var(--cyan);margin-bottom:4px}
+.tooltip .tt-line{color:var(--dim);margin-bottom:2px}
+
+/* === RIGHT PANEL === */
+.panel-right{border-left:1px solid var(--border);display:flex;flex-direction:column;background:rgba(17,24,39,.4);overflow:hidden}
+.feed-header{padding:12px 16px;border-bottom:1px solid var(--border)}
+.feed-list{flex:1;overflow-y:auto;padding:8px 12px}
+.feed-list::-webkit-scrollbar{width:4px}
+.feed-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.feed-item{padding:6px 8px;border-radius:6px;font-size:11px;display:flex;gap:8px;animation:feedIn .3s ease;margin-bottom:2px;transition:background .2s}
+.feed-item:hover{background:rgba(255,255,255,.03)}
+@keyframes feedIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.feed-time{color:var(--dim);font-family:'Courier New',monospace;font-size:9px;flex-shrink:0;min-width:44px}
+.feed-msg{line-height:1.4}
+.feed-dispatch{color:var(--cyan)}
+.feed-execute{color:var(--amber)}
+.feed-complete{color:var(--green)}
+.feed-quality{color:var(--purple)}
+.feed-budget{color:var(--amber)}
+.feed-system{color:var(--dim)}
+
+/* === FOOTER === */
+.footer{display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 16px;border-top:1px solid var(--border);background:rgba(17,24,39,.6);flex-wrap:nowrap;overflow:hidden}
+.pipe-stage{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:8px;font-size:11px;font-weight:600;border:1px solid var(--border)}
+.pipe-arrow{color:var(--dim);font-size:14px;animation:arrowPulse 2s ease-in-out infinite}
+@keyframes arrowPulse{0%,100%{opacity:.4}50%{opacity:1}}
+.pipe-backlog{border-color:#4a5568;color:#8896b3}
+.pipe-todo{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,.05)}
+.pipe-progress{border-color:var(--amber);color:var(--amber);background:rgba(255,171,0,.05)}
+.pipe-review{border-color:var(--purple);color:var(--purple);background:rgba(179,136,255,.05)}
+.pipe-done{border-color:var(--green);color:var(--green);background:rgba(0,230,118,.05)}
+.footer-sep{width:1px;height:20px;background:var(--border);margin:0 8px}
+.footer-stat{font-size:11px;color:var(--dim)}
+.footer-stat b{color:var(--text);font-weight:600}
+
+/* Scanline effect */
+.scanline{position:fixed;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.15),transparent);z-index:100;pointer-events:none;animation:scanline 8s linear infinite}
+@keyframes scanline{0%{transform:translateY(-2px)}100%{transform:translateY(100vh)}}
+</style></head><body>
+
+<div class="scanline"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">DARIO <span>Orchestrator</span> — Agent Command Center</div>
+  <div class="hdr-badges">
+    <div class="hdr-badge" style="background:rgba(0,229,255,.1);color:var(--cyan);border:1px solid rgba(0,229,255,.3)"><span class="pulse-dot"></span> Pulse: active</div>
+    <div class="hdr-badge" style="background:rgba(179,136,255,.1);color:var(--purple);border:1px solid rgba(179,136,255,.3)">Agents: 131</div>
+    <div class="hdr-badge" style="background:rgba(255,171,0,.1);color:var(--amber);border:1px solid rgba(255,171,0,.3)">Tasks: 6</div>
+    <div class="hdr-badge" style="background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.3)">Budget: 0.3%</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT: Agent Hierarchy -->
+  <div class="panel-left">
+    <div class="panel-title">Agent Hierarchy</div>
+    <div id="tree"></div>
+  </div>
+
+  <!-- CENTER: Orchestration Map -->
+  <div class="panel-center">
+    <div class="orch-map" id="orchMap">
+      <svg class="orch-svg" id="orchSvg"></svg>
+      <div id="mapNodes"></div>
+      <div id="heartbeatContainer"></div>
+    </div>
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+
+  <!-- RIGHT: Activity Feed -->
+  <div class="panel-right">
+    <div class="feed-header">
+      <div class="panel-title" style="margin-bottom:0">Live Activity Feed</div>
+    </div>
+    <div class="feed-list" id="feedList"></div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="pipe-stage pipe-backlog">backlog: <b>0</b></div>
+  <span class="pipe-arrow">&#10132;</span>
+  <div class="pipe-stage pipe-todo">todo: <b id="fTodo">0</b></div>
+  <span class="pipe-arrow">&#10132;</span>
+  <div class="pipe-stage pipe-progress">in_progress: <b id="fProg">0</b></div>
+  <span class="pipe-arrow">&#10132;</span>
+  <div class="pipe-stage pipe-review">in_review: <b id="fRev">0</b></div>
+  <span class="pipe-arrow">&#10132;</span>
+  <div class="pipe-stage pipe-done">done: <b id="fDone">6</b></div>
+  <div class="footer-sep"></div>
+  <div class="footer-stat">Quality: <b style="color:var(--green)">88.3</b></div>
+  <div class="footer-sep"></div>
+  <div class="footer-stat">Budget: <b style="color:var(--green)">0.3%</b></div>
+  <div class="footer-sep"></div>
+  <div class="footer-stat">Last pulse: <b id="lastPulse">--:--</b></div>
+</div>
+
+<script>
+// ==================== DATA ====================
+const hierarchy = [
+  { id:'ceo', name:'D.A.R.I.O.', title:'CEO', type:'ceo', status:'active', children:[
+    { id:'diva-vp', name:'D.I.V.A.', title:'VP Architecture', type:'vp', status:'idle', children:[
+      { id:'dir-design', name:'Design Dir', title:'Director of Design', type:'dir', status:'idle', workers:10, children:[] },
+      { id:'dir-construction', name:'Construction Dir', title:'Director of Construction', type:'dir', status:'idle', workers:10, children:[] },
+      { id:'dir-regulatory', name:'Regulatory Dir', title:'Director of Regulatory', type:'dir', status:'idle', workers:2, children:[] }
+    ]},
+    { id:'lucas-vp', name:'L.U.C.A.S.', title:'VP Operations', type:'vp', status:'active', children:[
+      { id:'dir-cost-control', name:'Cost Control Dir', title:'Director of Cost Control', type:'dir', status:'idle', workers:4, children:[] },
+      { id:'dir-quality', name:'Quality Dir', title:'Director of Quality', type:'dir', status:'idle', workers:4, children:[] },
+      { id:'dir-monitoring', name:'Monitoring Dir', title:'Director of Monitoring', type:'dir', status:'active', workers:4, children:[] },
+      { id:'dir-analytics', name:'Analytics Dir', title:'Director of Analytics', type:'dir', status:'idle', workers:4, children:[] },
+      { id:'dir-saas-eng', name:'SaaS Eng Dir', title:'Director of SaaS Engineering', type:'dir', status:'idle', workers:4, children:[] },
+      { id:'dir-accounting', name:'Accounting Dir', title:'Director of Accounting', type:'dir', status:'idle', workers:3, children:[] }
+    ]},
+    { id:'a360-vp', name:'Accelera 360', title:'VP Business Accel', type:'vp', status:'idle', children:[
+      { id:'dir-a360-research', name:'A360 Research Dir', title:'Director of Research', type:'dir', status:'idle', workers:3, children:[] },
+      { id:'dir-a360-production', name:'A360 Production Dir', title:'Director of Production', type:'dir', status:'idle', workers:5, children:[] }
+    ]},
+    { id:'dir-marketing', name:'Marketing Dir', title:'Director of Marketing', type:'dir', status:'active', workers:12, children:[] },
+    { id:'dir-technical', name:'Technical Dir', title:'Director of Technical', type:'dir', status:'idle', workers:7, children:[] },
+    { id:'dir-seo', name:'SEO Dir', title:'Director of SEO', type:'dir', status:'active', workers:16, children:[] },
+    { id:'dir-finance', name:'Finance Dir', title:'Director of Finance', type:'dir', status:'idle', workers:3, children:[] },
+    { id:'dir-legal', name:'Legal Dir', title:'Director of Legal', type:'dir', status:'idle', workers:1, children:[] },
+    { id:'dir-hr', name:'HR Dir', title:'Director of HR', type:'dir', status:'idle', workers:1, children:[] },
+    { id:'dir-content', name:'Content Dir', title:'Director of Content', type:'dir', status:'idle', workers:2, children:[] },
+    { id:'dir-support', name:'Support Dir', title:'Director of Support', type:'dir', status:'idle', workers:1, children:[] },
+    { id:'dir-product', name:'Product Dir', title:'Director of Product', type:'dir', status:'idle', workers:1, children:[] },
+    { id:'dir-pr', name:'PR Dir', title:'Director of PR', type:'dir', status:'idle', workers:1, children:[] },
+    { id:'dir-client-success', name:'Client Success Dir', title:'Director of Client Success', type:'dir', status:'idle', workers:3, children:[] }
+  ]}
+];
+
+const feedEvents = [
+  { type:'system', msg:'Heartbeat pulse initiated - scanning taskboard' },
+  { type:'dispatch', msg:'CEO dispatched MNB-001 \u2192 worker-brand' },
+  { type:'execute', msg:'worker-brand executing (dario-brand)' },
+  { type:'complete', msg:'worker-brand completed MNB-001 \u2014 score: 92/100 \u2713' },
+  { type:'quality', msg:'Quality: success_pattern extracted for brand_positioning' },
+  { type:'budget', msg:'Budget: +12,400 tokens (0.05% total)' },
+  { type:'system', msg:'CEO unblocked MNB-002, MNB-003 (dependencies resolved)' },
+  { type:'dispatch', msg:'Dispatch: MNB-002 \u2192 worker-naming' },
+  { type:'dispatch', msg:'Dispatch: MNB-003 \u2192 worker-seo-local' },
+  { type:'execute', msg:'worker-naming executing (dario-naming)' },
+  { type:'execute', msg:'worker-seo-local executing (seo-local)' },
+  { type:'complete', msg:'worker-naming completed MNB-002 \u2014 score: 88/100 \u2713' },
+  { type:'quality', msg:'Quality: 5-dim rubric applied \u2014 Specificity:18 Action:17 Complete:18 Acc:18 Tone:17' },
+  { type:'complete', msg:'worker-seo-local completed MNB-003 \u2014 score: 85/100 \u2713' },
+  { type:'budget', msg:'Budget: +18,200 tokens (0.09% total)' },
+  { type:'dispatch', msg:'Dispatch: MNB-004 \u2192 worker-story-circle' },
+  { type:'dispatch', msg:'Dispatch: MNB-005 \u2192 worker-seo-plan' },
+  { type:'execute', msg:'worker-story-circle executing (dario-story-circle)' },
+  { type:'execute', msg:'worker-seo-plan executing (seo-plan)' },
+  { type:'complete', msg:'worker-story-circle completed MNB-004 \u2014 score: 90/100 \u2713' },
+  { type:'complete', msg:'worker-seo-plan completed MNB-005 \u2014 score: 86/100 \u2713' },
+  { type:'quality', msg:'Quality avg updated: 88.3 across 5 tasks' },
+  { type:'budget', msg:'Budget: +22,600 tokens (0.14% total)' },
+  { type:'dispatch', msg:'Dispatch: MNB-006 \u2192 dario-ceo (synthesis)' },
+  { type:'execute', msg:'CEO executing final synthesis for Mar & Brasa' },
+  { type:'complete', msg:'MNB-006 completed \u2014 all 6 deliverables packaged \u2713' },
+  { type:'system', msg:'Project mar-brasa: 6/6 tasks done \u2014 100% complete' },
+  { type:'budget', msg:'Budget total: 160,000 tokens (0.3%) \u2014 well under limit' },
+  { type:'quality', msg:'Project quality: 88.3 avg \u2014 all above auto-approve threshold' },
+  { type:'system', msg:'Heartbeat complete \u2014 next pulse in 30 min' },
+  { type:'system', msg:'RAG health: OK \u2014 88 sources, 1215 chunks active' },
+  { type:'system', msg:'LUCAS monitoring: 0 stale tasks, 0 alerts pending' },
+  { type:'system', msg:'Obsidian sync: D.A.R.I.O vault OK, D.I.V.A vault OK' },
+  { type:'dispatch', msg:'Scheduled: daily_standup at 09:00 Lisbon time' },
+  { type:'quality', msg:'Skill metrics updated: dario-brand \u2192 Tier S (avg 92.0)' },
+  { type:'budget', msg:'Model routing: Opus for critical, Sonnet for standard \u2014 optimal' },
+  { type:'system', msg:'Agent memory synced: 5 project files, 131 entities' },
+];
+
+// ==================== TREE VIEW ====================
+function renderTree() {
+  const container = document.getElementById('tree');
+  container.innerHTML = buildTreeHTML(hierarchy[0], 0, true);
+  container.querySelectorAll('.tree-toggle').forEach(el => {
+    el.addEventListener('click', () => {
+      el.classList.toggle('collapsed');
+      const group = el.nextElementSibling;
+      if (group && group.classList.contains('tree-group')) {
+        if (el.classList.contains('collapsed')) {
+          group.style.maxHeight = '0';
+        } else {
+          group.style.maxHeight = group.scrollHeight + 'px';
+        }
+      }
+    });
+  });
+  container.querySelectorAll('.tree-node').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = el.dataset.id;
+      highlightNode(id);
+      container.querySelectorAll('.tree-node').forEach(n => n.classList.remove('active'));
+      el.classList.add('active');
+    });
+  });
+}
+
+function buildTreeHTML(node, depth, isLast) {
+  const dotClass = node.status === 'active' ? 'dot-active' : (node.status === 'idle' ? 'dot-idle' : 'dot-off');
+  const indent = '<span class="tree-indent"></span>'.repeat(Math.max(0, depth - 1));
+  const branch = depth === 0 ? '' : `<span class="tree-branch">${isLast ? '\u2514' : '\u251C'}</span>`;
+  const badge = node.workers ? `<span class="node-badge">${node.workers}w</span>` : '';
+  const hasChildren = node.children && node.children.length > 0;
+  let html = '';
+
+  if (hasChildren) {
+    html += `<div class="tree-toggle" style="padding-left:${depth>0?4:0}px">`;
+    html += `<div class="tree-node" data-id="${node.id}">${indent}${branch}<span class="arrow">\u25BC</span><span class="node-dot ${dotClass}"></span><span class="node-label">${node.name}</span>${badge}</div>`;
+    html += `</div>`;
+    html += `<div class="tree-group" style="max-height:1000px">`;
+    node.children.forEach((child, i) => {
+      html += buildTreeHTML(child, depth + 1, i === node.children.length - 1);
+    });
+    html += `</div>`;
+  } else {
+    html += `<div style="padding-left:${depth>0?4:0}px">`;
+    html += `<div class="tree-node" data-id="${node.id}">${indent}${branch}<span style="width:12px;display:inline-block"></span><span class="node-dot ${dotClass}"></span><span class="node-label">${node.name}</span>${badge}</div>`;
+    html += `</div>`;
+  }
+  return html;
+}
+
+// ==================== ORCHESTRATION MAP ====================
+const mapNodeData = [];
+let mapW, mapH, cx, cy;
+
+function layoutMap() {
+  const panel = document.querySelector('.panel-center');
+  mapW = panel.clientWidth;
+  mapH = panel.clientHeight;
+  cx = mapW / 2;
+  cy = mapH / 2;
+  mapNodeData.length = 0;
+
+  // CEO center
+  mapNodeData.push({ id:'ceo', x:cx, y:cy, type:'ceo', name:'D.A.R.I.O.', label:'CEO', title:'Chief Executive Officer', status:'active' });
+
+  // VPs ring (adaptive — fills space but caps at max)
+  const baseR = Math.min(mapW * 0.45, mapH * 0.45, 420);
+  const vpRx = baseR * 0.52;
+  const vpRy = baseR * 0.52;
+  const vps = [
+    { id:'diva-vp', name:'D.I.V.A.', label:'DIVA', title:'VP Architecture & Design', status:'idle' },
+    { id:'lucas-vp', name:'L.U.C.A.S.', label:'LUCAS', title:'VP Operations & Intelligence', status:'active' },
+    { id:'a360-vp', name:'Accelera 360', label:'A360', title:'VP Business Acceleration', status:'idle' }
+  ];
+  vps.forEach((vp, i) => {
+    const angle = -Math.PI/2 + (i * 2 * Math.PI / 3);
+    mapNodeData.push({ ...vp, x: cx + vpRx * Math.cos(angle), y: cy + vpRy * Math.sin(angle), type:'vp' });
+  });
+
+  // Directors ring (adaptive — same base)
+  const dirRx = baseR * 0.95;
+  const dirRy = baseR * 0.92;
+  const dirs = [
+    // DIVA directors
+    { id:'dir-design', name:'Design', label:'DES', parent:'diva-vp', workers:10, status:'idle', title:'Director of Design' },
+    { id:'dir-construction', name:'Construction', label:'CON', parent:'diva-vp', workers:10, status:'idle', title:'Director of Construction' },
+    { id:'dir-regulatory', name:'Regulatory', label:'REG', parent:'diva-vp', workers:2, status:'idle', title:'Director of Regulatory' },
+    // LUCAS directors
+    { id:'dir-cost-control', name:'Cost Ctrl', label:'CST', parent:'lucas-vp', workers:4, status:'idle', title:'Director of Cost Control' },
+    { id:'dir-quality', name:'Quality', label:'QUA', parent:'lucas-vp', workers:4, status:'idle', title:'Director of Quality' },
+    { id:'dir-monitoring', name:'Monitoring', label:'MON', parent:'lucas-vp', workers:4, status:'active', title:'Director of Monitoring' },
+    { id:'dir-analytics', name:'Analytics', label:'ANA', parent:'lucas-vp', workers:4, status:'idle', title:'Director of Analytics' },
+    { id:'dir-saas-eng', name:'SaaS Eng', label:'SAS', parent:'lucas-vp', workers:4, status:'idle', title:'Director of SaaS Eng' },
+    { id:'dir-accounting', name:'Accounting', label:'ACC', parent:'lucas-vp', workers:3, status:'idle', title:'Director of Accounting' },
+    // A360 directors
+    { id:'dir-a360-research', name:'A360 Research', label:'RES', parent:'a360-vp', workers:3, status:'idle', title:'Director of Research' },
+    { id:'dir-a360-production', name:'A360 Prod', label:'PRD', parent:'a360-vp', workers:5, status:'idle', title:'Director of Production' },
+    // CEO direct directors
+    { id:'dir-marketing', name:'Marketing', label:'MKT', parent:'ceo', workers:12, status:'active', title:'Director of Marketing' },
+    { id:'dir-technical', name:'Technical', label:'TEC', parent:'ceo', workers:7, status:'idle', title:'Director of Technical' },
+    { id:'dir-seo', name:'SEO', label:'SEO', parent:'ceo', workers:16, status:'active', title:'Director of SEO' },
+    { id:'dir-finance', name:'Finance', label:'FIN', parent:'ceo', workers:3, status:'idle', title:'Director of Finance' },
+    { id:'dir-legal', name:'Legal', label:'LEG', parent:'ceo', workers:1, status:'idle', title:'Director of Legal' },
+    { id:'dir-hr', name:'HR', label:'HR', parent:'ceo', workers:1, status:'idle', title:'Director of HR' },
+    { id:'dir-content', name:'Content', label:'CNT', parent:'ceo', workers:2, status:'idle', title:'Director of Content' },
+    { id:'dir-support', name:'Support', label:'SUP', parent:'ceo', workers:1, status:'idle', title:'Director of Support' },
+    { id:'dir-product', name:'Product', label:'PRO', parent:'ceo', workers:1, status:'idle', title:'Director of Product' },
+    { id:'dir-pr', name:'PR', label:'PR', parent:'ceo', workers:1, status:'idle', title:'Director of PR' },
+    { id:'dir-client-success', name:'Client Suc', label:'CLI', parent:'ceo', workers:3, status:'idle', title:'Director of Client Success' }
+  ];
+
+  dirs.forEach((d, i) => {
+    const angle = -Math.PI/2 + (i * 2 * Math.PI / dirs.length);
+    mapNodeData.push({
+      ...d,
+      x: cx + dirRx * Math.cos(angle),
+      y: cy + dirRy * Math.sin(angle),
+      type:'dir'
+    });
+  });
+
+  renderMapNodes();
+  renderConnections();
+}
+
+function renderMapNodes() {
+  const container = document.getElementById('mapNodes');
+  container.innerHTML = '';
+  mapNodeData.forEach(n => {
+    const div = document.createElement('div');
+    div.className = `map-node node-${n.type}${n.status==='active'?' has-tasks':''}`;
+    div.id = `mn-${n.id}`;
+    div.style.left = n.x + 'px';
+    div.style.top = n.y + 'px';
+
+    let inner = `<div class="node-circle">${n.label || n.name.substring(0,3).toUpperCase()}</div>`;
+    inner += `<div class="node-name">${n.name}</div>`;
+    if (n.workers) inner += `<div class="node-count">${n.workers} workers</div>`;
+    div.innerHTML = inner;
+
+    div.addEventListener('mouseenter', (e) => showTooltip(e, n));
+    div.addEventListener('mouseleave', hideTooltip);
+    container.appendChild(div);
+  });
+}
+
+function renderConnections() {
+  const svg = document.getElementById('orchSvg');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  mapNodeData.forEach(n => {
+    if (n.type === 'ceo') return;
+    const parentId = n.parent || (n.type === 'vp' ? 'ceo' : null);
+    if (!parentId) return;
+    const parent = mapNodeData.find(p => p.id === parentId);
+    if (!parent) return;
+
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', parent.x);
+    line.setAttribute('y1', parent.y);
+    line.setAttribute('x2', n.x);
+    line.setAttribute('y2', n.y);
+    line.classList.add('conn-line');
+    if (n.status === 'active' || parent.status === 'active') line.classList.add('active');
+    svg.appendChild(line);
+  });
+}
+
+// ==================== TOOLTIP ====================
+const tooltip = document.getElementById('tooltip');
+function showTooltip(e, node) {
+  const statusLabel = node.status === 'active' ? '<span style="color:var(--green)">ACTIVE</span>' : '<span style="color:var(--dim)">IDLE</span>';
+  let html = `<div class="tt-title">${node.name}</div>`;
+  html += `<div class="tt-line">${node.title || node.type.toUpperCase()}</div>`;
+  html += `<div class="tt-line">Status: ${statusLabel}</div>`;
+  if (node.workers) html += `<div class="tt-line">Workers: ${node.workers}</div>`;
+  if (node.id === 'ceo') html += `<div class="tt-line">Heartbeat: 30 min</div><div class="tt-line">131 entities managed</div>`;
+  if (node.id === 'lucas-vp') html += `<div class="tt-line">Heartbeat: 15 min</div><div class="tt-line">Budget enforcement: ON</div>`;
+  if (node.id === 'dir-marketing') html += `<div class="tt-line">Active: worker-brand, worker-naming</div>`;
+  if (node.id === 'dir-seo') html += `<div class="tt-line">Active: worker-seo-local, worker-seo-plan</div>`;
+  tooltip.innerHTML = html;
+  tooltip.classList.add('show');
+
+  const rect = document.querySelector('.panel-center').getBoundingClientRect();
+  let tx = e.clientX - rect.left + 12;
+  let ty = e.clientY - rect.top + 12;
+  if (tx + 220 > rect.width) tx = e.clientX - rect.left - 230;
+  if (ty + 120 > rect.height) ty = e.clientY - rect.top - 130;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+}
+function hideTooltip() { tooltip.classList.remove('show'); }
+
+// ==================== HEARTBEAT ====================
+function fireHeartbeat() {
+  const container = document.getElementById('heartbeatContainer');
+  const wave = document.createElement('div');
+  wave.className = 'heartbeat-wave animate';
+  wave.style.left = cx + 'px';
+  wave.style.top = cy + 'px';
+  container.appendChild(wave);
+  setTimeout(() => wave.remove(), 3100);
+}
+setInterval(fireHeartbeat, 4500);
+setTimeout(fireHeartbeat, 500);
+
+// ==================== TASK DOTS ====================
+function fireTaskDot(fromId, toId, type) {
+  const from = mapNodeData.find(n => n.id === fromId);
+  const to = mapNodeData.find(n => n.id === toId);
+  if (!from || !to) return;
+
+  const dot = document.createElement('div');
+  dot.className = `task-dot ${type}`;
+  dot.style.left = from.x + 'px';
+  dot.style.top = from.y + 'px';
+  document.getElementById('mapNodes').appendChild(dot);
+
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const dur = 1200;
+  const start = performance.now();
+
+  function animate(now) {
+    const t = Math.min((now - start) / dur, 1);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+    dot.style.left = (from.x + dx * ease) + 'px';
+    dot.style.top = (from.y + dy * ease) + 'px';
+    if (t < 1) requestAnimationFrame(animate);
+    else {
+      dot.style.transition = 'opacity .3s';
+      dot.style.opacity = '0';
+      setTimeout(() => dot.remove(), 300);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+// Cycle through task dot animations
+const dotSequences = [
+  { from:'ceo', to:'dir-marketing', type:'dispatch' },
+  { from:'dir-marketing', to:'dir-seo', type:'dispatch' },
+  { from:'dir-seo', to:'ceo', type:'success' },
+  { from:'ceo', to:'lucas-vp', type:'dispatch' },
+  { from:'lucas-vp', to:'dir-monitoring', type:'dispatch' },
+  { from:'dir-monitoring', to:'lucas-vp', type:'success' },
+  { from:'lucas-vp', to:'ceo', type:'success' },
+  { from:'ceo', to:'diva-vp', type:'dispatch' },
+  { from:'diva-vp', to:'dir-design', type:'dispatch' },
+  { from:'dir-design', to:'diva-vp', type:'success' },
+  { from:'ceo', to:'dir-marketing', type:'dispatch' },
+  { from:'dir-marketing', to:'ceo', type:'revision' },
+  { from:'ceo', to:'a360-vp', type:'dispatch' },
+  { from:'a360-vp', to:'dir-a360-research', type:'dispatch' },
+  { from:'dir-a360-research', to:'a360-vp', type:'success' },
+  { from:'a360-vp', to:'ceo', type:'success' },
+];
+let dotIdx = 0;
+setInterval(() => {
+  const seq = dotSequences[dotIdx % dotSequences.length];
+  fireTaskDot(seq.from, seq.to, seq.type);
+  dotIdx++;
+}, 2200);
+
+// ==================== ACTIVITY FEED ====================
+const feedList = document.getElementById('feedList');
+let feedIdx = 0;
+let feedHour = 14, feedMin = 30, feedSec = 0;
+
+function addFeedItem() {
+  const ev = feedEvents[feedIdx % feedEvents.length];
+  feedIdx++;
+
+  feedSec += Math.floor(Math.random() * 4) + 1;
+  if (feedSec >= 60) { feedSec -= 60; feedMin++; }
+  if (feedMin >= 60) { feedMin -= 60; feedHour++; }
+  if (feedHour >= 24) feedHour = 0;
+
+  const ts = `${String(feedHour).padStart(2,'0')}:${String(feedMin).padStart(2,'0')}:${String(feedSec).padStart(2,'0')}`;
+
+  const item = document.createElement('div');
+  item.className = 'feed-item';
+  item.innerHTML = `<span class="feed-time">${ts}</span><span class="feed-msg feed-${ev.type}">${ev.msg}</span>`;
+
+  feedList.insertBefore(item, feedList.firstChild);
+
+  // Keep max 50 entries
+  while (feedList.children.length > 50) {
+    feedList.removeChild(feedList.lastChild);
+  }
+}
+
+// Seed initial items
+for (let i = 0; i < 8; i++) addFeedItem();
+setInterval(addFeedItem, 2500);
+
+// ==================== HIGHLIGHT ====================
+function highlightNode(id) {
+  document.querySelectorAll('.map-node').forEach(n => {
+    n.style.filter = '';
+    n.style.opacity = '';
+  });
+  const target = document.getElementById(`mn-${id}`);
+  if (target) {
+    document.querySelectorAll('.map-node').forEach(n => {
+      n.style.opacity = '0.3';
+      n.style.filter = 'grayscale(0.5)';
+    });
+    target.style.opacity = '1';
+    target.style.filter = 'brightness(1.3) drop-shadow(0 0 12px rgba(0,229,255,.5))';
+
+    // Also highlight parent/children connections
+    const node = mapNodeData.find(n => n.id === id);
+    if (node) {
+      // Highlight parent
+      const parentId = node.parent || (node.type === 'vp' ? 'ceo' : null);
+      if (parentId) {
+        const pel = document.getElementById(`mn-${parentId}`);
+        if (pel) { pel.style.opacity = '1'; pel.style.filter = ''; }
+      }
+      // Highlight children
+      mapNodeData.filter(n => n.parent === id || (id === 'ceo' && n.type === 'vp')).forEach(child => {
+        const cel = document.getElementById(`mn-${child.id}`);
+        if (cel) { cel.style.opacity = '1'; cel.style.filter = ''; }
+      });
+    }
+
+    // Reset after 3s
+    setTimeout(() => {
+      document.querySelectorAll('.map-node').forEach(n => {
+        n.style.filter = '';
+        n.style.opacity = '';
+      });
+    }, 3000);
+  }
+}
+
+// ==================== CLOCK ====================
+function updateClock() {
+  const now = new Date();
+  document.getElementById('lastPulse').textContent = now.toLocaleTimeString('pt-PT', { hour:'2-digit', minute:'2-digit' });
+}
+updateClock();
+setInterval(updateClock, 30000);
+
+// ==================== PIPELINE ANIMATION ====================
+let pipeState = { todo:0, prog:0, rev:0, done:6 };
+const pipeSequences = [
+  { todo:3, prog:0, rev:0, done:6 },
+  { todo:2, prog:1, rev:0, done:6 },
+  { todo:1, prog:2, rev:0, done:6 },
+  { todo:0, prog:2, rev:1, done:6 },
+  { todo:0, prog:1, rev:1, done:7 },
+  { todo:0, prog:1, rev:0, done:8 },
+  { todo:0, prog:0, rev:1, done:8 },
+  { todo:0, prog:0, rev:0, done:9 },
+  { todo:0, prog:0, rev:0, done:6 },
+];
+let pipeIdx = 0;
+setInterval(() => {
+  pipeState = pipeSequences[pipeIdx % pipeSequences.length];
+  pipeIdx++;
+  document.getElementById('fTodo').textContent = pipeState.todo;
+  document.getElementById('fProg').textContent = pipeState.prog;
+  document.getElementById('fRev').textContent = pipeState.rev;
+  document.getElementById('fDone').textContent = pipeState.done;
+}, 5000);
+
+// ==================== INIT ====================
+window.addEventListener('load', () => {
+  renderTree();
+  layoutMap();
+});
+window.addEventListener('resize', layoutMap);
+
+// Deselect on map click
+document.querySelector('.panel-center').addEventListener('click', (e) => {
+  if (e.target.closest('.map-node')) return;
+  document.querySelectorAll('.map-node').forEach(n => {
+    n.style.filter = '';
+    n.style.opacity = '';
+  });
+  document.querySelectorAll('.tree-node').forEach(n => n.classList.remove('active'));
+});
+</script>
+</body></html>

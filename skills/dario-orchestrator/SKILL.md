@@ -1,0 +1,639 @@
+---
+name: dario-orchestrator
+description: "Paperclip-inspired control plane for the DARIO + DIVA ecosystem. Orchestrates agents, skills, squads, and services using heartbeats, atomic task checkout, execution policies, and budget controls. Triggers on: 'orchestrate', 'planeia', 'decompoe', 'coordena', 'delega', 'orquestra', 'paperclip mode', 'control plane', 'quem faz o que', 'organiza o trabalho'."
+license: MIT
+---
+
+# DARIO Orchestrator — Paperclip-Inspired Control Plane
+
+The central nervous system of the DARIO + DIVA ecosystem. This skill transforms ad-hoc skill invocation into structured, auditable, budget-aware orchestration using patterns from Paperclip AI.
+
+## Core Principles
+
+1. **Orchestration, not execution** — The orchestrator coordinates; workers execute
+2. **Discrete heartbeats** — Work happens in bounded execution windows, not continuous loops
+3. **Atomic task checkout** — One agent owns a task at a time; no duplicate work
+4. **Execution policies** — Quality gates (comment, review, approval) enforced at runtime
+5. **Transparency** — Every action logged to audit trail; every delegation explained
+6. **Budget awareness** — Token spend tracked per project and agent
+
+## When to activate
+
+- User brings a complex, multi-step project (not a single tactical task)
+- User says "orchestrate", "planeia", "decompoe", "coordena", "delega", "orquestra"
+- User wants to understand or control how work flows across agents
+- User asks "quem faz o que" or "organiza o trabalho"
+- Start of any ambitious initiative spanning multiple skills/squads
+- When the user explicitly invokes `/dario-orchestrator`
+
+Do NOT activate when:
+- Single tactical task (just invoke the specific skill directly)
+- Quick question or status check
+- User already knows exactly which skill to run
+
+## Architecture Overview
+
+```
+User Request
+    |
+    v
+[DARIO CEO — Orchestrator]
+    |
+    ├── 1. UNDERSTAND — Parse intent, gather context
+    ├── 2. DECOMPOSE — Break into atomic tasks
+    ├── 3. DISPATCH — Route each task to right agent/skill
+    ├── 4. EXECUTE — Workers run in heartbeat windows
+    ├── 5. REVIEW — Execution policies enforced
+    ├── 6. SYNTHESIZE — Combine outputs into deliverable
+    └── 7. AUDIT — Log everything, update budget
+```
+
+## Workflow
+
+### Phase 0: VALIDATE (Pre-flight Checks)
+
+Before any decomposition or execution, run these validation checks:
+
+**1. Circular Dependency Detection:**
+```
+For each task in the project:
+  visited = set()
+  stack = [task]
+  while stack:
+    current = stack.pop()
+    if current in visited:
+      ABORT — circular dependency detected: {chain}
+    visited.add(current)
+    stack.extend(current.depends_on)
+```
+If circular dependency found → report to user with the full cycle chain. DO NOT proceed.
+
+**2. Worker Availability Check:**
+```
+For each task to dispatch:
+  worker = lookup(task.skill) in company.yaml workers section
+  active_tasks = count tasks in active/ where assignee == worker AND status == "in_progress"
+  if active_tasks > 0:
+    FLAG — worker busy. Queue task or find fallback.
+```
+
+**3. Budget Pre-check:**
+Read `~/.claude/orchestrator/budgets/YYYY-MM.yaml`:
+- If `percentage >= 95`: **ABORT** — budget exceeded. Inform user.
+- If `percentage >= 80`: **WARN** — limit to 1 parallel worker (not 3).
+- If budget file doesn't exist: **CREATE** it with defaults.
+
+**4. File Initialization:**
+Ensure all required paths exist before execution:
+```
+~/.claude/orchestrator/tasks/active/     — create if missing
+~/.claude/orchestrator/tasks/done/       — create if missing
+~/.claude/orchestrator/tasks/templates/  — create if missing
+~/.claude/orchestrator/audit/            — create if missing
+~/.claude/orchestrator/budgets/          — create if missing
+~/.claude/orchestrator/quality/          — create if missing
+```
+
+**5. Stale Task Recovery:**
+Scan `tasks/active/` for tasks stuck in `in_progress` for >24h:
+- If found: set status → `blocked`, set `blocked_reason: "stale — no update for >24h"`
+- Add to report for user visibility
+
+### Phase 1: UNDERSTAND
+
+1. **Parse the user request** — What is the end goal? What's the scope?
+2. **RAG consult** (mandatory):
+   ```
+   mcp__dario-rag__search_kb(query: "<extracted keywords>", collection: "dario", limit: 5)
+   ```
+3. **Check agent memory** — Is there existing context for this client/project?
+4. **Load company config** — Read `~/.claude/orchestrator/company.yaml` to understand available agents
+5. **Identify constraints** — Budget, timeline, dependencies, blockers
+
+Output: **Mission Brief** — A structured understanding of what needs to happen.
+
+### Phase 2: DECOMPOSE (Task Breakdown)
+
+Break the mission into **atomic tasks** following Paperclip's issue model:
+
+```yaml
+task:
+  id: "PROJ-001"
+  title: "Descriptive action title"
+  description: "What needs to be done and why"
+  status: "todo"              # backlog | todo | in_progress | in_review | done | blocked
+  priority: "high"            # critical | high | medium | low
+  assignee: null              # Set during dispatch
+  parent: null                # Parent task ID (for hierarchy)
+  project: "client-slug"
+  execution_policy: "default" # default | critical | client_facing | financial
+  estimated_tokens: 5000      # Rough token budget for this task
+  depends_on: []              # Task IDs that must complete first
+  created: "2026-04-26T19:44:00Z"
+```
+
+**Decomposition rules:**
+- Each task maps to ONE skill or squad invocation
+- Tasks must have clear success criteria
+- Dependencies must be explicit (don't assume ordering)
+- Parent tasks group related work; only leaf tasks are executable
+- CRITICO items get `execution_policy: "critical"` automatically
+- Client deliverables get `execution_policy: "client_facing"`
+- **Every task MUST include schema v2 fields:** `revision_max_loops` (from execution_policy), `blocked_reason: null`, `watchers: []`
+- **Every task MUST set `sla_deadline`** based on execution_policy.sla_hours from company.yaml (critical: 1h, client_facing: 4h, financial: 2h, default: 8h). If task is created without going through dispatch, orchestrator sets this directly.
+
+**Save each task** to `~/.claude/orchestrator/tasks/active/PROJ-NNN.yaml`
+
+### Phase 3: DISPATCH (Intelligent Routing)
+
+For each task, determine the best executor:
+
+1. **Read company.yaml** — Match task capabilities to agent capabilities
+2. **Apply routing rules:**
+
+| Task Domain | Primary Agent | Fallback | Parallel Squad |
+|---|---|---|---|
+| Brand/positioning | worker-brand | dir-marketing | Brand Squad |
+| Offer/pricing | worker-offer | dir-marketing | Hormozi Squad |
+| Copy/sales letter | worker-sales-letter | dir-marketing | Copy Squad |
+| Paid traffic | worker-ads | dir-marketing | Traffic Masters |
+| Funnel design | worker-funnel | dir-marketing | Sales Squad |
+| WordPress audit | worker-wp-audit | dir-technical | Cybersecurity Squad |
+| WooCommerce | worker-woo-audit | dir-technical | - |
+| Performance | worker-cwv-fix | dir-technical | - |
+| Security | worker-pentest | dir-technical | Cybersecurity Squad |
+| Full SEO audit | worker-seo-audit | dir-seo | Data Squad |
+| Technical SEO | worker-seo-technical | dir-seo | - |
+| Content SEO | worker-seo-content | dir-seo | - |
+| Local SEO | worker-seo-local | dir-seo | - |
+| AI/GEO | worker-seo-geo | dir-seo | - |
+| Schema | worker-seo-schema | dir-seo | - |
+| Keywords | worker-kw-cluster | dir-seo | - |
+| Financial model | worker-financial-model | dir-finance | CFO Squad |
+| Pricing | worker-pricing-calculator | dir-finance | - |
+| SaaS metrics | worker-saas-metrics | dir-finance | - |
+| Client onboard | worker-client-onboard | dir-client-success | - |
+| Diagnostic | worker-diagnose | dir-client-success | Advisory Board |
+| Interior design | worker-diva-moodboard | dir-design | Interior Design Squad |
+| Materials | worker-diva-materials | dir-design | - |
+| Floor plan | worker-diva-floor-plan | dir-design | Architecture Masters |
+| Renders | worker-diva-render | dir-design | - |
+| Budget (constr.) | worker-diva-budget | dir-construction | Budget Squad |
+| Timeline | worker-diva-timeline | dir-construction | - |
+| Inspection | worker-diva-inspection | dir-construction | - |
+| Contract | worker-diva-contract | dir-construction | - |
+| Licensing | worker-diva-licensing | dir-regulatory | Regulation Squad |
+| Energy cert | worker-diva-energy | dir-regulatory | - |
+
+3. **Assign task** (atomic checkout):
+   - Set `assignee` to the chosen worker ID
+   - Set `status` to `todo`
+   - Set `checked_out_at` timestamp
+   - Only ONE agent can own a task at a time
+
+4. **Plan parallelism:**
+   - Independent tasks run simultaneously via Agent tool
+   - Maximum 3 parallel workers per heartbeat (cost + context)
+   - Tasks with `depends_on` wait for predecessors to reach `done`
+
+### Phase 4: EXECUTE (Heartbeat Windows)
+
+Each execution is a **discrete heartbeat** — a bounded work session:
+
+```
+Heartbeat Execution Flow:
+1. Check identity (which agent am I?)
+2. Review assigned tasks (what's on my plate?)
+3. Pick next task (highest priority, no blockers)
+4. Atomic checkout (claim it)
+5. Execute via skill invocation
+6. Post completion comment (mandatory)
+7. Update task status
+8. Return control to orchestrator
+```
+
+**Execution via Agent tool:**
+```python
+# Single worker execution
+Agent({
+  description: "Execute task PROJ-001: <title>",
+  subagent_type: "dario-v2-digital-ceo",  # or "diva-v1-design-architect" for DIVA tasks
+  prompt: """
+  You are worker <worker-id> executing task PROJ-001.
+  
+  TASK: <title>
+  DESCRIPTION: <description>
+  SKILL TO USE: /dario-<skill-name>
+  CONTEXT: <relevant context from RAG + memory>
+  SUCCESS CRITERIA: <what "done" looks like>
+  EXECUTION POLICY: <policy name>
+  
+  Execute this task using the specified skill.
+  When done, provide:
+  1. A substantive completion comment
+  2. The deliverable/output
+  3. Any blockers or follow-up tasks discovered
+  """
+})
+```
+
+**Parallel execution (up to 3):**
+```python
+# Launch independent tasks simultaneously
+Agent({ description: "PROJ-001: Brand audit", ... })  # In parallel
+Agent({ description: "PROJ-002: SEO audit", ... })    # In parallel
+Agent({ description: "PROJ-003: CRO audit", ... })    # In parallel
+```
+
+**Coalescing rules:**
+- If a worker is already processing a similar task, coalesce (merge) instead of duplicating
+- If a heartbeat is running, queue new work for the next window
+- Cooldown: minimum 2 minutes between heartbeats for the same worker
+
+### Phase 4.5: ERROR RECOVERY
+
+When a task execution fails (Agent tool timeout, error, or empty output):
+
+**Retry Protocol (exponential backoff):**
+```
+max_retries = 3
+for attempt in 1..max_retries:
+  wait = min(30 * (2 ^ attempt), 270)  # 60s, 120s, 240s — stay in cache window
+  execute(task)
+  if success:
+    break
+  if attempt == max_retries:
+    ESCALATE to dead-letter
+```
+
+**Dead-Letter Queue:**
+Tasks that fail after all retries:
+1. Set status → `blocked`
+2. Set `blocked_reason: "execution_failed — {error_summary}. Retried {N} times."`
+3. Add note with full error context
+4. Move to dead-letter list in report
+5. Continue with other tasks (don't block the wave)
+
+**Mid-Execution Crash Recovery:**
+If the session ends unexpectedly (compaction, timeout):
+1. On next heartbeat, scan `tasks/active/` for tasks with:
+   - `status: "in_progress"` AND `checked_out_at` older than SLA timeout
+2. Apply SLA timeouts per execution policy:
+   - `critical` → 1h
+   - `client_facing` → 4h  
+   - `default` → 8h
+   - `financial` → 2h
+3. If past SLA: reset status → `todo`, clear `checked_out_at`, increment `notes[]` with recovery entry
+4. Task is now available for re-dispatch
+
+**Idempotency Guard:**
+Before executing a task, check:
+- Is this task already `done`? → Skip (don't double-execute)
+- Is this task `in_progress` by another agent? → Skip (atomic checkout)
+- Did this task run in the last 5 minutes? → Skip (prevent rapid re-execution after crash)
+
+### Phase 5: REVIEW (Execution Policies)
+
+After each task completes, enforce the applicable execution policy:
+
+**Layer 1 — Comment (always enforced):**
+- Worker MUST post a substantive completion comment
+- Comment includes: what was done, key findings, confidence level
+- If missing, task stays `in_progress` and agent is re-prompted
+
+**Layer 2 — Review (when policy requires it):**
+- Director-level agent reviews the output
+- Can: approve (→ done), request revision (→ back to worker), escalate (→ CEO)
+- Maximum revision loops defined per policy (default: 3)
+
+**Layer 3 — Approval (for critical/financial tasks):**
+- CEO or user explicitly approves
+- For `critical` policy: user is always asked to approve
+- For `financial` policy: user approves budget-impacting decisions
+- Use AskUserQuestion tool to get approval
+
+**Status transitions during review:**
+```
+in_progress → in_review (worker marks as done)
+in_review → done (reviewer approves)
+in_review → in_progress (reviewer requests revision)
+in_review → blocked (reviewer finds external dependency)
+```
+
+### Phase 6: SYNTHESIZE (Combine Outputs)
+
+Once all tasks in a project reach `done`:
+
+1. **Gather all task outputs** from the heartbeat results
+2. **Combine into a unified deliverable** using the project template
+3. **Cross-reference findings** — look for contradictions or synergies across outputs
+4. **Apply DARIO prioritization** — CRITICO / IMPORTANTE / OTIMIZACAO
+5. **Generate executive summary** with actionable next steps
+
+### Phase 7: AUDIT (Logging & Budget)
+
+**Activity Audit Trail:**
+Every mutation is logged to `~/.claude/orchestrator/audit/YYYY-MM-DD.yaml`:
+
+```yaml
+- timestamp: "2026-04-26T19:45:00Z"
+  actor: "dario-ceo"
+  action: "task_created"
+  entity_type: "task"
+  entity_id: "PROJ-001"
+  details: "Created task: Brand positioning audit for Client X"
+
+- timestamp: "2026-04-26T19:46:00Z"
+  actor: "dario-ceo"
+  action: "task_assigned"
+  entity_type: "task"
+  entity_id: "PROJ-001"
+  details: "Assigned to worker-brand (atomic checkout)"
+```
+
+**Budget Tracking — Token Capture Contract:**
+
+Tokens flow from execution to budget in 3 steps:
+
+**Step 1: Capture** — After each Agent tool execution completes:
+- Extract token count from the Agent result metadata (if available)
+- If metadata unavailable, ESTIMATE based on output length:
+  - Short output (<500 chars): ~2,000 tokens
+  - Medium output (500-3000 chars): ~5,000 tokens
+  - Long output (>3000 chars): ~10,000 tokens
+  - With subagent spawning: multiply by 1.5x
+- Record `actual_tokens` in the task YAML
+
+**Step 2: Aggregate** — Update `~/.claude/orchestrator/budgets/YYYY-MM.yaml`:
+```yaml
+month: "2026-04"
+total_tokens_used: 125000
+limit: 50000000
+percentage: 0.25                      # auto-calculated: total / limit * 100
+by_project:
+  atrium: 45000
+  vivenda: 30000
+  lucas: 50000
+by_skill:                             # track per skill for optimization insights
+  dario-brand: 15000
+  seo-audit: 35000
+  dario-wp-audit: 25000
+by_model:                             # track model usage for cost optimization
+  opus: 80000
+  sonnet: 35000
+  haiku: 10000
+last_updated: "2026-04-27T08:00:00Z"
+alert_80_sent: false
+alert_95_sent: false
+```
+
+**Step 3: Enforce** — Check thresholds AFTER every budget update:
+- If `percentage >= 80` AND `alert_80_sent == false`:
+  - Set `alert_80_sent: true`
+  - Report to user: "Budget a 80% — limitando a 1 worker paralelo"
+  - Reduce max parallel workers from 3 to 1
+- If `percentage >= 95` AND `alert_95_sent == false`:
+  - Set `alert_95_sent: true`
+  - **STOP all execution**. Report: "Budget critico (X%). Execucao pausada."
+  - Set all `in_progress` tasks back to `todo`
+  - Do NOT proceed until user explicitly raises the limit
+
+**Budget File Initialization:**
+If `budgets/YYYY-MM.yaml` doesn't exist at month start, create it:
+```yaml
+month: "<current month>"
+total_tokens_used: 0
+limit: 50000000      # from company.yaml company.budget.monthly_limit_tokens
+percentage: 0.0
+by_project: {}
+by_skill: {}
+by_model: {}
+last_updated: "<now>"
+alert_80_sent: false
+alert_95_sent: false
+```
+
+## Task Templates
+
+### Template: Full Client Audit
+```yaml
+parent: "AUDIT-000"
+children:
+  - title: "Diagnostic analysis"
+    skill: "dario-diagnose"
+    policy: "default"
+    priority: "critical"
+  - title: "WordPress audit"
+    skill: "dario-wp-audit"
+    policy: "client_facing"
+    depends_on: ["diagnostic"]
+  - title: "SEO audit"
+    skill: "seo-audit"
+    policy: "client_facing"
+    depends_on: ["diagnostic"]
+  - title: "CRO review"
+    squad: "CRO Squad"
+    policy: "client_facing"
+    depends_on: ["diagnostic"]
+  - title: "Synthesize findings"
+    skill: "orchestrator"
+    policy: "critical"
+    depends_on: ["wp-audit", "seo-audit", "cro-review"]
+  - title: "Save to Obsidian + RAG"
+    skill: "dario-obsidian-save"
+    depends_on: ["synthesize"]
+```
+
+### Template: Brand + Offer + Copy Pipeline
+```yaml
+parent: "BRAND-000"
+children:
+  - title: "Brand positioning workshop"
+    skill: "dario-brand"
+    policy: "client_facing"
+    priority: "high"
+  - title: "Grand Slam Offer creation"
+    skill: "dario-offer"
+    policy: "client_facing"
+    depends_on: ["brand-positioning"]
+  - title: "Sales letter"
+    skill: "dario-sales-letter"
+    policy: "client_facing"
+    depends_on: ["offer-creation"]
+  - title: "Ads blueprint"
+    skill: "dario-ads-blueprint"
+    policy: "default"
+    depends_on: ["sales-letter"]
+  - title: "Email sequences"
+    skill: "dario-email-seq"
+    policy: "default"
+    depends_on: ["offer-creation"]
+```
+
+### Template: Architecture Project (DIVA)
+```yaml
+parent: "ARCH-000"
+children:
+  - title: "Client briefing"
+    skill: "diva-briefing"
+    policy: "default"
+    priority: "critical"
+  - title: "Space diagnostic"
+    skill: "diva-diagnose"
+    policy: "default"
+    depends_on: ["briefing"]
+  - title: "Floor plan analysis"
+    skill: "diva-floor-plan"
+    policy: "client_facing"
+    depends_on: ["diagnostic"]
+  - title: "Moodboard creation"
+    skill: "diva-moodboard"
+    policy: "client_facing"
+    depends_on: ["briefing"]
+  - title: "Material specification"
+    skill: "diva-materials"
+    policy: "client_facing"
+    depends_on: ["moodboard"]
+  - title: "Budget estimation"
+    skill: "diva-budget"
+    policy: "financial"
+    depends_on: ["floor-plan", "materials"]
+  - title: "Timeline / Gantt"
+    skill: "diva-timeline"
+    policy: "client_facing"
+    depends_on: ["budget"]
+  - title: "Licensing check"
+    skill: "diva-licensing"
+    policy: "critical"
+    depends_on: ["diagnostic"]
+  - title: "Project roadmap"
+    skill: "diva-roadmap"
+    policy: "critical"
+    depends_on: ["budget", "timeline", "licensing"]
+```
+
+## Orchestrator Commands
+
+When the orchestrator is active, these commands are available:
+
+| Command | Action |
+|---|---|
+| `status` | Show all active tasks with status, assignee, priority |
+| `next` | Pick and execute the next available task |
+| `assign <task> to <worker>` | Manually assign a task |
+| `block <task> reason <text>` | Mark task as blocked |
+| `unblock <task>` | Remove blocker |
+| `review <task>` | Trigger review for completed task |
+| `approve <task>` | Approve a task pending approval |
+| `budget` | Show current budget usage |
+| `audit [date]` | Show audit log for date |
+| `parallel <task1> <task2> [task3]` | Execute tasks in parallel |
+| `template <name> <project>` | Create tasks from a template |
+| `escalate <task>` | Escalate task to next level in hierarchy |
+| `reassign <task> to <worker>` | Change task assignee |
+| `pause` | Pause all active heartbeats |
+| `resume` | Resume paused heartbeats |
+
+## Output Template (Orchestration Report)
+
+```markdown
+# Orchestration Report — <Project Name>
+
+## Mission
+<What was requested and why>
+
+## Task Decomposition
+| # | Task | Assignee | Status | Policy | Priority |
+|---|---|---|---|---|---|
+| 001 | ... | worker-brand | done | client_facing | high |
+| 002 | ... | worker-seo-audit | in_progress | client_facing | high |
+
+## Execution Timeline
+1. [19:45] Task 001 created, assigned to worker-brand
+2. [19:46] Task 001 execution started (heartbeat)
+3. [19:52] Task 001 completed, review passed
+4. [19:52] Task 002 started (dependency resolved)
+
+## Deliverables
+- <list of outputs produced>
+
+## Budget Impact
+- Tokens used this session: X
+- Project total: Y / Z (budget)
+
+## Next Actions
+- <what needs to happen next>
+
+## Blockers
+- <any unresolved blockers>
+```
+
+## Integration with Existing Systems
+
+### RAG Engine
+- ALL tasks consult RAG before execution (mandatory DARIO protocol)
+- Task outputs are ingested into RAG via `dario-rag-ingest`
+- RAG collection: `orchestrator` for task metadata; project-specific for deliverables
+
+### Agent Memory
+- Orchestration state persists in `~/.claude/orchestrator/`
+- Project context in `~/.claude/agent-memory/dario-v2-digital-ceo/`
+- Cross-session continuity via session hooks (already in place)
+
+### Obsidian
+- Final deliverables saved via `dario-obsidian-save` or `diva-obsidian-save`
+- Orchestration reports saved to `05 - Claude - IA/Outputs/`
+- Audit logs optionally mirrored to `05 - Claude - IA/Decisoes/`
+
+### Hooks
+- `SessionStart` — Load active orchestration state
+- `PreCompact` — Save orchestration progress
+- `PostCompact` — Restore orchestration context
+- `Stop` — Archive completed tasks, update budget totals
+
+## Notification Protocol
+
+Events trigger notifications through channels defined in `~/.claude/orchestrator/notifications.yaml`. The orchestrator uses a `notify(event, data)` pattern:
+
+```python
+def notify(event_name, data):
+    config = load_yaml("~/.claude/orchestrator/notifications.yaml")
+    event = config["events"][event_name]
+    message = event["template"].format(**data)
+    
+    for channel in event["channels"]:
+        if channel == "pulse_report":
+            append_to_pulse(message, event["severity"])
+        elif channel == "audit_log":
+            append_audit({"timestamp": now(), "actor": "orchestrator", "action": event_name, "details": message})
+        elif channel == "obsidian_alert" and event["severity"] == "critical":
+            save_obsidian_alert(event_name, message)
+        elif channel == "task_note" and "task" in data:
+            data["task"].notes.append(f"[{now()}] {message}")
+```
+
+**Key events:** `task_completed`, `task_revision`, `task_escalated`, `sla_warning`, `sla_breach`, `budget_warning`, `budget_critical`, `quality_low`, `playbook_detected`, `project_completed`, `health_check_failed`, `stale_task`
+
+**Severity levels:** `info` (pulse only), `warning` (pulse + audit), `critical` (pulse + audit + Obsidian alert note)
+
+## Red Flags
+
+- Never execute a task without checking company.yaml for the right agent
+- Never skip the audit log
+- Never run more than 3 parallel workers (cost explosion risk)
+- Never auto-approve critical or financial tasks (always ask user)
+- Never ignore a task's `depends_on` — respect the dependency graph
+- Never assign a task to an agent outside its declared capabilities
+- If a revision loop exceeds max_loops, escalate to user immediately
+
+## Why This Skill Exists
+
+The DARIO ecosystem grew to 70+ skills and 18 squads. Without structured orchestration:
+- Work was ad-hoc (whoever got called first did the work)
+- No task tracking across sessions
+- No execution quality gates
+- No budget visibility
+- No audit trail for client accountability
+- Cross-division work (DARIO + DIVA) had no coordination protocol
+
+The Paperclip-inspired orchestrator fixes all of this while preserving everything that already works.

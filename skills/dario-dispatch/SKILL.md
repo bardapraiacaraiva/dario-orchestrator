@@ -1,0 +1,676 @@
+---
+name: dario-dispatch
+description: "Intelligent routing engine — maps tasks to the optimal agent, skill, or squad based on capabilities, availability, and company hierarchy. Supports parallel assignment, escalation chains, and cross-division coordination (DARIO + DIVA + LUCAS). Triggers on: 'dispatch', 'despacha', 'routing', 'quem faz isto', 'atribui', 'assign'."
+license: MIT
+---
+
+# DARIO Dispatch — Intelligent Task Routing
+
+The "brain" that decides WHO does WHAT. Maps tasks to the optimal executor using capability matching, workload awareness, and company hierarchy from `company.yaml`.
+
+## When to activate
+
+- Called by `dario-orchestrator` during Phase 3 (Dispatch)
+- User asks "quem faz isto?", "quem deve trabalhar nisto?"
+- User wants to assign or reassign work
+- Cross-division coordination needed (DARIO + DIVA + LUCAS)
+- Invoked via `/dario-dispatch`
+
+## Routing Algorithm
+
+### Step 1: Parse Task Requirements
+
+From the task, extract:
+- **Domain keywords** — What area of expertise is needed?
+- **Skill reference** — Does the task specify a skill directly?
+- **Division** — DARIO (digital), DIVA (architecture), LUCAS (SaaS accounting)?
+- **Complexity** — Single skill, multi-skill, or squad-level?
+- **Policy** — What execution policy applies?
+
+### Step 2: Capability Matching + Workload Awareness
+
+Load `~/.claude/orchestrator/company.yaml` (both `agents:` and `workers:` sections) and match:
+
+```python
+def find_best_executor(task):
+    # 1. Direct skill match (fastest path)
+    if task.skill:
+        worker = find_worker_by_skill(task.skill)  # check workers: section
+        if worker and is_available(worker):
+            return worker
+        elif worker and not is_available(worker):
+            # Primary worker busy — find fallback (see Step 2.5)
+            fallback = find_fallback(task, worker)
+            if fallback:
+                return fallback
+            # No fallback — queue task for next pulse
+            LOG "QUEUED: {task.id} — {worker.id} busy, no fallback available"
+            return None
+    
+    # 2. Capability intersection
+    candidates = []
+    for worker in all_workers:
+        overlap = set(task.required_capabilities) & set(worker.capabilities)
+        if overlap:
+            load = get_active_task_count(worker)  # workload check
+            candidates.append((worker, len(overlap), load))
+    
+    # 3. Sort by: capability overlap > lowest workload > division match
+    candidates.sort(key=lambda x: (
+        x[1],                          # More capability overlap = better
+        -x[2],                         # FEWER active tasks = better (negative for desc sort)
+        x[0].division == task.division, # Same division preferred
+    ), reverse=True)
+    
+    # 4. Return best match (or escalate)
+    return candidates[0][0] if candidates else escalate_to_manager(task)
+```
+
+### Step 2.5: Workload Awareness
+
+**Before assigning ANY task, check worker availability:**
+
+```python
+def is_available(worker):
+    """A worker is available if they have no in_progress tasks."""
+    active_tasks = read_all_tasks("~/.claude/orchestrator/tasks/active/")
+    in_progress = [t for t in active_tasks 
+                   if t.assignee == worker.id and t.status == "in_progress"]
+    return len(in_progress) == 0
+
+def get_active_task_count(worker):
+    """Count tasks assigned to this worker (any non-done status)."""
+    active_tasks = read_all_tasks("~/.claude/orchestrator/tasks/active/")
+    return len([t for t in active_tasks 
+                if t.assignee == worker.id and t.status in ["todo", "in_progress", "in_review"]])
+
+def find_fallback(task, primary_worker):
+    """Find next-best worker when primary is busy."""
+    # 1. Check same director's other workers with overlapping capabilities
+    director = primary_worker.reports_to
+    siblings = [w for w in all_workers if w.reports_to == director and w.id != primary_worker.id]
+    
+    for sibling in siblings:
+        overlap = set(task.required_capabilities or []) & set(sibling.capabilities)
+        if overlap and is_available(sibling):
+            LOG "FALLBACK: {task.id} → {sibling.id} (primary {primary_worker.id} busy)"
+            return sibling
+    
+    # 2. Escalate to director (manager can execute if capable)
+    director_agent = get_agent(director)
+    if director_agent and has_capability_overlap(director_agent, task):
+        LOG "ESCALATE: {task.id} → {director} (all workers busy)"
+        return director_agent
+    
+    # 3. No fallback — return None (task will be queued)
+    return None
+```
+
+**Workload limits:**
+- Worker: max 1 `in_progress` task at a time (atomic checkout)
+- Director: max 2 tasks (can oversee + execute)
+- VP/CEO: no limit (orchestration overhead, not execution)
+
+### Step 3: Division Routing
+
+| Task Domain | Primary Division | Adapter |
+|---|---|---|
+| Digital marketing, SEO, web dev, copy | DARIO | `dario-v2-digital-ceo` |
+| Architecture, interior design, construction | DIVA | `diva-v1-design-architect` |
+| Portuguese accounting SaaS, AI agents | LUCAS | `dario-v2-digital-ceo` (LUCAS context) |
+| Cross-division (e.g., website for architect) | DARIO + DIVA | Multi-agent parallel |
+
+### Step 4: Escalation Chain
+
+If no worker matches:
+```
+Worker (skill) → Director (manager) → VP (division) → CEO (DARIO)
+```
+
+Each level can:
+- Accept and execute (if capable)
+- Delegate down to a different worker
+- Escalate up to the next level
+- Request a new worker be "hired" (new skill created)
+
+### Step 5: Parallel Assignment Planning
+
+For complex tasks requiring multiple capabilities:
+
+**Rule: Maximum 3 parallel workers per heartbeat**
+
+```python
+def plan_parallel(tasks):
+    # Group independent tasks (no mutual dependencies)
+    independent_groups = find_independent_sets(tasks)
+    
+    # Create execution waves
+    waves = []
+    for group in independent_groups:
+        # Max 3 per wave
+        for batch in chunks(group, 3):
+            waves.append(batch)
+    
+    return waves
+```
+
+**Parallel execution via Agent tool:**
+```python
+# Wave 1: Independent tasks run simultaneously
+Agent({ description: "Task A", subagent_type: "dario-v2-digital-ceo", prompt: "..." })
+Agent({ description: "Task B", subagent_type: "diva-v1-design-architect", prompt: "..." })
+Agent({ description: "Task C", subagent_type: "dario-v2-digital-ceo", prompt: "..." })
+
+# Wave 2: Tasks that depended on Wave 1
+Agent({ description: "Task D (depends on A+B)", ... })
+```
+
+## Routing Tables
+
+### DARIO Division — Digital Agency
+
+#### Marketing & Growth (dir-marketing)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| brand, positioning, archetype, identity | worker-brand | dario-brand | Brand Squad |
+| offer, pricing, value equation, hormozi | worker-offer | dario-offer | Hormozi Squad |
+| copy, sales letter, headline, VSL | worker-sales-letter | dario-sales-letter | Copy Squad |
+| ads, traffic, facebook, google, youtube | worker-ads | dario-ads-blueprint | Traffic Masters |
+| funnel, value ladder, tripwire, lead magnet | worker-funnel | dario-funnel | Sales Squad |
+| pipeline, outbound, prospecting, ICP | worker-pipeline | dario-pipeline | Sales Squad |
+| email, sequence, nurture, launch | worker-email-seq | dario-email-seq | Copy Squad |
+| naming, brand name, domain | worker-naming | dario-naming | Brand Squad |
+| story, narrative, origin, about page | worker-story-circle | dario-story-circle | Storytelling Squad |
+| pitch, deck, investor, presentation | worker-pitch | dario-pitch | - |
+| proposal, quotation, scope, budget | worker-proposal | dario-proposal | Sales Squad |
+| negotiation, objections, closing | worker-negotiation | dario-negotiation | Sales Squad |
+
+#### Technical (dir-technical)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| wordpress, theme, plugin, wp | worker-wp-audit | dario-wp-audit | - |
+| woocommerce, checkout, payment, mbway | worker-woo-audit | dario-woo-audit | - |
+| core web vitals, lcp, inp, cls, speed | worker-cwv-fix | dario-cwv-fix | - |
+| security, pentest, owasp, vulnerability | worker-pentest | dario-pentest-checklist | Cybersecurity Squad |
+| make, automation, zapier, webhook | worker-make-blueprint | dario-make-blueprint | - |
+| ios, iphone, swift, hig, apple | worker-ios-hig | dario-ios-hig | - |
+| sop, procedure, process, checklist | worker-sop | dario-sop | Operations Squad |
+
+#### SEO (dir-seo)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| full seo audit, site health | worker-seo-audit | seo-audit | Data Squad |
+| crawl, robots, indexation, javascript render | worker-seo-technical | seo-technical | - |
+| content quality, eeat, readability | worker-seo-content | seo-content | - |
+| schema, json-ld, structured data, rich results | worker-seo-schema | seo-schema | - |
+| local seo, gbp, nap, citations, map pack | worker-seo-local | seo-local | - |
+| ai overviews, geo, perplexity, chatgpt search | worker-seo-geo | seo-geo | - |
+| seo strategy, content plan, site architecture | worker-seo-plan | seo-plan | - |
+| single page analysis, on-page | worker-seo-page | seo-page | - |
+| sitemap, xml sitemap | worker-seo-sitemap | seo-sitemap | - |
+| image seo, alt text, lazy loading | worker-seo-images | seo-images | - |
+| hreflang, international, multilingual | worker-seo-hreflang | seo-hreflang | - |
+| programmatic seo, scaled pages | worker-seo-programmatic | seo-programmatic | - |
+| competitor pages, vs, alternatives | worker-seo-competitor | seo-competitor-pages | - |
+| keyword data, serp, backlinks, live data | worker-seo-dataforseo | seo-dataforseo | - |
+| og image, social preview, hero image | worker-seo-image-gen | seo-image-gen | - |
+| keyword cluster, topic map, pillar | worker-kw-cluster | dario-kw-cluster | - |
+
+#### Finance (dir-finance)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| p&l, cash flow, forecast, break-even | worker-financial-model | dario-financial-model | CFO Squad |
+| pricing, rate, cost/hour, margin | worker-pricing-calculator | dario-pricing-calculator | - |
+| mrr, arr, churn, ltv, cac, nrr | worker-saas-metrics | dario-saas-metrics | CFO Squad |
+
+#### Client Success (dir-client-success)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| onboard, new client, kickoff | worker-client-onboard | dario-client-onboard | - |
+| diagnose, audit, evaluate, roadmap | worker-diagnose | dario-diagnose | Advisory Board |
+| switch project, context, load project | worker-projeto | dario-projeto | - |
+
+### DIVA Division — Architecture & Design
+
+#### Design (dir-design)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| moodboard, palette, style, inspiration | worker-diva-moodboard | diva-moodboard | Interior Design Squad |
+| materials, finishes, ceramic, stone, wood | worker-diva-materials | diva-materials | - |
+| floor plan, layout, circulation, spatial | worker-diva-floor-plan | diva-floor-plan | Architecture Masters |
+| render, visualization, 3D, midjourney | worker-diva-render | diva-render | - |
+| render brief, camera, lighting, styling | worker-diva-render-brief | diva-render-brief | - |
+| photo analysis, space assessment, vision | worker-diva-vision | diva-vision | - |
+| portfolio, case study, showcase | worker-diva-portfolio | diva-portfolio | - |
+| smart home, domotica, knx, zigbee | worker-diva-smart-home | diva-smart-home | - |
+| briefing, client needs, requirements | worker-diva-briefing | diva-briefing | - |
+
+#### Construction (dir-construction)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| budget, cost, pronic, iva, m2 price | worker-diva-budget | diva-budget | Budget Squad |
+| calculator, 3 scenarios, simulate | worker-diva-calc | diva-calc | - |
+| timeline, gantt, duration, phases | worker-diva-timeline | diva-timeline | - |
+| inspection, punch list, quality control | worker-diva-inspection | diva-inspection | - |
+| contract, empreitada, guarantees, penalties | worker-diva-contract | diva-contract | - |
+| compare proposals, contractor, best value | worker-diva-comparador | diva-comparador | - |
+| planradar, field report, export tickets | worker-diva-planradar | diva-planradar | - |
+| bim, revit, archicad, ifc, schedules | worker-diva-bim | diva-bim | - |
+| diagnostic, structural, regulatory check | worker-diva-diagnose | diva-diagnose | - |
+| roadmap, big picture, visual plan | worker-diva-roadmap | diva-roadmap | - |
+
+#### Regulatory (dir-regulatory)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| licensing, permits, camara, rjue, rgeu | worker-diva-licensing | diva-licensing | Regulation Squad |
+| energy, sce, reh, recs, nzeb, certification | worker-diva-energy | diva-energy | - |
+
+### A360 Division — Business Acceleration
+
+#### Research & Discovery (dir-a360-research)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| nicho, niche, top nichos, validar nicho | worker-a360-nicho-explorer | nicho-explorer | - |
+| mapear nicho, ICP, dores, mecanismo, oferta | worker-a360-mapear-nicho | mapear-nicho-lite | - |
+| cliente, prospect, pesquisar empresa, SPIN | worker-a360-cliente-radar | cliente-radar | - |
+
+#### Production (dir-a360-production)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| landing page, LP, CRO, AIDA, PAS | worker-a360-lp-builder | lp-builder | - |
+| pitch deck, slides, apresentacao comercial | worker-a360-pitch-deck | pitch-deck-builder | - |
+| go to market, GTM, outbound, prospectar | worker-a360-gtm | gtm-architect | - |
+| script vendas, playbook, objecoes, DEAL | worker-a360-playbook-vendas | playbook-vendas | - |
+| meeting prep, briefing reuniao, call | worker-a360-meeting-prep | meeting-prep | - |
+
+#### A360 Pipelines (pre-composed)
+
+O A360 tem o seu proprio coordenador (`a360-framework-lite`) com pipelines pre-compostos. Quando o dispatch detecta intencao A360, pode:
+- Delegar directamente ao coordenador A360 (que gere o pipeline internamente)
+- Ou decompor em tasks individuais no taskboard (para tracking granular)
+
+| Pipeline | Trigger | Skills Chain |
+|---|---|---|
+| prospect-meeting | "vou apresentar para cliente X" | cliente-radar → mapear-nicho → pitch-deck → meeting-prep |
+| business-foundation | "estruturar empresa para nicho X" | nicho-explorer → mapear-nicho → gtm-architect → lp-builder |
+| client-deliverable | "pacote completo para cliente" | cliente-radar → mapear-nicho → lp-builder → pitch-deck |
+| niche-discovery | "nao sei que nicho escolher" | nicho-explorer → (user picks) → mapear-nicho |
+| quick-pitch-deck | "preciso do deck para amanha" | mapear-nicho → pitch-deck |
+
+### ATLAS Division — Events, Logistics & Services
+
+#### Event Planning (dir-event-planning)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| briefing evento, novo evento, event brief, requisitos | worker-atlas-briefing | atlas-briefing | Event Masters Squad |
+| venue, local, espaco, quinta, palacio, sala | worker-atlas-venue | atlas-venue | - |
+| timeline, run of show, cronograma, agenda dia | worker-atlas-timeline | atlas-timeline | - |
+| budget evento, orcamento evento, custos evento | worker-atlas-budget | atlas-budget | - |
+| checklist, day-of, run sheet, procedimentos | worker-atlas-checklist | atlas-checklist | - |
+| pos-evento, debrief, survey, ROI evento, feedback | worker-atlas-post-event | atlas-post-event | - |
+
+#### Logistics Operations (dir-logistics)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| vendor, fornecedor, RFP, procurement evento | worker-atlas-vendor | atlas-vendor | Logistics Operations Squad |
+| catering, menu, F&B, comida, bebidas, HACCP | worker-atlas-catering | atlas-catering | - |
+| transporte, shuttle, parking, fleet, load-in | worker-atlas-transport | atlas-transport | - |
+| hotel, alojamento, room block, hospedagem | worker-atlas-accommodation | atlas-accommodation | - |
+| staff evento, equipa, voluntarios, briefing equipa | worker-atlas-staff | atlas-staff | - |
+| armazem, inventario, equipamento, stock, kit | worker-atlas-warehouse | atlas-warehouse | - |
+
+#### Creative Production (dir-production)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| som, luz, AV, projecao, palco tech, streaming | worker-atlas-av | atlas-av | Creative Production Squad |
+| cenografia, palco design, set, truss, rigging | worker-atlas-staging | atlas-staging | - |
+| decoracao, tema, flores, ambiance, centros mesa | worker-atlas-decor | atlas-decor | - |
+| entretenimento, banda, DJ, fado, artista, MC | worker-atlas-entertainment | atlas-entertainment | - |
+| fotografia, video, drone, photo booth, ANAC | worker-atlas-photo-video | atlas-photo-video | - |
+
+#### Guest Experience (dir-guest-experience)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| convidados, RSVP, guest list, registo, badges | worker-atlas-guest | atlas-guest | Guest Experience Squad |
+| seating, mapa lugares, mesas, planta sala | worker-atlas-seating | atlas-seating | - |
+| protocolo, VIP, etiqueta, precedencia, dress code | worker-atlas-protocol | atlas-protocol | - |
+| tech evento, app, WiFi, check-in, QR code | worker-atlas-tech | atlas-tech | - |
+| hibrido, virtual, streaming, zoom, plataforma online | worker-atlas-hybrid | atlas-hybrid | - |
+
+#### Event Business (dir-event-business)
+
+| Capability Keywords | Worker | Skill | Squad Boost |
+|---|---|---|---|
+| marketing evento, promocao, ticketing, earlybird | worker-atlas-marketing | atlas-marketing | Event Business Squad |
+| sponsor, patrocinio, sponsorship deck, parceiros | worker-atlas-sponsor | atlas-sponsor | - |
+| CRM evento, follow-up, retencao, attendee | worker-atlas-crm | atlas-crm | - |
+| risco evento, contingencia, seguranca, emergencia | worker-atlas-risk | atlas-risk | Risk & Compliance Squad |
+| licencas, IGAC, camara, SCIE, HACCP, alvara | worker-atlas-compliance | atlas-compliance | Risk & Compliance Squad |
+| sustentabilidade, green event, ISO 20121, carbono | worker-atlas-sustainability | atlas-sustainability | - |
+
+#### ATLAS Pipelines (pre-composed)
+
+| Pipeline | Trigger | Skills Chain |
+|---|---|---|
+| full-event | "planear evento completo" | briefing → venue + budget → timeline + staff → catering + decor + av → checklist → marketing → post-event |
+| corporate-conference | "conferencia corporate" | briefing → venue → av + tech + hybrid → guest + seating → sponsor → marketing → checklist → post-event |
+| wedding-gala | "casamento" ou "gala" | briefing → venue → decor + entertainment + catering → guest + seating + protocol → photo-video → checklist → post-event |
+| festival-outdoor | "festival" ou "evento outdoor" | briefing → venue → compliance + risk → av + staging → entertainment → transport + staff → marketing → checklist |
+| quick-event-audit | "auditar evento existente" | checklist → risk → compliance → budget → post-event |
+
+### LUCAS Division — SaaS Accounting
+
+| Capability Keywords | Routing |
+|---|---|
+| contabilidade, accounting, portuguese tax | Project context: LUCAS/LUSOconta |
+| ai agents, multi-agent, saas platform | Project context: LUCAS + orchestrator |
+| iva, irs, irc, at portal, efatura | Project context: LUCAS accounting domain |
+
+**LUCAS routing note:** LUCAS doesn't have its own skill set yet — it operates through DARIO's technical + financial workers with LUCAS project context loaded. Cross-reference agent-memory `project_lucas_lusoconta.md`.
+
+## Squad Boost Protocol
+
+When a task is complex enough to benefit from squad activation:
+
+1. **Detect complexity signals:**
+   - Task description mentions multiple dimensions
+   - Priority is `critical`
+   - Multiple capabilities needed simultaneously
+   - User explicitly requests "deep analysis"
+
+2. **Select squad(s)** from the routing table (max 2 squads per task)
+
+3. **Compose squad prompt:**
+   ```
+   Agent({
+     subagent_type: "dario-v2-digital-ceo",
+     prompt: "Activate <Squad Name>. Analyze <target> focusing on <squad-specific dimensions>. 
+              Task context: <task description>. 
+              Deliver: <specific outputs expected>."
+   })
+   ```
+
+4. **Merge squad output** into task completion comment
+
+## Cross-Division Coordination
+
+When a task spans DARIO + DIVA (e.g., "website for architecture studio"):
+
+```
+1. CEO decomposes into division-specific subtasks:
+   ├── DARIO subtask: Website design, SEO, copy
+   └── DIVA subtask: Portfolio content, project descriptions, material specs
+
+2. Each subtask dispatched to its division's director
+
+3. Directors coordinate via parent task:
+   ├── Shared artifact: client brief (both divisions read)
+   ├── Handoff point: DIVA delivers content → DARIO integrates
+   └── Sync point: Both done → CEO synthesizes
+
+4. Final deliverable merges both divisions' outputs
+```
+
+## Dispatch Report
+
+After routing all tasks, generate:
+
+```markdown
+## Dispatch Report — <Project>
+
+### Routing Decisions
+| Task | Assigned To | Skill | Squad | Division | Wave |
+|---|---|---|---|---|---|
+| PROJ-001 | worker-brand | dario-brand | Brand Squad | DARIO | 1 |
+| PROJ-002 | worker-seo-audit | seo-audit | - | DARIO | 1 |
+| PROJ-003 | worker-diva-budget | diva-budget | - | DIVA | 1 |
+| PROJ-004 | worker-sales-letter | dario-sales-letter | Copy Squad | DARIO | 2 |
+
+### Execution Plan
+- **Wave 1:** PROJ-001 + PROJ-002 + PROJ-003 (parallel, independent)
+- **Wave 2:** PROJ-004 (depends on PROJ-001)
+
+### Escalations
+- None (all tasks matched to workers)
+
+### Budget Estimate
+- Total estimated tokens: ~25,000
+- By division: DARIO 18,000 | DIVA 7,000
+```
+
+## Taskboard Integration (Bidirectional)
+
+Dispatch reads FROM and writes TO the taskboard. This is the link between routing decisions and persistent task state.
+
+### READ: Unassigned Tasks
+
+```python
+def get_dispatchable_tasks():
+    """Read taskboard for tasks needing assignment."""
+    tasks = read_all_yamls("~/.claude/orchestrator/tasks/active/")
+    return [t for t in tasks 
+            if t.status in ["todo", "backlog"] 
+            and t.assignee is None
+            and all_deps_done(t)]
+```
+
+### WRITE: Assignment Results
+
+After routing a task to a worker:
+```python
+def write_assignment(task, worker):
+    """Write dispatch result back to taskboard."""
+    task.assignee = worker.id
+    task.assigned_by = "dario-dispatch"
+    task.status = "todo"  # Ready for execution
+    task.updated_at = now()
+    write_yaml(f"~/.claude/orchestrator/tasks/active/{task.id}.yaml", task)
+    
+    # Audit log
+    append_audit({
+        "timestamp": now(),
+        "actor": "dario-dispatch",
+        "action": "task_assigned",
+        "entity_id": task.id,
+        "details": f"Dispatched to {worker.id} (skill: {worker.skill})"
+    })
+```
+
+### CREATE: Cross-Division Subtasks
+
+When dispatch detects a cross-division task, it CREATES subtasks in the taskboard:
+
+```python
+def create_subtasks(parent_task, subtask_specs):
+    """Create subtasks for cross-division work."""
+    for i, spec in enumerate(subtask_specs):
+        subtask = {
+            "id": f"{parent_task.id}-{chr(65+i)}",  # PROJ-001-A, PROJ-001-B
+            "title": spec.title,
+            "description": spec.description,
+            "project": parent_task.project,
+            "status": "todo",
+            "priority": parent_task.priority,
+            "parent": parent_task.id,
+            "depends_on": spec.depends_on or [],
+            "blocks": [],
+            "execution_policy": spec.policy or parent_task.execution_policy,
+            "skill": spec.skill,
+            "division": spec.division,
+            "revision_max_loops": 3,
+            "blocked_reason": None,
+            "watchers": parent_task.watchers or [],
+        }
+        write_yaml(f"~/.claude/orchestrator/tasks/active/{subtask['id']}.yaml", subtask)
+    
+    # Update parent
+    parent_task.children = [f"{parent_task.id}-{chr(65+i)}" for i in range(len(subtask_specs))]
+    write_yaml(f"~/.claude/orchestrator/tasks/active/{parent_task.id}.yaml", parent_task)
+```
+
+### Batch Dispatch
+
+Process all unassigned tasks in one pass:
+
+```python
+def batch_dispatch():
+    """Dispatch all unassigned tasks. Called by autopilot/heartbeat."""
+    tasks = get_dispatchable_tasks()
+    results = {"assigned": [], "queued": [], "escalated": []}
+    
+    for task in sorted(tasks, key=lambda t: t.priority_rank):
+        worker = find_best_executor(task)
+        if worker:
+            write_assignment(task, worker)
+            results["assigned"].append((task.id, worker.id))
+        elif is_cross_division(task):
+            create_subtasks(task, decompose_cross_division(task))
+            results["escalated"].append((task.id, "decomposed"))
+        else:
+            results["queued"].append(task.id)
+    
+    return results
+```
+
+## SLA Timeouts per Execution Policy
+
+Dispatch records expected SLA at assignment time:
+
+| Execution Policy | SLA Timeout | Action on Timeout |
+|---|---|---|
+| `critical` | 1 hour | Auto-escalate to CEO + notify watchers |
+| `client_facing` | 4 hours | Flag as stale + notify director |
+| `financial` | 2 hours | Auto-escalate to CEO + block until reviewed |
+| `default` | 8 hours | Flag as stale in next heartbeat |
+
+When assigning a task, record the SLA deadline:
+```python
+task.sla_deadline = now() + sla_duration[task.execution_policy]
+```
+Heartbeat checks `sla_deadline` against current time during stale detection.
+
+## Auto-Playbook Recommendation
+
+When dispatch receives the **first task** in a new project, it detects the domain and recommends a pre-built skill chain (playbook) for automatic decomposition.
+
+### Domain Detection Algorithm
+
+Scan task + project keywords against known patterns:
+
+```python
+DOMAIN_PATTERNS = {
+    "restaurant":    ["restaurant", "restaurante", "menu", "reserva", "chef"],
+    "agency":        ["agency", "agencia", "servicos digitais", "web agency"],
+    "ecommerce":     ["ecommerce", "loja online", "woocommerce", "produtos", "checkout"],
+    "saas":          ["saas", "subscription", "mrr", "churn", "software"],
+    "architecture":  ["architecture", "arquitectura", "remodelacao", "obra", "planta"],  # → DIVA
+    "events":       ["evento", "event", "conferencia", "gala", "casamento", "festival", "catering", "venue", "logistics"],  # → ATLAS
+}
+
+def detect_domain(project_keywords):
+    scores = {}
+    for domain, patterns in DOMAIN_PATTERNS.items():
+        hits = sum(1 for kw in project_keywords if kw.lower() in patterns)
+        if hits > 0:
+            scores[domain] = hits
+    if scores:
+        return max(scores, key=scores.get)
+    return "custom"  # fallback → manual decomposition
+```
+
+### Playbook Loading
+
+```python
+def recommend_playbook(project_keywords):
+    domain = detect_domain(project_keywords)
+    playbooks = load_yaml("~/.claude/orchestrator/quality/skill-metrics.yaml")["domain_playbooks"]
+    if domain in playbooks:
+        playbook = playbooks[domain]
+        LOG f"PLAYBOOK DETECTED: {domain} — {len(playbook['optimal_skill_chain'])} skills"
+        return playbook
+    return None
+```
+
+### Auto-Decompose from Playbook
+
+When a playbook is found, auto-create tasks on the taskboard:
+
+```python
+def auto_decompose(project, playbook):
+    tasks = []
+    for step in playbook["optimal_skill_chain"]:
+        deps = [t.id for t in tasks if t.order < step["order"] and not step["parallel"]]
+        task = create_task(
+            project=project,
+            skill=step["skill"],
+            order=step["order"],
+            parallel=step["parallel"],
+            depends_on=deps
+        )
+        tasks.append(task)
+    LOG f"AUTO-DECOMPOSED: {project} → {len(tasks)} tasks from {playbook['domain']} playbook"
+    return tasks
+```
+
+### Playbook Override
+
+User can always override the auto-detection:
+
+| User says | Behavior |
+|---|---|
+| "use restaurant playbook" | Force specific playbook regardless of keywords |
+| "custom decomposition" | Skip playbook, use manual task-by-task decomposition |
+| "adapt restaurant playbook + add seo-technical" | Load playbook + append custom skills to the chain |
+
+Override is applied **before** `auto_decompose` runs — dispatch checks for explicit user intent first, keyword detection second.
+
+### Learning Loop
+
+After project completes, compare actual execution vs playbook prediction:
+
+```python
+def playbook_feedback(project, playbook):
+    actual_chain = get_completed_skill_chain(project)  # what actually ran
+    predicted_chain = playbook["optimal_skill_chain"]   # what playbook suggested
+    project_score = get_project_avg_score(project)      # quality score
+
+    diff = compare_chains(actual_chain, predicted_chain)
+    if diff["reordered"] or diff["added_skills"] or diff["skipped_skills"]:
+        suggestion = {
+            "domain": playbook["domain"],
+            "project": project,
+            "score": project_score,
+            "changes": diff,
+            "recommendation": "update_playbook" if project_score > playbook["avg_score"] else "keep"
+        }
+        append_to("~/.claude/orchestrator/quality/playbook-feedback.yaml", suggestion)
+        LOG f"PLAYBOOK FEEDBACK: {playbook['domain']} — score {project_score} vs avg {playbook['avg_score']}"
+```
+
+Feedback is consumed by `lucas-analytics` to propose playbook updates when enough data accumulates (min 3 projects per domain).
+
+## Red Flags
+
+- Never assign a task outside the worker's declared capabilities
+- Never run more than 3 parallel workers (cost control)
+- Never dispatch without checking dependencies first
+- Never ignore division boundaries — use cross-division protocol
+- If no worker matches, escalate to director, don't force-fit
+- If LUCAS tasks come in, always load LUCAS project context first
+- Squad boost is optional — don't activate squads for simple tasks (cost waste)
+- **Never assign to a busy worker** — check workload first (Step 2.5)
+- **Always write back to taskboard** — dispatch without persistence is lost work

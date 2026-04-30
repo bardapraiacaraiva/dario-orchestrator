@@ -1,0 +1,114 @@
+# Domain Playbooks — LUCAS Analytics
+# Auto-generated from completed projects. Updated as new projects score.
+# Last updated: 2026-04-27
+
+playbooks:
+
+  restaurant:
+    confidence: "medium"  # 1 project — needs 3+ for "high"
+    projects: ["mar-brasa"]
+    avg_quality: 89.4
+    pipeline:
+      wave_1:
+        - skill: "dario-brand"
+          avg_score: 92
+          required: true
+          notes: "Always first. Sets archetype, tone, messaging for everything else."
+      wave_2:
+        parallel: true
+        max_workers: 3
+        tasks:
+          - skill: "dario-naming"
+            avg_score: 85
+            notes: "Domain check + INPI + social handles. Quick win."
+          - skill: "seo-local"
+            avg_score: 91
+            notes: "GBP + citations + reviews. Critical for discovery."
+          - skill: "seo-plan"
+            avg_score: 89
+            notes: "Site architecture + keywords + schema. Foundation for build."
+      wave_3:
+        - skill: "dario-story-circle"
+          avg_score: 90
+          depends_on: ["dario-brand", "dario-naming"]
+          notes: "Origin story + about page + short bios."
+      wave_4:
+        - skill: "orchestrator-synthesis"
+          notes: "Combine all outputs + prioritize + roadmap + save Obsidian + RAG."
+    total_estimated_tokens: 35000
+    total_estimated_time: "15-20 minutes"
+    rag_preparation:
+      - "Local competitor data for the city (GBP profiles, menu prices)"
+      - "Citation sources PT (TripAdvisor, TheFork, Zomato listings)"
+      - "Restaurant industry pricing benchmarks for the region"
+    common_mistakes:
+      - "Running seo-plan without brand context produces generic keywords"
+      - "Skipping seo-local for restaurants is a critical error — 60%+ discovery is Maps"
+    extensions_optional:
+      - skill: "dario-offer"
+        when: "Client also wants offer/pricing strategy"
+      - skill: "dario-ads-blueprint"
+        when: "Client has ad budget for launch"
+      - skill: "lp-builder"
+        when: "Need landing page before full site"
+
+  wordpress_agency_client:
+    confidence: "medium"  # Based on Vivenda + Lisbon Dog Care patterns
+    projects: ["vivenda", "lisbon-dog-care"]
+    avg_quality: 83.0
+    pipeline:
+      wave_1:
+        - skill: "dario-diagnose"
+          notes: "Full 7-dimension diagnostic first."
+      wave_2:
+        parallel: true
+        max_workers: 3
+        tasks:
+          - skill: "dario-wp-audit"
+            notes: "9-category WordPress audit"
+          - skill: "seo-audit"
+            notes: "Parallel SEO audit with 7 specialists"
+      wave_3:
+        - skill: "dario-cwv-fix"
+          depends_on: ["dario-wp-audit"]
+          notes: "Fix CWV issues found in audit"
+      wave_4:
+        - skill: "orchestrator-synthesis"
+    rag_preparation:
+      - "Client's current site URL and admin access"
+      - "Google Search Console data if available"
+      - "Competitor sites in same market"
+
+  golden_visa_website:
+    confidence: "low"  # 1 project, unique niche
+    projects: ["atrium"]
+    avg_quality: 85.0
+    pipeline:
+      wave_1:
+        - skill: "dario-brand"
+      wave_2:
+        parallel: true
+        tasks:
+          - skill: "seo-plan"
+          - skill: "seo-content"
+          - skill: "seo-schema"
+      wave_3:
+        - skill: "seo-geo"
+          notes: "AI Overviews optimization critical for informational queries"
+    rag_preparation:
+      - "Portuguese Golden Visa regulations (current)"
+      - "Competitor analysis (GetGoldenVisa, etc.)"
+      - "HNW investor audience research"
+
+  # Placeholder — to be filled as projects complete
+  architecture_studio:
+    confidence: "none"
+    projects: []
+    pipeline: null
+    notes: "Expected: DARIO (brand, seo-local, seo-plan) + DIVA (portfolio, briefing). Cross-division."
+
+  saas_product:
+    confidence: "none"
+    projects: []
+    pipeline: null
+    notes: "Expected: DARIO (brand, offer, funnel) + A360 (gtm, lp-builder). Cross-division."
