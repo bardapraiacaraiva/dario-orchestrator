@@ -1,0 +1,87 @@
+name: Validate Skills & Orchestrator
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'skills/**'
+      - 'orchestrator/**'
+  pull_request:
+    branches: [master]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check skill structure
+        run: |
+          echo "=== Skill Inventory ==="
+          total=0
+          for dir in skills/*/; do
+            skill=$(basename "$dir")
+            if [ -f "${dir}SKILL.md" ]; then
+              total=$((total + 1))
+            else
+              echo "WARN: ${skill} missing SKILL.md"
+            fi
+          done
+          echo "Total skills with SKILL.md: $total"
+
+      - name: Validate SKILL.md frontmatter
+        run: |
+          errors=0
+          for f in skills/*/SKILL.md; do
+            skill=$(basename "$(dirname "$f")")
+            # Check for YAML frontmatter (--- ... ---)
+            if ! head -1 "$f" | grep -q "^---"; then
+              echo "ERROR: $skill/SKILL.md missing YAML frontmatter"
+              errors=$((errors + 1))
+            fi
+            # Check for name field
+            if ! grep -q "^name:" "$f"; then
+              echo "ERROR: $skill/SKILL.md missing 'name:' field"
+              errors=$((errors + 1))
+            fi
+            # Check for description field
+            if ! grep -q "^description:" "$f"; then
+              echo "ERROR: $skill/SKILL.md missing 'description:' field"
+              errors=$((errors + 1))
+            fi
+          done
+          echo "Frontmatter errors: $errors"
+          if [ $errors -gt 0 ]; then exit 1; fi
+
+      - name: Validate orchestrator core files
+        run: |
+          required_files=(
+            "orchestrator/install.sh"
+            "orchestrator/orch"
+            "orchestrator/budget_tracker.py"
+            "orchestrator/quality/eval-baseline.yaml"
+          )
+          for f in "${required_files[@]}"; do
+            if [ -f "$f" ]; then
+              echo "OK: $f"
+            else
+              echo "MISSING: $f"
+              exit 1
+            fi
+          done
+
+      - name: Python syntax check
+        run: |
+          for f in orchestrator/*.py; do
+            python3 -c "import py_compile; py_compile.compile('$f', doraise=True)"
+            echo "OK: $f"
+          done
+
+      - name: Summary
+        run: |
+          skills=$(ls -d skills/*/SKILL.md 2>/dev/null | wc -l)
+          py=$(ls orchestrator/*.py 2>/dev/null | wc -l)
+          echo "## Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Skills validated: **$skills**" >> $GITHUB_STEP_SUMMARY
+          echo "- Python files checked: **$py**" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: **PASS**" >> $GITHUB_STEP_SUMMARY
