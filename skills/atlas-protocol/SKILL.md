@@ -1,3 +1,9 @@
+---
+name: atlas-protocol
+description: "Protocol, Etiquette & VIP Management — Portuguese state protocol, diplomatic protocol, receiving lines, dress code"
+version: "1.0"
+---
+
 # atlas-protocol — Protocol, Etiquette & VIP Management
 
 ## Description

@@ -1,3 +1,9 @@
+---
+name: atlas-tech
+description: "Event Technology & Registration Systems — registration platforms, check-in, event apps, WiFi, lead capture, RGPD"
+version: "1.0"
+---
+
 # atlas-tech — Event Technology & Registration Systems
 
 ## Description

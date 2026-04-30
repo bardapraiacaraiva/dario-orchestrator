@@ -1,3 +1,9 @@
+---
+name: atlas-guest
+description: "Guest Management & RSVP — database design, invitation strategy, registration, check-in, capacity management, RGPD compliance"
+version: "1.0"
+---
+
 # atlas-guest — Guest Management & RSVP
 
 ## Description

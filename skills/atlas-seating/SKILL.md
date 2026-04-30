@@ -1,3 +1,9 @@
+---
+name: atlas-seating
+description: "Seating Plans & Table Management — table configurations, floor plan layout, VIP seating, protocol, digital tools"
+version: "1.0"
+---
+
 # atlas-seating — Seating Plans & Table Management
 
 ## Description

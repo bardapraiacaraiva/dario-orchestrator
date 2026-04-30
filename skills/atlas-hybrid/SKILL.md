@@ -1,3 +1,9 @@
+---
+name: atlas-hybrid
+description: "Virtual & Hybrid Event Management — hybrid models, platform selection, streaming, engagement equity, analytics"
+version: "1.0"
+---
+
 # atlas-hybrid — Virtual & Hybrid Event Management
 
 ## Description
