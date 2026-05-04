@@ -616,6 +616,50 @@ def notify(event_name, data):
 
 **Severity levels:** `info` (pulse only), `warning` (pulse + audit), `critical` (pulse + audit + Obsidian alert note)
 
+## Phase 7.5: SKILL CHAINING (Auto-Sequential Execution)
+
+When a task matches a chain (defined in `~/.claude/orchestrator/skill_chains.yaml`), execute skills **sequentially with automatic output passing** — no CEO intervention between steps.
+
+**How it works:**
+```
+User: "cria marca completa para restaurante"
+Orchestrator detects: chain "brand_to_market"
+
+Step 1: dario-brand → produces: posicionamento, archetype
+   ↓ (output passes automatically)
+Step 2: dario-naming → receives posicionamento → produces: nome
+   ↓
+Step 3: dario-offer → receives posicionamento + nome → produces: offer
+   ↓
+Step 4: dario-sales-letter → receives all above → produces: copy
+   ↓
+Step 5: dario-email-seq → receives offer + copy → produces: emails
+
+Result: complete package without CEO re-dispatching between steps.
+```
+
+**Execution protocol:**
+1. Dispatch detects chain trigger keywords
+2. First skill receives user context
+3. Each subsequent skill receives: user context + previous skill output
+4. Quality gate between steps: if score < 70, retry 1x before stopping
+5. On complete: merge all outputs + calculate avg score + log chain
+6. On failure: deliver partial output (everything completed before failure)
+
+**Available chains:** brand_to_market, brand_to_ads, audit_to_fix, seo_full_pipeline, diva_full_project, client_full_onboard
+
+**Difference from Composite Modes:**
+- Composite Modes = parallel (all at once, merge)
+- Skill Chains = sequential (each feeds the next, automatic handoff)
+
+**Log codes:**
+- `DARIO_CHAIN_START_{name}` — chain activated
+- `DARIO_CHAIN_STEP_{n}_{skill}_DONE` — step completed
+- `DARIO_CHAIN_COMPLETE_{name}_{score}` — chain finished
+- `DARIO_CHAIN_FAIL_{name}_AT_STEP_{n}` — chain failed at step
+
+---
+
 ## Phase 8: AUTODIAG (Silent Periodic Audit) — ASIMO Pattern
 
 Inspired by ASIMO's AutoDiag_20 module. The orchestrator runs a silent self-diagnostic at defined intervals WITHOUT producing output unless issues are detected.

@@ -18,6 +18,19 @@ The "brain" that decides WHO does WHAT. Maps tasks to the optimal executor using
 
 ## Routing Algorithm
 
+### Step 0: Check Skill Chains FIRST
+
+Before any individual routing, check if the task matches a **skill chain** in `~/.claude/orchestrator/skill_chains.yaml`:
+
+1. Extract keywords from user request
+2. Match against `trigger_keywords` of each chain
+3. If match found → **activate chain** (auto-sequential execution, no individual dispatch needed)
+4. If no chain match → proceed to Step 1 (individual routing)
+
+**Available chains:** brand_to_market, brand_to_ads, audit_to_fix, seo_full_pipeline, diva_full_project, client_full_onboard
+
+**Priority:** Chain > Composite Mode > Individual Skill
+
 ### Step 1: Parse Task Requirements
 
 From the task, extract:

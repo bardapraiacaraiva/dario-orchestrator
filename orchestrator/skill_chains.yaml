@@ -1,0 +1,282 @@
+## DARIO Skill Chaining — Auto-Sequential Execution
+## Quando um skill termina, o próximo da chain arranca sozinho.
+## O output de cada etapa é input da próxima. Zero intervenção do CEO entre etapas.
+##
+## Diferente de Composite Modes (paralelo) — chains são SEQUENCIAIS com dependência.
+## Diferente de Taskboard (manual) — chains são AUTOMÁTICAS sem dispatch entre etapas.
+
+# ═══════════════════════════════════════════════════════════════
+# COMO FUNCIONA:
+#
+#   User pede: "cria marca completa para restaurante"
+#   Orchestrator detecta: chain "brand_to_market"
+#   Executa:
+#     1. dario-brand      → output: posicionamento, archetype, mensagem
+#        ↓ (output passa automaticamente)
+#     2. dario-naming      → recebe: posicionamento → output: nome, domínio
+#        ↓
+#     3. dario-offer       → recebe: posicionamento + nome → output: Grand Slam Offer
+#        ↓
+#     4. dario-sales-letter → recebe: tudo acima → output: copy de venda
+#        ↓
+#     5. dario-email-seq    → recebe: offer + copy → output: sequência de emails
+#
+#   Resultado: pacote completo Brand→Nome→Oferta→Copy→Emails
+#   Sem o CEO intervir entre etapas. Automático.
+# ═══════════════════════════════════════════════════════════════
+
+chains:
+
+  # ── MARKETING ──
+
+  brand_to_market:
+    name: "Da Marca ao Mercado"
+    description: "Posicionamento → Naming → Oferta → Sales Letter → Email Sequence"
+    trigger_keywords: ["marca completa", "brand completo", "do zero ao mercado", "marca ate vendas"]
+    steps:
+      - skill: dario-brand
+        receives: "briefing do user (cliente, industria, concorrentes)"
+        produces: "posicionamento, archetype, messaging hierarchy, diferenciacao"
+        pass_to_next: [posicionamento, archetype, tom_de_voz, diferenciadores]
+
+      - skill: dario-naming
+        receives: "posicionamento + archetype do step anterior"
+        produces: "3-5 nomes candidatos, analise linguistica, dominio check"
+        pass_to_next: [nome_escolhido, dominio]
+
+      - skill: dario-offer
+        receives: "posicionamento + nome + diferenciadores"
+        produces: "Grand Slam Offer (value equation, pricing, bonuses, garantia)"
+        pass_to_next: [oferta_completa, pricing, bonuses, garantia]
+
+      - skill: dario-sales-letter
+        receives: "posicionamento + nome + oferta completa"
+        produces: "Sales letter longa (Halbert/Schwartz/Brunson)"
+        pass_to_next: [headline, lead, body, cta]
+
+      - skill: dario-email-seq
+        receives: "oferta + sales letter + tom de voz"
+        produces: "Sequencia de 7 emails (soap opera + indoctrination)"
+        pass_to_next: null  # fim da chain
+
+    on_complete: "Gerar pacote unificado: Brand Guide + Naming + Offer + Sales Letter + Emails"
+    estimated_tokens: 35000
+    quality_gate: "cada step deve ter score >= 70 para avançar. Se falhar, retry 1x antes de parar."
+
+  brand_to_ads:
+    name: "Da Marca aos Anúncios"
+    description: "Posicionamento → Oferta → Funil → Ads Blueprint"
+    trigger_keywords: ["marca ate anuncios", "brand to ads", "funil completo"]
+    steps:
+      - skill: dario-brand
+        receives: "briefing do user"
+        produces: "posicionamento, archetype"
+        pass_to_next: [posicionamento, archetype, tom_de_voz]
+
+      - skill: dario-offer
+        receives: "posicionamento"
+        produces: "Grand Slam Offer"
+        pass_to_next: [oferta_completa, value_equation]
+
+      - skill: dario-funnel
+        receives: "posicionamento + oferta"
+        produces: "Funil completo (lead magnet, tripwire, core, profit maximizer)"
+        pass_to_next: [funil_estrutura, paginas, ctas]
+
+      - skill: dario-ads-blueprint
+        receives: "posicionamento + oferta + funil"
+        produces: "Blueprint de anuncios (audiences, creative, budget, metricas)"
+        pass_to_next: null
+
+    on_complete: "Pacote GTM: Brand + Offer + Funnel + Ads"
+    estimated_tokens: 30000
+
+  # ── AUDITORIA ──
+
+  audit_to_fix:
+    name: "Da Auditoria à Correção"
+    description: "Diagnóstico → Auditoria WP → Auditoria SEO → CWV Fix → Relatório"
+    trigger_keywords: ["audita e corrige", "audit and fix", "diagnostico completo com correcao"]
+    steps:
+      - skill: dario-diagnose
+        receives: "URL do site + briefing"
+        produces: "diagnostico holístico, triage CRITICO/IMPORTANTE/OTIMIZACAO"
+        pass_to_next: [problemas_criticos, prioridades, url]
+
+      - skill: dario-wp-audit
+        receives: "URL + problemas criticos do diagnostico"
+        produces: "audit WP completo (performance, seguranca, plugins, theme)"
+        pass_to_next: [issues_wp, score, recomendacoes]
+
+      - skill: seo-audit
+        receives: "URL + diagnostico"
+        produces: "audit SEO completo (technical, content, schema, links)"
+        pass_to_next: [issues_seo, score, keywords]
+
+      - skill: dario-cwv-fix
+        receives: "issues WP + issues SEO (só os fixáveis por código)"
+        produces: "patches aplicados, antes/depois CWV"
+        pass_to_next: [fixes_aplicados, metricas_antes_depois]
+
+    on_complete: "Relatório unificado: Diagnóstico + Audit WP + Audit SEO + Fixes Aplicados"
+    estimated_tokens: 45000
+    quality_gate: "diagnóstico deve ter score >= 60 para chain continuar"
+
+  # ── SEO ──
+
+  seo_full_pipeline:
+    name: "Pipeline SEO Completo"
+    description: "Keywords → Clusters → Content Plan → Schema → Sitemap"
+    trigger_keywords: ["seo completo", "seo do zero", "estrategia seo total"]
+    steps:
+      - skill: dario-kw-cluster
+        receives: "industria + concorrentes + URL"
+        produces: "keyword clusters, intent mapping, cannibalization check"
+        pass_to_next: [clusters, keywords_primarias, intent_map]
+
+      - skill: seo-plan
+        receives: "clusters + keywords"
+        produces: "estrategia SEO 90 dias, content calendar, link building plan"
+        pass_to_next: [content_calendar, target_pages]
+
+      - skill: seo-schema
+        receives: "target pages + industria"
+        produces: "schema JSON-LD para cada tipo de pagina"
+        pass_to_next: [schemas_gerados]
+
+      - skill: seo-sitemap
+        receives: "target pages + content calendar"
+        produces: "sitemap XML optimizado"
+        pass_to_next: null
+
+    on_complete: "Pacote SEO: Keywords → Strategy → Schema → Sitemap"
+    estimated_tokens: 25000
+
+  # ── ARQUITECTURA (DIVA) ──
+
+  diva_full_project:
+    name: "Projecto Arquitectura Completo"
+    description: "Briefing → Diagnose → Floor Plan + Moodboard → Materials → Budget → Timeline → Roadmap"
+    trigger_keywords: ["projecto arquitectura completo", "remodelacao completa", "obra do inicio ao fim"]
+    steps:
+      - skill: diva-briefing
+        receives: "briefing do cliente (estilo, orcamento, necessidades)"
+        produces: "documento de requisitos estruturado"
+        pass_to_next: [requisitos, estilo, restricoes, orcamento_indicativo]
+
+      - skill: diva-diagnose
+        receives: "requisitos + fotos/planta do espaco"
+        produces: "diagnostico estrutural, potencial, restricoes"
+        pass_to_next: [diagnostico, potencial, restricoes_reais]
+
+      - skill: diva-floor-plan
+        receives: "requisitos + diagnostico"
+        produces: "layout optimizado, circulacao, zonamento"
+        pass_to_next: [planta_proposta, areas, zonamento]
+
+      - skill: diva-moodboard
+        receives: "estilo + requisitos"
+        produces: "direcao visual, paleta, referencias"
+        pass_to_next: [paleta, materiais_sugeridos, estilo_definido]
+
+      - skill: diva-materials
+        receives: "moodboard + planta"
+        produces: "especificacao de materiais com fornecedores PT"
+        pass_to_next: [lista_materiais, custos_unitarios]
+
+      - skill: diva-budget
+        receives: "planta + materiais + requisitos"
+        produces: "orcamento detalhado por fase"
+        pass_to_next: [orcamento_total, fases, custos_por_divisao]
+
+      - skill: diva-timeline
+        receives: "orcamento + fases"
+        produces: "cronograma/Gantt com dependencias"
+        pass_to_next: [timeline, milestones, duracao_total]
+
+      - skill: diva-roadmap
+        receives: "tudo acima"
+        produces: "roadmap visual do projecto completo"
+        pass_to_next: null
+
+    on_complete: "Projecto completo: Briefing → Planta → Visual → Materiais → Orçamento → Timeline → Roadmap"
+    estimated_tokens: 50000
+    quality_gate: "briefing e diagnose devem ter >= 70 para avançar"
+
+  # ── CLIENTE ──
+
+  client_full_onboard:
+    name: "Onboarding Completo de Cliente"
+    description: "Diagnose → Audit → Brand → Proposal → Contrato"
+    trigger_keywords: ["onboard completo", "novo cliente do zero", "processo comercial completo"]
+    steps:
+      - skill: dario-diagnose
+        receives: "URL + briefing inicial do cliente"
+        produces: "diagnostico, oportunidades, prioridades"
+        pass_to_next: [diagnostico, oportunidades, quick_wins]
+
+      - skill: dario-wp-audit
+        receives: "URL + diagnostico"
+        produces: "audit tecnico completo"
+        pass_to_next: [score, issues, recomendacoes]
+
+      - skill: dario-brand
+        receives: "diagnostico + industria do cliente"
+        produces: "analise de posicionamento actual + recomendacoes"
+        pass_to_next: [posicionamento_actual, gaps, recomendacoes_marca]
+
+      - skill: dario-proposal
+        receives: "diagnostico + audit + brand analysis"
+        produces: "proposta comercial 3 opcoes (Blair Enns)"
+        pass_to_next: null
+
+    on_complete: "Pacote onboarding: Diagnóstico + Audit + Brand Analysis + Proposta 3 opções"
+    estimated_tokens: 30000
+
+# ═══════════════════════════════════════════════════════════════
+# PROTOCOLO DE EXECUÇÃO
+# ═══════════════════════════════════════════════════════════════
+
+execution_protocol:
+  # 1. Detecção
+  detection: "Dispatch verifica trigger_keywords. Se match → activa chain em vez de skill individual."
+
+  # 2. Contexto inicial
+  context_injection: |
+    O primeiro skill da chain recebe o pedido do user.
+    Cada skill subsequente recebe:
+    - O output do skill anterior (campos definidos em pass_to_next)
+    - O contexto original do user
+    - O chain_id para tracking
+
+  # 3. Passagem automática
+  auto_handoff: |
+    Quando um skill completa:
+    1. Quality gate: verificar score >= threshold (default 70)
+    2. Se passou: extrair campos de pass_to_next do output
+    3. Construir prompt para próximo skill com: contexto + output anterior
+    4. Lançar próximo skill automaticamente (sem voltar ao CEO)
+    5. Log: DARIO_CHAIN_{chain_id}_STEP_{n}_COMPLETE
+
+  # 4. Se falhar
+  on_step_failure: |
+    1. Retry 1x com prompt ajustado
+    2. Se falhar de novo: PARAR chain
+    3. Log: DARIO_CHAIN_{chain_id}_STEP_{n}_FAILED
+    4. Entregar output parcial (tudo que completou até ao ponto de falha)
+    5. Notificar user: "A chain parou no step N. Entreguei o que foi produzido até aqui."
+
+  # 5. Resultado final
+  on_chain_complete: |
+    1. Juntar todos os outputs numa entrega unificada
+    2. Calcular quality score médio da chain
+    3. Log: DARIO_CHAIN_{chain_id}_COMPLETE (score, tokens, duration)
+    4. Se score >= 90: log como success pattern para Evolutionary Delta
+    5. Actualizar synaptic_weights dos pares de skills que participaram
+
+  # 6. Tracking
+  chain_tracking:
+    log_code_start: "DARIO_CHAIN_START_{chain_name}"
+    log_code_step: "DARIO_CHAIN_STEP_{n}_{skill}_DONE"
+    log_code_complete: "DARIO_CHAIN_COMPLETE_{chain_name}_{score}"
+    log_code_fail: "DARIO_CHAIN_FAIL_{chain_name}_AT_STEP_{n}"
