@@ -1,0 +1,264 @@
+## DARIO Operational States — Formal State Machine (DARIO v1.0 Pattern)
+## Defines system states with explicit transitions and triggers
+## The orchestrator is ALWAYS in one of these states
+
+states:
+  ACTIVE:
+    description: "Normal operation — full autonomy, max parallelism, all systems go"
+    allowed_actions: [dispatch, execute, score, auto_approve]
+    max_parallel: 3
+    triggers_to_enter:
+      - "SystemHealth >= 0.85"
+      - "Budget < 80%"
+      - "No quality regression detected"
+      - "User explicitly resumes"
+
+  REFLECTIVE_PAUSE:
+    description: "System detected anomaly — reduced operation, increased auditing"
+    allowed_actions: [dispatch, score, audit]  # execute only with user approval
+    max_parallel: 1
+    triggers_to_enter:
+      - "Quality score of last 3 tasks avg < 60"
+      - "SystemHealth between 0.50 and 0.70"
+      - "AutoDiag detected 3+ warnings in same pulse"
+      - "evolutionary_delta negative for 5+ tasks"
+    auto_actions:
+      - "Run full AutoDiag"
+      - "Generate diagnostic report for user"
+      - "Pause auto-execution until root cause identified"
+
+  GUARDIAN:
+    description: "Ethical or compliance issue detected — minimal operation, human oversight required"
+    allowed_actions: [audit, report]  # NO execution without explicit user approval
+    max_parallel: 0
+    triggers_to_enter:
+      - "Budget >= 95%"
+      - "Ethical pre-gate failed (clarity=false OR coherence=false)"
+      - "SystemHealth < 0.50"
+      - "User reports incorrect/harmful output"
+      - "Blocklist violation detected"
+    auto_actions:
+      - "Pause ALL in_progress tasks"
+      - "Generate incident report"
+      - "Log DARIO_GUARDIAN_ACTIVATED_{reason}"
+      - "Wait for user acknowledgement before resuming"
+
+  EXPANSION:
+    description: "Learning and improvement cycle — system improves itself"
+    allowed_actions: [audit, score, learn, optimize]
+    max_parallel: 1
+    triggers_to_enter:
+      - "All tasks done, no pending work"
+      - "User says 'optimiza', 'melhora o sistema', 'aprende'"
+      - "Weekly cycle (Sunday auto-trigger)"
+    auto_actions:
+      - "Review last 10 task scores — extract success patterns"
+      - "Update synaptic_weights.yaml based on performance"
+      - "Check memory staleness (>30 days)"
+      - "Propose skill improvements to user"
+      - "Calculate evolutionary_delta"
+      - "Log DARIO_EXPANSION_CYCLE_{timestamp}"
+
+## Transition rules
+transitions:
+  ACTIVE_to_REFLECTIVE:
+    condition: "Any REFLECTIVE trigger fires"
+    action: "Log transition, notify user, reduce parallelism"
+    reversible: true
+
+  ACTIVE_to_GUARDIAN:
+    condition: "Any GUARDIAN trigger fires"
+    action: "IMMEDIATE stop all execution, log incident"
+    reversible: true  # Only after user acknowledgement
+
+  REFLECTIVE_to_ACTIVE:
+    condition: "Root cause resolved + SystemHealth >= 0.85"
+    action: "Log recovery, resume normal operation"
+
+  REFLECTIVE_to_GUARDIAN:
+    condition: "Issue worsens during reflection"
+    action: "Escalate to full stop"
+
+  GUARDIAN_to_ACTIVE:
+    condition: "User explicitly acknowledges + fix applied"
+    action: "Log resolution, resume cautiously (max_parallel=1 for first pulse)"
+
+  ANY_to_EXPANSION:
+    condition: "No pending work + user triggers OR weekly schedule"
+    action: "Enter learning cycle"
+
+  EXPANSION_to_ACTIVE:
+    condition: "Learning cycle completes"
+    action: "Resume normal with updated weights/patterns"
+
+## Ethical Pre-Gate (DARIO v1.0 "Filtro Triplice")
+## Applied BEFORE every dispatch decision
+ethical_pre_gate:
+  questions:
+    clarity: "Is the task clearly defined with unambiguous success criteria?"
+    freedom: "Does executing this respect user autonomy and informed consent?"
+    coherence: "Is this aligned with project objectives and manifesto values?"
+  on_fail:
+    action: "Enter GUARDIAN state"
+    alternative: "Propose reformulated task that passes all 3 checks"
+    log: "DARIO_ETHICAL_GATE_FAIL_{question}_{task_id}"
+
+## Blocklist — Actions the system NEVER executes
+blocklist:
+  - "Make promises about results/guarantees without data"
+  - "Use manipulative persuasion tactics (fake urgency, fear-based)"
+  - "Execute tasks that bypass user's explicit instructions"
+  - "Auto-approve financial decisions above estimated budget"
+  - "Delete user data/files without explicit confirmation"
+  - "Send communications to external parties without approval"
+  - "Commit code with known security vulnerabilities"
+  - "Override quality gates to ship faster"
+
+## Evolutionary Delta — Meta-learning metric
+evolutionary_delta:
+  description: "Measures rate of improvement per iteration"
+  formula: "avg_quality_last_10 - avg_quality_previous_10"
+  target: "> 0 (always improving)"
+  alert_threshold: "< -5 (regression detected)"
+  tracked_in: "~/.claude/orchestrator/quality/evolution.yaml"
+
+## Autonomy Ladder — Progressive Permission Escalation (DIVA2 Pattern)
+## System unlocks more autonomy as trust (metrics) accumulates
+autonomy_ladder:
+  P-A1:
+    name: "Supervised"
+    description: "All actions require user approval before execution"
+    unlock_condition: "default — new project or SystemHealth < 0.60"
+    permissions: [dispatch_with_approval, score, audit, report]
+    max_parallel: 1
+
+  P-A2:
+    name: "Guided"
+    description: "Routine tasks auto-execute, complex tasks need approval"
+    unlock_condition: "SystemHealth >= 0.70 AND last_10_tasks_avg_score >= 70"
+    permissions: [dispatch_routine, execute_routine, score, audit, report]
+    max_parallel: 2
+    routine_policies: [default]  # Only default policy auto-executes
+
+  P-A3:
+    name: "Autonomous"
+    description: "Most tasks auto-execute, only critical/financial need approval"
+    unlock_condition: "SystemHealth >= 0.85 AND last_20_tasks_avg_score >= 80 AND evolutionary_delta > 0"
+    permissions: [dispatch_all, execute_most, score, audit, report, auto_approve_default]
+    max_parallel: 3
+    approval_required: [critical, financial]
+
+  P-A4:
+    name: "Full Autonomy"
+    description: "System self-manages completely, user notified post-facto"
+    unlock_condition: "SystemHealth >= 0.90 AND last_50_tasks_avg_score >= 85 AND zero_guardian_triggers_30d"
+    permissions: [all]
+    max_parallel: 3
+    approval_required: [financial_above_budget_10pct]  # Only very large financial decisions
+
+  # Demotion rules: If metrics drop, autonomy level decreases
+  demotion:
+    - "Guardian triggered → immediate drop to P-A1"
+    - "SystemHealth < 0.60 → drop to P-A1"
+    - "3 consecutive scores < 60 → drop one level"
+    - "Evolutionary delta < -10 → drop one level"
+
+## Self-Healing Actions Map (DIVA2 Doc 03 Pattern)
+## Declarative: metric < threshold → specific named action
+self_healing:
+  quality_avg_below_60:
+    action: "Enter REFLECTIVE_PAUSE, run full AutoDiag, review last 5 task outputs for patterns"
+    severity: warning
+
+  quality_avg_below_40:
+    action: "Enter GUARDIAN, pause all execution, generate incident report for user"
+    severity: critical
+
+  budget_above_80:
+    action: "Reduce max_parallel to 1, notify user, prioritize only critical tasks"
+    severity: warning
+
+  budget_above_95:
+    action: "STOP all execution, set all in_progress → todo, notify user"
+    severity: critical
+
+  stale_tasks_above_3:
+    action: "Block stale tasks, reassign via fallback_matrix, log DARIO_STALE_RECOVERY"
+    severity: warning
+
+  evolutionary_delta_below_minus5:
+    action: "Enter REFLECTIVE_PAUSE, analyze regression root cause, propose skill updates"
+    severity: warning
+
+  memory_staleness_above_50pct:
+    action: "Flag stale memories in status report, suggest cleanup to user"
+    severity: info
+
+  synaptic_weight_below_0.2:
+    action: "Flag underperforming skill pair, suggest alternative combinations"
+    severity: info
+
+## Boot Dependency Chain (DIVA2 Doc 12 Pattern)
+## Ordered initialization with explicit dependencies
+## Used by Reactivation Protocol at session start
+boot_chain:
+  step_1:
+    component: "manifesto"
+    action: "Load ~/.claude/orchestrator/manifesto.yaml"
+    depends_on: []
+    on_fail: "ABORT — governance foundation missing"
+
+  step_2:
+    component: "ethical_gate"
+    action: "Validate operational_states.yaml exists and ethical_pre_gate is defined"
+    depends_on: [manifesto]
+    on_fail: "ABORT — ethical layer missing"
+
+  step_3:
+    component: "memory"
+    action: "Load project memory files, verify freshness"
+    depends_on: [manifesto]
+    on_fail: "WARN — proceed with degraded context"
+
+  step_4:
+    component: "taskboard"
+    action: "Scan active tasks, run stale check, calculate task counts"
+    depends_on: [manifesto, ethical_gate]
+    on_fail: "WARN — create empty taskboard"
+
+  step_5:
+    component: "budget"
+    action: "Load monthly budget, check thresholds"
+    depends_on: [manifesto]
+    on_fail: "WARN — create default budget"
+
+  step_6:
+    component: "autodiag"
+    action: "Run silent audit on all components loaded so far"
+    depends_on: [taskboard, budget, memory]
+    on_fail: "WARN — log degraded AutoDiag"
+
+  step_7:
+    component: "autonomy_level"
+    action: "Calculate current autonomy level from metrics"
+    depends_on: [autodiag, budget]
+    on_fail: "DEFAULT to P-A1 (Supervised)"
+
+  step_8:
+    component: "seal"
+    action: "Log DARIO_BOOT_OK or DARIO_BOOT_DEGRADED with failed steps"
+    depends_on: [all_above]
+    on_fail: "N/A — always executes"
+
+## Circuit Breaker with Quarantine (DIVA2 Doc 12 Pattern)
+## Graceful restart that isolates external communication during recovery
+circuit_breaker:
+  trigger: "Skill execution fails 3x consecutively OR SystemHealth drops > 20pts in one pulse"
+  protocol:
+    1_isolate: "Pause all external outputs (no task execution, no dispatch)"
+    2_diagnose: "Run full AutoDiag to identify root cause"
+    3_recover: "Restart failed component: reload skill, clear cache, reset state"
+    4_validate: "Run test task on recovered component to verify"
+    5_resume: "If test passes → resume normal operation. If fails → enter GUARDIAN"
+  quarantine_duration: "Until validation passes or user intervenes"
+  log_code: "DARIO_CIRCUIT_BREAKER_{component}_{timestamp}"

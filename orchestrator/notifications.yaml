@@ -1,0 +1,143 @@
+# Notification Protocol — DARIO Orchestrator
+# Defines what events trigger notifications, where they go, and what they contain.
+# Version: 1.0 | Created: 2026-04-27
+
+# === CHANNELS ===
+# Where notifications are delivered. Each event can target multiple channels.
+
+channels:
+
+  pulse_report:
+    type: "inline"
+    description: "Shown in heartbeat/autopilot output. Always active."
+    always_on: true
+
+  audit_log:
+    type: "file"
+    description: "Appended to ~/.claude/orchestrator/audit/YYYY-MM-DD.yaml"
+    path: "~/.claude/orchestrator/audit/"
+    always_on: true
+
+  obsidian_alert:
+    type: "file"
+    description: "Critical alerts saved as Obsidian note for persistent visibility"
+    path: "C:\\Users\\barda\\OneDrive\\Documents\\D.A.R.I.O\\05 - Claude - IA\\Decisoes\\"
+    filename_pattern: "YYYY-MM-DD - ALERT - {event_type}.md"
+    min_severity: "critical"
+
+  task_note:
+    type: "task_yaml"
+    description: "Appended to task.notes[] array in the task YAML file"
+    always_on: true
+
+# === EVENTS ===
+# What triggers a notification, severity, channels, and message template.
+
+events:
+
+  task_completed:
+    severity: "info"
+    channels: [pulse_report, audit_log, task_note]
+    template: "[DONE] {task.id}: {task.title} — score {task.quality_score}/100, {task.actual_tokens} tokens"
+
+  task_revision:
+    severity: "warning"
+    channels: [pulse_report, audit_log, task_note]
+    template: "[REVISION] {task.id}: score {score}/100 — {feedback}. Attempt {task.revision_count}/{task.revision_max_loops}"
+
+  task_escalated:
+    severity: "critical"
+    channels: [pulse_report, audit_log, task_note, obsidian_alert]
+    template: "[ESCALATED] {task.id}: {reason}. Requires user intervention."
+
+  sla_warning:
+    severity: "warning"
+    channels: [pulse_report, audit_log, task_note]
+    template: "[SLA WARNING] {task.id}: {age_hours:.1f}h in progress, SLA is {sla_hours}h ({task.execution_policy})"
+
+  sla_breach:
+    severity: "critical"
+    channels: [pulse_report, audit_log, task_note, obsidian_alert]
+    template: "[SLA BREACH] {task.id}: {age_hours:.1f}h — 2x SLA exceeded. Task blocked and unassigned."
+
+  budget_warning:
+    severity: "warning"
+    channels: [pulse_report, audit_log, obsidian_alert]
+    template: "[BUDGET WARNING] {percentage}% used ({total_tokens:,} / {limit:,}). Limiting to 1 parallel worker."
+
+  budget_critical:
+    severity: "critical"
+    channels: [pulse_report, audit_log, obsidian_alert]
+    template: "[BUDGET CRITICAL] {percentage}% used. ALL EXECUTION STOPPED. User must approve or increase limit."
+
+  quality_low:
+    severity: "warning"
+    channels: [pulse_report, audit_log, task_note]
+    template: "[QUALITY LOW] {skill}: avg score {avg_score}/100, revision rate {revision_rate}%. Needs prompt improvement."
+
+  playbook_detected:
+    severity: "info"
+    channels: [pulse_report, audit_log]
+    template: "[PLAYBOOK] Domain: {domain} — {skill_count} skills auto-decomposed from {playbook_name} playbook"
+
+  project_completed:
+    severity: "info"
+    channels: [pulse_report, audit_log, obsidian_alert]
+    template: "[PROJECT DONE] {project}: {task_count} tasks, avg quality {avg_score}/100, {total_tokens:,} tokens, {duration}"
+
+  health_check_failed:
+    severity: "critical"
+    channels: [pulse_report, audit_log, obsidian_alert]
+    template: "[HEALTH] {service} is DOWN: {reason}. Auto-fix {auto_fixable ? 'attempted' : 'not possible — manual intervention required'}."
+
+  stale_task:
+    severity: "warning"
+    channels: [pulse_report, audit_log, task_note]
+    template: "[STALE] {task.id}: in_progress for {age_hours:.0f}h without update. Escalating to {escalate_to}."
+
+  circular_dependency_detected:
+    severity: "critical"
+    channels: [pulse_report, audit_log, obsidian_alert]
+    template: "[CIRCULAR DEP] Cycle detected: {chain}. Task decomposition ABORTED. Fix dependencies before proceeding."
+
+  worker_unavailable_queued:
+    severity: "info"
+    channels: [pulse_report, audit_log]
+    template: "[QUEUED] {task.id}: worker {worker_id} busy ({active_tasks} active). Task queued for next pulse."
+
+  file_init_completed:
+    severity: "info"
+    channels: [pulse_report, audit_log]
+    template: "[INIT] Created missing directory/file: {path}"
+
+  validation_passed:
+    severity: "info"
+    channels: [pulse_report]
+    template: "[VALIDATE] Phase 0 passed: {checks_passed} checks OK, {warnings} warnings."
+
+  task_retry:
+    severity: "warning"
+    channels: [pulse_report, audit_log, task_note]
+    template: "[RETRY] {task.id}: attempt {attempt}/{max_retries} after failure: {error_summary}"
+
+  dead_letter:
+    severity: "critical"
+    channels: [pulse_report, audit_log, task_note, obsidian_alert]
+    template: "[DEAD LETTER] {task.id}: failed after {max_retries} retries. Blocked. Requires manual intervention."
+
+# === NOTIFICATION LOGIC ===
+#
+# In heartbeat/autopilot, after any event occurs:
+#
+# 1. Look up event in this config
+# 2. Format template with event data
+# 3. For each channel in channels[]:
+#    - pulse_report: append to pulse output markdown
+#    - audit_log: append YAML entry to audit file
+#    - obsidian_alert: write markdown note to vault (critical only)
+#    - task_note: append to task.notes[] array
+# 4. If severity == "critical": add to pulse report ALERTS section
+#
+# Usage in skills:
+#   notify("task_completed", {task: task, score: 88})
+#   notify("budget_warning", {percentage: 82, total_tokens: 41000000, limit: 50000000})

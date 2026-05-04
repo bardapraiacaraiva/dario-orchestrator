@@ -1,0 +1,73 @@
+## DARIO Composite Modes — Pre-configured Agent Formations (DIVA2 Pattern)
+## Atomic activation of skill subsets as temporary task forces
+## Different from squads (permanent) — these are context-triggered formations
+
+# When a task requires multi-skill collaboration, dispatch activates a composite mode
+# instead of individual sequential skills. All skills in a mode execute collaboratively.
+
+modes:
+  brand_launch:
+    name: "Brand Launch Formation"
+    description: "Full brand identity + offer + copy in one atomic execution"
+    skills: [dario-brand, dario-naming, dario-offer, dario-sales-letter]
+    trigger_keywords: ["lancamento marca", "brand launch", "nova marca", "rebranding completo"]
+    output_merge: "orchestrator synthesizes individual outputs into unified brand package"
+    estimated_tokens: 25000
+
+  full_audit:
+    name: "Full Audit Formation"
+    description: "Diagnostic + WP + SEO + CRO in parallel, merged into single report"
+    skills: [dario-diagnose, dario-wp-audit, seo-audit, dario-cro]
+    trigger_keywords: ["auditoria completa", "full audit", "diagnostico total"]
+    output_merge: "CRITICO/IMPORTANTE/OTIMIZACAO triage across all outputs"
+    estimated_tokens: 40000
+
+  architecture_kickoff:
+    name: "Architecture Kickoff Formation"
+    description: "DIVA project initiation — briefing + diagnose + floor plan + moodboard"
+    skills: [diva-briefing, diva-diagnose, diva-floor-plan, diva-moodboard]
+    trigger_keywords: ["projecto arquitectura", "novo projecto DIVA", "remodelacao"]
+    output_merge: "unified project brief with visual + technical + regulatory"
+    estimated_tokens: 30000
+
+  content_engine:
+    name: "Content Engine Formation"
+    description: "Content strategy + SEO keywords + editorial calendar + first pieces"
+    skills: [dario-content, dario-kw-cluster, seo-content, dario-social]
+    trigger_keywords: ["estrategia conteudo", "content plan", "editorial calendar"]
+    output_merge: "calendar with keyword-mapped content pieces"
+    estimated_tokens: 20000
+
+  client_onboard_full:
+    name: "Client Onboarding Formation"
+    description: "Complete onboard — diagnose + audit + brand + proposal"
+    skills: [dario-client-onboard, dario-diagnose, dario-wp-audit, dario-proposal]
+    trigger_keywords: ["onboard cliente", "novo cliente", "client onboarding"]
+    output_merge: "onboarding package with diagnostic + proposal"
+    estimated_tokens: 35000
+
+  financial_review:
+    name: "Financial Review Formation"
+    description: "Full financial analysis — model + pricing + SaaS metrics"
+    skills: [dario-financial-model, dario-pricing-calculator, dario-saas-metrics]
+    trigger_keywords: ["revisao financeira", "financial review", "viabilidade"]
+    output_merge: "unified financial dashboard"
+    estimated_tokens: 15000
+
+# Activation Protocol (from DIVA2 Doc 14 — PAA 5 stages):
+# 1. PERCEPCAO — Detect composite mode match from user input keywords
+# 2. ANALISE — Verify all skills in mode are available (not busy/blocked)
+# 3. SELECCAO — Confirm mode is appropriate (budget check, scope check)
+# 4. EXECUCAO — Launch all skills in parallel via Agent tool (co-signature)
+# 5. SINTESE — Orchestrator merges outputs into unified deliverable
+
+# Co-signature pattern (DIVA2 Doc 16):
+# Multiple agents contribute to same output simultaneously
+# Orchestrator receives all outputs and synthesizes final version
+# Each contributor is credited in the audit log
+
+co_signature:
+  enabled: true
+  merge_strategy: "orchestrator_synthesis"  # orchestrator reads all outputs and creates unified version
+  conflict_resolution: "most-specific-wins"  # if skills disagree, domain expert wins
+  credit_tracking: true  # log which skills contributed to final output

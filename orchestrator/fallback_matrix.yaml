@@ -1,0 +1,176 @@
+## DARIO Fallback Matrix — Inspired by ASIMO Cognitive Fallback Protocol
+## Defines what happens when a primary skill fails
+
+# Trigger conditions for fallback:
+# - Skill execution returns empty output
+# - Skill execution exceeds SLA timeout
+# - Skill produces output with quality score < 40
+# - Agent tool returns error/timeout
+
+# Does NOT trigger for:
+# - User-cancelled execution
+# - Budget exceeded (hard stop)
+# - Circular dependency (abort)
+
+matrix:
+  # Marketing Division
+  dario-brand:
+    fallback: dir-marketing
+    escalate: dario-ceo
+    reason: "Brand requires strategic oversight"
+
+  dario-offer:
+    fallback: dario-brand
+    escalate: dir-marketing
+    reason: "Offer builds on brand positioning"
+
+  dario-sales-letter:
+    fallback: dario-content
+    escalate: dir-marketing
+    reason: "Sales letter is specialized content"
+
+  dario-ads-blueprint:
+    fallback: dario-funnel
+    escalate: dir-marketing
+    reason: "Ads serve the funnel"
+
+  dario-funnel:
+    fallback: dario-offer
+    escalate: dir-marketing
+    reason: "Funnel delivers the offer"
+
+  dario-email-seq:
+    fallback: dario-content
+    escalate: dir-marketing
+    reason: "Email is content with sequence logic"
+
+  dario-naming:
+    fallback: dario-brand
+    escalate: dir-marketing
+    reason: "Naming derives from brand"
+
+  # Technical Division
+  dario-wp-audit:
+    fallback: seo-technical
+    escalate: dir-technical
+    reason: "At minimum do technical SEO checks"
+
+  dario-woo-audit:
+    fallback: dario-wp-audit
+    escalate: dir-technical
+    reason: "WooCommerce is WordPress subset"
+
+  dario-cwv-fix:
+    fallback: seo-performance
+    escalate: dir-technical
+    reason: "CWV fix uses performance data"
+
+  dario-pentest-checklist:
+    fallback: seo-technical
+    escalate: dir-technical
+    reason: "Security overlaps with technical audit"
+
+  # SEO Division
+  seo-audit:
+    fallback: seo-technical
+    escalate: dir-seo
+    reason: "Technical SEO is the foundation"
+
+  seo-technical:
+    fallback: seo-page
+    escalate: dir-seo
+    reason: "Single page analysis as minimum"
+
+  seo-content:
+    fallback: seo-page
+    escalate: dir-seo
+    reason: "Page-level content check"
+
+  seo-local:
+    fallback: seo-schema
+    escalate: dir-seo
+    reason: "Local SEO needs schema at minimum"
+
+  seo-geo:
+    fallback: seo-content
+    escalate: dir-seo
+    reason: "GEO builds on content quality"
+
+  seo-schema:
+    fallback: null
+    escalate: dir-seo
+    reason: "Schema is atomic, no simpler fallback"
+
+  dario-kw-cluster:
+    fallback: seo-dataforseo
+    escalate: dir-seo
+    reason: "DataForSEO provides raw keyword data"
+
+  # Finance Division
+  dario-financial-model:
+    fallback: dario-saas-metrics
+    escalate: dir-finance
+    reason: "Metrics are subset of financial model"
+
+  dario-pricing-calculator:
+    fallback: dario-financial-model
+    escalate: dir-finance
+    reason: "Pricing needs financial context"
+
+  dario-saas-metrics:
+    fallback: null
+    escalate: dir-finance
+    reason: "Metrics are atomic"
+
+  # DIVA Division (Architecture/Design)
+  diva-budget:
+    fallback: diva-calc
+    escalate: dir-construction
+    reason: "Simpler calculator as minimum"
+
+  diva-floor-plan:
+    fallback: diva-briefing
+    escalate: dir-design
+    reason: "Re-capture requirements"
+
+  diva-moodboard:
+    fallback: diva-materials
+    escalate: dir-design
+    reason: "Materials define the aesthetic"
+
+  diva-render:
+    fallback: diva-render-brief
+    escalate: dir-design
+    reason: "At minimum produce the brief for manual render"
+
+  diva-timeline:
+    fallback: diva-budget
+    escalate: dir-construction
+    reason: "Timeline needs budget data"
+
+  diva-licensing:
+    fallback: null
+    escalate: dir-regulatory
+    reason: "Licensing is binary — no simpler version"
+
+  diva-energy:
+    fallback: null
+    escalate: dir-regulatory
+    reason: "Energy cert is regulatory, no fallback"
+
+  # Client Success
+  dario-client-onboard:
+    fallback: dario-diagnose
+    escalate: dario-ceo
+    reason: "At minimum diagnose the client"
+
+  dario-diagnose:
+    fallback: null
+    escalate: dario-ceo
+    reason: "Diagnose is the entry point, no simpler version"
+
+  # Default (any skill not listed)
+  DEFAULT:
+    fallback: null
+    escalate: dario-ceo
+    reason: "CEO decides on unknown skills"
