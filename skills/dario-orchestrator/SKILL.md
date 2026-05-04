@@ -616,6 +616,237 @@ def notify(event_name, data):
 
 **Severity levels:** `info` (pulse only), `warning` (pulse + audit), `critical` (pulse + audit + Obsidian alert note)
 
+## Phase 8: AUTODIAG (Silent Periodic Audit) — ASIMO Pattern
+
+Inspired by ASIMO's AutoDiag_20 module. The orchestrator runs a silent self-diagnostic at defined intervals WITHOUT producing output unless issues are detected.
+
+**Trigger:** Every 10 task completions OR at the start of each heartbeat pulse.
+
+**Diagnostic Checks:**
+
+```yaml
+autodiag_protocol:
+  frequency: every_10_tasks_or_pulse_start
+  mode: silent  # Only outputs if issues found
+  checks:
+    - name: coherence_check
+      action: "Verify all in_progress tasks still have valid assignees in company.yaml"
+      on_fail: "Set task status → blocked, reason: 'assignee not found in hierarchy'"
+
+    - name: orphan_detection
+      action: "Find tasks with parent IDs that don't exist"
+      on_fail: "Clear parent reference, add note: 'orphaned — parent removed'"
+
+    - name: dependency_integrity
+      action: "Verify all depends_on references point to existing tasks"
+      on_fail: "Remove broken dep, add note: 'dependency removed — target missing'"
+
+    - name: budget_drift
+      action: "Compare actual_tokens sum vs budget YAML total"
+      on_fail: "Recalculate and update budget YAML"
+
+    - name: stale_review
+      action: "Find tasks in_review for >2x SLA time"
+      on_fail: "Auto-approve if score >= auto_approve_threshold, else escalate"
+
+    - name: quality_regression
+      action: "Check last 5 task scores — if avg dropped >15 points from baseline"
+      on_fail: "Flag quality regression, notify user"
+```
+
+**Log codes (structured, append-only):**
+```
+DARIO_AUTODIAG_OK_{timestamp}        — all checks passed
+DARIO_AUTODIAG_WARN_{check}_{id}     — issue found and auto-fixed
+DARIO_AUTODIAG_FAIL_{check}_{id}     — issue found, needs manual intervention
+```
+
+**Principles (from ASIMO):**
+- `append-only` — never delete audit entries, only add
+- `most-specific-wins` — if two rules conflict, the more specific one applies
+- `silent-mode` — AutoDiag never outputs unless it finds a problem
+
+---
+
+## Phase 9: REACTIVATION PROTOCOL (Context Recovery) — ASIMO Pattern
+
+Inspired by ASIMO's PromptActivation_Master_21. Ensures full system state is restored at session start.
+
+**Trigger:** Start of every new session OR after context compaction.
+
+**Sequence (5 steps, sequential):**
+
+```
+Step 1: MEMORY LOAD
+  - Read ~/.claude/projects/*/memory/MEMORY.md
+  - Identify active project from user's first message or taskboard state
+  - Load project-specific memory file
+
+Step 2: RAG HEALTH
+  - mcp__dario-rag__kb_health()
+  - If DOWN: attempt restart, flag to user
+  - If UP: note source count and last ingest
+
+Step 3: TASKBOARD SYNC
+  - Scan ~/.claude/orchestrator/tasks/active/*.yaml
+  - Count: total, in_progress, blocked, todo
+  - Identify next executable task (highest priority, deps resolved)
+  - Run stale check (>24h in_progress → block)
+
+Step 4: BUDGET CHECK
+  - Read ~/.claude/orchestrator/budgets/YYYY-MM.yaml
+  - Report percentage, enforce limits (80%/95%)
+
+Step 5: INTEGRITY SEAL
+  - If all 4 steps pass: log DARIO_REACTIVATION_OK_{timestamp}
+  - If any step fails: log DARIO_REACTIVATION_DEGRADED_{step}
+  - Report status to user in compact format
+```
+
+**Output format (only on degraded state):**
+```
+[DARIO Reactivation] DEGRADED
+- RAG: DOWN (attempting restart...)
+- Taskboard: 3 stale tasks auto-blocked
+- Budget: 67% (OK)
+```
+
+**On healthy state:** No output (silent, like ASIMO's principle).
+
+---
+
+## Conflict Resolution — Most-Specific-Wins (ASIMO Pattern)
+
+When multiple skills or agents could handle a task, or when instructions conflict:
+
+**Resolution hierarchy (most specific wins):**
+```
+1. User explicit instruction (highest priority)
+2. Task-level config (skill, assignee specified in YAML)
+3. Project-level playbook (if domain detected)
+4. Division-level routing (company.yaml dispatch table)
+5. Global defaults (lowest priority)
+```
+
+**Example:** User says "use seo-technical for this". Project playbook says "use seo-audit". Resolution: User instruction wins (level 1 > level 3).
+
+**Merge policy:** `append-only`
+- New instructions don't delete previous ones
+- They layer on top with higher specificity
+- Previous context remains accessible for reference
+- Only user can explicitly revoke a previous instruction
+
+---
+
+## Fallback Protocol (Per-Skill Resilience) — ASIMO Pattern
+
+Every skill invocation must have a defined fallback path:
+
+```yaml
+fallback_matrix:
+  # If primary skill fails → try fallback → if fallback fails → escalate
+  dario-brand:
+    fallback: dir-marketing  # Director handles manually
+    escalate: dario-ceo
+  seo-audit:
+    fallback: seo-technical  # Narrower scope but still useful
+    escalate: dir-seo
+  diva-budget:
+    fallback: diva-calc      # Simpler calculator version
+    escalate: dir-construction
+  dario-wp-audit:
+    fallback: seo-technical  # At least do technical checks
+    escalate: dir-technical
+  DEFAULT:
+    fallback: null           # No automatic fallback
+    escalate: dario-ceo      # CEO decides
+```
+
+**Fallback trigger conditions:**
+- Skill execution returns empty output
+- Skill execution exceeds SLA timeout
+- Skill produces output with quality score < 40
+- Agent tool returns error
+
+**Fallback does NOT trigger for:**
+- User-cancelled execution
+- Budget exceeded (that's a hard stop, not a fallback)
+- Circular dependency detected (that's an abort)
+
+---
+
+## Metacognition Protocol (Confidence Signaling) — ASIMO Pattern
+
+Inspired by ASIMO's 3-mode metacognition (INCERTEZA / ALTA_CONFIANCA / EXPLORACAO). Every task output must declare its confidence mode:
+
+```yaml
+confidence_modes:
+  HIGH_CONFIDENCE:
+    signal: "Baseado em dados verificados, RAG confirmado, experiencia anterior"
+    output_style: "Assertivo, recomendacoes directas, sem hedging"
+    when: "RAG score >0.7 AND similar task completed before AND data available"
+
+  UNCERTAINTY:
+    signal: "Dados insuficientes, primeira vez neste contexto, assumptions marcadas"
+    output_style: "Explicitar assumptions, marcar como [ASSUMPTION], pedir validacao"
+    when: "RAG score <0.5 OR no prior context OR missing data"
+
+  EXPLORATION:
+    signal: "Modo criativo/experimental, multiplas opcoes, sem resposta unica correcta"
+    output_style: "Apresentar 2-3 alternativas com pros/cons, pedir preferencia"
+    when: "Creative task (brand, naming, content) OR user asks 'o que achas?'"
+```
+
+**Integration with Quality Scoring:**
+- HIGH_CONFIDENCE outputs penalized harder for errors (expected to be right)
+- UNCERTAINTY outputs get bonus for flagging assumptions correctly
+- EXPLORATION outputs scored on variety and rationale quality
+
+---
+
+## Operational States (DARIO v1.0 Pattern)
+
+The orchestrator is ALWAYS in one of 4 states defined in `~/.claude/orchestrator/operational_states.yaml`:
+
+| State | Max Parallel | Actions Allowed | Trigger |
+|---|---|---|---|
+| **ACTIVE** | 3 | All | SystemHealth >= 0.85, Budget < 80% |
+| **REFLECTIVE_PAUSE** | 1 | Dispatch, Score, Audit | Quality avg < 60, 3+ AutoDiag warnings |
+| **GUARDIAN** | 0 | Audit, Report only | Budget >= 95%, Ethical gate fail, Health < 0.50 |
+| **EXPANSION** | 1 | Audit, Score, Learn | No pending work, weekly cycle |
+
+**State transitions are logged:** `DARIO_STATE_{from}→{to}_{reason}`
+
+## Ethical Pre-Gate (DARIO v1.0 "Filtro Triplice")
+
+Before EVERY dispatch decision, apply 3 questions:
+1. **Clarity:** Is the task clearly defined with unambiguous success criteria?
+2. **Freedom:** Does this respect user autonomy and informed consent?
+3. **Coherence:** Is this aligned with project objectives and manifesto values?
+
+If ANY answer is `false`: do NOT dispatch. Instead:
+- Propose reformulated task that passes all 3 checks
+- Log `DARIO_ETHICAL_GATE_FAIL_{question}_{task_id}`
+- If repeated failures: enter GUARDIAN state
+
+## Synaptic Weights (Inter-Agent Affinity)
+
+Skills that co-activate frequently with high scores build "synaptic weight" — stored in `~/.claude/orchestrator/synaptic_weights.yaml`.
+
+**Dispatch enhancement:** When a complex task needs 2+ skills:
+1. Check affinity graph for highest-weight pairs
+2. Prefer proven combinations over untested ones
+3. After task completion, update weights:
+   - Score >= 80: weight += 0.05
+   - Score < 50: weight -= 0.03
+
+## Evolutionary Delta (Meta-Learning)
+
+Track improvement rate: `delta = avg_quality_last_10 - avg_quality_previous_10`
+- delta > 0: System improving (ACTIVE state valid)
+- delta < -5: Regression detected → trigger REFLECTIVE_PAUSE
+- Stored in `~/.claude/orchestrator/quality/evolution.yaml`
+
 ## Red Flags
 
 - Never execute a task without checking company.yaml for the right agent
@@ -625,6 +856,13 @@ def notify(event_name, data):
 - Never ignore a task's `depends_on` — respect the dependency graph
 - Never assign a task to an agent outside its declared capabilities
 - If a revision loop exceeds max_loops, escalate to user immediately
+- Never delete audit entries (append-only principle)
+- Never suppress AutoDiag findings — if it finds a problem, it reports
+- Never skip the Reactivation Protocol at session start
+- Never override a higher-specificity instruction with a lower one
+- Never dispatch when Ethical Pre-Gate fails (clarity/freedom/coherence)
+- Never execute in GUARDIAN state without user acknowledgement
+- Never bypass the blocklist (operational_states.yaml)
 
 ## Why This Skill Exists
 

@@ -61,11 +61,30 @@ PULSE START
 │   ├── Add note to task: "STALE — no progress in 24h"
 │   └── If >48h → escalate to CEO (mark as blocked, add reason)
 │
-├── 8. REPORT — Generate pulse summary:
+├── 8. AUTODIAG (ASIMO Pattern) — Silent periodic audit:
+│   ├── Run checks from ~/.claude/orchestrator/autodiag.yaml
+│   ├── Coherence: all assignees exist in company.yaml?
+│   ├── Orphans: all parent refs valid?
+│   ├── Dependencies: all depends_on targets exist?
+│   ├── Budget drift: task tokens sum == budget YAML total?
+│   ├── Quality regression: last 5 scores avg vs baseline?
+│   ├── If ALL pass → log DARIO_AUTODIAG_OK_{timestamp} (silent)
+│   ├── If WARN → auto-fix + log DARIO_AUTODIAG_WARN_{check}_{id}
+│   └── If FAIL → report to user + log DARIO_AUTODIAG_FAIL_{check}_{id}
+│
+├── 9. MICRO EVOLUTION — After each task in wave:
+│   ├── Update synaptic_weights.yaml (if multi-skill task)
+│   ├── Log observation to session buffer
+│   ├── If user corrected dispatch → log pattern for crystallization
+│   └── If 10th task in session → trigger SESSION EVOLUTION
+│
+├── 10. REPORT — Generate pulse summary:
 │   ├── Tasks executed this pulse: N
 │   ├── Tasks waiting: N
 │   ├── Tasks stale: N
 │   ├── Budget used: X% (N tokens / limit)
+│   ├── AutoDiag: OK / N warnings / N failures
+│   ├── Evolution: Gen {N}, {mutations} mutations, fitness {score}
 │   └── Next wave ready: [task IDs]
 │
 └── PULSE END — Write pulse timestamp to ~/.claude/orchestrator/last_pulse.yaml
