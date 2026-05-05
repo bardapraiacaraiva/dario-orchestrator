@@ -37,6 +37,10 @@ orchestrator/company.yaml
 orchestrator/last_pulse.yaml
 orchestrator/notifications.yaml
 orchestrator/open-dashboard.bat
+orchestrator/license_manager.py
+orchestrator/create_batch_tasks.py
+orchestrator/export_outputs.py
+orchestrator/dario.db
 orchestrator/tasks/active/
 orchestrator/tasks/done/
 orchestrator/audit/

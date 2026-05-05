@@ -11,16 +11,18 @@ The skill that closes the loop. Not a reporter — an **executor**.
 ## What this does in ONE invocation
 
 ```
-1. SCAN    — Read all tasks in ~/.claude/orchestrator/tasks/active/
-2. BUDGET  — Check spend. If >95%, STOP. If >80%, WARN.
-3. UNBLOCK — Cascade: done tasks unblock dependents → todo
-4. DISPATCH — Unassigned todo tasks get assigned via company.yaml capability match
-5. EXECUTE — Launch next wave (max 3 parallel) via Agent tool
-6. SCORE   — Quality-score completed tasks (rubric 5 dimensions, 0-100)
-7. LOG     — Update audit trail + budget + skill metrics
-8. PACE    — If more tasks waiting: schedule next pulse in 60s
+1. STATE   — Evaluate state machine (python state_machine.py --evaluate --json)
+             If GUARDIAN: STOP. If REFLECTIVE_PAUSE: max_parallel=1, no auto-execute.
+2. SCAN    — Read all tasks in ~/.claude/orchestrator/tasks/active/
+3. BUDGET  — Check spend. If >95%, STOP. If >80%, WARN.
+4. UNBLOCK — Cascade: done tasks unblock dependents → todo
+5. DISPATCH — Run dispatch engine (python dispatch_engine.py --json)
+6. EXECUTE — Launch next wave (max_parallel from state machine) via Agent tool
+7. SCORE   — Quality-score completed tasks (rubric 5 dimensions, 0-100)
+8. LOG     — Update audit trail + budget + skill metrics
+9. PACE    — If more tasks waiting: schedule next pulse in 60s
              If idle: schedule next pulse in 1800s (30min)
-             If budget critical: STOP loop
+             If budget critical or GUARDIAN: STOP loop
 ```
 
 ## When to activate
@@ -31,7 +33,37 @@ The skill that closes the loop. Not a reporter — an **executor**.
 
 ## Execution Protocol
 
-### Step 1: SCAN
+### Step 1: STATE CHECK (via State Machine)
+
+**First action of every pulse** — evaluate the operational state machine:
+
+```bash
+python ~/.claude/orchestrator/state_machine.py --evaluate --json
+```
+
+This returns:
+```json
+{
+  "transitioned": false,
+  "state": "ACTIVE",
+  "autonomy_level": "P-A2",
+  "max_parallel": 3,
+  "system_health": 0.95
+}
+```
+
+**Behavior by state:**
+
+| State | Action |
+|---|---|
+| `ACTIVE` | Continue normally. Use `max_parallel` from state machine response. |
+| `REFLECTIVE_PAUSE` | Reduce to max_parallel=1. Skip auto-execute. Dispatch only. Run AutoDiag. |
+| `GUARDIAN` | **STOP immediately.** No dispatch, no execution. Log and notify user. |
+| `EXPANSION` | Skip execution. Run learning cycle (scores review, weight updates). |
+
+If `state_machine.py` fails: **default to ACTIVE with max_parallel=2** (safe degraded mode).
+
+### Step 2: SCAN
 
 Read every `.yaml` file in `~/.claude/orchestrator/tasks/active/`.
 Build a task map:
@@ -77,20 +109,42 @@ for task in tasks where status == "done":
             UPDATE dependent YAML file on disk
 ```
 
-### Step 4: AUTO-DISPATCH
+### Step 4: AUTO-DISPATCH (via Dispatch Engine)
 
+**Run the actual dispatch engine** — deterministic routing with full capability matching, workload awareness, sibling fallback, and director escalation:
+
+```bash
+python ~/.claude/orchestrator/dispatch_engine.py --json
+```
+
+This atomically:
+- Reads all unassigned todo tasks
+- Matches each to the optimal worker via keyword→skill→worker lookup
+- Checks worker availability (max 1 in_progress per worker)
+- Falls back to siblings or escalates to director if primary busy
+- Writes assignee + dispatch_reason to the task YAML
+- Logs to audit/dispatch_{date}.log
+
+The `--json` output gives:
+```json
+{
+  "dispatched": 2,
+  "queued": 1,
+  "total_analyzed": 3,
+  "assignments": [
+    {"task_id": "PROJ-001", "assigned_to": "worker-brand", "skill": "dario-brand", "reason": "AVAILABLE"},
+    {"task_id": "PROJ-002", "assigned_to": null, "skill": "custom-skill", "reason": "NO_WORKER"}
+  ]
+}
+```
+
+If dispatch returns `queued > 0`, log: `"DISPATCH WARNING: {queued} tasks could not be routed — need manual assignment or new worker"`
+
+**Fallback:** If the Python engine fails (import error, file missing), fall back to inline dispatch:
 ```python
-for task in tasks where status == "todo" and assignee is null:
-    # Read company.yaml
-    # Match task.skill → worker in workers registry
-    worker = find_worker_by_skill(task.skill)
-    if worker:
-        task.assignee = worker.id
-        task.assigned_by = "lucas-autopilot"
-        LOG "DISPATCHED: {task.id} → {worker.id}"
-        UPDATE task YAML file on disk
-    else:
-        LOG "NO MATCH: {task.id} — cannot dispatch, needs manual assignment"
+for task in unassigned_todo_tasks:
+    worker = find_worker_by_skill(task.skill)  # simple lookup in company.yaml workers section
+    if worker: assign(task, worker)
 ```
 
 ### Step 5: EXECUTE WAVE
@@ -150,15 +204,32 @@ UPDATE budget YAML (add actual_tokens)
 LOG audit entry
 ```
 
-### Step 6: QUALITY SCORE (delegated to lucas-quality)
+### Step 7: QUALITY SCORE (via quality_scorer.py)
 
-Quality scoring is **delegated** to the `lucas-quality` skill — NOT embedded in autopilot. This ensures separation of concerns and allows quality rubrics to evolve independently.
+After executing each task, **evaluate the output** using the 5-dimension rubric, then **record** the score:
 
+**Step 7a — Evaluate (Claude does this inline):**
+Read the completion_comment and score each dimension (0.0-1.0):
+- **Specificity**: mentions client/project by name, uses specific data?
+- **Actionability**: clear next steps, no ambiguity?
+- **Completeness**: all task requirements covered?
+- **Accuracy**: facts and recommendations correct?
+- **Tone**: matches expected format and brand voice?
+
+Calculate: `score = round((0.25*S + 0.20*A + 0.20*C + 0.25*Ac + 0.10*T) * 100)`
+
+**Step 7b — Record (quality_scorer.py persists it):**
+```bash
+python ~/.claude/orchestrator/quality_scorer.py --task {task_id} --score {score} --skill {skill} --project {project} --dimensions '{"specificity":S,"actionability":A,"completeness":C,"accuracy":Ac,"tone":T}' --json
+```
+
+Returns: `{ "action": "ship"|"revision"|"success_pattern"|"escalate", "tier": "A"|"B"|"C"|"D" }`
+
+**Step 7c — Act on result:**
 ```python
 for task in just_completed_tasks:
-    # DELEGATE scoring to lucas-quality
-    # Do NOT embed rubric logic here — call the skill
-    score = invoke_lucas_quality(task)
+    score = evaluate_with_rubric(task)  # Claude inline evaluation
+    result = call("python quality_scorer.py --task {id} --score {score} ...")  # Record
     
     # lucas-quality returns: { score: int, dimensions: dict, action: str }
     VALID_ACTIONS = ["ship", "revision", "success_pattern", "escalate"]

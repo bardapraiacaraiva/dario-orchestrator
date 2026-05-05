@@ -59,6 +59,27 @@ curl -s http://localhost:11434/api/tags
 ```
 Report: embedding model + chat model availability.
 
+### 9. AutoDiag (Silent Audit) — ASIMO Pattern
+Run checks from `~/.claude/orchestrator/autodiag.yaml`:
+- Coherence check (assignees valid)
+- Orphan detection (broken parent refs)
+- Dependency integrity (broken depends_on)
+- Budget drift (sum mismatch)
+- Stale reviews (>2x SLA)
+- Quality regression (avg score drop >15)
+
+Report: only issues found. If all pass → "AutoDiag: OK".
+Log code: `DARIO_AUTODIAG_OK_{timestamp}` or `DARIO_AUTODIAG_WARN_{check}_{id}`
+
+### 10. Fallback Matrix Health
+Read `~/.claude/orchestrator/fallback_matrix.yaml`.
+Check: all primary skills in matrix exist in `~/.claude/skills/`.
+Report: missing skills, orphan entries.
+
+### 11. Reactivation Status
+Check last log entry for `DARIO_REACTIVATION_OK` or `DARIO_REACTIVATION_DEGRADED`.
+Report: last successful reactivation timestamp, any degraded steps.
+
 ## Output format
 
 ```
@@ -74,6 +95,9 @@ Report: embedding model + chat model availability.
 | Scheduled Tasks | X/4 running | ... |
 | Skills | X dario + Y seo | total Z |
 | Ollama | X models | embed: Y, chat: Z |
+| AutoDiag | OK/WARN/FAIL | last: HH:MM, issues: N |
+| Fallback Matrix | X skills mapped | Y missing |
+| Reactivation | OK/DEGRADED | last: YYYY-MM-DD HH:MM |
 | Auto-Dream | last: YYYY-MM-DD | X dreams total |
 | Overall | HEALTHY/DEGRADED/DOWN | ... |
 ```

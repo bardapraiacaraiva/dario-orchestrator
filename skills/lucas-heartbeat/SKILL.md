@@ -20,6 +20,13 @@ The missing piece that transforms the orchestrator from a planning tool into an 
 ```
 PULSE START
 │
+├── 0. STATE CHECK — python ~/.claude/orchestrator/state_machine.py --evaluate --json
+│   ├── Returns: { state, autonomy_level, max_parallel, system_health }
+│   ├── If GUARDIAN → STOP pulse immediately (no execution allowed)
+│   ├── If REFLECTIVE_PAUSE → reduce max_parallel to 1, skip auto-execute
+│   ├── If EXPANSION → skip execution, run learning cycle instead
+│   └── If ACTIVE → proceed normally with max_parallel from response
+│
 ├── 1. SCAN — Read all tasks in ~/.claude/orchestrator/tasks/active/
 │   ├── Count by status: backlog, todo, in_progress, in_review, done, blocked
 │   ├── Flag: stale (in_progress >24h without updated_at change)
@@ -36,11 +43,12 @@ PULSE START
 │   ├── If yes → transition to "todo" (ready for dispatch)
 │   └── Log cascade events to audit
 │
-├── 4. AUTO-DISPATCH — For each task with status "todo" and no assignee:
-│   ├── Read company.yaml → match task capabilities to workers
-│   ├── Assign best worker (capability overlap + division match)
-│   ├── Set assignee, status stays "todo"
-│   └── Log dispatch to audit
+├── 4. AUTO-DISPATCH — Run the dispatch engine:
+│   ├── Execute: `python ~/.claude/orchestrator/dispatch_engine.py --json`
+│   ├── Engine handles: keyword→skill→worker lookup, workload check, sibling fallback, director escalation
+│   ├── Writes assignee + dispatch_reason to task YAML atomically
+│   ├── Logs decisions to audit/dispatch_{date}.log
+│   └── Fallback: if engine fails, inline match task.skill → worker in company.yaml
 │
 ├── 5. WAVE PLANNING — Group assigned "todo" tasks:
 │   ├── Identify independent tasks (no mutual depends_on)
@@ -61,15 +69,75 @@ PULSE START
 │   ├── Add note to task: "STALE — no progress in 24h"
 │   └── If >48h → escalate to CEO (mark as blocked, add reason)
 │
-├── 8. REPORT — Generate pulse summary:
+├── 8. AUTODIAG (via autodiag_runner.py) — Silent periodic audit:
+│   ├── Execute: `python ~/.claude/orchestrator/autodiag_runner.py --fix --json`
+│   ├── 7 checks: coherence, orphans, dependencies, budget_drift, stale_review, quality_regression, memory_staleness
+│   ├── Auto-fixes: blocks invalid assignees, removes broken deps, clears orphan parents
+│   ├── Exit 0 = all OK (silent). Exit 2 = warnings (log). Exit 3 = critical (alert user).
+│   └── Audit log: ~/.claude/orchestrator/audit/autodiag.log
+│
+├── 9. MICRO EVOLUTION — After each task in wave:
+│   ├── Update synaptic_weights.yaml (if multi-skill task)
+│   ├── Log observation to session buffer
+│   ├── If user corrected dispatch → log pattern for crystallization
+│   └── If 10th task in session → trigger SESSION EVOLUTION
+│
+├── 10. REPORT — Generate pulse summary:
 │   ├── Tasks executed this pulse: N
 │   ├── Tasks waiting: N
 │   ├── Tasks stale: N
 │   ├── Budget used: X% (N tokens / limit)
+│   ├── AutoDiag: OK / N warnings / N failures
+│   ├── Evolution: Gen {N}, {mutations} mutations, fitness {score}
 │   └── Next wave ready: [task IDs]
 │
 └── PULSE END — Write pulse timestamp to ~/.claude/orchestrator/last_pulse.yaml
 ```
+
+## Heartbeat Scheduler — 3 Layers of Autonomy
+
+The heartbeat fires through 3 independent mechanisms (layered redundancy):
+
+### Layer 1: SessionStart Hook (automatic)
+
+Every time Claude starts a session, `session_boot.py` runs automatically:
+- Evaluates state machine → detects GUARDIAN/REFLECTIVE triggers
+- Runs dispatch engine → auto-assigns any unassigned tasks
+- Outputs status summary to session context
+
+**No user action needed.** This is configured in `~/.claude/settings.json` SessionStart hook.
+
+### Layer 2: In-Session Cron (semi-automatic)
+
+When a session is active, cron jobs fire `/lucas-heartbeat` every ~30 minutes:
+```
+:17 and :47 past each hour → /lucas-heartbeat
+```
+
+**Setup:** At session start, Claude should create the crons:
+```
+CronCreate({ cron: "17 * * * *", prompt: "/lucas-heartbeat", recurring: true })
+CronCreate({ cron: "47 * * * *", prompt: "/lucas-heartbeat", recurring: true })
+```
+
+**Limitation:** Session-bound (dies when Claude exits). Auto-expires after 7 days.
+
+### Layer 3: Autonomous Loop (full autonomy)
+
+User starts with:
+```
+/loop /lucas-autopilot
+```
+
+This is the **full autopilot** — self-pacing (90s active, 30min idle), executes tasks, scores outputs, dispatches work. Runs until budget critical or user stops.
+
+### Summary
+
+| Layer | Trigger | Scope | Executes? | User Action |
+|---|---|---|---|---|
+| SessionStart | Every session open | Boot check + dispatch | Dispatch only | None (automatic) |
+| Cron 30min | While session is idle | Full heartbeat cycle | Yes (waves) | None (auto if crons set) |
+| `/loop` | User invokes once | Full autopilot | Yes (continuous) | Must invoke manually |
 
 ## Heartbeat Configuration (from company.yaml)
 
@@ -143,10 +211,11 @@ If a heartbeat is already running when a new trigger fires:
 - Heartbeat writes status updates, assignees, timestamps
 - Heartbeat moves completed tasks to done/
 
-### With dario-dispatch
-- Heartbeat calls dispatch logic for unassigned tasks
-- Dispatch returns worker assignment
-- Heartbeat writes assignment to task YAML
+### With dario-dispatch (via dispatch_engine.py)
+- Heartbeat calls `python ~/.claude/orchestrator/dispatch_engine.py --json`
+- Engine reads company.yaml, matches capabilities, checks workload, assigns atomically
+- Returns JSON: { dispatched: N, queued: N, assignments: [...] }
+- Supports: --task ID (single), --dry-run (preview), --status (availability), --explain ID (reasoning chain)
 
 ### With lucas-quality-scorer
 - After task execution, heartbeat triggers quality evaluation

@@ -18,6 +18,19 @@ The "brain" that decides WHO does WHAT. Maps tasks to the optimal executor using
 
 ## Routing Algorithm
 
+### Step 0: Check Skill Chains FIRST
+
+Before any individual routing, check if the task matches a **skill chain** in `~/.claude/orchestrator/skill_chains.yaml`:
+
+1. Extract keywords from user request
+2. Match against `trigger_keywords` of each chain
+3. If match found → **activate chain** (auto-sequential execution, no individual dispatch needed)
+4. If no chain match → proceed to Step 1 (individual routing)
+
+**Available chains:** brand_to_market, brand_to_ads, audit_to_fix, seo_full_pipeline, diva_full_project, client_full_onboard
+
+**Priority:** Chain > Composite Mode > Individual Skill
+
 ### Step 1: Parse Task Requirements
 
 From the task, extract:
@@ -662,6 +675,61 @@ def playbook_feedback(project, playbook):
 ```
 
 Feedback is consumed by `lucas-analytics` to propose playbook updates when enough data accumulates (min 3 projects per domain).
+
+## Implementation: dispatch_engine.py
+
+The routing algorithm above is implemented as a deterministic Python engine at `~/.claude/orchestrator/dispatch_engine.py`. This is the **single source of truth** for dispatch decisions.
+
+### CLI Usage
+
+```bash
+# Dispatch all unassigned tasks (default)
+python ~/.claude/orchestrator/dispatch_engine.py
+
+# Dispatch a specific task
+python ~/.claude/orchestrator/dispatch_engine.py --task MNB-002
+
+# Preview routing without assigning
+python ~/.claude/orchestrator/dispatch_engine.py --dry-run
+
+# Show all worker availability
+python ~/.claude/orchestrator/dispatch_engine.py --status
+
+# Explain WHY a routing decision was made
+python ~/.claude/orchestrator/dispatch_engine.py --explain MNB-002
+
+# Machine-readable output for autopilot/heartbeat integration
+python ~/.claude/orchestrator/dispatch_engine.py --json
+```
+
+### Integration Points
+
+| Caller | How it invokes dispatch | When |
+|---|---|---|
+| `lucas-autopilot` | `python dispatch_engine.py --json` | Step 4 of every pulse |
+| `lucas-heartbeat` | `python dispatch_engine.py --json` | Step 4 of every heartbeat cycle |
+| `dario-orchestrator` | `python dispatch_engine.py --task {id}` | After decomposing a task into subtasks |
+| User (manual) | `python dispatch_engine.py --dry-run` | When verifying routing before committing |
+
+### What it does atomically
+
+1. Reads `company.yaml` → builds worker indexes
+2. Reads all `tasks/active/*.yaml` → calculates workload per worker
+3. For each unassigned todo task:
+   - Infers skill from title/description keywords
+   - Maps skill → primary worker
+   - Checks availability (max 1 in_progress per worker)
+   - Falls back to sibling workers with capability overlap
+   - Escalates to director if all siblings busy
+   - Queues if no one available
+4. Writes `assignee`, `assigned_at`, `dispatch_reason` to task YAML
+5. Logs decision chain to `audit/dispatch_{date}.log`
+
+### Exit Codes
+
+- `0` = success (dispatched or nothing to dispatch)
+- `1` = error (missing files, parse failure)
+- `2` = all workers busy (tasks queued for next pulse)
 
 ## Red Flags
 

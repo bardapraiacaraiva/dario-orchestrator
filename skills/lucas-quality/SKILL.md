@@ -17,25 +17,67 @@ Measures what matters. Without quality scoring, the system produces output but n
 
 ## Quality Rubric (Universal — applies to all skill outputs)
 
-### 5 Dimensions (20 points each = 100 total)
+### 5 Dimensions — Weighted Scoring (ASIMO phi I.H. Pattern)
 
-| Dimension | What it measures | Score Guide |
+**Formula:** `QS = (W1*Specificity + W2*Actionability + W3*Completeness + W4*Accuracy + W5*Tone) * 100`
+
+**Default Weights (Coeficiente Universal):**
+`QS = (0.25*S + 0.20*A + 0.20*C + 0.25*Ac + 0.10*T)` — max 100
+
+**Context-Adaptive Weights (per task type):**
+
+| Task Type | Specificity | Actionability | Completeness | Accuracy | Tone |
+|---|---|---|---|---|---|
+| **Default** | 0.25 | 0.20 | 0.20 | 0.25 | 0.10 |
+| **Brand/Copy** | 0.15 | 0.15 | 0.20 | 0.20 | **0.30** |
+| **Technical Audit** | 0.20 | 0.20 | 0.20 | **0.30** | 0.10 |
+| **Strategy/Plan** | 0.20 | **0.30** | 0.20 | 0.20 | 0.10 |
+| **Client Deliverable** | **0.30** | 0.20 | 0.20 | 0.15 | 0.15 |
+| **Financial** | 0.15 | 0.20 | 0.20 | **0.35** | 0.10 |
+
+Weight selection: auto-detected from `execution_policy` + `skill` in task YAML.
+
+| Dimension | What it measures | Score (0-1.0) |
 |---|---|---|
-| **Specificity** | Is the output specific to THIS client/project, or generic? | 20: mentions client by name, uses their data. 10: somewhat specific. 0: could be any client. |
-| **Actionability** | Can the client act on this immediately? | 20: clear next steps, no ambiguity. 10: some steps clear. 0: vague recommendations. |
-| **Completeness** | Does it cover all requirements from the task description? | 20: all requirements met. 10: most met. 0: significant gaps. |
-| **Accuracy** | Are the facts, data, and recommendations correct? | 20: verified, sourced. 10: mostly correct. 0: contains errors. |
-| **Tone & Format** | Does it match the brand voice and deliverable format? | 20: client-ready, polished. 10: needs minor edits. 0: wrong tone/format. |
+| **Specificity** | Is the output specific to THIS client/project, or generic? | 1.0: mentions client by name, uses their data. 0.5: somewhat specific. 0: could be any client. |
+| **Actionability** | Can the client act on this immediately? | 1.0: clear next steps, no ambiguity. 0.5: some steps clear. 0: vague recommendations. |
+| **Completeness** | Does it cover all requirements from the task description? | 1.0: all requirements met. 0.5: most met. 0: significant gaps. |
+| **Accuracy** | Are the facts, data, and recommendations correct? | 1.0: verified, sourced. 0.5: mostly correct. 0: contains errors. |
+| **Tone & Format** | Does it match the brand voice and deliverable format? | 1.0: client-ready, polished. 0.5: needs minor edits. 0: wrong tone/format. |
 
-### Score Interpretation
+### Confidence Mode Bonus/Penalty (ASIMO phi Metacognition)
 
-| Score | Grade | Action |
-|---|---|---|
-| 90-100 | Excellent | Ship to client. Log as success pattern. |
-| 75-89 | Good | Minor revision, then ship. |
-| 60-74 | Acceptable | Director review required. May need revision. |
-| 40-59 | Poor | Revision required. Analyze why. |
-| 0-39 | Fail | Reject. Reassign to different worker or escalate. |
+| Confidence Mode | Scoring Adjustment |
+|---|---|
+| HIGH_CONFIDENCE | Accuracy errors penalized 2x (expected to be right) |
+| UNCERTAINTY | Bonus +5 for correctly flagging assumptions |
+| EXPLORATION | Scored on variety + rationale quality, not absolute accuracy |
+
+### Score Interpretation (ASIMO phi I.H. Scale)
+
+| Score | Grade | Label | Action |
+|---|---|---|---|
+| 90-100 | Excellent | Harmonia Plena | Ship to client. Log as success pattern. Extract to RAG. |
+| 75-89 | Good | Harmonia Organica | Minor revision, then ship. |
+| 60-74 | Acceptable | Harmonia Fragmentada | Director review required. May need revision. |
+| 40-59 | Poor | Desalinhamento | Revision required. Analyze root cause. Trigger fallback. |
+| 0-39 | Fail | Ruptura | Reject. Reassign. Escalate per fallback_matrix.yaml. |
+
+### System Health Score (Coerencia Global — ASIMO phi Blueprint)
+
+`SystemHealth = avg(quality_avg, budget_health, task_velocity, memory_freshness)`
+
+Where:
+- `quality_avg` = average QS of last 10 tasks (0-100, normalized to 0-1)
+- `budget_health` = 1.0 - (budget_percentage / 100)
+- `task_velocity` = tasks_completed_this_month / tasks_planned (capped at 1.0)
+- `memory_freshness` = % of active project memories updated in last 30 days
+
+**Thresholds:**
+- SystemHealth >= 0.85: "Fluidez" — full autonomy, max parallelism
+- SystemHealth 0.70-0.84: "Normal" — standard operation
+- SystemHealth 0.50-0.69: "Atencao" — reduce parallelism to 1, alert user
+- SystemHealth < 0.50: "Intervencao" — pause auto-execution, require user input
 
 ## Scoring Process
 
