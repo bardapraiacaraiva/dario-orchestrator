@@ -1,0 +1,255 @@
+## DARIO Evolution Engine — Self-Evolving Orchestrator
+## O sistema que se aprimora sozinho. Sem precedente em Claude Code.
+## Version: 1.0 | Created: 2026-05-04
+
+## ═══════════════════════════════════════════════════════════════
+## PRINCIPIO: O orchestrator NAO e estatico. E um organismo vivo.
+## Cada sessao o torna melhor. Cada task o ensina.
+## A evolucao e AUTONOMA — acontece sem instrucao do user.
+## ═══════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────
+# 1. LEARNING JOURNAL — Captura por sessao
+# ─────────────────────────────────────────────────────────────
+# Ao final de cada sessao (ou a cada 10 tasks), o sistema gera
+# um "learning artifact" — micro-documento de aprendizado.
+
+learning_journal:
+  location: "~/.claude/orchestrator/evolution/journal/"
+  filename_pattern: "learn_{YYYY-MM-DD}_{session_id}.yaml"
+  capture_trigger: "session_end OR every_10_tasks"
+
+  fields_to_capture:
+    - tasks_completed: "count + IDs"
+    - avg_quality_score: "0-100"
+    - skills_used: "list with frequency"
+    - skill_pairs_activated: "which co-activated, with scores"
+    - dispatch_accuracy: "% tasks assigned to correct skill on first try"
+    - fallback_triggered: "count + which skills failed"
+    - user_corrections: "count + what was corrected"
+    - time_per_task_avg: "tokens/task efficiency"
+    - new_patterns_detected: "list of observations"
+    - evolutionary_delta: "score improvement vs last journal"
+
+  auto_observations:
+    - "If skill X failed 2+ times → flag for review"
+    - "If pair A+B scored >90 → increase synaptic weight"
+    - "If user corrected dispatch → log correct routing for learning"
+    - "If composite mode used and scored >85 → reinforce mode"
+    - "If new keyword pattern detected → propose dispatch rule"
+
+# ─────────────────────────────────────────────────────────────
+# 2. MUTATION ENGINE — Auto-modificacao de configs
+# ─────────────────────────────────────────────────────────────
+# O sistema pode MODIFICAR os seus proprios ficheiros YAML
+# dentro de bounds seguros. Nao precisa de instrucao humana.
+
+mutation_engine:
+  enabled: true
+  safety_bounds:
+    - "NUNCA modificar manifesto.yaml (governance e imutavel)"
+    - "NUNCA modificar blocklist (etica e imutavel)"
+    - "NUNCA modificar ethical_pre_gate (hard constraint)"
+    - "NUNCA aumentar max_parallel acima de 3"
+    - "NUNCA reduzir quality threshold abaixo de 50"
+    - "Mutations limitadas a 3 por sessao (anti-runaway)"
+    - "Cada mutacao e logged com before/after para rollback"
+
+  files_allowed_to_mutate:
+    synaptic_weights.yaml:
+      what: "Ajustar pesos de afinidade entre skills"
+      trigger: "After scoring multi-skill tasks"
+      bounds: "[0.1, 1.0]"
+
+    composite_modes.yaml:
+      what: "Adicionar novos modos compostos baseados em padroes"
+      trigger: "When same 3+ skills are co-activated 5+ times with avg score >80"
+      bounds: "Max 12 modes total"
+
+    autodiag.yaml:
+      what: "Ajustar thresholds de checks baseado em false positives/negatives"
+      trigger: "When autodiag flags issue that user dismisses 3+ times"
+      bounds: "Thresholds: [30%, 90%] range"
+
+    operational_states.yaml:
+      what: "Ajustar self-healing thresholds"
+      trigger: "When self-healing triggers too often (>5x/session) or never"
+      bounds: "Thresholds: [30, 95] range"
+
+    fallback_matrix.yaml:
+      what: "Actualizar fallback paths baseado em success rates"
+      trigger: "When current fallback fails >50% of the time"
+      bounds: "Must always have at least 1 fallback per skill"
+
+  mutation_log:
+    location: "~/.claude/orchestrator/evolution/mutations/"
+    format: "mutation_{YYYY-MM-DD}_{seq}.yaml"
+    fields: [timestamp, file_mutated, field_changed, old_value, new_value, reason, confidence]
+
+# ─────────────────────────────────────────────────────────────
+# 3. PATTERN CRYSTALLIZATION — De observacoes a regras
+# ─────────────────────────────────────────────────────────────
+# Padroes que se repetem 5+ vezes cristalizam-se em regras.
+# Regras sao aplicadas automaticamente em sessoes futuras.
+
+crystallization:
+  threshold: 5  # Pattern must repeat N times before becoming rule
+
+  pattern_types:
+    dispatch_correction:
+      description: "User corrigiu dispatch de skill X para skill Y"
+      action: "Add routing rule: keyword_pattern → skill Y (priority over X)"
+      storage: "~/.claude/orchestrator/evolution/rules/dispatch_rules.yaml"
+
+    quality_pattern:
+      description: "Skill X consistently scores <60 on dimension D"
+      action: "Add pre-execution instruction: 'For skill X, focus extra on dimension D'"
+      storage: "~/.claude/orchestrator/evolution/rules/quality_hints.yaml"
+
+    timing_pattern:
+      description: "Tasks of type T consistently take >N tokens"
+      action: "Update estimated_tokens for that task type in templates"
+      storage: "~/.claude/orchestrator/evolution/rules/token_estimates.yaml"
+
+    composite_emergence:
+      description: "Skills A, B, C consistently co-activate with high scores"
+      action: "CREATE new composite mode automatically"
+      storage: "composite_modes.yaml (auto-append)"
+
+    fallback_discovery:
+      description: "When skill X fails, skill Y consistently succeeds"
+      action: "Update fallback_matrix: X.fallback = Y"
+      storage: "fallback_matrix.yaml (auto-update)"
+
+    affinity_discovery:
+      description: "New skill pair co-activates with consistently high scores"
+      action: "Add to synaptic_weights.yaml as new pair"
+      storage: "synaptic_weights.yaml (auto-append)"
+
+# ─────────────────────────────────────────────────────────────
+# 4. GENERATIVE EVOLUTION — Criar o que nao existe
+# ─────────────────────────────────────────────────────────────
+# O sistema pode PROPOR (e com aprovacao P-A4, CRIAR) novos
+# componentes que nao existiam antes.
+
+generative:
+  enabled: true
+  autonomy_required: "P-A3 para propor, P-A4 para criar automaticamente"
+
+  capabilities:
+    new_composite_mode:
+      trigger: "3+ skills co-activated 5+ times, avg score >80, no existing mode covers them"
+      action: "Generate new composite_mode entry and append to YAML"
+      approval: "P-A3: ask user | P-A4: auto-create + notify"
+
+    new_dispatch_rule:
+      trigger: "User consistently routes tasks with keyword K to skill S (3+ times)"
+      action: "Add keyword trigger to dispatch routing"
+      approval: "P-A3: ask user | P-A4: auto-create + notify"
+
+    new_self_healing_rule:
+      trigger: "Recurring problem with consistent fix (5+ occurrences)"
+      action: "Add new entry to self_healing map"
+      approval: "Always ask user (safety critical)"
+
+    skill_enhancement_proposal:
+      trigger: "Skill X consistently misses dimension D in quality scoring"
+      action: "Propose addition to skill SKILL.md (stored as proposal, not auto-applied)"
+      approval: "Always requires user review"
+
+    new_affinity_pair:
+      trigger: "Previously unlinked skills co-activate with score >85 (3+ times)"
+      action: "Create new entry in synaptic_weights.yaml"
+      approval: "P-A3: ask user | P-A4: auto-create"
+
+# ─────────────────────────────────────────────────────────────
+# 5. EVOLUTIONARY PRESSURE — Seleccao natural de configs
+# ─────────────────────────────────────────────────────────────
+# Configs que produzem bons resultados sobrevivem.
+# Configs que produzem maus resultados sao revertidas.
+
+selection:
+  fitness_metric: "avg_quality_last_10 * (1 - budget_usage_ratio) * task_velocity"
+
+  survival_rules:
+    - "Mutation survives if fitness_metric improves after 10 tasks"
+    - "Mutation is reverted if fitness_metric drops >5% after 10 tasks"
+    - "Mutation is reinforced (doubled) if fitness_metric improves >10%"
+
+  anti_drift:
+    - "Max 3 mutations per session (prevent rapid divergence)"
+    - "Weekly checkpoint: compare current fitness vs 4-week-ago baseline"
+    - "If fitness dropped >15% over 4 weeks: FULL ROLLBACK to last checkpoint"
+    - "Checkpoints stored in ~/.claude/orchestrator/evolution/checkpoints/"
+
+  checkpoint:
+    frequency: "weekly (Sunday) OR after every 50 tasks"
+    action: "Snapshot all mutable YAMLs + fitness metrics"
+    storage: "~/.claude/orchestrator/evolution/checkpoints/ckpt_{YYYY-MM-DD}.tar.gz"
+    retention: "Keep last 8 checkpoints (2 months)"
+
+# ─────────────────────────────────────────────────────────────
+# 6. EVOLUTION PULSE — Quando a evolucao acontece
+# ─────────────────────────────────────────────────────────────
+# A evolucao NAO e continua — acontece em momentos definidos.
+
+pulse_triggers:
+  micro_evolution:
+    when: "After every task completion"
+    what: "Update synaptic weights, log observations"
+    cost: "~100 tokens"
+
+  session_evolution:
+    when: "End of session (Stop hook) OR after 10 tasks"
+    what: "Generate learning journal, apply crystallized patterns, run mutation engine"
+    cost: "~500 tokens"
+
+  weekly_evolution:
+    when: "EXPANSION state (Sunday or no pending work)"
+    what: "Full review: fitness check, checkpoint, propose generative changes, prune dead rules"
+    cost: "~2000 tokens"
+
+  monthly_evolution:
+    when: "First pulse of new month"
+    what: "Compare vs 4-week baseline, major fitness review, prune underperforming mutations"
+    cost: "~3000 tokens"
+
+# ─────────────────────────────────────────────────────────────
+# 7. OBSERVABILITY — O sistema sabe que esta a evoluir
+# ─────────────────────────────────────────────────────────────
+
+metrics:
+  total_mutations_applied: 0
+  total_mutations_reverted: 0
+  total_patterns_crystallized: 0
+  total_composite_modes_created: 0
+  total_dispatch_rules_learned: 0
+  total_affinity_pairs_discovered: 0
+  fitness_trend: []  # Last 10 fitness scores
+  generation: 1  # Increments with each weekly evolution
+
+  display_in_status:
+    format: "Evolution: Gen {generation} | {total_mutations_applied} mutations | {total_patterns_crystallized} patterns | Fitness: {fitness_trend[-1]}"
+
+# ─────────────────────────────────────────────────────────────
+# 8. VERSIONING — Cada evolucao e uma "geracao"
+# ─────────────────────────────────────────────────────────────
+
+versioning:
+  current_generation: 1
+  increment_trigger: "weekly_evolution completes"
+  format: "v2.0-gen{N}"
+  changelog: "~/.claude/orchestrator/evolution/CHANGELOG.md"
+
+  changelog_entry_format: |
+    ## Generation {N} — {date}
+    ### Mutations Applied
+    - {mutation_1}
+    - {mutation_2}
+    ### Patterns Crystallized
+    - {pattern_1}
+    ### Fitness Delta
+    - Before: {old_fitness}
+    - After: {new_fitness}
+    ### Reverted
+    - {reverted_mutations}

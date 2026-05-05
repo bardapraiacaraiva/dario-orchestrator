@@ -1,0 +1,80 @@
+## DARIO AutoDiag Protocol — Inspired by ASIMO AutoDiag_20
+## Silent periodic self-diagnostic for system coherence
+
+config:
+  frequency: every_10_tasks_or_pulse_start
+  mode: silent
+  log_file: ~/.claude/orchestrator/audit/autodiag.log
+  merge_policy: append-only
+  resolution: most-specific-wins
+
+checks:
+  - id: coherence_check
+    name: "Assignee Coherence"
+    description: "Verify all in_progress tasks have valid assignees in company.yaml"
+    severity: warning
+    auto_fix: true
+    fix_action: "Set task status → blocked, reason: 'assignee not found in hierarchy'"
+
+  - id: orphan_detection
+    name: "Orphan Task Detection"
+    description: "Find tasks with parent IDs that don't exist"
+    severity: info
+    auto_fix: true
+    fix_action: "Clear parent reference, add note: 'orphaned — parent removed'"
+
+  - id: dependency_integrity
+    name: "Dependency Graph Integrity"
+    description: "Verify all depends_on references point to existing tasks"
+    severity: warning
+    auto_fix: true
+    fix_action: "Remove broken dep, add note: 'dependency removed — target missing'"
+
+  - id: budget_drift
+    name: "Budget Drift Detection"
+    description: "Compare sum of actual_tokens in tasks vs budget YAML total"
+    severity: warning
+    auto_fix: true
+    fix_action: "Recalculate and update budget YAML"
+
+  - id: stale_review
+    name: "Stale Review Detection"
+    description: "Find tasks in_review for >2x SLA time"
+    severity: critical
+    auto_fix: false
+    fix_action: "Auto-approve if score >= auto_approve_threshold, else escalate to user"
+
+  - id: quality_regression
+    name: "Quality Score Regression"
+    description: "Check if last 5 task scores average dropped >15 points from eval baseline"
+    severity: critical
+    auto_fix: false
+    fix_action: "Flag quality regression, notify user, pause auto-execution"
+
+  - id: memory_staleness
+    name: "Memory Staleness Check"
+    description: "Check if project memories are >30 days old without update"
+    severity: info
+    auto_fix: false
+    fix_action: "Flag stale memories in status report for user review"
+
+log_codes:
+  all_pass: "DARIO_AUTODIAG_OK_{timestamp}"
+  warning: "DARIO_AUTODIAG_WARN_{check_id}_{entity_id}"
+  failure: "DARIO_AUTODIAG_FAIL_{check_id}_{entity_id}"
+  fix_applied: "DARIO_AUTODIAG_FIX_{check_id}_{entity_id}"
+
+reactivation_codes:
+  success: "DARIO_REACTIVATION_OK_{timestamp}"
+  degraded: "DARIO_REACTIVATION_DEGRADED_{failed_step}"
+  failed: "DARIO_REACTIVATION_FAILED_{timestamp}"
+
+task_codes:
+  dispatch: "DARIO_TASK_DISPATCH_OK_{task_id}"
+  complete: "DARIO_TASK_COMPLETE_{task_id}_SCORE_{score}"
+  budget_ok: "DARIO_BUDGET_CHECK_OK_{percentage}%"
+  heartbeat: "DARIO_HEARTBEAT_OK_{timestamp}"
+  quality_pass: "DARIO_QUALITY_PASS_{task_id}_{score}"
+  quality_fail: "DARIO_QUALITY_FAIL_{task_id}_{score}"
+  fallback_triggered: "DARIO_FALLBACK_{primary_skill}→{fallback_skill}"
+  escalation: "DARIO_ESCALATE_{task_id}→{target_agent}"
