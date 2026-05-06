@@ -70,6 +70,8 @@ from model_router import ModelRouterFilter
 from artifact_schemas import SchemaValidationFilter
 from checkpoint_interrupt import should_interrupt, interrupt_task
 from approval_gates import get_approval_level, request_approval
+from guardrails import validate_task
+from termination import default_task_conditions
 
 PYTHON = sys.executable
 
@@ -156,10 +158,10 @@ def execute_task(task_id: str, dry_run: bool = False) -> dict:
     result["model_id"] = filter_ctx.get("model_id", "claude-sonnet-4-6")
     result["_filter_ctx"] = filter_ctx  # Pass to after-pipeline
 
-    # ─── Step 1: GUARDRAILS ──────────────────────────────────────────────
-    guard = run_engine("guardrails.py", ["--task", task_id, "--json"])
+    # ─── Step 1: GUARDRAILS (now direct import, was subprocess) ────────
+    guard = validate_task(task_id)
     verdict = guard.get("verdict", "FAIL")
-    result["steps"].append({"step": "guardrails", "result": verdict})
+    result["steps"].append({"step": "guardrails", "result": verdict, "checks": guard.get("checks", {})})
 
     if verdict == "FAIL":
         result["status"] = "blocked"
@@ -311,6 +313,24 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
         db.complete_task(task_id, score=score, tokens=tokens, output=output[:2000], status=status)
         result["steps"].append({"step": "completed", "final_status": status})
         result["status"] = status
+
+        # ─── AUTO-LEARN (capture insights from high-quality tasks) ────────
+        if score >= 90:
+            try:
+                from memory_blocks import auto_learn
+                auto_learn(output[:200], scope=project or "global", skill=skill, score=score)
+            except Exception:
+                pass
+
+        # ─── REACTIVE SUBSCRIPTIONS (trigger downstream tasks) ───────────
+        if status == "done":
+            try:
+                from reactive_subscriptions import on_task_completed
+                created = on_task_completed(task, score=score, tokens=tokens)
+                if created:
+                    result["reactive_tasks_created"] = len(created)
+            except Exception:
+                pass
 
         # ─── AUDIT ───────────────────────────────────────────────────────
         db.log_event("executor", "task_completed", task_id=task_id,
