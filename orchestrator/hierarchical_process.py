@@ -158,19 +158,34 @@ def get_synaptic_affinity(skill_a: str, skill_b: str) -> float:
 
 
 def find_best_worker(skill: str, directors: dict = None) -> dict:
-    """Find the best available worker for a skill, using affinity weights."""
+    """Find the best AVAILABLE worker for a skill (fixed: now checks workload)."""
     if directors is None:
         directors = get_directors()
+
+    # Get current workload to check availability
+    workload = {}
+    try:
+        from db import DB
+        db = DB()
+        active = db.get_tasks(status="in_progress")
+        for t in active:
+            a = t.get("assignee", "")
+            if a:
+                workload[a] = workload.get(a, 0) + 1
+    except Exception:
+        pass
 
     candidates = []
     for dir_id, director in directors.items():
         for worker in director["team"]:
             if worker["skill"] == skill:
+                busy = workload.get(worker["id"], 0)
                 candidates.append({
                     "worker_id": worker["id"],
                     "skill": skill,
                     "director": dir_id,
-                    "affinity": 1.0,  # Direct match
+                    "affinity": 1.0,
+                    "busy": busy,
                 })
 
     # If no direct match, find workers with high affinity
@@ -179,15 +194,21 @@ def find_best_worker(skill: str, directors: dict = None) -> dict:
             for worker in director["team"]:
                 affinity = get_synaptic_affinity(skill, worker["skill"])
                 if affinity > 0.6:
+                    busy = workload.get(worker["id"], 0)
                     candidates.append({
                         "worker_id": worker["id"],
                         "skill": worker["skill"],
                         "director": dir_id,
                         "affinity": affinity,
+                        "busy": busy,
                     })
 
-    # Sort by affinity
-    candidates.sort(key=lambda c: c["affinity"], reverse=True)
+    # Sort by: available first, then highest affinity
+    candidates.sort(key=lambda c: (-c["busy"], -c["affinity"]))
+    # Prefer available workers (busy < 1)
+    available = [c for c in candidates if c["busy"] < 1]
+    if available:
+        return available[0]
     return candidates[0] if candidates else {}
 
 
