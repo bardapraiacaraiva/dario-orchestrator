@@ -45,11 +45,26 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 from db import DB
+from filter_pipeline import FilterPipeline, LoggingFilter, BudgetFilter, QualityGateFilter, TokenBudgetFilter
+from output_guardrails import OutputGuardrailFilter
+from model_router import ModelRouterFilter, route_model
+from artifact_schemas import SchemaValidationFilter
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("api_exec")
 
 PYTHON = sys.executable
+
+# Safety pipeline — same filters as executor.py (was: BYPASSED entirely)
+API_PIPELINE = FilterPipeline([
+    LoggingFilter(),
+    ModelRouterFilter(),
+    BudgetFilter(warn_pct=80, block_pct=95),
+    SchemaValidationFilter(),
+    OutputGuardrailFilter(),
+    QualityGateFilter(min_score=60),
+    TokenBudgetFilter(),
+])
 
 # Model config (pricing per million tokens as of 2026)
 MODELS = {
@@ -360,7 +375,7 @@ def run_engine(script: str, args: list) -> dict:
         return {"error": f"{script} not found"}
     try:
         r = subprocess.run([PYTHON, str(path)] + args,
-                           capture_output=True, text=True, timeout=15, cwd=str(ORCH_DIR))
+                           capture_output=True, text=True, timeout=30, cwd=str(ORCH_DIR))
         if r.stdout.strip():
             try:
                 return json.loads(r.stdout.strip())
@@ -403,6 +418,22 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
 
     # Reload task after enrichment (may have new fields)
     task = db.get_task(task_id)
+
+    # 0.5. FILTER PIPELINE — BEFORE (budget, model routing, logging)
+    filter_ctx = API_PIPELINE.before(task)
+    result["steps"].append({
+        "step": "filter_pipeline_before",
+        "blocked": filter_ctx.get("blocked", False),
+        "model": filter_ctx.get("recommended_model", "sonnet"),
+    })
+    if filter_ctx.get("blocked"):
+        result["status"] = "blocked"
+        result["error"] = f"Pipeline: {filter_ctx.get('block_reason', '?')}"
+        return result
+
+    # Use model router's recommendation instead of hardcoded select_model
+    if not model_override:
+        model_override = filter_ctx.get("recommended_model", "sonnet")
 
     # 1. Guardrails
     guard = run_engine("guardrails.py", ["--task", task_id, "--json"])
@@ -460,6 +491,22 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
         output_tokens = api_result["output_tokens"]
         total_tokens = input_tokens + output_tokens
         cost = api_result["cost"]
+
+        # 8.5. FILTER PIPELINE — AFTER (schema, guardrails, quality gate)
+        after_ctx = {"actual_tokens": total_tokens, "quality_score": 0}
+        after_result = API_PIPELINE.after(task, output, after_ctx)
+        result["steps"].append({
+            "step": "filter_pipeline_after",
+            "tripwire": after_result.get("tripwire", False),
+        })
+        if after_result.get("tripwire"):
+            log.warning(f"[TRIPWIRE] {task_id}: {after_result.get('tripwire_reason', '?')}")
+            db.block_task(task_id, f"Tripwire: {after_result.get('tripwire_reason', '')[:200]}")
+            result["status"] = "tripwire"
+            result["tripwire_reason"] = after_result.get("tripwire_reason", "")
+            db.log_event("api-executor", "task_tripwire", task_id=task_id,
+                        details=after_result.get("tripwire_reason", "")[:200])
+            return result
 
         # 9. Auto-score via Haiku
         score_result = auto_score_output(output, rubric, task)

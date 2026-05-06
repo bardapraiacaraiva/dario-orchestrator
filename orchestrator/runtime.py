@@ -98,6 +98,8 @@ class Scheduler:
 
     async def _pulse(self):
         """Execute heartbeat pulse via subprocess."""
+        # Zombie task reaper (new: tasks in_progress > 60 min → blocked)
+        self._reap_zombies()
         # State check
         _run_engine("state_machine.py", ["--evaluate", "--json"])
         # Dispatch
@@ -105,6 +107,33 @@ class Scheduler:
         # AutoDiag
         _run_engine("autodiag_runner.py", ["--fix", "--json"])
         log.info(f"Pulse #{self.pulse_count + 1} complete")
+
+    def _reap_zombies(self, max_age_minutes: int = 60):
+        """Find tasks stuck in in_progress and block them (new: zombie reaper)."""
+        try:
+            from db import DB
+            db = DB()
+            tasks = db.get_tasks(status="in_progress")
+            now = datetime.now(timezone.utc)
+            reaped = 0
+            for t in tasks:
+                checked_out = t.get("checked_out_at", "")
+                if not checked_out:
+                    continue
+                try:
+                    co_time = datetime.fromisoformat(checked_out.replace("Z", "+00:00"))
+                    age_min = (now - co_time).total_seconds() / 60
+                    if age_min > max_age_minutes:
+                        db.block_task(t["id"], f"Zombie reaper: in_progress for {age_min:.0f} min (max {max_age_minutes})")
+                        db.log_event("zombie_reaper", "task_reaped", task_id=t["id"],
+                                    details=f"Stuck {age_min:.0f} min")
+                        reaped += 1
+                except Exception:
+                    pass
+            if reaped:
+                log.warning(f"[REAPER] Reaped {reaped} zombie tasks")
+        except Exception as e:
+            log.error(f"[REAPER] Error: {e}")
 
 
 scheduler = Scheduler()
@@ -118,7 +147,7 @@ def _run_engine(script: str, args: list) -> dict:
     try:
         result = subprocess.run(
             [PYTHON, str(script_path)] + args,
-            capture_output=True, text=True, timeout=15, cwd=str(ORCH_DIR)
+            capture_output=True, text=True, timeout=30, cwd=str(ORCH_DIR)
         )
         if result.stdout.strip():
             try:
@@ -136,9 +165,25 @@ def _run_engine(script: str, args: list) -> dict:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # STARTUP: Resume suspended tasks (new: was not wired)
+    try:
+        _run_engine("suspend_resume.py", ["--restart-all", "--json"])
+        log.info("[STARTUP] Suspended tasks resumed")
+    except Exception as e:
+        log.warning(f"[STARTUP] Resume failed: {e}")
+
     if scheduler_enabled:
         await scheduler.start()
+
     yield
+
+    # SHUTDOWN: Suspend all in_progress tasks (new: was not wired)
+    try:
+        _run_engine("suspend_resume.py", ["--suspend-all", "--json"])
+        log.info("[SHUTDOWN] Active tasks suspended")
+    except Exception as e:
+        log.warning(f"[SHUTDOWN] Suspend failed: {e}")
+
     if scheduler_enabled:
         await scheduler.stop()
 

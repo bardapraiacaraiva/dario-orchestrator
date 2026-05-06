@@ -53,6 +53,10 @@ def main():
     except Exception:
         pass
 
+    # 0.5. Resume suspended tasks from previous session (new: was not wired)
+    resume_result = run_engine("suspend_resume.py", ["--restart-all", "--json"])
+    output["resumed_tasks"] = resume_result.get("resumed", 0)
+
     # 1. State machine evaluation
     state_result = run_engine("state_machine.py", ["--evaluate", "--json"])
     output["state"] = state_result

@@ -144,10 +144,25 @@ DEFAULT_SCHEMAS = {
 
 
 def validate_artifact(skill: str, artifact: dict) -> dict:
-    """Validate an artifact against its skill schema."""
+    """Validate an artifact against its skill schema (uses artifact_schemas.py if available)."""
+    # Try new unified schemas first (fixed: was hardcoded only)
+    try:
+        from artifact_schemas import validate_artifact as validate_full, SCHEMAS
+        if skill in SCHEMAS:
+            output_str = json.dumps(artifact) if isinstance(artifact, dict) else str(artifact)
+            result = validate_full(output_str, skill)
+            return {
+                "valid": result.get("valid", True),
+                "missing_required": result.get("errors", []),
+                "fields_present": list(artifact.keys()) if isinstance(artifact, dict) else [],
+                "schema_exists": True,
+            }
+    except ImportError:
+        pass
+
+    # Fallback to hardcoded DEFAULT_SCHEMAS
     schema = DEFAULT_SCHEMAS.get(skill, {})
     required = schema.get("required", [])
-
     missing = [f for f in required if f not in artifact or artifact[f] is None]
 
     return {
