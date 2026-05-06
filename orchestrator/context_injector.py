@@ -46,7 +46,10 @@ except ImportError:
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 TASKS_DIR = ORCH_DIR / "tasks" / "active"
-MEMORY_DIR = Path.home() / ".claude" / "projects" / "C--Users-barda" / "memory"
+# Dynamic memory dir (fixed: was hardcoded to one user/machine)
+_project_base = Path.home() / ".claude" / "projects"
+_candidates = list(_project_base.glob("*/memory")) if _project_base.exists() else []
+MEMORY_DIR = _candidates[0] if _candidates else _project_base / "default" / "memory"
 CHAINS_FILE = ORCH_DIR / "skill_chains.yaml"
 RUNS_DIR = ORCH_DIR / "chain_runs"
 RAG_URL = "http://localhost:8420"
@@ -202,6 +205,16 @@ def search_rag(keywords: list, task_description: str = "") -> list:
                         })
         except Exception:
             pass
+
+    # Rank results with composite scoring (fixed: was orphan module, now integrated)
+    if results:
+        try:
+            from composite_memory_scoring import score_and_rank
+            project = ""  # Will be set by caller
+            ranked = score_and_rank(results, scope=project, limit=5)
+            results = [{"text": r["content"][:300], "score": r["composite"], "source": r["source"], "method": "ranked"} for r in ranked]
+        except ImportError:
+            pass  # Fallback to unranked results
 
     # Strategy 2: Keyword fallback (if semantic returned nothing)
     if not results and keywords:
