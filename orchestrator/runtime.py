@@ -173,7 +173,25 @@ def _run_engine(script: str, args: list) -> dict:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # STARTUP: Resume suspended tasks (new: was not wired)
+    # LICENSE CHECK (was ORPHAN — never enforced, anyone could run indefinitely)
+    try:
+        from license_manager import check_license
+        lic = check_license()
+        if not lic.get("valid"):
+            log.error(f"[LICENSE] {lic.get('reason', 'Invalid')}. Runtime blocked.")
+            log.error(f"[LICENSE] Activate: python license_manager.py --activate DARIO-XXXX-XXXX-XXXX-PRO")
+            # Don't sys.exit — allow health endpoint but block task execution
+            app.state.license_valid = False
+        else:
+            app.state.license_valid = True
+            tier = lic.get("tier", "?")
+            days = lic.get("days_remaining", "permanent")
+            log.info(f"[LICENSE] {tier.upper()} — {'permanent' if lic.get('permanent') else f'{days} days remaining'}")
+    except Exception as e:
+        log.warning(f"[LICENSE] Check failed: {e} — allowing startup")
+        app.state.license_valid = True  # Fail-open for dev
+
+    # STARTUP: Resume suspended tasks
     try:
         _run_engine("suspend_resume.py", ["--restart-all", "--json"])
         log.info("[STARTUP] Suspended tasks resumed")
@@ -367,8 +385,11 @@ async def get_scores():
 
 
 @app.post("/pulse")
-async def trigger_pulse():
+async def trigger_pulse(request: Request = None):
     """Manually trigger a heartbeat pulse."""
+    # License guard on execution (was ORPHAN — no enforcement)
+    if hasattr(app.state, 'license_valid') and not app.state.license_valid:
+        return {"error": "License expired or invalid. Activate VIP key.", "status": "blocked"}
     await scheduler._pulse()
     scheduler.pulse_count += 1
     scheduler.last_pulse = datetime.now(timezone.utc).isoformat()
