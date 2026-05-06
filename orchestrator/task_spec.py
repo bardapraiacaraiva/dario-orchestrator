@@ -455,7 +455,8 @@ def check_preconditions(task_id: str) -> dict:
         elif tipo == "budget_check":
             try:
                 import yaml
-                budget_path = ORCH_DIR / "budgets" / "2026-05.yaml"
+                from datetime import datetime
+                budget_path = ORCH_DIR / "budgets" / f"{datetime.now().strftime('%Y-%m')}.yaml"
                 if budget_path.exists():
                     with open(budget_path) as f:
                         budget = yaml.safe_load(f)

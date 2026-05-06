@@ -484,6 +484,24 @@ def dry_run_chain(chain_name: str) -> dict:
     chains_data = load_yaml(str(CHAINS_FILE)) if CHAINS_FILE.exists() else {}
     chains = chains_data.get("chains", {})
 
+    # Also check workflow_graph presets (was ORPHAN — now connected)
+    if chain_name not in chains:
+        try:
+            from workflow_graph import WORKFLOWS
+            if chain_name in WORKFLOWS:
+                wf = WORKFLOWS[chain_name]
+                plan = wf.compile()
+                return {
+                    "chain": chain_name,
+                    "description": f"Workflow graph: {chain_name}",
+                    "source": "workflow_graph",
+                    "total_waves": len(plan.waves),
+                    "total_steps": plan.total_steps,
+                    "plan": plan.to_dict(),
+                }
+        except ImportError:
+            pass
+
     if chain_name not in chains:
         return {"error": f"Chain '{chain_name}' not found. Available: {list(chains.keys())}"}
 

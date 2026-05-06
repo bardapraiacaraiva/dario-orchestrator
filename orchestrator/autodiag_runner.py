@@ -65,6 +65,17 @@ log = logging.getLogger("autodiag")
 # =============================================================================
 
 def load_all_tasks() -> list:
+    """Load tasks — DB first, YAML fallback (fixed: was YAML-only)."""
+    try:
+        sys.path.insert(0, str(ORCH_DIR))
+        from db import DB
+        db = DB()
+        tasks = db.get_tasks()
+        if tasks:
+            return tasks
+    except Exception:
+        pass
+    # YAML fallback
     tasks = []
     if not TASKS_DIR.exists():
         return tasks

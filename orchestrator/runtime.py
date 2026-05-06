@@ -112,6 +112,8 @@ class Scheduler:
             log.info("[EVOLUTION] Daily cycle executed")
         # Budget tracker
         _run_engine("budget_tracker.py", ["--check", "--quiet"])
+        # Dashboard refresh (was ORPHAN — dashboard went stale between manual runs)
+        _run_engine("generate_dashboard.py", [])
         log.info(f"Pulse #{self.pulse_count + 1} complete")
 
     def _reap_zombies(self, max_age_minutes: int = 60):
@@ -389,48 +391,53 @@ async def start_chain(chain_name: str, project: str = "", context: str = ""):
 
 # ─── #15: Real-Time SSE Event Stream ─────────────────────────────────────────
 
-from asyncio import Queue
 from fastapi.responses import StreamingResponse
 
-event_subscribers: list[Queue] = []
-
-
-async def broadcast_event(event: dict):
-    """Push event to all SSE subscribers."""
-    dead = []
-    for q in event_subscribers:
-        try:
-            await q.put(event)
-        except Exception:
-            dead.append(q)
-    for q in dead:
-        event_subscribers.remove(q)
+# SSE Streaming — now uses full EventBus (was ORPHAN inline version)
+try:
+    from sse_streaming import get_bus, stream_task_events
+    _sse_bus = get_bus()
+    log.info("[SSE] EventBus active (was inline orphan)")
+except ImportError:
+    _sse_bus = None
+    log.warning("[SSE] sse_streaming.py not available")
 
 
 @app.get("/events")
-async def sse_stream():
-    """Server-Sent Events stream for real-time updates."""
-    queue = Queue()
-    event_subscribers.append(queue)
-
-    async def event_generator():
-        try:
-            yield f"data: {json.dumps({'type': 'connected', 'subscribers': len(event_subscribers)})}\n\n"
-            while True:
-                event = await queue.get()
-                yield f"data: {json.dumps(event, default=str)}\n\n"
-        except asyncio.CancelledError:
-            event_subscribers.remove(queue)
-
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+async def sse_stream(task_id: str = "", modes: str = "updates,scores"):
+    """Server-Sent Events stream with filtering (upgraded from inline to full EventBus)."""
+    if not _sse_bus:
+        return {"error": "SSE not available"}
+    mode_list = [m.strip() for m in modes.split(",")]
+    return StreamingResponse(
+        stream_task_events(_sse_bus, task_id, mode_list),
+        media_type="text/event-stream"
+    )
 
 
-# Override task endpoints to broadcast events
+@app.get("/events/history/{task_id}")
+async def sse_history(task_id: str, limit: int = 50):
+    """Get recent events for a task (new endpoint)."""
+    if not _sse_bus:
+        return []
+    return _sse_bus.get_history(task_id, limit)
+
+
+@app.get("/events/stats")
+async def sse_stats():
+    """SSE bus statistics (new endpoint)."""
+    if not _sse_bus:
+        return {}
+    return _sse_bus.stats()
+
+
+# Override task endpoints to emit SSE events
 _orig_complete = complete_task
 @app.post("/tasks/{task_id}/complete", response_model=None)
 async def complete_task_with_event(task_id: str, req: TaskComplete):
     result = await _orig_complete(task_id, req)
-    await broadcast_event({"type": "task_completed", "task_id": task_id, "score": req.score})
+    if _sse_bus:
+        _sse_bus.emit(task_id, "task_complete", {"score": req.score})
     return result
 
 
