@@ -88,8 +88,8 @@ def check_hallucinated_paths(output: str) -> list[str]:
     for pattern in sus_patterns:
         matches = re.findall(pattern, output)
         for m in matches:
-            # Skip common documentation paths
-            if any(skip in m.lower() for skip in ["example", "your-", "path/to", "username"]):
+            # Skip known safe paths (orchestrator, documentation, examples)
+            if any(skip in m.lower() for skip in ["example", "your-", "path/to", "username", ".claude/orchestrator", "node_modules", "site-packages"]):
                 continue
             issues.append(f"WARNING: Local file path reference: {m[:60]}...")
     return issues
@@ -136,6 +136,20 @@ def check_format_compliance(output: str, skill: str = "") -> list[str]:
         "dario-proposal": ["opcao", "scope", "timeline", "investimento"],
         "dario-wp-audit": ["performance", "seguranca", "seo"],
         "dario-diagnose": ["critico", "importante", "optimizacao"],
+        "dario-naming": ["candidato", "dominio"],
+        "dario-pitch": ["problema", "solucao", "mercado"],
+        "dario-sales-letter": ["headline", "oferta", "cta"],
+        "dario-story-circle": ["protagonista", "transformacao"],
+        "dario-content": ["titulo", "introducao", "conclusao"],
+        "seo-local": ["gbp", "nap", "citation"],
+        "seo-schema": ["@type", "json"],
+        "seo-plan": ["keyword", "estrategia", "prioridade"],
+        "diva-budget": ["capitulo", "total", "m2"],
+        "diva-briefing": ["projecto", "cliente", "requisito"],
+        "diva-moodboard": ["estilo", "paleta", "material"],
+        "diva-timeline": ["fase", "semana", "prazo"],
+        "dario-financial-model": ["receita", "custo", "margem"],
+        "dario-saas-metrics": ["mrr", "churn", "cac"],
     }
 
     if skill in format_rules:
