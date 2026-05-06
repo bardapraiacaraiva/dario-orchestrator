@@ -1,104 +1,73 @@
-## DARIO Synaptic Weights — Inter-Agent Affinity Graph (DARIO v1.0 Pattern)
-## Tracks which skills work well together based on historical co-activation
-## Updated automatically by lucas-quality after scoring multi-skill tasks
-
-# Principle: Links that produce high scores together strengthen over time
-# Formula: weight = base + (co_activations * avg_combined_score / 100)
-# Dispatch uses this: when selecting skills for complex tasks, prefer high-affinity pairs
-
 affinity_graph:
-  # Marketing pairs (brand + adjacent)
-  dario-brand + dario-offer:
-    co_activations: 0
-    avg_combined_score: 0
-    weight: 0.5  # base
-    notes: "Brand positioning feeds directly into offer creation"
-
-  dario-brand + dario-naming:
-    co_activations: 3
-    avg_combined_score: 95.0
-    weight: 0.7
-    notes: "Naming derives from brand identity"
-
-  dario-offer + dario-sales-letter:
-    co_activations: 0
-    avg_combined_score: 0
-    weight: 0.5
-    notes: "Sales letter delivers the offer"
-
-  dario-offer + dario-email-seq:
-    co_activations: 0
-    avg_combined_score: 0
-    weight: 0.5
-    notes: "Email sequences nurture toward the offer"
-
-  dario-funnel + dario-ads-blueprint:
-    co_activations: 0
-    avg_combined_score: 0
-    weight: 0.5
-    notes: "Ads drive traffic into funnel"
-
-  # Technical pairs
-  dario-wp-audit + seo-technical:
-    co_activations: 0
-    avg_combined_score: 0
-    weight: 0.5
-    notes: "WP audit overlaps heavily with technical SEO"
-
-  dario-wp-audit + dario-cwv-fix:
-    co_activations: 0
-    avg_combined_score: 0
-    weight: 0.5
-    notes: "Audit finds issues, CWV fixes them"
-
-  seo-audit + seo-schema:
-    co_activations: 0
-    avg_combined_score: 0
-    weight: 0.5
-    notes: "Full audit often reveals schema gaps"
-
-  # DIVA pairs
-  diva-briefing + diva-diagnose:
-    co_activations: 0
-    avg_combined_score: 0
-    weight: 0.5
-    notes: "Briefing captures requirements, diagnose assesses reality"
-
-  diva-moodboard + diva-materials:
-    co_activations: 0
-    avg_combined_score: 0
-    weight: 0.5
-    notes: "Visual direction feeds material selection"
-
-  diva-budget + diva-timeline:
-    co_activations: 0
-    avg_combined_score: 0
-    weight: 0.5
-    notes: "Budget constrains timeline, timeline affects budget"
-
-  # Cross-division pairs
   dario-brand + dario-content:
-    co_activations: 0
-    avg_combined_score: 0
-    weight: 0.5
-    notes: "Brand voice guides content production"
-
+    avg_combined_score: 82.5
+    co_activations: 4
+    notes: Brand voice guides content production
+    weight: 1.0
+  dario-brand + dario-naming:
+    avg_combined_score: 82.4
+    co_activations: 7
+    notes: Naming derives from brand identity
+    weight: 1.0
+  dario-brand + dario-offer:
+    avg_combined_score: 80.5
+    co_activations: 4
+    notes: Brand positioning feeds directly into offer creation
+    weight: 1.0
   dario-diagnose + seo-audit:
-    co_activations: 0
+    avg_combined_score: 81.4
+    co_activations: 11
+    notes: Diagnostic + SEO audit = complete picture
+    weight: 1.0
+  dario-funnel + dario-ads-blueprint:
+    avg_combined_score: 80.0
+    co_activations: 2
+    notes: Ads drive traffic into funnel
+    weight: 1.0
+  dario-offer + dario-email-seq:
+    avg_combined_score: 80.0
+    co_activations: 2
+    notes: Email sequences nurture toward the offer
+    weight: 1.0
+  dario-offer + dario-sales-letter:
+    avg_combined_score: 80.0
+    co_activations: 2
+    notes: Sales letter delivers the offer
+    weight: 1.0
+  dario-wp-audit + dario-cwv-fix:
     avg_combined_score: 0
+    co_activations: 0
+    notes: Audit finds issues, CWV fixes them
     weight: 0.5
-    notes: "Diagnostic + SEO audit = complete picture"
-
-# Reinforcement rules:
-# - After multi-skill task completes with score >= 80: increase weight by 0.05
-# - After multi-skill task completes with score < 50: decrease weight by 0.03
-# - Weight range: [0.1, 1.0] — never goes below 0.1 or above 1.0
-# - Dispatch bonus: when 2+ skills needed, prefer pair with highest weight
-
+  dario-wp-audit + seo-technical:
+    avg_combined_score: 81.5
+    co_activations: 5
+    notes: WP audit overlaps heavily with technical SEO
+    weight: 1.0
+  diva-briefing + diva-diagnose:
+    avg_combined_score: 0
+    co_activations: 0
+    notes: Briefing captures requirements, diagnose assesses reality
+    weight: 0.5
+  diva-budget + diva-timeline:
+    avg_combined_score: 82.0
+    co_activations: 2
+    notes: Budget constrains timeline, timeline affects budget
+    weight: 1.0
+  diva-moodboard + diva-materials:
+    avg_combined_score: 85.0
+    co_activations: 2
+    notes: Visual direction feeds material selection
+    weight: 1.0
+  seo-audit + seo-schema:
+    avg_combined_score: 81.4
+    co_activations: 6
+    notes: Full audit often reveals schema gaps
+    weight: 1.0
 reinforcement:
+  failure_decrement: 0.03
+  max_weight: 1.0
+  min_weight: 0.1
+  on_failure_threshold: 50
   on_success_threshold: 80
   success_increment: 0.05
-  on_failure_threshold: 50
-  failure_decrement: 0.03
-  min_weight: 0.1
-  max_weight: 1.0

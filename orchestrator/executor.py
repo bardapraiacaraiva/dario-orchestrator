@@ -64,8 +64,23 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 from db import DB
+from filter_pipeline import FilterPipeline, LoggingFilter, BudgetFilter, QualityGateFilter, TokenBudgetFilter
+from output_guardrails import OutputGuardrailFilter
+from model_router import ModelRouterFilter
+from artifact_schemas import SchemaValidationFilter
 
 PYTHON = sys.executable
+
+# TIER 1 Filter Pipeline — composable middleware for every execution
+PIPELINE = FilterPipeline([
+    LoggingFilter(),            # 10: log start/end
+    ModelRouterFilter(),        # 15: select optimal model
+    BudgetFilter(),             # 20: check budget before execution
+    SchemaValidationFilter(),   # 65: validate output structure
+    OutputGuardrailFilter(),    # 70: check for secrets/PII/injection
+    QualityGateFilter(),        # 80: quality threshold gate
+    TokenBudgetFilter(),        # 90: update budget after execution
+])
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("executor")
 
@@ -116,6 +131,28 @@ def execute_task(task_id: str, dry_run: bool = False) -> dict:
     skill = task.get("skill", "")
     project = task.get("project", "")
     worker = task.get("assignee", "")
+
+    # ─── Step 0: FILTER PIPELINE — BEFORE ────────────────────────────────
+    # Runs: LoggingFilter → ModelRouter → BudgetFilter
+    filter_ctx = PIPELINE.before(task)
+    result["steps"].append({
+        "step": "filter_pipeline_before",
+        "blocked": filter_ctx.get("blocked", False),
+        "model": filter_ctx.get("recommended_model", "sonnet"),
+        "savings_pct": filter_ctx.get("model_routing", {}).get("savings_vs_opus_pct", 0),
+    })
+
+    if filter_ctx.get("blocked"):
+        result["status"] = "blocked"
+        result["error"] = f"Filter pipeline blocked: {filter_ctx.get('block_reason', '?')}"
+        db.log_event("executor", "task_blocked", task_id=task_id,
+                     details=f"Pipeline: {filter_ctx.get('block_reason', '?')}")
+        return result
+
+    # Store recommended model for API execution
+    result["recommended_model"] = filter_ctx.get("recommended_model", "sonnet")
+    result["model_id"] = filter_ctx.get("model_id", "claude-sonnet-4-6")
+    result["_filter_ctx"] = filter_ctx  # Pass to after-pipeline
 
     # ─── Step 1: GUARDRAILS ──────────────────────────────────────────────
     guard = run_engine("guardrails.py", ["--task", task_id, "--json"])
@@ -198,6 +235,34 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
     project = task.get("project", "")
 
     if success:
+        # ─── FILTER PIPELINE — AFTER ────────────────────────────────────
+        # Runs: SchemaValidation → OutputGuardrails → QualityGate → TokenBudget
+        filter_ctx = {"actual_tokens": tokens, "quality_score": score}
+        after_result = PIPELINE.after(task, output, filter_ctx)
+        result["steps"].append({
+            "step": "filter_pipeline_after",
+            "tripwire": after_result.get("tripwire", False),
+            "tripwire_reason": after_result.get("tripwire_reason", ""),
+            "schema_valid": after_result.get("schema_valid", True),
+        })
+
+        # If tripwire fired, quarantine output and route to replanner
+        if after_result.get("tripwire"):
+            log.warning(f"[TRIPWIRE] {task_id}: {after_result.get('tripwire_reason', '?')}")
+            run_engine("tracer.py", ["--end", "--task", task_id, "--status", "tripwire",
+                                      "--error", after_result.get("tripwire_reason", "")[:300]])
+            failure_type = "output_guardrail_tripwire"
+            replan = run_engine("replanner.py", [
+                "--task", task_id, "--failure", failure_type,
+                "--score", str(score),
+                "--error", after_result.get("tripwire_reason", "")[:200], "--json"
+            ])
+            result["steps"].append({"step": "replanned_tripwire", "action": replan.get("action", "?")})
+            result["status"] = "tripwire"
+            db.log_event("executor", "task_tripwire", task_id=task_id,
+                         details=f"Tripwire: {after_result.get('tripwire_reason', '')[:100]}")
+            return result
+
         # ─── TRACE END (success) ─────────────────────────────────────────
         run_engine("tracer.py", ["--end", "--task", task_id, "--status", "success",
                                   "--tokens", str(tokens), "--score", str(score),
