@@ -98,7 +98,7 @@ class Scheduler:
 
     async def _pulse(self):
         """Execute heartbeat pulse via subprocess."""
-        # Zombie task reaper (new: tasks in_progress > 60 min → blocked)
+        # Zombie task reaper
         self._reap_zombies()
         # State check
         _run_engine("state_machine.py", ["--evaluate", "--json"])
@@ -106,6 +106,12 @@ class Scheduler:
         _run_engine("dispatch_engine.py", ["--json"])
         # AutoDiag
         _run_engine("autodiag_runner.py", ["--fix", "--json"])
+        # Evolution cycle (was ORPHAN — the system's differentiator, never ran)
+        if self.pulse_count > 0 and self.pulse_count % 48 == 0:  # Every ~24h (48 * 30min)
+            _run_engine("evolution_runner.py", ["--json"])
+            log.info("[EVOLUTION] Daily cycle executed")
+        # Budget tracker
+        _run_engine("budget_tracker.py", ["--check", "--quiet"])
         log.info(f"Pulse #{self.pulse_count + 1} complete")
 
     def _reap_zombies(self, max_age_minutes: int = 60):
@@ -196,6 +202,37 @@ app = FastAPI(
     description="Persistent runtime engine for the DARIO orchestrator ecosystem",
     lifespan=lifespan,
 )
+
+# Auth middleware (was ORPHAN — all endpoints were unauthenticated)
+try:
+    from auth import verify_key, check_permission
+    from fastapi import Request
+    from starlette.middleware.base import BaseHTTPMiddleware
+
+    class AuthMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request: Request, call_next):
+            # Skip auth for health and docs
+            if request.url.path in ("/health", "/docs", "/openapi.json", "/dashboard"):
+                return await call_next(request)
+            # Check API key header
+            api_key = request.headers.get("X-API-Key", "")
+            if api_key:
+                auth_result = verify_key(api_key)
+                if not auth_result.get("valid"):
+                    from fastapi.responses import JSONResponse
+                    return JSONResponse({"detail": "Invalid API key"}, status_code=401)
+                request.state.role = auth_result.get("role", "viewer")
+            # Allow unauthenticated for localhost (dev mode)
+            elif request.client and request.client.host in ("127.0.0.1", "localhost", "::1"):
+                request.state.role = "admin"
+            else:
+                request.state.role = "viewer"  # Read-only for unknown callers
+            return await call_next(request)
+
+    app.add_middleware(AuthMiddleware)
+    log.info("[AUTH] Middleware active (was orphaned)")
+except ImportError:
+    log.warning("[AUTH] auth.py not available — endpoints unauthenticated")
 
 
 # ─── Models ──────────────────────────────────────────────────────────────────

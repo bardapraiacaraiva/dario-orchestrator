@@ -158,6 +158,13 @@ def execute_task(task_id: str, dry_run: bool = False) -> dict:
     result["model_id"] = filter_ctx.get("model_id", "claude-sonnet-4-6")
     result["_filter_ctx"] = filter_ctx  # Pass to after-pipeline
 
+    # ─── Step 0.9: LIFECYCLE HOOK — task_start (was ORPHAN) ────────────
+    try:
+        from lifecycle_hooks import get_registry
+        get_registry().emit("task_start", task=task)
+    except Exception:
+        pass
+
     # ─── Step 1: GUARDRAILS (now direct import, was subprocess) ────────
     guard = validate_task(task_id)
     verdict = guard.get("verdict", "FAIL")
@@ -332,6 +339,30 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
             except Exception:
                 pass
 
+        # ─── TOKEN METER (was ORPHAN — costs never tracked) ────────────
+        if tokens > 0:
+            try:
+                model = result.get("recommended_model", "sonnet")
+                run_engine("token_meter.py", [
+                    "--input", str(int(tokens * 0.7)),
+                    "--output", str(int(tokens * 0.3)),
+                    "--model", model,
+                    "--skill", skill,
+                    "--project", project or "unknown",
+                ])
+            except Exception:
+                pass
+
+        # ─── LIFECYCLE HOOKS (was ORPHAN — events never emitted) ──────
+        try:
+            from lifecycle_hooks import get_registry
+            registry = get_registry()
+            registry.emit("task_complete", task=task, output=output[:200], score=score)
+            if score >= 90:
+                registry.emit("quality_scored", task=task, score=score)
+        except Exception:
+            pass
+
         # ─── AUDIT ───────────────────────────────────────────────────────
         db.log_event("executor", "task_completed", task_id=task_id,
                      details=f"score={score} tokens={tokens} status={status}")
@@ -342,7 +373,20 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
                                   "--error", error[:300]])
         result["steps"].append({"step": "trace_end", "status": "failed"})
 
-        # ─── REPLAN (auto-recovery) ──────────────────────────────────────
+        # ─── ERROR HANDLERS (was ORPHAN — per-skill recovery) ────────────
+        try:
+            from error_handlers import get_error_registry
+            handler = get_error_registry().get(skill)
+            recovery = handler.handle(Exception(error), task, {"_retry_count": 0})
+            result["steps"].append({"step": "error_handler", "action": recovery.action, "recovered": recovery.recovered})
+            if recovery.recovered and recovery.action == "skip":
+                result["status"] = "skipped"
+                db.log_event("executor", "task_skipped", task_id=task_id, details=recovery.reason[:200])
+                return result
+        except Exception:
+            pass
+
+        # ─── REPLAN (auto-recovery fallback) ─────────────────────────────
         failure_type = "agent_timeout" if "timeout" in error.lower() else "quality_below_50" if score < 50 and score > 0 else "unknown"
         replan = run_engine("replanner.py", [
             "--task", task_id, "--failure", failure_type,
@@ -351,6 +395,13 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
         result["steps"].append({"step": "replanned", "action": replan.get("action", "?")})
         result["status"] = "replanned"
         result["replan_action"] = replan.get("action")
+
+        # ─── LIFECYCLE HOOK — task_fail ──────────────────────────────────
+        try:
+            from lifecycle_hooks import get_registry
+            get_registry().emit("task_fail", task=task, error=error[:200])
+        except Exception:
+            pass
 
         # ─── AUDIT ───────────────────────────────────────────────────────
         db.log_event("executor", "task_failed", task_id=task_id,
