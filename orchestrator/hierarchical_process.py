@@ -138,13 +138,21 @@ def get_synaptic_affinity(skill_a: str, skill_b: str) -> float:
         return 0.5
 
     weights = load_yaml(str(WEIGHTS_FILE))
-    if not weights or "pairs" not in weights:
+    if not weights:
         return 0.5
 
-    for pair in weights["pairs"]:
-        skills = pair.get("skills", [])
-        if set(skills) == {skill_a, skill_b}:
-            return pair.get("weight", 0.5)
+    # Read from affinity_graph (correct key)
+    affinity = weights.get("affinity_graph", {})
+    if not affinity:
+        return 0.5
+
+    # Try both orderings: "skill_a + skill_b" and "skill_b + skill_a"
+    key1 = f"{skill_a} + {skill_b}"
+    key2 = f"{skill_b} + {skill_a}"
+    pair = affinity.get(key1) or affinity.get(key2)
+
+    if pair and isinstance(pair, dict):
+        return float(pair.get("weight", 0.5))
 
     return 0.5
 
