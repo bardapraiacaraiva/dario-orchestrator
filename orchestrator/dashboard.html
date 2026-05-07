@@ -111,6 +111,9 @@ html, body {
 #main-wrapper {
   position: fixed;
   top: 48px; left: 0; right: 260px; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 #sidebar {
@@ -222,17 +225,23 @@ html, body {
 .tab-content {
   display: none;
   width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .tab-content.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 /* TAB 1: CANVAS */
 #canvas-container {
   width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 400px;
   position: relative;
 }
 
