@@ -205,6 +205,44 @@ def validate_task(task_id: str, strict: bool = False) -> dict:
         result["errors"].append(f"Task status '{status}' blocks execution")
     result["checks"]["not_already_running"] = not_running
 
+    # --- Check 8: PT Financial Validators (for finance skills) ---
+    finance_skills = {
+        "conta-facturacao", "conta-iva", "conta-irc", "conta-irs", "conta-ss",
+        "conta-payroll", "conta-lancamentos", "conta-conciliacao", "conta-plano",
+        "conta-ap", "conta-ativos", "conta-custos", "conta-orcamento",
+        "conta-tesouraria", "conta-relatorios", "conta-consolidacao",
+        "conta-encerramento", "conta-auditoria", "cfo-agency-pnl",
+        "cfo-token-roi", "cfo-tax-autopilot", "lucas-finance",
+    }
+    pt_validation_ok = True
+    if skill and skill in finance_skills:
+        # Check that pt_validators.py exists
+        validator_path = ORCH_DIR / "pt_validators.py"
+        if not validator_path.exists():
+            result["warnings"].append("pt_validators.py not found — PT validation unavailable")
+            pt_validation_ok = False
+        # Check output_schemas.yaml exists
+        schemas_path = ORCH_DIR / "finance" / "output_schemas.yaml"
+        if not schemas_path.exists():
+            result["warnings"].append("output_schemas.yaml not found — schema validation unavailable")
+        # Check security tier from worker config
+        worker = None
+        for wk, wv in company.get("workers", {}).items():
+            if wv.get("skill") == skill:
+                worker = wv
+                break
+        if worker and worker.get("security_tier"):
+            tier = worker["security_tier"]
+            result["checks"]["security_tier"] = True
+            # Tier 1 workers should never have Write/Edit
+            if tier == 1 and task.get("execution_policy") in ("critical",):
+                result["warnings"].append(f"Tier 1 (reader) worker executing critical task — extra caution")
+        else:
+            result["checks"]["security_tier"] = True  # No tier defined = ok, just not enforced
+    else:
+        result["checks"]["security_tier"] = True  # Non-finance skill, skip
+    result["checks"]["pt_validators_available"] = pt_validation_ok
+
     # --- Verdict ---
     if result["errors"]:
         result["verdict"] = "FAIL"

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DARIO CFO Dashboard</title>
+<style>
+:root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; --green: #3fb950; --yellow: #d29922; --red: #f85149; --orange: #d18616; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace; padding: 20px; }
+h1 { color: var(--accent); font-size: 1.4em; margin-bottom: 4px; }
+h2 { color: var(--accent); font-size: 1.1em; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+.subtitle { color: #8b949e; font-size: 0.85em; margin-bottom: 20px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.metric { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.9em; }
+.metric:last-child { border: none; }
+.metric .label { color: #8b949e; }
+.metric .value { font-weight: 600; }
+.metric .value.green { color: var(--green); }
+.metric .value.yellow { color: var(--yellow); }
+.metric .value.red { color: var(--red); }
+.metric .value.orange { color: var(--orange); }
+table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+th { text-align: left; color: #8b949e; border-bottom: 1px solid var(--border); padding: 6px 4px; font-weight: 500; }
+td { padding: 5px 4px; border-bottom: 1px solid #21262d; }
+.bar { height: 8px; background: #21262d; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.badge { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 4px 12px; font-size: 0.8em; }
+.alert-banner { background: #1c0f0f; border: 1px solid var(--red); border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+.alert-banner.warning { background: #1c1a0f; border-color: var(--orange); }
+</style>
+</head>
+<body>
+<div class="header">
+    <div>
+        <h1>DARIO CFO Dashboard</h1>
+        <div class="subtitle">Financial Command Center — 2026-05 — Generated 2026-05-08T13:15:08</div>
+    </div>
+    <div>
+        <span class="badge">Budget: <span style="color:#44cc44">0.8%</span></span>
+        <span class="badge">Tasks: 67/67</span>
+        <span class="badge">Quality: 81.9</span>
+    </div>
+</div>
+
+<div class='alert-banner'><strong>TAX ALERT:</strong> 1 obrigacao(oes) em ATRASO + 3 URGENTE(S)</div>
+
+<div class="grid">
+    <div class="card">
+        <h2>Token Budget</h2>
+        <div class="metric"><span class="label">Tokens usados</span><span class="value">386,732</span></div>
+        <div class="metric"><span class="label">Limite mensal</span><span class="value">50,000,000</span></div>
+        <div class="metric"><span class="label">Uso</span><span class="value" style="color:#44cc44">0.77%</span></div>
+        <div class="metric"><span class="label">Custo estimado</span><span class="value">EUR 3.78</span></div>
+        <div class="bar"><div class="bar-fill" style="width:0.8%;background:#44cc44"></div></div>
+    </div>
+
+    <div class="card">
+        <h2>Tasks</h2>
+        <div class="metric"><span class="label">Total</span><span class="value">67</span></div>
+        <div class="metric"><span class="label">Concluidas</span><span class="value green">67</span></div>
+        <div class="metric"><span class="label">Activas</span><span class="value yellow">0</span></div>
+        <div class="metric"><span class="label">Projectos</span><span class="value">11</span></div>
+        <div class="metric"><span class="label">Quality avg</span><span class="value">81.9</span></div>
+    </div>
+
+    <div class="card">
+        <h2>Receivables</h2>
+        <div class="metric"><span class="label">Pendente</span><span class="value">EUR 0.00</span></div>
+        <div class="metric"><span class="label">Overdue</span><span class="value red">EUR 0.00</span></div>
+        <div class="metric"><span class="label">Pago este mes</span><span class="value green">EUR 0.00</span></div>
+        <div class="metric"><span class="label">Dias med. cobranca</span><span class="value">0</span></div>
+    </div>
+
+    <div class="card">
+        <h2>Freelancers YTD</h2>
+        <div class="metric"><span class="label">Bruto total</span><span class="value">EUR 0.00</span></div>
+        <div class="metric"><span class="label">IRS retido</span><span class="value">EUR 0.00</span></div>
+        <div class="metric"><span class="label">Liquido pago</span><span class="value">EUR 0.00</span></div>
+        <div class="metric"><span class="label">Activos</span><span class="value">0</span></div>
+    </div>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h2>Calendario Fiscal</h2>
+        <table>
+            <tr><th>Obrigacao</th><th>Deadline</th><th>Dias</th><th>Status</th></tr>
+            <tr>
+            <td>Relatório Único (Anexo A) — GEP/MTSSS</td>
+            <td>2026-04-15</td>
+            <td>-23d</td>
+            <td><span style="color:#ff4444;font-weight:bold">OVERDUE</span></td>
+        </tr><tr>
+            <td>DMR — Declaração Mensal de Remunerações</td>
+            <td>2026-05-10</td>
+            <td>2d</td>
+            <td><span style="color:#ff8800;font-weight:bold">URGENT</span></td>
+        </tr><tr>
+            <td>DRI — Declaração de Remunerações à SS</td>
+            <td>2026-05-10</td>
+            <td>2d</td>
+            <td><span style="color:#ff8800;font-weight:bold">URGENT</span></td>
+        </tr><tr>
+            <td>Declaração Periódica IVA — Q1</td>
+            <td>2026-05-15</td>
+            <td>7d</td>
+            <td><span style="color:#ff8800;font-weight:bold">URGENT</span></td>
+        </tr><tr>
+            <td>IRC Modelo 22 — Declaração Anual</td>
+            <td>2026-05-31</td>
+            <td>23d</td>
+            <td><span style="color:#ffcc00;font-weight:bold">WARNING</span></td>
+        </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Custo por Projecto</h2>
+        <table>
+            <tr><th>Projecto</th><th>Tokens</th><th>Custo Est.</th></tr>
+            <tr><td>vivenda-test</td><td>334,270</td><td>EUR 3.27</td></tr><tr><td>mar-brasa</td><td>30,000</td><td>EUR 0.29</td></tr><tr><td>vivenda</td><td>12,800</td><td>EUR 0.13</td></tr><tr><td>demo</td><td>8,300</td><td>EUR 0.08</td></tr><tr><td>atrium-golden-visa</td><td>8,300</td><td>EUR 0.08</td></tr><tr><td>vivenda-pilot</td><td>6,117</td><td>EUR 0.06</td></tr><tr><td>lucas-lusoconta</td><td>3,200</td><td>EUR 0.03</td></tr><tr><td>test</td><td>2,000</td><td>EUR 0.02</td></tr><tr><td>audit</td><td>2,000</td><td>EUR 0.02</td></tr><tr><td></td><td>1,800</td><td>EUR 0.02</td></tr>
+        </table>
+    </div>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h2>Quality por Skill</h2>
+        <table>
+            <tr><th>Skill</th><th>Avg Score</th><th>Execucoes</th></tr>
+            <tr><td>dario-saas-metrics</td><td>65.0</td><td>1</td></tr><tr><td>seo-geo</td><td>83.0</td><td>1</td></tr><tr><td>dario-brand</td><td>83.5</td><td>4</td></tr><tr><td>seo-audit</td><td>82.5</td><td>2</td></tr><tr><td>dario-diagnose</td><td>88.0</td><td>1</td></tr><tr><td>cfo-agency-pnl</td><td>72.0</td><td>1</td></tr><tr><td>cfo-token-roi</td><td>78.0</td><td>1</td></tr><tr><td>dario-pricing-calculator</td><td>85.0</td><td>1</td></tr><tr><td>cfo-tax-autopilot</td><td>92.0</td><td>1</td></tr><tr><td>dario-naming</td><td>85.0</td><td>1</td></tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Security Compliance</h2>
+        <div class="metric"><span class="label">Workers financeiros</span><span class="value">39</span></div>
+        <div class="metric"><span class="label">Com security tier</span><span class="value">21</span></div>
+        <div class="metric"><span class="label">Com validator</span><span class="value">11</span></div>
+        <div class="metric"><span class="label">Com output schema</span><span class="value">6</span></div>
+        <div class="metric"><span class="label">Compliance</span><span class="value yellow">54%</span></div>
+        <div class="bar"><div class="bar-fill" style="width:54%;background:var(--green)"></div></div>
+    </div>
+</div>
+
+<div style="text-align:center;color:#8b949e;margin-top:20px;font-size:0.8em">
+    DARIO CFO v1.0 — Wave 5 Dashboard — Auto-refresh: <a href="/cfo" style="color:var(--accent)">reload</a> |
+    <a href="/cfo/data" style="color:var(--accent)">JSON API</a> |
+    <a href="/dashboard" style="color:var(--accent)">Orchestrator Dashboard</a>
+</div>
+</body>
+</html>

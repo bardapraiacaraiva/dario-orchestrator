@@ -1,0 +1,146 @@
+# DARIO — Client Onboarding E2E Chain
+# The FIRST real workflow that produces deliverables for a client.
+# Uses the wave scheduler for optimal parallel execution.
+#
+# Usage:
+#   curl -X POST http://localhost:8422/chains/client_onboarding/start \
+#     -H "Content-Type: application/json" \
+#     -d '{"client_name": "Acme Lda", "website": "acme.pt", "sector": "tech"}'
+#
+# Or via executor:
+#   python executor.py --chain client_onboarding --project acme --context '{"client_name": "Acme"}'
+
+chain_id: client_onboarding
+name: "Client Onboarding — Full Diagnostic to Proposal"
+description: "Complete client onboarding: diagnose → audit → brand check → SEO check → proposal with pricing"
+version: 1
+execution_policy: client_facing
+
+# Input variables (required from caller)
+inputs:
+  - name: client_name
+    type: string
+    required: true
+  - name: website
+    type: string
+    required: true
+  - name: sector
+    type: string
+    required: true
+    description: "e.g., restaurant, tech, retail, construction, services"
+  - name: budget_range
+    type: string
+    required: false
+    default: "5-15K EUR"
+
+# Steps — executed in waves by the WaveScheduler
+steps:
+  # === WAVE 1: Parallel discovery (no dependencies) ===
+  - name: diagnose
+    skill: dario-diagnose
+    depends_on: []
+    description: "Holistic diagnostic — CRITICO/IMPORTANTE/OPTIMIZACAO triage"
+    input_template: |
+      Diagnostico holistico para ${client_name}.
+      Website: ${website}
+      Sector: ${sector}
+      Faz uma analise completa e categoriza em CRITICO, IMPORTANTE e OPTIMIZACAO.
+
+  - name: seo_audit
+    skill: seo-audit
+    depends_on: []
+    description: "Full SEO audit of the client website"
+    input_template: |
+      Auditoria SEO completa para ${website}.
+      Sector: ${sector}
+      Analisa: tecnico, conteudo, on-page, local SEO, schema, performance.
+
+  - name: brand_check
+    skill: dario-brand
+    depends_on: []
+    description: "Brand positioning assessment"
+    input_template: |
+      Avaliacao do posicionamento de marca actual de ${client_name}.
+      Website: ${website}
+      Sector: ${sector}
+      Analisa: messaging, diferenciacao, tom de voz, archetype, consistency.
+
+  # === WAVE 2: Depends on Wave 1 results ===
+  - name: competitive_analysis
+    skill: seo-competitor-pages
+    depends_on: [seo_audit]
+    description: "Competitor analysis based on SEO findings"
+    input_template: |
+      Analise competitiva para ${client_name} no sector ${sector}.
+      Baseado nos resultados da auditoria SEO de ${website}.
+
+  - name: offer_design
+    skill: dario-offer
+    depends_on: [diagnose, brand_check]
+    description: "Design service offer based on diagnostic"
+    input_template: |
+      Desenhar oferta de servico para ${client_name} baseada no diagnostico.
+      Prioridades identificadas no diagnose. Usar Grand Slam Offer framework.
+      Budget range do cliente: ${budget_range}
+
+  # === WAVE 3: Synthesis ===
+  - name: proposal
+    skill: dario-proposal
+    depends_on: [diagnose, seo_audit, brand_check, offer_design]
+    description: "Generate 3-option commercial proposal"
+    input_template: |
+      Proposta comercial 3 opcoes (Blair Enns) para ${client_name}.
+      Baseada em:
+      - Diagnostico holistico (prioridades CRITICO/IMPORTANTE)
+      - Auditoria SEO (score e gaps)
+      - Assessment de marca (gaps de posicionamento)
+      - Oferta desenhada (Grand Slam Offer)
+      Budget range: ${budget_range}
+
+      Incluir: scope, timeline, investimento por opcao, ROI estimado.
+
+  # === WAVE 4: Financial ===
+  - name: pricing
+    skill: dario-pricing-calculator
+    depends_on: [proposal]
+    description: "Calculate real pricing with margins"
+    input_template: |
+      Calcular pricing real para proposta de ${client_name}.
+      Servicos propostos na proposta comercial.
+      Calcular: custo/hora interno, horas estimadas, margem target 40%, token cost estimado.
+
+# Wave schedule (auto-computed by WaveScheduler):
+# Wave 1: [diagnose, seo_audit, brand_check]           — 3 parallel
+# Wave 2: [competitive_analysis, offer_design]          — 2 parallel
+# Wave 3: [proposal]                                    — sequential
+# Wave 4: [pricing]                                     — sequential
+
+# Quality gates between waves
+quality_gates:
+  after_wave_1:
+    min_score: 60
+    action_on_fail: "retry_with_feedback"
+  after_wave_3:
+    min_score: 70
+    action_on_fail: "human_review"
+
+# Output deliverable
+output:
+  format: markdown
+  save_to_obsidian: true
+  obsidian_path: "05 - Claude - IA/Outputs/${date} - Onboarding - ${client_name}.md"
+  sections:
+    - "Diagnostico Executivo"
+    - "Auditoria SEO (resumo)"
+    - "Assessment de Marca"
+    - "Analise Competitiva"
+    - "Proposta Comercial (3 opcoes)"
+    - "Pricing Detalhado"
+    - "Proximos Passos"
+
+# Estimated resources
+estimates:
+  total_tokens: 25000-40000
+  model_mix: "80% Sonnet, 20% Opus (proposal + pricing)"
+  duration: "15-25 minutes"
+  cost: "EUR 0.15-0.30"

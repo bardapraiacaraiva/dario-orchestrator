@@ -208,24 +208,75 @@ agents:
     - ai_search_optimization
     squads:
     - Data Squad
-  dir_finance:
-    id: dir-finance
-    name: Finance Director
-    title: Director of Finance & Operations
-    type: manager
+  vp_cfo:
+    id: dario-cfo
+    name: C.F.O.
+    title: VP Finance, Accounting & Risk
+    type: orchestrator
+    adapter: dario-v2-digital-ceo
     reports_to: dario-ceo
+    manages_directors:
+    - dir-agency-finance
+    - dir-accounting
+    - dir-risk
+    - dir-cost-control
+    capabilities:
+    - financial_governance
+    - accounting_oversight
+    - risk_management
+    - compliance_governance
+    - tax_strategy_pt
+    - budget_enforcement
+    - cost_optimization
+    - treasury_management
+    - audit_coordination
+    - financial_reporting
+    - regulatory_compliance
+    - token_cost_roi
+    heartbeat:
+      enable_timer: true
+      interval_minutes: 30
+      enable_assignment_wakeup: true
+      enable_on_demand: true
+      cooldown_minutes: 10
+    context_mode: full
+    execution_policy: financial
+    squads:
+    - CFO Squad
+    - PT Tax Compliance Squad
+    - Risk & Governance Squad
+    engines:
+    - budget_tracker.py
+    - token_meter.py
+    - model_router.py
+    data_files:
+    - finance/receivables.yaml
+    - finance/freelancers.yaml
+    - finance/tax_calendar.yaml
+  dir_agency_finance:
+    id: dir-agency-finance
+    name: Agency Finance Director
+    title: Director of Agency Finance & Pricing
+    type: manager
+    reports_to: dario-cfo
     manages:
     - worker-financial-model
     - worker-pricing-calculator
     - worker-saas-metrics
+    - worker-cfo-agency-pnl
+    - worker-cfo-token-roi
+    - worker-cfo-tax-autopilot
     capabilities:
     - financial_modeling
     - pricing_strategy
     - saas_analytics
     - budget_forecasting
+    - agency_pnl
+    - client_profitability
+    - token_roi
+    - tax_automation
     squads:
     - CFO Squad
-    - Operations Squad
   vp_lucas:
     id: lucas-vp
     name: L.U.C.A.S.
@@ -254,7 +305,7 @@ agents:
     name: Cost Control Director
     title: Director of Cost Control & Model Routing
     type: manager
-    reports_to: lucas-vp
+    reports_to: dario-cfo
     manages:
     - worker-lucas-budget-tracker
     - worker-lucas-model-router
@@ -335,18 +386,202 @@ agents:
   dir_accounting:
     id: dir-accounting
     name: Accounting Director
-    title: Director of Accounting
+    title: Director of Accounting & Tax (PT)
     type: manager
-    reports_to: lucas-vp
+    reports_to: dario-cfo
     manages:
-    - worker-lucas-tax
-    - worker-lucas-compliance
-    - worker-lucas-reporting
+    - worker-conta-facturacao
+    - worker-conta-iva
+    - worker-conta-irc
+    - worker-conta-irs
+    - worker-conta-ss
+    - worker-conta-payroll
+    - worker-conta-lancamentos
+    - worker-conta-conciliacao
+    - worker-conta-plano
+    - worker-conta-ap
+    - worker-conta-ativos
+    - worker-conta-custos
+    - worker-conta-orcamento
+    - worker-conta-tesouraria
+    - worker-conta-relatorios
+    - worker-conta-consolidacao
+    - worker-conta-encerramento
+    - worker-conta-auditoria
     capabilities:
     - pt_tax_law
     - at_compliance
     - financial_reporting
     - saf_t
+    - snc_accounting
+    - iva_declarations
+    - irc_computation
+    - payroll_processing
+    - bank_reconciliation
+    - year_end_close
+    - audit_preparation
+    - budget_management
+    - treasury_management
+    - cost_accounting
+    squads:
+    - PT Accounting Squad
+    - Tax Compliance Squad
+  dir_risk:
+    id: dir-risk
+    name: Risk & Compliance Director
+    title: Director of Risk, Compliance & Governance
+    type: manager
+    reports_to: dario-cfo
+    manages:
+    - worker-risco-rgpd
+    - worker-risco-aml
+    - worker-risco-matrix
+    - worker-risco-bcp
+    - worker-risco-esg
+    - worker-risco-iso27001
+    - worker-risco-whistleblowing
+    - worker-risco-regulatorio
+    - worker-risco-etica
+    - worker-risco-contractual
+    - worker-risco-seguros
+    - worker-risco-terceiros
+    - worker-risco-reporting
+    - worker-risco-audit
+    capabilities:
+    - rgpd_gdpr_compliance
+    - aml_kyc
+    - risk_assessment
+    - business_continuity
+    - esg_reporting
+    - iso27001_nis2
+    - whistleblowing
+    - regulatory_monitoring
+    - ethics_governance
+    - contract_compliance
+    - insurance_management
+    - third_party_risk
+    - compliance_reporting
+    - internal_audit
+    squads:
+    - Risk & Compliance Squad
+    - Governance Squad
+  vp_builder:
+    id: builder-vp
+    name: B.U.I.L.D.E.R.
+    title: VP Product Building & Engineering
+    type: orchestrator
+    adapter: dario-v2-digital-ceo
+    reports_to: dario-ceo
+    manages_directors:
+    - dir-design-visual
+    - dir-frontend
+    - dir-backend
+    - dir-devops
+    capabilities:
+    - product_building
+    - design_systems
+    - frontend_development
+    - backend_development
+    - api_design
+    - database_design
+    - deployment
+    - ci_cd
+    - visual_identity
+    - landing_pages
+    - full_stack
+    - idea_to_product
+    heartbeat:
+      enable_timer: true
+      interval_minutes: 30
+      enable_assignment_wakeup: true
+      enable_on_demand: true
+      cooldown_minutes: 10
+    context_mode: full
+    squads:
+    - Design Squad
+    - Frontend Squad
+    - Full-Stack Squad
+    - DevOps Squad
+  dir_design_visual:
+    id: dir-design-visual
+    name: Design Visual Director
+    title: Director of Visual Design & Brand Systems
+    type: manager
+    reports_to: builder-vp
+    manages:
+    - worker-builder-design-system
+    - worker-builder-brand-identity
+    - worker-builder-wireframe
+    capabilities:
+    - design_tokens
+    - color_palettes
+    - typography_systems
+    - component_libraries
+    - wireframing
+    - brand_guidelines
+    - tailwind_config
+    squads:
+    - Design Squad
+  dir_frontend:
+    id: dir-frontend
+    name: Frontend Director
+    title: Director of Frontend Engineering
+    type: manager
+    reports_to: builder-vp
+    manages:
+    - worker-builder-landing-page
+    - worker-builder-nextjs-app
+    - worker-builder-react-components
+    capabilities:
+    - react
+    - nextjs
+    - tailwindcss
+    - shadcn_ui
+    - responsive_design
+    - landing_pages
+    - dashboards
+    squads:
+    - Frontend Squad
+  dir_backend_build:
+    id: dir-backend-build
+    name: Backend Director
+    title: Director of Backend & API Engineering
+    type: manager
+    reports_to: builder-vp
+    manages:
+    - worker-builder-api-design
+    - worker-builder-database-schema
+    - worker-builder-auth-system
+    capabilities:
+    - rest_api
+    - graphql
+    - postgresql
+    - sqlite
+    - jwt_auth
+    - oauth
+    - node_express
+    - fastapi_python
+    squads:
+    - Full-Stack Squad
+  dir_devops_build:
+    id: dir-devops-build
+    name: DevOps Director
+    title: Director of DevOps & Deployment
+    type: manager
+    reports_to: builder-vp
+    manages:
+    - worker-builder-vercel-deploy
+    - worker-builder-docker-compose
+    - worker-builder-ci-cd
+    capabilities:
+    - vercel
+    - docker
+    - github_actions
+    - nginx
+    - ssl_certbot
+    - monitoring
+    squads:
+    - DevOps Squad
   vp_a360:
     id: a360-vp
     name: Accelera 360
@@ -1088,7 +1323,7 @@ workers:
   worker-financial-model:
     type: worker
     skill: dario-financial-model
-    reports_to: dir-finance
+    reports_to: dir-agency-finance
     capabilities:
     - pl_forecast
     - cash_flow
@@ -1097,7 +1332,7 @@ workers:
   worker-pricing-calculator:
     type: worker
     skill: dario-pricing-calculator
-    reports_to: dir-finance
+    reports_to: dir-agency-finance
     capabilities:
     - service_pricing
     - cost_per_hour
@@ -1106,7 +1341,7 @@ workers:
   worker-saas-metrics:
     type: worker
     skill: dario-saas-metrics
-    reports_to: dir-finance
+    reports_to: dir-agency-finance
     capabilities:
     - mrr
     - arr
@@ -1114,6 +1349,44 @@ workers:
     - ltv_cac
     - nrr
     - unit_economics
+  # === CFO DIFFERENTIATORS (3 novos — Wave 3) ===
+  worker-cfo-agency-pnl:
+    type: worker
+    skill: cfo-agency-pnl
+    reports_to: dir-agency-finance
+    capabilities:
+    - client_margin
+    - project_pnl
+    - token_cost_allocation
+    - rework_cost
+    - delivery_cost
+    watches:
+    - lucas-quality
+    - lucas-finance
+    watch_condition: "always"
+  worker-cfo-token-roi:
+    type: worker
+    skill: cfo-token-roi
+    reports_to: dir-agency-finance
+    capabilities:
+    - roi_calculation
+    - model_cost_breakdown
+    - efficiency_scoring
+    - savings_recommendations
+    - forecast_90d
+    watches:
+    - lucas-finance
+  worker-cfo-tax-autopilot:
+    type: worker
+    skill: cfo-tax-autopilot
+    reports_to: dir-agency-finance
+    capabilities:
+    - tax_calendar_monitoring
+    - deadline_alerts
+    - preparation_checklists
+    - obligation_tracking
+    - penalty_prevention
+    engine: tax_calendar.py
   worker-client-onboard:
     type: worker
     skill: dario-client-onboard
@@ -1318,38 +1591,42 @@ workers:
     - diva-floor-plan
   worker-lucas-budget-tracker:
     type: worker
-    skill: lucas-budget-tracking
+    skill: lucas-finance
     reports_to: dir-cost-control
     capabilities:
     - token_counting
     - budget_tracking
     - spend_reporting
     - project_cost_allocation
+    engine: budget_tracker.py
   worker-lucas-model-router:
     type: worker
-    skill: lucas-model-routing
+    skill: lucas-analytics
     reports_to: dir-cost-control
     capabilities:
     - model_selection
     - haiku_sonnet_opus_routing
     - cost_per_quality_optimization
+    engine: model_router.py
   worker-lucas-cost-alerts:
     type: worker
-    skill: lucas-cost-alerting
+    skill: lucas-finance
     reports_to: dir-cost-control
     capabilities:
     - threshold_alerting
     - budget_warning
     - auto_pause
     - spend_notification
+    engine: token_meter.py
   worker-lucas-cost-optimizer:
     type: worker
-    skill: lucas-cost-optimization
+    skill: lucas-analytics
     reports_to: dir-cost-control
     capabilities:
     - token_efficiency_analysis
     - waste_detection
     - optimization_suggestions
+    engine: cost_optimization_engine.py
   worker-lucas-quality-scorer:
     type: worker
     skill: lucas-quality
@@ -1573,36 +1850,518 @@ workers:
     - migrations
     - data_modeling
     - pgvector
-  worker-lucas-tax:
+  worker-lucas-agency-finance:
     type: worker
-    skill: lucas-tax-compliance
+    skill: lucas-finance
     reports_to: dir-accounting
     capabilities:
-    - iva_rules
-    - irc_computation
-    - irs_categories
-    - at_portal
-    - efatura_integration
-  worker-lucas-compliance:
+    - agency_invoicing
+    - monthly_pnl
+    - cash_flow_forecast
+    - freelancer_tracking
+    - client_profitability
+    - tax_calendar_alerts
+    - atcud_qr_saft
+  # === CONTABILIDADE PT (18 workers) ===
+  worker-conta-facturacao:
     type: worker
-    skill: lucas-regulatory-compliance
+    skill: conta-facturacao
+    reports_to: dir-accounting
+    security_tier: 3
+    allowed_tools: [Read, Write, Edit]
+    output_schema: conta-facturacao
+    validator: pt_validators.py
+    capabilities:
+    - efatura_at
+    - atcud_qr_code
+    - saf_t
+    - credit_notes
+    - series_management
+    - dl_28_2019
+  worker-conta-iva:
+    type: worker
+    skill: conta-iva
+    reports_to: dir-accounting
+    security_tier: 2
+    allowed_tools: [Read, Grep, Glob]
+    output_schema: conta-iva
+    validator: pt_validators.py
+    capabilities:
+    - iva_periodic_returns
+    - regime_normal
+    - regime_simplificado
+    - intra_eu_vies
+    - pro_rata
+    - regularizations
+  worker-conta-irc:
+    type: worker
+    skill: conta-irc
+    reports_to: dir-accounting
+    security_tier: 2
+    allowed_tools: [Read, Grep, Glob]
+    output_schema: conta-irc
+    validator: pt_validators.py
+    capabilities:
+    - modelo_22
+    - derrama
+    - pec
+    - tributacao_autonoma
+    - tax_planning
+    - deductions
+  worker-conta-irs:
+    type: worker
+    skill: conta-irs
+    reports_to: dir-accounting
+    security_tier: 2
+    allowed_tools: [Read, Grep, Glob]
+    validator: pt_validators.py
+    capabilities:
+    - withholding_categories
+    - cat_a_b_e_f_g
+    - freelancer_retention
+    - non_residents
+    - annual_obligations
+  worker-conta-ss:
+    type: worker
+    skill: conta-ss
+    reports_to: dir-accounting
+    security_tier: 2
+    allowed_tools: [Read, Grep, Glob]
+    capabilities:
+    - employer_contributions
+    - employee_contributions
+    - dri_declarations
+    - independent_workers
+    - special_regimes
+    - tsu_rates
+  worker-conta-payroll:
+    type: worker
+    skill: conta-payroll
+    reports_to: dir-accounting
+    security_tier: 2
+    allowed_tools: [Read, Grep, Glob]
+    output_schema: conta-payroll
+    validator: pt_validators.py
+    capabilities:
+    - salary_processing
+    - subsidio_alimentacao
+    - subsidio_ferias_natal
+    - overtime
+    - termination
+    - dmr
+  worker-conta-lancamentos:
+    type: worker
+    skill: conta-lancamentos
+    reports_to: dir-accounting
+    security_tier: 3
+    allowed_tools: [Read, Write, Edit]
+    validator: pt_validators.py
+    capabilities:
+    - double_entry
+    - recurring_entries
+    - accruals
+    - adjustments
+    - reversals
+    - snc_compliance
+  worker-conta-conciliacao:
+    type: worker
+    skill: conta-conciliacao
+    reports_to: dir-accounting
+    security_tier: 1
+    allowed_tools: [Read, Grep]
+    output_schema: conta-conciliacao
+    validator: pt_validators.py
+    capabilities:
+    - multi_bank
+    - auto_matching
+    - discrepancy_resolution
+    - periodic_close
+  worker-conta-plano:
+    type: worker
+    skill: conta-plano
+    reports_to: dir-accounting
+    security_tier: 3
+    allowed_tools: [Read, Write, Edit]
+    validator: pt_validators.py
+    capabilities:
+    - snc_chart_of_accounts
+    - ncrf_mapping
+    - ifrs_alignment
+    - account_validation
+  worker-conta-ap:
+    type: worker
+    skill: conta-ap
+    reports_to: dir-accounting
+    security_tier: 1
+    allowed_tools: [Read, Grep]
+    validator: pt_validators.py
+    capabilities:
+    - three_way_match
+    - payment_scheduling
+    - aging_analysis
+    - supplier_management
+  worker-conta-ativos:
+    type: worker
+    skill: conta-ativos
     reports_to: dir-accounting
     capabilities:
-    - saf_t_generation
-    - at_compliance
-    - rgpd
-    - audit_trail
-    - digital_signatures
-  worker-lucas-reporting:
+    - depreciation_rates
+    - asset_register
+    - acquisition_disposal
+    - revaluation
+    - impairment
+    - dr_25_2009
+  worker-conta-custos:
     type: worker
-    skill: lucas-financial-reporting
+    skill: conta-custos
     reports_to: dir-accounting
     capabilities:
-    - financial_reports
-    - balance_sheet
-    - income_statement
-    - cash_flow
-    - dashboards
+    - cost_centers
+    - abc_costing
+    - margins
+    - break_even
+    - profitability_analysis
+  worker-conta-orcamento:
+    type: worker
+    skill: conta-orcamento
+    reports_to: dir-accounting
+    capabilities:
+    - annual_budget
+    - variance_analysis
+    - rolling_forecasts
+    - departmental_budgets
+    - kpis
+  worker-conta-tesouraria:
+    type: worker
+    skill: conta-tesouraria
+    reports_to: dir-accounting
+    capabilities:
+    - cash_flow_forecast
+    - working_capital
+    - liquidity_ratios
+    - bank_relationships
+  worker-conta-relatorios:
+    type: worker
+    skill: conta-relatorios
+    reports_to: dir-accounting
+    security_tier: 3
+    allowed_tools: [Read, Write, Edit]
+    output_schema: conta-relatorios
+    validator: pt_validators.py
+    capabilities:
+    - balancete
+    - demonstracao_resultados
+    - balanco
+    - fluxos_de_caixa
+    - anexo
+    - snc_statements
+  worker-conta-consolidacao:
+    type: worker
+    skill: conta-consolidacao
+    reports_to: dir-accounting
+    capabilities:
+    - intercompany_elimination
+    - currency_translation
+    - minorities
+    - equity_method
+  worker-conta-encerramento:
+    type: worker
+    skill: conta-encerramento
+    reports_to: dir-accounting
+    security_tier: 3
+    allowed_tools: [Read, Write, Edit]
+    validator: pt_validators.py
+    capabilities:
+    - closing_checklist
+    - provisions
+    - adjustments
+    - statutory_filings
+    - modelo_22_ies
+    - assembleia_geral
+  worker-conta-auditoria:
+    type: worker
+    skill: conta-auditoria
+    reports_to: dir-accounting
+    security_tier: 1
+    allowed_tools: [Read, Grep]
+    capabilities:
+    - dossier_fiscal
+    - working_papers
+    - management_letter
+    - roc_procedures
+    - internal_controls
+  # === RISCO & COMPLIANCE (14 workers) ===
+  worker-risco-rgpd:
+    type: worker
+    skill: risco-rgpd
+    reports_to: dir-risk
+    security_tier: 1
+    allowed_tools: [Read, Grep]
+    capabilities:
+    - data_mapping
+    - dpia
+    - consent_management
+    - breach_notification_72h
+    - ropa
+    - dpo_obligations
+    - lei_58_2019
+  worker-risco-aml:
+    type: worker
+    skill: risco-aml
+    reports_to: dir-risk
+    security_tier: 1
+    allowed_tools: [Read, Grep]
+    capabilities:
+    - customer_due_diligence
+    - pep_screening
+    - suspicious_transaction_reporting
+    - lei_83_2017
+  worker-risco-matrix:
+    type: worker
+    skill: risco-matrix
+    reports_to: dir-risk
+    security_tier: 2
+    allowed_tools: [Read, Grep, Glob]
+    capabilities:
+    - likelihood_impact_scoring
+    - heat_map
+    - mitigation_planning
+    - risk_register
+  worker-risco-bcp:
+    type: worker
+    skill: risco-bcp
+    reports_to: dir-risk
+    capabilities:
+    - business_impact_analysis
+    - recovery_strategies
+    - crisis_management
+    - bcm_testing
+    - iso_22301
+  worker-risco-esg:
+    type: worker
+    skill: risco-esg
+    reports_to: dir-risk
+    security_tier: 2
+    allowed_tools: [Read, Grep, Glob]
+    capabilities:
+    - csrd_compliance
+    - eu_taxonomy
+    - double_materiality
+    - carbon_footprint
+    - sustainability_metrics
+  worker-risco-iso27001:
+    type: worker
+    skill: risco-iso27001
+    reports_to: dir-risk
+    capabilities:
+    - isms_implementation
+    - annex_a_controls
+    - statement_of_applicability
+    - incident_management
+    - nis2_compliance
+  worker-risco-whistleblowing:
+    type: worker
+    skill: risco-whistleblowing
+    reports_to: dir-risk
+    security_tier: 3
+    allowed_tools: [Read, Write, Edit]
+    capabilities:
+    - dl_93_2021
+    - internal_reporting_channel
+    - investigation_procedure
+    - retaliation_protection
+  worker-risco-regulatorio:
+    type: worker
+    skill: risco-regulatorio
+    reports_to: dir-risk
+    capabilities:
+    - legislative_change_tracking
+    - compliance_calendar
+    - regulatory_impact_assessment
+  worker-risco-etica:
+    type: worker
+    skill: risco-etica
+    reports_to: dir-risk
+    security_tier: 3
+    allowed_tools: [Read, Write, Edit]
+    capabilities:
+    - code_of_conduct
+    - conflict_of_interest
+    - gifts_hospitality
+    - ethics_hotline
+  worker-risco-contractual:
+    type: worker
+    skill: risco-contractual
+    reports_to: dir-risk
+    capabilities:
+    - obligation_tracking
+    - sla_monitoring
+    - penalty_management
+    - contract_lifecycle
+  worker-risco-seguros:
+    type: worker
+    skill: risco-seguros
+    reports_to: dir-risk
+    capabilities:
+    - coverage_analysis
+    - renewal_calendar
+    - claims_management
+    - policy_gap_identification
+  worker-risco-terceiros:
+    type: worker
+    skill: risco-terceiros
+    reports_to: dir-risk
+    security_tier: 1
+    allowed_tools: [Read, Grep]
+    capabilities:
+    - vendor_due_diligence
+    - supply_chain_risk
+    - onboarding_monitoring
+    - exit_management
+  worker-risco-reporting:
+    type: worker
+    skill: risco-reporting
+    reports_to: dir-risk
+    security_tier: 2
+    allowed_tools: [Read, Grep, Glob]
+    capabilities:
+    - kri_dashboards
+    - incident_log
+    - board_reports
+    - regulatory_filings
+    - compliance_metrics
+  worker-risco-audit:
+    type: worker
+    skill: risco-audit
+    reports_to: dir-risk
+    capabilities:
+    - internal_audit_planning
+    - fieldwork
+    - findings_documentation
+    - management_response
+    - follow_up_tracking
+  # === BUILDER WORKERS (Sprint 1) ===
+  worker-builder-design-system:
+    type: worker
+    skill: builder-design-system
+    reports_to: dir-design-visual
+    capabilities:
+    - design_tokens
+    - color_palette
+    - typography_scale
+    - tailwind_config
+    - component_specs
+    - spacing_system
+  worker-builder-brand-identity:
+    type: worker
+    skill: builder-brand-identity
+    reports_to: dir-design-visual
+    capabilities:
+    - logo_brief
+    - brand_guidelines
+    - color_system
+    - visual_identity
+  worker-builder-wireframe:
+    type: worker
+    skill: builder-wireframe
+    reports_to: dir-design-visual
+    capabilities:
+    - wireframe_lowfi
+    - user_flow
+    - sitemap
+    - page_structure
+  worker-builder-landing-page:
+    type: worker
+    skill: builder-landing-page
+    reports_to: dir-frontend
+    capabilities:
+    - html_generation
+    - react_jsx
+    - tailwind_styling
+    - responsive
+    - hero_section
+    - pricing_table
+    - cta_design
+  worker-builder-nextjs-app:
+    type: worker
+    skill: builder-nextjs-app
+    reports_to: dir-frontend
+    capabilities:
+    - nextjs_app_router
+    - page_scaffold
+    - layout_system
+    - loading_states
+    - error_boundaries
+    - server_components
+  worker-builder-react-components:
+    type: worker
+    skill: builder-react-components
+    reports_to: dir-frontend
+    capabilities:
+    - typescript_components
+    - shadcn_ui
+    - compound_components
+    - variant_system
+    - storybook
+  worker-builder-api-design:
+    type: worker
+    skill: builder-api-design
+    reports_to: dir-backend-build
+    capabilities:
+    - rest_endpoints
+    - openapi_spec
+    - request_validation
+    - error_handling
+    - rate_limiting
+  worker-builder-database-schema:
+    type: worker
+    skill: builder-database-schema
+    reports_to: dir-backend-build
+    capabilities:
+    - postgresql_ddl
+    - sqlite_schema
+    - migrations
+    - indexes
+    - relationships
+  worker-builder-auth-system:
+    type: worker
+    skill: builder-auth-system
+    reports_to: dir-backend-build
+    capabilities:
+    - jwt
+    - session_management
+    - oauth
+    - role_based_access
+    - password_hashing
+  worker-builder-vercel-deploy:
+    type: worker
+    skill: builder-vercel-deploy
+    reports_to: dir-devops-build
+    capabilities:
+    - vercel_config
+    - env_vars
+    - domains
+    - preview_urls
+    - edge_functions
+  worker-builder-docker-compose:
+    type: worker
+    skill: builder-docker-compose
+    reports_to: dir-devops-build
+    capabilities:
+    - dockerfile
+    - compose_yaml
+    - multi_service
+    - volumes
+    - networking
+  worker-builder-ci-cd:
+    type: worker
+    skill: builder-ci-cd
+    reports_to: dir-devops-build
+    capabilities:
+    - github_actions
+    - build_test_deploy
+    - preview_deploys
+    - release_workflow
   worker-diva-briefing:
     type: worker
     skill: diva-briefing

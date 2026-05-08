@@ -1,0 +1,39 @@
+# DARIO Finance — Freelancer Payments Tracker
+# Pagamentos a freelancers e prestadores de serviços
+# Actualizado por: lucas-finance skill
+# Schema v1.0
+
+freelancers:
+  # Exemplo de estrutura por freelancer
+  # - name: "Nome do Freelancer"
+  #   nif: "123456789"
+  #   regime: "irs_cat_b"  # irs_cat_b | empresa_lda | eni
+  #   irs_retention_rate: 0.25  # 25% standard, 0% se < 12500 EUR/ano
+  #   ss_independent: true
+  #   services:
+  #     - description: "Desenvolvimento frontend"
+  #       project: "project-id"
+  #       invoice_ref: "RC 2026/001"
+  #       gross_amount: 1500.00
+  #       irs_retention: 375.00
+  #       net_payment: 1125.00
+  #       iva_amount: 345.00  # 23% se não isento
+  #       iva_exempt: false  # Art. 53 CIVA se < 14500 EUR
+  #       payment_date: "2026-01-31"
+  #       status: paid | pending | scheduled
+
+summary:
+  total_gross_ytd: 0.00
+  total_irs_retained_ytd: 0.00
+  total_net_paid_ytd: 0.00
+  freelancers_active: 0
+  # Alerta: Se total_gross > 12500 EUR para um freelancer, retenção IRS obrigatória
+  retention_threshold: 12500.00
+
+alerts:
+  # DMR (Declaração Mensal de Remunerações) — até dia 10 do mês seguinte
+  dmr_deadline_day: 10
+  # Modelo 10 — até 25 de Fevereiro (retenções ano anterior)
+  modelo_10_deadline: "02-25"
+
+updated_at: "2026-05-08T00:00:00Z"

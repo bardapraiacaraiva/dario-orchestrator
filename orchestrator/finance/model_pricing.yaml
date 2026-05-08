@@ -1,0 +1,57 @@
+# DARIO CFO — Model Pricing Registry
+# Auto-updatable pricing for all models used by the orchestrator.
+# Inspired by AgentOps/tokencost pattern but without external dependency bugs.
+# Prices in USD per 1M tokens. Last updated: 2026-05-08.
+# Source: https://docs.anthropic.com/en/docs/about-claude/models
+
+pricing:
+  # === Anthropic Claude 4.6 ===
+  claude-opus-4-6:
+    input: 15.00
+    output: 75.00
+    cached_input: 1.50
+    batch_input: 7.50
+    batch_output: 37.50
+    context: 1048576
+
+  # === Anthropic Claude 4.5 ===
+  claude-sonnet-4-5-20250514:
+    input: 3.00
+    output: 15.00
+    cached_input: 0.30
+    batch_input: 1.50
+    batch_output: 7.50
+    context: 1048576
+
+  claude-haiku-4-5-20251001:
+    input: 0.80
+    output: 4.00
+    cached_input: 0.08
+    batch_input: 0.40
+    batch_output: 2.00
+    context: 1048576
+
+  # === Aliases (for dispatch_engine compatibility) ===
+  opus:
+    alias: claude-opus-4-6
+  sonnet:
+    alias: claude-sonnet-4-5-20250514
+  haiku:
+    alias: claude-haiku-4-5-20251001
+
+# Exchange rate for EUR conversion
+exchange:
+  usd_eur: 0.92
+  last_updated: "2026-05-08"
+
+# Model routing cost thresholds
+routing:
+  # Use Haiku if predicted quality impact < 5 points
+  haiku_quality_threshold: 5
+  # Use Sonnet for most tasks (default)
+  default_model: sonnet
+  # Use Opus only for critical/complex tasks
+  opus_triggers:
+    - execution_policy: critical
+    - predicted_score_delta: ">15"
+    - skill_minimum: opus

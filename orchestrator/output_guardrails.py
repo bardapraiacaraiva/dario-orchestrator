@@ -185,6 +185,38 @@ def check_prompt_injection(output: str) -> list[str]:
     return issues
 
 
+def check_canary_token(output: str) -> list[str]:
+    """
+    Detect canary token exfiltration (Rebuff pattern).
+    If a known canary token appears in the output, it means the system prompt
+    or internal instructions were leaked — a prompt exfiltration attack succeeded.
+    The canary is injected into system prompts and should NEVER appear in output.
+    """
+    issues = []
+    # Canary tokens — rotate periodically. These are intentionally unique strings
+    # that exist nowhere except in system prompts. If they appear in output,
+    # the system prompt was exfiltrated.
+    CANARY_TOKENS = [
+        "DARIO-CANARY-7f3a9b2e",       # Primary canary
+        "CFO-SENTINEL-4d8c1e5f",        # Financial module canary
+        "ORCH-BEACON-2a6f9d3b",         # Orchestrator canary
+    ]
+    for canary in CANARY_TOKENS:
+        if canary in output:
+            issues.append(
+                f"CRITICAL: Canary token '{canary[:12]}...' found in output — "
+                f"system prompt exfiltration attack detected. Output QUARANTINED."
+            )
+    # Also check for partial canary leaks (attacker may try to extract piece by piece)
+    canary_fragments = ["DARIO-CANARY", "CFO-SENTINEL", "ORCH-BEACON"]
+    for frag in canary_fragments:
+        if frag in output and not any(c in output for c in CANARY_TOKENS):
+            issues.append(
+                f"WARNING: Canary fragment '{frag}' found in output — possible partial exfiltration"
+            )
+    return issues
+
+
 # =============================================================================
 # MAIN VALIDATION
 # =============================================================================
@@ -207,6 +239,7 @@ def validate_output(output: str, skill: str = "", strict: bool = False) -> dict:
         ("empty_or_error", check_empty_or_error(output, skill)),
         ("format_compliance", check_format_compliance(output, skill)),
         ("prompt_injection", check_prompt_injection(output)),
+        ("canary_token", check_canary_token(output)),
     ]
 
     for name, issues in checks:

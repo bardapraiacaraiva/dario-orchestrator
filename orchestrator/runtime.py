@@ -669,6 +669,145 @@ async def get_rubric(task_id: str):
     return result
 
 
+# ─── Core Upgrades v11.0 ────────────────────────────────────────────────────
+
+try:
+    from core_upgrades import init_core_upgrades
+    init_core_upgrades(app, db)
+    log.info("Core Upgrades v11.0 loaded: TaskQueue + MessageBus + EngineRegistry + HandoffProtocol + CheckpointStore + DurableDecorators + SessionManager")
+except ImportError as e:
+    log.warning(f"Core Upgrades not loaded: {e}")
+
+try:
+    from execution_upgrades import init_execution_upgrades
+    init_execution_upgrades(app)
+    log.info("Execution Upgrades v11.0 loaded: ParallelAgent + AgentCards + DualOrchestrator + TeamCoordinator + Blackboard + AgentToolbox + RaceExecutor + WaveScheduler")
+except ImportError as e:
+    log.warning(f"Execution Upgrades not loaded: {e}")
+
+try:
+    from intelligence_upgrades import init_intelligence_upgrades
+    init_intelligence_upgrades(app)
+    log.info("Intelligence Upgrades v11.0 loaded: TieredMemory + QValueMemory + KnowledgeGraph + LearnedRouter + ToolMemory + BenchmarkEvolution + MetricsRegistry")
+except ImportError as e:
+    log.warning(f"Intelligence Upgrades not loaded: {e}")
+
+try:
+    from quality_upgrades import init_quality_upgrades
+    init_quality_upgrades(app)
+    log.info("Quality Upgrades v11.0 loaded")
+except ImportError as e:
+    log.warning(f"Quality Upgrades not loaded: {e}")
+
+try:
+    from state_upgrades import init_state_upgrades
+    init_state_upgrades(app)
+    log.info("State Upgrades v11.0 loaded")
+except ImportError as e:
+    log.warning(f"State Upgrades not loaded: {e}")
+
+try:
+    from observability_upgrades import init_observability_upgrades
+    init_observability_upgrades(app)
+    log.info("Observability Upgrades v11.0 loaded")
+except ImportError as e:
+    log.warning(f"Observability Upgrades not loaded: {e}")
+
+try:
+    from security_upgrades import init_security_upgrades
+    init_security_upgrades(app)
+    log.info("Security Upgrades v11.0 loaded")
+except ImportError as e:
+    log.warning(f"Security Upgrades not loaded: {e}")
+
+try:
+    from financial_upgrades import init_financial_upgrades
+    init_financial_upgrades(app)
+    log.info("Financial Upgrades v11.0 loaded")
+except ImportError as e:
+    log.warning(f"Financial Upgrades not loaded: {e}")
+
+
+# ─── Production Data Connectors ────────────────────────────────────────────
+
+@app.post("/prod/parse-bank-statement")
+async def parse_bank_statement(file_path: str, bank: str = None):
+    """Parse a bank statement CSV and return structured transactions."""
+    args = ["--file", file_path, "--output", "json"]
+    if bank:
+        args.extend(["--bank", bank])
+    result = _run_engine("bank_parser.py", args)
+    return result
+
+@app.post("/prod/parse-saft")
+async def parse_saft(file_path: str, update: bool = False):
+    """Parse a SAF-T XML and return structured invoice/customer data."""
+    args = ["--file", file_path, "--json"]
+    if update:
+        args.append("--update")
+    result = _run_engine("saft_parser.py", args)
+    return result
+
+@app.get("/prod/tax-alerts")
+async def tax_alerts():
+    """Get current tax calendar alerts."""
+    result = _run_engine("tax_calendar.py", ["--alerts", "--json"])
+    return result
+
+@app.post("/prod/validate-pt")
+async def validate_pt(data: dict):
+    """Validate Portuguese financial data (NIF, ATCUD, SNC, IVA, IBAN)."""
+    result = _run_engine("pt_validators.py", ["--validate-all", json.dumps(data)])
+    return result
+
+@app.get("/prod/chain/onboarding")
+async def get_onboarding_chain():
+    """Get the client onboarding E2E chain definition."""
+    import yaml
+    chain_file = ORCH_DIR / "chains" / "client_onboarding.yaml"
+    if chain_file.exists():
+        with open(chain_file) as f:
+            return yaml.safe_load(f)
+    return {"error": "Chain not found"}
+
+log.info("Production Data Connectors loaded: bank_parser + saft_parser + tax_alerts + pt_validators + onboarding_chain")
+
+
+# ─── CFO Financial Dashboard ────────────────────────────────────────────────
+
+@app.get("/cfo", response_class=HTMLResponse)
+async def cfo_dashboard():
+    """CFO Financial Dashboard — unified 360 view."""
+    try:
+        result = subprocess.run(
+            [sys.executable, str(ORCH_DIR / "financial_dashboard.py"), "--html"],
+            capture_output=True, text=True, timeout=15
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return HTMLResponse(content=result.stdout)
+    except Exception:
+        pass
+    # Fallback to saved file
+    cfo_file = ORCH_DIR / "cfo_dashboard.html"
+    if cfo_file.exists():
+        return HTMLResponse(content=cfo_file.read_text(encoding="utf-8"))
+    return HTMLResponse(content="<h1>CFO Dashboard not available. Run: python financial_dashboard.py --save-html</h1>", status_code=404)
+
+
+@app.get("/cfo/data")
+async def cfo_data():
+    """CFO data API — JSON for integrations."""
+    try:
+        result = subprocess.run(
+            [sys.executable, str(ORCH_DIR / "financial_dashboard.py"), "--json"],
+            capture_output=True, text=True, timeout=15
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return json.loads(result.stdout)
+    except Exception as e:
+        return {"error": str(e)}
+
+
 # ─── TIER 3 Registration ────────────────────────────────────────────────────
 
 try:

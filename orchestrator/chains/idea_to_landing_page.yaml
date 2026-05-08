@@ -1,0 +1,115 @@
+# DARIO — Idea to Landing Page E2E Chain
+# O PRIMEIRO chain que CONSTROI algo — nao so aconselha.
+# De ideia vaga a landing page funcional em ~4 waves.
+
+chain_id: idea_to_landing_page
+name: "Idea to Landing Page — Design + Build + Deploy"
+description: "Takes an idea and produces a functional landing page: brand → design system → code → deploy"
+version: 1
+execution_policy: client_facing
+
+inputs:
+  - name: idea
+    type: string
+    required: true
+    description: "The product/service idea in natural language"
+  - name: target_audience
+    type: string
+    required: true
+  - name: style
+    type: string
+    required: false
+    default: "modern minimal"
+    description: "Design style: modern minimal, bold, corporate, playful, luxury"
+
+steps:
+  # Wave 1: Strategy (parallel — no deps)
+  - name: brand_positioning
+    skill: dario-brand
+    depends_on: []
+    input_template: |
+      Brand positioning for: ${idea}
+      Target audience: ${target_audience}
+      Define: archetype, messaging hierarchy, tone of voice, differentiators.
+
+  - name: offer_design
+    skill: dario-offer
+    depends_on: []
+    input_template: |
+      Grand Slam Offer for: ${idea}
+      Target: ${target_audience}
+      Design the offer with Hormozi value equation: dream outcome, perceived likelihood, time delay, effort/sacrifice.
+
+  # Wave 2: Design (depends on brand)
+  - name: design_system
+    skill: builder-design-system
+    depends_on: [brand_positioning]
+    input_template: |
+      Generate design system for: ${idea}
+      Brand archetype from positioning. Style: ${style}
+      Output: tailwind.config.ts + globals.css + component specs.
+
+  # Wave 3: Build (depends on design + offer)
+  - name: landing_page
+    skill: builder-landing-page
+    depends_on: [design_system, offer_design]
+    input_template: |
+      Build landing page for: ${idea}
+      Use design system tokens from previous step.
+      Use offer copy (headline, subheadline, pricing, CTAs) from offer design.
+      Sections: hero, features, pricing, testimonials, FAQ, CTA, footer.
+      Style: ${style}
+
+  - name: nextjs_scaffold
+    skill: builder-nextjs-app
+    depends_on: [design_system]
+    input_template: |
+      Scaffold Next.js app for: ${idea}
+      Type: landing page
+      Include design system config from previous step.
+
+  # Wave 4: Deploy + SEO
+  - name: deploy
+    skill: builder-vercel-deploy
+    depends_on: [landing_page, nextjs_scaffold]
+    input_template: |
+      Deploy the landing page to Vercel or VPS.
+      Pre-deploy checklist. vercel.json config. Security headers.
+
+  - name: seo_check
+    skill: seo-technical
+    depends_on: [landing_page]
+    input_template: |
+      SEO technical check for the landing page.
+      Verify: meta tags, OG, schema, sitemap, robots, CWV estimates.
+
+# Wave schedule:
+# Wave 1: [brand_positioning, offer_design]  — 2 parallel
+# Wave 2: [design_system]                     — 1 sequential
+# Wave 3: [landing_page, nextjs_scaffold]    — 2 parallel
+# Wave 4: [deploy, seo_check]               — 2 parallel
+
+quality_gates:
+  after_wave_1:
+    min_score: 65
+    action_on_fail: retry_with_feedback
+  after_wave_3:
+    min_score: 70
+    action_on_fail: human_review
+
+output:
+  format: code
+  deliverables:
+    - tailwind.config.ts
+    - globals.css
+    - app/page.tsx
+    - components/sections/*.tsx
+    - vercel.json
+    - DESIGN_TOKENS.md
+  save_to_obsidian: true
+
+estimates:
+  total_tokens: 30000-50000
+  model_mix: "70% Sonnet, 30% Opus (brand + offer)"
+  duration: "20-40 minutes"
+  cost: "EUR 0.20-0.40"

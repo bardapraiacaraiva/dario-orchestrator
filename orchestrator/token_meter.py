@@ -37,12 +37,42 @@ from db import DB
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("meter")
 
-# Cost per million tokens (2026 pricing)
-MODEL_COSTS = {
-    "opus":   {"input": 15.00, "output": 75.00},
-    "sonnet": {"input": 3.00,  "output": 15.00},
-    "haiku":  {"input": 0.80,  "output": 4.00},
-}
+# Cost per million tokens — loaded from model_pricing.yaml (auto-updatable)
+def _load_pricing():
+    """Load pricing from YAML registry, fallback to hardcoded."""
+    pricing_file = ORCH_DIR / "finance" / "model_pricing.yaml"
+    if pricing_file.exists():
+        try:
+            import yaml
+            with open(pricing_file, "r") as f:
+                data = yaml.safe_load(f)
+            pricing = data.get("pricing", {})
+            costs = {}
+            for model, info in pricing.items():
+                if "alias" in info:
+                    continue  # Skip aliases
+                # Map to short names
+                short = model
+                if "opus" in model:
+                    short = "opus"
+                elif "sonnet" in model:
+                    short = "sonnet"
+                elif "haiku" in model:
+                    short = "haiku"
+                costs[short] = {"input": info["input"], "output": info["output"]}
+                if "cached_input" in info:
+                    costs[short]["cached_input"] = info["cached_input"]
+            return costs
+        except Exception as e:
+            log.warning(f"Failed to load model_pricing.yaml: {e}")
+    # Fallback
+    return {
+        "opus":   {"input": 15.00, "output": 75.00},
+        "sonnet": {"input": 3.00,  "output": 15.00},
+        "haiku":  {"input": 0.80,  "output": 4.00},
+    }
+
+MODEL_COSTS = _load_pricing()
 
 
 def record_usage(input_tokens: int, output_tokens: int, model: str = "sonnet",

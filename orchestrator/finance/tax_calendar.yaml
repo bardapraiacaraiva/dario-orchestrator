@@ -1,0 +1,136 @@
+# DARIO Finance — Calendário Fiscal PT 2026
+# Obrigações fiscais da agência perante AT, SS, e outras entidades
+# Usado pelo heartbeat para alertas automáticos
+# Schema v1.0
+
+obligations:
+  # === IVA (Trimestral — Regime Normal) ===
+  - id: iva_q1
+    name: "Declaração Periódica IVA — Q1"
+    entity: AT
+    deadline: "2026-05-15"
+    period: "2026-01 a 2026-03"
+    status: pending  # pending | submitted | paid | overdue
+    notes: "Regime trimestral. Submeter via Portal das Finanças."
+    alert_days_before: 7
+
+  - id: iva_q2
+    name: "Declaração Periódica IVA — Q2"
+    entity: AT
+    deadline: "2026-08-15"
+    period: "2026-04 a 2026-06"
+    status: pending
+    alert_days_before: 7
+
+  - id: iva_q3
+    name: "Declaração Periódica IVA — Q3"
+    entity: AT
+    deadline: "2026-11-15"
+    period: "2026-07 a 2026-09"
+    status: pending
+    alert_days_before: 7
+
+  - id: iva_q4
+    name: "Declaração Periódica IVA — Q4"
+    entity: AT
+    deadline: "2027-02-15"
+    period: "2026-10 a 2026-12"
+    status: pending
+    alert_days_before: 7
+
+  # === IRC ===
+  - id: irc_ppc_1
+    name: "IRC Pagamento por Conta — 1ª prestação"
+    entity: AT
+    deadline: "2026-07-31"
+    status: pending
+    notes: "30% do IRC do ano anterior"
+    alert_days_before: 14
+
+  - id: irc_ppc_2
+    name: "IRC Pagamento por Conta — 2ª prestação"
+    entity: AT
+    deadline: "2026-09-30"
+    status: pending
+    notes: "30% do IRC do ano anterior"
+    alert_days_before: 14
+
+  - id: irc_ppc_3
+    name: "IRC Pagamento por Conta — 3ª prestação"
+    entity: AT
+    deadline: "2026-12-15"
+    status: pending
+    notes: "40% do IRC do ano anterior"
+    alert_days_before: 14
+
+  - id: irc_modelo22
+    name: "IRC Modelo 22 — Declaração Anual"
+    entity: AT
+    deadline: "2026-05-31"
+    period: "Exercício 2025"
+    status: pending
+    notes: "Submeter até último dia útil de Maio"
+    alert_days_before: 30
+
+  # === IES ===
+  - id: ies_annual
+    name: "IES — Informação Empresarial Simplificada"
+    entity: AT
+    deadline: "2026-07-15"
+    period: "Exercício 2025"
+    status: pending
+    notes: "Inclui Anexo A (contabilidade) + outros"
+    alert_days_before: 30
+
+  # === DMR (Mensal) ===
+  - id: dmr_monthly
+    name: "DMR — Declaração Mensal de Remunerações"
+    entity: AT
+    recurrence: monthly
+    deadline_day: 10
+    notes: "Até dia 10 do mês seguinte. Inclui retenções IRS e SS."
+    alert_days_before: 5
+
+  # === Segurança Social (Mensal) ===
+  - id: ss_dri
+    name: "DRI — Declaração de Remunerações à SS"
+    entity: SS
+    recurrence: monthly
+    deadline_day: 10
+    notes: "Até dia 10 do mês seguinte."
+    alert_days_before: 5
+
+  - id: ss_payment
+    name: "Pagamento contribuições SS"
+    entity: SS
+    recurrence: monthly
+    deadline_day: 20
+    notes: "Até dia 20 do mês seguinte. TSU: 23.75% entidade + 11% trabalhador."
+    alert_days_before: 5
+
+  # === SAF-T ===
+  - id: saft_monthly
+    name: "SAF-T (PT) — Comunicação mensal à AT"
+    entity: AT
+    recurrence: monthly
+    deadline_day: 12
+    notes: "Ficheiro SAF-T da facturação do mês anterior."
+    alert_days_before: 3
+
+  # === Relatório Único ===
+  - id: relatorio_unico
+    name: "Relatório Único (Anexo A) — GEP/MTSSS"
+    entity: GEP
+    deadline: "2026-04-15"
+    period: "Exercício 2025"
+    status: pending
+    alert_days_before: 14
+
+penalties:
+  iva_late_submission: "Coima de 150€ a 3750€"
+  irc_late_submission: "Coima de 150€ a 3750€ + juros compensatórios"
+  dmr_late_submission: "Coima de 50€ a 25000€"
+  saft_late_submission: "Coima de 200€ a 10000€"
+  ss_late_payment: "Juros de mora 3% + possível coima"
+
+updated_at: "2026-05-08T00:00:00Z"

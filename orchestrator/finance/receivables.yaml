@@ -1,0 +1,36 @@
+# DARIO Finance — Receivables Tracker
+# Contas a receber por cliente
+# Actualizado por: lucas-finance skill + heartbeat
+# Schema v1.0
+
+receivables:
+  # Exemplo de estrutura por cliente
+  # - client: "Nome do Cliente"
+  #   project: "project-id"
+  #   invoice_number: "FT 2026/001"
+  #   invoice_date: "2026-01-15"
+  #   due_date: "2026-02-14"
+  #   amount: 2500.00
+  #   iva_rate: 0.23
+  #   iva_amount: 575.00
+  #   total: 3075.00
+  #   status: pending | overdue | paid | partial
+  #   paid_amount: 0.00
+  #   paid_date: null
+  #   payment_method: null  # transferencia | mbway | multibanco | cheque
+  #   notes: ""
+  #   days_overdue: 0
+
+summary:
+  total_pending: 0.00
+  total_overdue: 0.00
+  total_paid_this_month: 0.00
+  avg_collection_days: 0
+  clients_overdue: 0
+
+alerts:
+  overdue_threshold_days: 30
+  warning_threshold_days: 15
+  auto_reminder_enabled: false
+
+updated_at: "2026-05-08T00:00:00Z"

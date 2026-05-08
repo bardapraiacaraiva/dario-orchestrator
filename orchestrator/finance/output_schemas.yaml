@@ -1,0 +1,426 @@
+# DARIO CFO — Output Schemas for Financial Workers
+# Inspired by Anthropic Financial Services schema-constrained output pattern.
+# Each schema defines required fields, format constraints, and validation rules.
+# Used by guardrails.py and output_guardrails.py as post-execution validation.
+# Schema v1.0 — 2026-05-08
+
+schemas:
+
+  # ═══════════════════════════════════════════════════
+  # FACTURAÇÃO
+  # ═══════════════════════════════════════════════════
+  conta-facturacao:
+    description: "Invoice output schema"
+    required_sections:
+      - "Dados do Emitente"
+      - "Dados do Cliente"
+      - "Linhas de Factura"
+      - "Totais"
+      - "ATCUD"
+    required_fields:
+      nif_emitente:
+        type: string
+        pattern: "^[1-9]\\d{8}$"
+        validation: nif_check_digit
+      nif_cliente:
+        type: string
+        pattern: "^[1-9]\\d{8}$"
+        validation: nif_check_digit
+      atcud:
+        type: string
+        pattern: "^[A-Z0-9]{4,8}-\\d+$"
+        validation: atcud_format
+      invoice_number:
+        type: string
+        pattern: "^(FT|FS|FR|NC|ND|RC) \\d{4}/\\d{1,6}$"
+      invoice_date:
+        type: string
+        pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+      iva_rate:
+        type: number
+        enum: [0, 4, 5, 6, 9, 12, 13, 16, 22, 23]
+        validation: iva_rate_region
+      total_sem_iva:
+        type: number
+        min: 0
+      total_iva:
+        type: number
+        min: 0
+      total_com_iva:
+        type: number
+        min: 0
+    forbidden_patterns:
+      - "\\b\\d{16}\\b"    # Credit card numbers
+      - "password"
+      - "api[_-]?key"
+    post_validation:
+      - "total_com_iva == total_sem_iva + total_iva"
+      - "iva_rate in valid_rates_for_region"
+
+  # ═══════════════════════════════════════════════════
+  # IVA
+  # ═══════════════════════════════════════════════════
+  conta-iva:
+    description: "IVA declaration output schema"
+    required_sections:
+      - "Período"
+      - "Base Tributável"
+      - "IVA Liquidado"
+      - "IVA Dedutível"
+      - "IVA Apurado"
+    required_fields:
+      period:
+        type: string
+        pattern: "^Q[1-4] \\d{4}$|^\\d{4}-\\d{2}$"
+      base_tributavel_normal:
+        type: number
+        min: 0
+      base_tributavel_reduzida:
+        type: number
+        min: 0
+      iva_liquidado:
+        type: number
+        min: 0
+      iva_dedutivel:
+        type: number
+        min: 0
+      iva_apurado:
+        type: number
+        description: "Can be negative (IVA a recuperar)"
+      regime:
+        type: string
+        enum: ["normal_mensal", "normal_trimestral", "simplificado"]
+    post_validation:
+      - "iva_apurado == iva_liquidado - iva_dedutivel"
+
+  # ═══════════════════════════════════════════════════
+  # IRC
+  # ═══════════════════════════════════════════════════
+  conta-irc:
+    description: "IRC computation output schema"
+    required_sections:
+      - "Resultado Contabilístico"
+      - "Correcções Fiscais"
+      - "Matéria Colectável"
+      - "Colecta"
+      - "Deduções"
+      - "IRC a Pagar"
+    required_fields:
+      exercicio:
+        type: string
+        pattern: "^\\d{4}$"
+      resultado_contabilistico:
+        type: number
+      correccoes_positivas:
+        type: number
+        min: 0
+      correccoes_negativas:
+        type: number
+        min: 0
+      materia_colectavel:
+        type: number
+        min: 0
+      taxa_irc:
+        type: number
+        enum: [17, 21]
+        description: "17% PME (first 50K), 21% general"
+      derrama_municipal:
+        type: number
+        min: 0
+        max: 1.5
+        description: "Percentage, max 1.5%"
+      tributacao_autonoma:
+        type: number
+        min: 0
+      colecta_total:
+        type: number
+        min: 0
+      ppc_deducao:
+        type: number
+        min: 0
+        description: "Pagamentos por conta already made"
+      irc_a_pagar:
+        type: number
+
+  # ═══════════════════════════════════════════════════
+  # PAYROLL
+  # ═══════════════════════════════════════════════════
+  conta-payroll:
+    description: "Payroll processing output schema"
+    required_sections:
+      - "Trabalhadores"
+      - "Remunerações"
+      - "Retenções IRS"
+      - "Contribuições SS"
+      - "Totais"
+    required_fields:
+      month:
+        type: string
+        pattern: "^\\d{4}-\\d{2}$"
+      total_bruto:
+        type: number
+        min: 0
+      total_irs_retido:
+        type: number
+        min: 0
+      total_ss_trabalhador:
+        type: number
+        min: 0
+        description: "11% of base"
+      total_ss_entidade:
+        type: number
+        min: 0
+        description: "23.75% of base"
+      total_liquido:
+        type: number
+        min: 0
+      subsidio_alimentacao_isento:
+        type: boolean
+        description: "True if <= 6 EUR/day (card) or 4.77 EUR (cash)"
+    post_validation:
+      - "total_liquido == total_bruto - total_irs_retido - total_ss_trabalhador"
+      - "total_ss_entidade / base_ss ~= 0.2375"
+
+  # ═══════════════════════════════════════════════════
+  # RELATORIOS FINANCEIROS
+  # ═══════════════════════════════════════════════════
+  conta-relatorios:
+    description: "Financial statements output schema"
+    required_sections:
+      - "Balanço"
+      - "Demonstração de Resultados"
+    balanco_required:
+      - "Activo não corrente"
+      - "Activo corrente"
+      - "Capital próprio"
+      - "Passivo não corrente"
+      - "Passivo corrente"
+    dr_required:
+      - "Vendas e serviços prestados"
+      - "CMVMC"
+      - "FSE"
+      - "Gastos com pessoal"
+      - "Resultado operacional"
+      - "Resultado antes de impostos"
+      - "Resultado líquido"
+    post_validation:
+      - "activo == capital_proprio + passivo"
+      - "All SNC accounts valid (class 1-8)"
+
+  # ═══════════════════════════════════════════════════
+  # CONCILIAÇÃO BANCÁRIA
+  # ═══════════════════════════════════════════════════
+  conta-conciliacao:
+    description: "Bank reconciliation output schema"
+    required_sections:
+      - "Saldo Contabilístico"
+      - "Saldo Bancário"
+      - "Movimentos Pendentes"
+      - "Diferença"
+    required_fields:
+      saldo_contabilistico:
+        type: number
+      saldo_bancario:
+        type: number
+      movimentos_pendentes_debito:
+        type: number
+        min: 0
+      movimentos_pendentes_credito:
+        type: number
+        min: 0
+      diferenca:
+        type: number
+        description: "Must be 0 after reconciliation"
+      iban:
+        type: string
+        pattern: "^PT50\\d{21}$"
+        validation: iban_mod97
+    post_validation:
+      - "diferenca == saldo_bancario + pendentes_debito - pendentes_credito - saldo_contabilistico"
+
+  # ═══════════════════════════════════════════════════
+  # CFO AGENCY PNL
+  # ═══════════════════════════════════════════════════
+  cfo-agency-pnl:
+    description: "P&L by client/project output schema"
+    required_sections:
+      - "Revenue"
+      - "Custos Directos"
+      - "Margem"
+    required_fields:
+      project:
+        type: string
+        maxLength: 64
+      revenue_liquido:
+        type: number
+        min: 0
+      token_cost_eur:
+        type: number
+        min: 0
+      hours_cost:
+        type: number
+        min: 0
+      rework_cost:
+        type: number
+        min: 0
+      gross_margin:
+        type: number
+      gross_margin_pct:
+        type: number
+        min: -100
+        max: 100
+      net_margin_pct:
+        type: number
+        min: -100
+        max: 100
+      classification:
+        type: string
+        enum: ["EXCELENTE", "SAUDAVEL", "ATENCAO", "CRITICO", "NEGATIVO"]
+
+  # ═══════════════════════════════════════════════════
+  # CFO TOKEN ROI
+  # ═══════════════════════════════════════════════════
+  cfo-token-roi:
+    description: "Token ROI output schema"
+    required_sections:
+      - "ROI Summary"
+      - "Cost Breakdown"
+      - "Efficiency"
+    required_fields:
+      total_ai_cost_eur:
+        type: number
+        min: 0
+      attributed_revenue_eur:
+        type: number
+        min: 0
+      roi_multiplier:
+        type: number
+        min: 0
+      avg_cost_per_task:
+        type: number
+        min: 0
+      model_efficiency_score:
+        type: number
+        min: 0
+        max: 100
+      rework_waste_pct:
+        type: number
+        min: 0
+        max: 100
+
+# ═══════════════════════════════════════════════════
+# SECURITY TIERS — Anthropic Three-Tier Pattern
+# ═══════════════════════════════════════════════════
+security_tiers:
+  tier_1_reader:
+    description: "Processes external/untrusted documents (SAF-T imports, bank statements, third-party invoices)"
+    allowed_tools: ["Read", "Grep"]
+    forbidden_tools: ["Write", "Edit", "Bash"]
+    mcp_access: false
+    output_constraint: "schema_validated_json_only"
+    workers:
+      - worker-conta-conciliacao   # Reads bank statements
+      - worker-conta-ap            # Reads supplier invoices
+      - worker-conta-auditoria     # Reads external audit docs
+      - worker-risco-aml           # Reads KYC documents
+      - worker-risco-rgpd          # Reads data processing records
+      - worker-risco-terceiros     # Reads vendor documents
+
+  tier_2_processor:
+    description: "Aggregates, analyzes, calculates — never touches untrusted docs directly"
+    allowed_tools: ["Read", "Grep", "Glob"]
+    forbidden_tools: ["Bash"]
+    mcp_access: "read_only"
+    output_constraint: "schema_validated"
+    workers:
+      - worker-conta-iva           # Calculates IVA
+      - worker-conta-irc           # Calculates IRC
+      - worker-conta-irs           # Calculates IRS withholdings
+      - worker-conta-ss            # Calculates SS contributions
+      - worker-conta-payroll       # Processes payroll
+      - worker-conta-custos        # Cost analysis
+      - worker-conta-orcamento     # Budget analysis
+      - worker-conta-tesouraria    # Cash flow analysis
+      - worker-conta-consolidacao  # Group consolidation
+      - worker-conta-ativos        # Depreciation calcs
+      - worker-cfo-agency-pnl     # P&L calculation
+      - worker-cfo-token-roi      # ROI calculation
+      - worker-risco-matrix        # Risk scoring
+      - worker-risco-esg           # ESG calculations
+      - worker-risco-reporting     # Compliance metrics
+
+  tier_3_writer:
+    description: "Produces final outputs — never touches untrusted documents"
+    allowed_tools: ["Read", "Write", "Edit"]
+    forbidden_tools: []
+    mcp_access: false
+    output_constraint: "human_approval_required"
+    workers:
+      - worker-conta-facturacao    # Emits invoices
+      - worker-conta-lancamentos   # Posts journal entries
+      - worker-conta-relatorios    # Produces financial statements
+      - worker-conta-encerramento  # Year-end close documents
+      - worker-conta-plano         # Chart of accounts modifications
+      - worker-cfo-tax-autopilot  # Updates tax calendar status
+      - worker-risco-whistleblowing # Produces investigation reports
+      - worker-risco-etica         # Produces conduct documents
+
+# ═══════════════════════════════════════════════════
+# VALIDATION RULES — pre/post execution
+# ═══════════════════════════════════════════════════
+validation_rules:
+  pre_execution:
+    - id: nif_format
+      applies_to: ["conta-facturacao", "conta-ap", "conta-irs"]
+      check: "All NIF fields match ^[1-9]\\d{8}$ and pass mod-11"
+      engine: "pt_validators.py --nif"
+      blocking: true
+
+    - id: iva_rate_valid
+      applies_to: ["conta-facturacao", "conta-iva"]
+      check: "IVA rate is valid for region"
+      engine: "pt_validators.py --iva"
+      blocking: true
+
+    - id: snc_account_valid
+      applies_to: ["conta-lancamentos", "conta-plano", "conta-relatorios"]
+      check: "All SNC accounts are class 1-8"
+      engine: "pt_validators.py --snc"
+      blocking: true
+
+    - id: atcud_format
+      applies_to: ["conta-facturacao"]
+      check: "ATCUD matches format and is sequential"
+      engine: "pt_validators.py --atcud"
+      blocking: true
+
+  post_execution:
+    - id: balance_check
+      applies_to: ["conta-relatorios"]
+      check: "Activo == Capital próprio + Passivo"
+      blocking: false
+      action: "flag_for_review"
+
+    - id: iva_arithmetic
+      applies_to: ["conta-iva"]
+      check: "IVA apurado == liquidado - dedutível"
+      blocking: true
+      action: "reject_and_retry"
+
+    - id: payroll_arithmetic
+      applies_to: ["conta-payroll"]
+      check: "Líquido == Bruto - IRS - SS trabalhador"
+      blocking: true
+      action: "reject_and_retry"
+
+    - id: forbidden_content
+      applies_to: ["*"]
+      check: "No credit card numbers, passwords, API keys in output"
+      blocking: true
+      action: "quarantine"
+
+    - id: margin_sanity
+      applies_to: ["cfo-agency-pnl"]
+      check: "Margin percentage between -100% and +100%"
+      blocking: false
+      action: "flag_for_review"
