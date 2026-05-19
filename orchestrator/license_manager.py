@@ -190,6 +190,66 @@ TIERS = {
             "dpa_anthropic": True, "sla_4h_support": True,
         },
     },
+    # =========================================================================
+    # DEMETER tiers (v11.3.0+) — Data Engineering & Analytics
+    # =========================================================================
+    "demeter_solo": {
+        "name": "DEMETER Solo (Data analyst / growth solo)",
+        "price_brl_month": 297,
+        "duration_days": None,
+        "max_parallel": 1,
+        "engines_allowed": ["analytics", "etl_basic"],
+        "demeter_skills_count": 8,
+        "demeter_dashboards_month": 5,
+        "demeter_warehouses": ["postgres", "duckdb", "bigquery_sandbox"],
+        "features": {
+            "api_execution": True, "demeter_agent": True,
+            "data_quality_basic": True, "dbt_core": True,
+            "ab_testing_basic": True, "single_warehouse": True,
+            "metrics_layer_lite": True, "support_email": True,
+        },
+    },
+    "demeter_team": {
+        "name": "DEMETER Team (Data team / startup)",
+        "price_brl_month": 997,
+        "duration_days": None,
+        "max_parallel": 3,
+        "engines_allowed": "all",
+        "demeter_skills_count": 15,
+        "demeter_dashboards_month": 25,
+        "demeter_warehouses": ["postgres", "duckdb", "bigquery", "snowflake", "redshift"],
+        "features": {
+            "api_execution": True, "evolution_engine": True, "llm_judge": True,
+            "demeter_agent": True, "data_quality_full": True,
+            "dbt_cloud": True, "ml_pipelines": True,
+            "ab_testing_full": True, "realtime_streaming": True,
+            "metrics_layer_full": True, "data_catalog": True,
+            "predictive_models": True, "support_chat": True,
+        },
+    },
+    "demeter_enterprise": {
+        "name": "DEMETER Enterprise (Data org / multi-warehouse)",
+        "price_brl_month_from": 4000,
+        "duration_days": None,
+        "max_parallel": 5,
+        "engines_allowed": "all",
+        "demeter_skills_count": 15,
+        "demeter_dashboards_month": "unlimited",
+        "demeter_warehouses": "all",
+        "features": {
+            "api_execution": True, "evolution_engine": True, "llm_judge": True,
+            "predictive_dispatch": True, "chain_executor": True,
+            "multi_tenancy": True, "federation": True,
+            "plugins": True, "adaptive_rubrics": True, "dashboard": True,
+            "task_templates": True, "demeter_agent": True,
+            "data_quality_full": True, "dbt_cloud": True,
+            "ml_pipelines_production": True, "ab_testing_full": True,
+            "realtime_streaming": True, "metrics_layer_full": True,
+            "data_catalog_enterprise": True, "data_lineage": True,
+            "model_explainability": True, "drift_detection": True,
+            "dpa_anthropic": True, "sla_4h_support": True,
+        },
+    },
 }
 
 
@@ -204,6 +264,8 @@ TIER_SUFFIXES = {
     "starter": "STR", "pro": "PRO", "enterprise": "ENT",
     # LEX-BR tiers (v11.2.0+)
     "lex_solo": "LXS", "lex_office": "LXO", "lex_enterprise": "LXE",
+    # DEMETER tiers (v11.3.0+)
+    "demeter_solo": "DMS", "demeter_team": "DMT", "demeter_enterprise": "DME",
 }
 TIER_MAP = {v: k for k, v in TIER_SUFFIXES.items()}
 
@@ -610,8 +672,11 @@ def main():
 
     elif args.generate_key:
         tier, email = args.generate_key
-        if tier not in ("starter", "pro", "enterprise"):
-            print("Tier must be 'starter', 'pro' or 'enterprise'")
+        valid_tiers = ("starter", "pro", "enterprise",
+                       "lex_solo", "lex_office", "lex_enterprise",
+                       "demeter_solo", "demeter_team", "demeter_enterprise")
+        if tier not in valid_tiers:
+            print(f"Tier must be one of: {', '.join(valid_tiers)}")
             return 1
         key = generate_key(tier, email)
         if args.json:
