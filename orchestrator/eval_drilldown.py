@@ -290,6 +290,15 @@ def drilldown_drifting(eval_ids: list = None) -> dict:
 
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("eval_drilldown")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     p = argparse.ArgumentParser(description="DARIO Eval Drilldown")
     p.add_argument("--eval", help="Eval ID to drilldown")
     p.add_argument("--candidate", help="Candidate output file to compare")

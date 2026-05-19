@@ -424,6 +424,15 @@ def stats() -> dict:
 
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("dispatch_cot")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     p = argparse.ArgumentParser(description="DARIO Dispatch Chain-of-Thought")
     p.add_argument("--reason", help="Task title/text to reason about (ad-hoc)")
     p.add_argument("--description", default="", help="Optional description for --reason")

@@ -385,6 +385,15 @@ def stats() -> dict:
 
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("episode_promoter")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     p = argparse.ArgumentParser(description="DARIO Episode → Semantic Promotion")
     p.add_argument("--scan", action="store_true", help="Dry-run (show candidates)")
     p.add_argument("--promote", action="store_true", help="Apply promotions")

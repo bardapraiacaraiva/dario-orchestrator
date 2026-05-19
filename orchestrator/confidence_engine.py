@@ -290,6 +290,15 @@ def gate_decision(score: int, dimensions: dict, skill: str = None,
 
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("confidence_engine")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     p = argparse.ArgumentParser(description="DARIO Confidence Engine")
     p.add_argument("--dims", type=str, help="JSON dimensions dict")
     p.add_argument("--score", type=int, default=0)

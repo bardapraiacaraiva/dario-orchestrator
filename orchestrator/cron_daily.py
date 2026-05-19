@@ -477,6 +477,15 @@ def status() -> dict:
 
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("cron_daily")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     p = argparse.ArgumentParser(description="DARIO Cron Daily")
     p.add_argument("--maybe-run", action="store_true",
                    help="Run only if >22h since last run (default for session_boot)")

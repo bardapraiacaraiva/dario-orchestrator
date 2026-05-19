@@ -223,6 +223,17 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# License middleware (v11.1+ hardening — 2026-05-19)
+# Guards ALL endpoints except whitelist (/health, /license/*, /docs, /openapi.json).
+# Returns 402 Payment Required when trial expired or no license.
+# Bypass requires DARIO_LICENSE_BYPASS=1 env AND dev.flag file (double-gate).
+try:
+    from license_guard import fastapi_middleware as license_middleware
+    license_middleware(app)
+    log.info("[LICENSE] Middleware installed — all non-whitelisted endpoints guarded")
+except Exception as e:
+    log.warning(f"[LICENSE] Middleware install failed: {e} — runtime running in fail-open mode")
+
 # Auth middleware (was ORPHAN — all endpoints were unauthenticated)
 try:
     from auth import verify_key, check_permission

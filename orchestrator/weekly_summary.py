@@ -472,6 +472,15 @@ def save_to_obsidian(label: str, content: str) -> Path:
 
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("weekly_summary")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     p = argparse.ArgumentParser(description="DARIO Weekly Cognitive Summary")
     p.add_argument("--week", help="ISO week (e.g. 2026-W20). Default: current.")
     p.add_argument("--no-save", action="store_true",

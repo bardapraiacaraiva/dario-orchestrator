@@ -375,6 +375,15 @@ def calibration_status() -> dict:
 
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("golden_eval")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     p = argparse.ArgumentParser(description="DARIO Golden Eval")
     p.add_argument("--capture", help="Eval ID to capture golden for")
     p.add_argument("--output-file", help="File with output text to capture/compare")

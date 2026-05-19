@@ -565,6 +565,15 @@ def generate(output_path: Path = None, open_browser: bool = False) -> Path:
 
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("cognitive_dashboard")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     p = argparse.ArgumentParser(description="DARIO Cognitive Dashboard")
     p.add_argument("--open", action="store_true", help="Open in browser after generating")
     p.add_argument("--json", "-j", action="store_true", help="Emit dataset only (debug)")

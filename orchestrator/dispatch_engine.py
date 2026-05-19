@@ -852,6 +852,15 @@ def cmd_explain(args):
 # =============================================================================
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("dispatch_engine")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     parser = argparse.ArgumentParser(
         description="DARIO Dispatch Engine — Automatic task routing",
         formatter_class=argparse.RawDescriptionHelpFormatter,

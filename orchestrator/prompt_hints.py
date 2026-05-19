@@ -343,6 +343,15 @@ def clear_skill(skill: str) -> bool:
 
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("prompt_hints")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     p = argparse.ArgumentParser(description="DARIO Prompt Hints")
     p.add_argument("--analyse", action="store_true",
                    help="Dry-run: scan drilldowns, report candidates")

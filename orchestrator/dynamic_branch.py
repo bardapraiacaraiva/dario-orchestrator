@@ -287,6 +287,15 @@ def decide_next_action(
 
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("dynamic_branch")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     p = argparse.ArgumentParser(description="DARIO Dynamic Chain Branching")
     p.add_argument("--simulate", nargs=3, metavar=("CHAIN", "STEP", "SCORE"),
                    help="Simulate a branch decision")

@@ -281,6 +281,15 @@ def stats() -> dict:
 
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("synaptic_update")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     p = argparse.ArgumentParser(description="DARIO Synaptic Weights Write-Back")
     p.add_argument("--simulate", nargs=4, metavar=("SKILL_A", "SKILL_B", "SCORE_A", "SCORE_B"),
                    help="Dry-run a pair update (no write)")

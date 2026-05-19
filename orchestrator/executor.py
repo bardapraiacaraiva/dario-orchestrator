@@ -660,6 +660,15 @@ def execute_pulse(dry_run: bool = False) -> dict:
 # =============================================================================
 
 def main():
+    # license_guard wired (v11.1+ hardening)
+    try:
+        from license_guard import enforce_or_exit
+        enforce_or_exit("executor")
+    except SystemExit:
+        raise
+    except Exception:
+        pass  # license_guard unavailable — fail-open during dev/testing
+
     parser = argparse.ArgumentParser(
         description="DARIO Executor — Durable task execution engine",
     )
