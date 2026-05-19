@@ -119,6 +119,65 @@ TIERS = {
             "task_templates": True,
         },
     },
+    # LEX-BR tiers (v11.2.0+ — agente Direito BR)
+    "lex_solo": {
+        "name": "LEX-BR Solo (Advogado individual)",
+        "price_brl_month": 297,
+        "duration_days": None,
+        "max_parallel": 2,
+        "engines_allowed": "lex_br_subset",
+        "lex_br_skills_count": 15,
+        "lex_br_mcp_servers": ["jusbrasil", "cnj_datajud", "stf"],
+        "lex_br_pieces_month": 50,
+        "features": {
+            "api_execution": True, "llm_judge": True, "chain_executor": True,
+            "plugins": True, "adaptive_rubrics": True, "dashboard": True,
+            "task_templates": True, "lex_br_agent": True,
+            "oab_205_gate": True, "lgpd_marker": True, "audit_oab": True,
+            "evolution_engine": False, "predictive_dispatch": False,
+            "multi_tenancy": False, "federation": False,
+        },
+    },
+    "lex_office": {
+        "name": "LEX-BR Office (Escritório < 10 advogados)",
+        "price_brl_month": 997,
+        "duration_days": None,
+        "max_parallel": 3,
+        "engines_allowed": "lex_br_full",
+        "lex_br_skills_count": 15,
+        "lex_br_mcp_servers": ["jusbrasil", "cnj_datajud", "stf", "anpd", "receita_federal"],
+        "lex_br_pieces_month": 200,
+        "features": {
+            "api_execution": True, "evolution_engine": True, "llm_judge": True,
+            "predictive_dispatch": True, "chain_executor": True,
+            "plugins": True, "adaptive_rubrics": True, "dashboard": True,
+            "task_templates": True, "lex_br_agent": True,
+            "oab_205_gate": True, "lgpd_marker": True, "audit_oab": True,
+            "lex_memory_multi_client": True, "dms_integration": True,
+            "multi_tenancy": False, "federation": False,
+        },
+    },
+    "lex_enterprise": {
+        "name": "LEX-BR Enterprise (Escritório/Dept. jurídico)",
+        "price_brl_month_from": 4000,
+        "duration_days": None,
+        "max_parallel": 5,
+        "engines_allowed": "all",
+        "lex_br_skills_count": 15,
+        "lex_br_mcp_servers": ["jusbrasil", "cnj_datajud", "stf", "diario_oficial",
+                               "anpd", "receita_federal", "advbox", "projuris"],
+        "lex_br_pieces_month": "unlimited",
+        "features": {
+            "api_execution": True, "evolution_engine": True, "llm_judge": True,
+            "predictive_dispatch": True, "chain_executor": True,
+            "multi_tenancy": True, "federation": True,
+            "plugins": True, "adaptive_rubrics": True, "dashboard": True,
+            "task_templates": True, "lex_br_agent": True,
+            "oab_205_gate": True, "lgpd_marker": True, "audit_oab": True,
+            "lex_memory_multi_client": True, "dms_integration": True,
+            "dpa_anthropic": True, "sla_4h_support": True,
+        },
+    },
 }
 
 
@@ -129,7 +188,11 @@ TIERS = {
 import hmac
 import secrets
 
-TIER_SUFFIXES = {"starter": "STR", "pro": "PRO", "enterprise": "ENT"}
+TIER_SUFFIXES = {
+    "starter": "STR", "pro": "PRO", "enterprise": "ENT",
+    # LEX-BR tiers (v11.2.0+)
+    "lex_solo": "LXS", "lex_office": "LXO", "lex_enterprise": "LXE",
+}
 TIER_MAP = {v: k for k, v in TIER_SUFFIXES.items()}
 
 

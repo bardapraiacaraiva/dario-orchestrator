@@ -1,0 +1,24 @@
+- timestamp: '2026-05-19T20:24:17.035824+00:00'
+  skill: lex-civil
+  task_id: LEX-TEST-002
+  client_hash: client-d0f631ca1ddb
+  output_type: draft_interno
+  output_hash: 95a2f1edb08a7612
+  output_length_chars: 6
+  revisao_humana: false
+  advogado_oab: null
+  flags:
+    cite_check: pass
+  tokens_used: 0
+- timestamp: '2026-05-19T20:39:31.769057+00:00'
+  skill: lex-test
+  task_id: TEST-001
+  client_hash: client-d5fe82513196
+  output_type: draft_interno
+  output_hash: 9f86d081884c7d65
+  output_length_chars: 4
+  revisao_humana: false
+  advogado_oab: null
+  flags:
+    test: true
+  tokens_used: 0
