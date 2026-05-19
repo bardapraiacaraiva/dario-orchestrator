@@ -37,7 +37,8 @@ orchestrator/company.yaml
 orchestrator/last_pulse.yaml
 orchestrator/notifications.yaml
 orchestrator/open-dashboard.bat
-orchestrator/license_manager.py
+# orchestrator/license_manager.py  # v11.1.2: now safe to publish (secret in env)
+# v11.1.2 — Trial fingerprint, HMAC keys
 orchestrator/create_batch_tasks.py
 orchestrator/export_outputs.py
 orchestrator/dario.db
@@ -77,3 +78,9 @@ agents/
 commands/
 mcp-needs-auth-cache.json
 policy-limits.json
+
+# v11.1.2 — Local MASTER_SECRET for HMAC key signing (NEVER commit)
+orchestrator/.master_secret
+orchestrator/.trial_fingerprint
+orchestrator/dev.flag
+
