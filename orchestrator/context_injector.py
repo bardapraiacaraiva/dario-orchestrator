@@ -264,23 +264,38 @@ def get_revision_feedback(task_data: dict) -> str:
 
 
 def get_skill_hints(skill: str) -> str:
-    """Get 'receives' field from skill_chains for context hints."""
-    if not CHAINS_FILE.exists():
-        return ""
+    """Get 'receives' field from skill_chains for context hints,
+    combined with learned regression hints (Upgrade 17 prompt_hints)."""
+    parts = []
 
-    chains = load_yaml(str(CHAINS_FILE))
-    if not chains:
-        return ""
+    # 1. Static chain hints (receives/produces from skill_chains.yaml)
+    if CHAINS_FILE.exists():
+        chains = load_yaml(str(CHAINS_FILE))
+        if chains:
+            for chain_def in (chains.get("chains") or {}).values():
+                for step in (chain_def.get("steps") or []):
+                    if isinstance(step, dict) and step.get("skill") == skill:
+                        receives = step.get("receives", "")
+                        produces = step.get("produces", "")
+                        if receives or produces:
+                            parts.append(
+                                f"This skill expects: {receives}\n"
+                                f"It should produce: {produces}"
+                            )
+                            break
 
-    for chain_def in (chains.get("chains") or {}).values():
-        for step in (chain_def.get("steps") or []):
-            if isinstance(step, dict) and step.get("skill") == skill:
-                receives = step.get("receives", "")
-                produces = step.get("produces", "")
-                if receives or produces:
-                    return f"This skill expects: {receives}\nIt should produce: {produces}"
+    # 2. Learned hints from prompt_hints (Upgrade 17 — derived from drilldowns)
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(ORCH_DIR))
+        from prompt_hints import get_hints_for_skill
+        learned = get_hints_for_skill(skill)
+        if learned:
+            parts.append(learned)
+    except Exception:
+        pass
 
-    return ""
+    return "\n\n".join(parts)
 
 
 def assemble_context(task_id: str, skill: str = "", project: str = "") -> dict:
@@ -400,6 +415,28 @@ def assemble_context(task_id: str, skill: str = "", project: str = "") -> dict:
     result["context_block"] = context_block
     result["total_tokens_est"] = len(context_block) // 4  # Rough estimate
     result["sources_used"] = len(result["sections"])
+
+    # Retrieval tracking — log which memory layers fed this context (Memory & Dreaming subsystem)
+    try:
+        from memory import retrieval as _ret
+        _layer_map = {
+            "project_memory": "semantic",
+            "previous_outputs": "episodic",
+            "chain_artifacts": "procedural",
+            "rag_knowledge": "semantic",
+            "skill_hints": "procedural",
+            "memory_blocks": "semantic",
+            "revision_feedback": "episodic",
+        }
+        for section in result["sections"]:
+            _ret.log_retrieval(
+                episode_id=task_id,
+                memory_id=f"CTX-{section['source']}",
+                layer=_layer_map.get(section["source"], "semantic"),
+                relevance=section.get("priority", "medium"),
+            )
+    except Exception:
+        pass
 
     return result
 

@@ -151,10 +151,43 @@ def record_score(task_id: str, score: int, skill: str = None,
             pass_threshold = SKILL_PROFILES[skill].get("pass_threshold", SHIP_THRESHOLD)
     except ImportError:
         pass
-    action = determine_action(score, revision_count, pass_threshold=pass_threshold)
+
+    # NEW (Upgrade 4 — cognitive audit Sprint 2): confidence-aware gating
+    # Replaces the old `score >= threshold ? ship : revision` binary with
+    # 5-way decision informed by dimension variance, skill tier, and outliers.
+    # Falls back to legacy determine_action() if confidence engine errors.
+    confidence_info = None
+    try:
+        execution_policy = "default"
+        if task_file.exists():
+            _task_data = load_yaml(str(task_file))
+            if _task_data:
+                execution_policy = _task_data.get("execution_policy", "default")
+        from confidence_engine import gate_decision
+        gate = gate_decision(
+            score=score,
+            dimensions=dimensions or {},
+            skill=skill,
+            revision_count=revision_count,
+            pass_threshold=pass_threshold,
+            execution_policy=execution_policy,
+        )
+        action = gate["action"]
+        confidence_info = {
+            "level": gate["confidence"]["level"],
+            "score": gate["confidence"]["score"],
+            "sigma": gate["confidence"]["sigma"],
+            "outlier": gate["confidence"]["outlier"],
+            "rationale": gate["rationale"],
+        }
+    except Exception:
+        action = determine_action(score, revision_count, pass_threshold=pass_threshold)
+
     result["action"] = action
     result["skill"] = skill
     result["pass_threshold"] = pass_threshold
+    if confidence_info is not None:
+        result["confidence"] = confidence_info
 
     # 3. Update skill-metrics.yaml + audit trail
     if skill:

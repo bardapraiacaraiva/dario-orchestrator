@@ -30,6 +30,13 @@ channels:
     description: "Appended to task.notes[] array in the task YAML file"
     always_on: true
 
+  webhook:
+    type: "http_post"
+    description: "POST to Slack/Discord/generic webhook configured in webhook_config.yaml. Idempotent: same event_key skipped within 24h. See webhook_dispatcher.py (Upgrade 15)."
+    config_file: "~/.claude/orchestrator/webhook_config.yaml"
+    log_file: "~/.claude/orchestrator/webhook_log.yaml"
+    min_severity: "alert"
+
 # === EVENTS ===
 # What triggers a notification, severity, channels, and message template.
 

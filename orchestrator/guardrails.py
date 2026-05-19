@@ -91,6 +91,36 @@ def validate_task(task_id: str, strict: bool = False) -> dict:
         result["errors"].append("Task data is empty or unparseable")
         return result
 
+    # --- Check 0: Ethical Pre-Gate (NEW — Upgrade 2, cognitive audit Sprint 1) ---
+    # Runs the three-question gate (clarity, freedom, coherence) BEFORE
+    # any technical validation. Previously defined in YAML but never invoked.
+    try:
+        sys.path.insert(0, str(ORCH_DIR))
+        from ethical_gate import evaluate as ethical_evaluate
+        eg = ethical_evaluate(task)
+        result["checks"]["ethical_gate"] = eg["verdict"] != "FAIL"
+        result["ethical_gate"] = {
+            "verdict": eg["verdict"],
+            "clarity":   eg["clarity"]["score"],
+            "freedom":   eg["freedom"]["score"],
+            "coherence": eg["coherence"]["score"],
+            "summary":   eg["summary"],
+        }
+        if eg["verdict"] == "FAIL":
+            result["errors"].append(
+                f"Ethical gate FAIL ({eg['passes']}/3): {eg['reformulation_hint']}"
+            )
+        elif eg["verdict"] == "WARN":
+            for q in ("clarity", "freedom", "coherence"):
+                if not eg[q]["passed"]:
+                    result["warnings"].append(
+                        f"Ethical gate WARN — {q}: {', '.join(eg[q]['reasons']) or 'borderline score'}"
+                    )
+    except Exception as e:
+        # Don't block dispatch if the gate itself errors — flag it
+        result["warnings"].append(f"Ethical gate unavailable: {e}")
+        result["checks"]["ethical_gate"] = True
+
     # --- Check 1: Required fields ---
     required = ["id", "title", "status"]
     missing = [f for f in required if not task.get(f)]

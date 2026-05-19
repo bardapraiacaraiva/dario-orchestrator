@@ -249,6 +249,7 @@ KEYWORD_SKILL_MAP = {
     "sop": "dario-sop", "procedure": "dario-sop", "checklist": "dario-sop",
     # SEO
     "seo audit": "seo-audit", "site health": "seo-audit",
+    "auditoria seo": "seo-audit", "auditoria de seo": "seo-audit", "seo completo": "seo-audit",
     "crawl": "seo-technical", "robots": "seo-technical", "indexation": "seo-technical",
     "content quality": "seo-content", "eeat": "seo-content", "readability": "seo-content",
     "schema": "seo-schema", "json-ld": "seo-schema", "structured data": "seo-schema",
@@ -371,13 +372,76 @@ KEYWORD_SKILL_MAP = {
 }
 
 
+# Semantic dispatch toggle (Upgrade 1 — cognitive audit Sprint 1)
+# Set ENV DARIO_DISABLE_SEMANTIC=1 to force legacy keyword-only matching
+import os as _os
+SEMANTIC_DISPATCH_ENABLED = _os.environ.get("DARIO_DISABLE_SEMANTIC") != "1"
+
+
+def _try_semantic_match(task: dict) -> Optional[str]:
+    """
+    Attempt semantic skill inference via embeddings cache.
+    Returns matched skill if score >= threshold, else None (caller falls back to keywords).
+    Silent on any error — never blocks dispatch.
+    """
+    if not SEMANTIC_DISPATCH_ENABLED:
+        return None
+    try:
+        from semantic_dispatch import infer_skill_semantic
+        skill, matches = infer_skill_semantic(task)
+        if skill and matches:
+            top = matches[0]
+            log.debug(f"SEMANTIC_MATCH: {skill} (score={top[1]:.3f})")
+        return skill
+    except Exception as e:
+        log.debug(f"SEMANTIC_FALLBACK: {e}")
+        return None
+
+
+def _try_qvalue_match(task: dict) -> Optional[str]:
+    """
+    Q-value memory suggestion (Upgrade 5 — cognitive audit Sprint 2).
+    Used as the last-resort signal when both semantic and keyword fail to
+    return a confident match. Returns a skill name if Q-memory has high-utility
+    episodes with similar context; None otherwise.
+    """
+    try:
+        from qvalue_memory_wire import suggest_skill
+        text = f"{task.get('title', '')} {task.get('description', '')}".strip()
+        if not text:
+            return None
+        project = task.get("project")
+        suggestions = suggest_skill(text, project=project, top_k=3)
+        if not suggestions:
+            return None
+        top = suggestions[0]
+        # Require non-trivial Q-value AND multiple visits (avoid one-off luck)
+        if top.get("q_value", 0) >= 0.70 and top.get("visits", 0) >= 1:
+            log.debug(f"QVALUE_MATCH: {top['skill']} (q={top['q_value']:.3f}, visits={top['visits']})")
+            return top["skill"]
+    except Exception as e:
+        log.debug(f"QVALUE_FALLBACK: {e}")
+    return None
+
+
 def infer_skill_from_task(task: dict) -> Optional[str]:
-    """Infer the best skill for a task using multiple signals."""
+    """Infer the best skill for a task using multiple signals.
+
+    Priority order:
+      1. Explicit task.skill field (strongest signal — always wins)
+      2. Semantic embedding match (cosine sim vs skill descriptions)
+      3. Keyword matching (legacy fallback when semantic fails or low confidence)
+    """
     # Signal 1: Explicit skill field (strongest)
     if task.get("skill"):
         return task["skill"]
 
-    # Signal 2: Keyword matching from title + description
+    # Signal 2: Semantic match (Upgrade 1 — cognitive audit Sprint 1)
+    semantic_skill = _try_semantic_match(task)
+    if semantic_skill:
+        return semantic_skill
+
+    # Signal 3: Keyword matching from title + description (legacy fallback)
     text = f"{task.get('title', '')} {task.get('description', '')}".lower()
 
     # Try multi-word matches first (more specific)
@@ -396,6 +460,12 @@ def infer_skill_from_task(task: dict) -> Optional[str]:
                 if keyword in title:
                     scores[skill] = scores.get(skill, 0) + 10  # Title match bonus
         return max(scores, key=scores.get)
+
+    # Signal 4: Q-value memory (Upgrade 5 — cognitive audit Sprint 2)
+    # Last-resort suggestion based on past successful episodes.
+    qvalue_skill = _try_qvalue_match(task)
+    if qvalue_skill:
+        return qvalue_skill
 
     return None
 
@@ -454,6 +524,25 @@ def find_best_worker(task: dict, hierarchy: CompanyHierarchy, workload: dict, ex
     5. If director busy → queue (return None)
     """
     reasons = []
+
+    # Pre-dispatch deliberation (Upgrade 9 — cognitive audit Sprint 4)
+    # Run the Chain-of-Thought layer to surface why each signal voted as it
+    # did, and persist the trace for post-mortem if the task underperforms.
+    # The CoT writes to dispatch_cot/{task_id}.yaml; legacy infer_skill_from_task
+    # still drives the actual selection so behaviour stays backwards-compatible.
+    try:
+        from dispatch_cot import reason as _cot_reason
+        _cot = _cot_reason(task, persist=bool(task.get("id")))
+        _decision = _cot.get("decision", {})
+        if _decision.get("winner"):
+            reasons.append(
+                f"COT: winner={_decision['winner']} "
+                f"conf={_decision['confidence']}({_decision['level']}) "
+                f"agreement={_decision['agreement']}"
+            )
+    except Exception as _e:
+        log.debug(f"COT_FALLBACK: {_e}")
+
     skill = infer_skill_from_task(task)
 
     # Load evolution weights for dispatch boosting

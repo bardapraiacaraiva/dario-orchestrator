@@ -311,6 +311,22 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
                 result["steps"].append({"step": "interrupted", "reason": interrupt_check["reason"]})
                 db.log_event("executor", "task_interrupted", task_id=task_id,
                             details=interrupt_check["reason"][:200])
+                # Capture Episode even when interrupted — the work happened, just pending review
+                try:
+                    from memory import hooks as mem_hooks
+                    mem_hooks.on_task_complete(
+                        task_id=task_id,
+                        skill=skill,
+                        outcome="revision",
+                        score=score if score else None,
+                        project=project,
+                        duration_seconds=float(result.get("duration_seconds", 0.0)),
+                        tokens_used=int(tokens or 0),
+                        model=result.get("recommended_model", "opus"),
+                        output_summary=(output or "")[:500] + " [AWAITING HUMAN]",
+                    )
+                except Exception:
+                    pass
                 return result
         except Exception:
             pass  # Interrupt failure should not block completion
@@ -321,11 +337,67 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
         result["steps"].append({"step": "completed", "final_status": status})
         result["status"] = status
 
+        # ─── SYNAPTIC WEIGHTS WRITE-BACK (Upgrade 3 — cognitive audit Sprint 1)
+        # Previously synaptic_weights.yaml was read-only at dispatch time and
+        # only updated by offline evolution cycles. Now closes the loop by
+        # updating co-activation weights immediately after task completion.
+        if status == "done" and score > 0 and skill and project:
+            try:
+                from synaptic_update import process_completion as _synaptic_update
+                _deltas = _synaptic_update(task_id=task_id, skill=skill,
+                                            project=project, score=score)
+                if _deltas:
+                    result["synaptic_updates"] = len(_deltas)
+            except Exception:
+                pass
+
+        # ─── Q-VALUE MEMORY (Upgrade 5 — cognitive audit Sprint 2)
+        # Records this task as a Q-learning episode. The Q-value updates with
+        # TD-learning; future dispatch decisions consult this memory when
+        # semantic and keyword matching are inconclusive.
+        if status == "done" and score > 0 and skill:
+            try:
+                from qvalue_memory_wire import record_outcome as _qvm_record
+                _task = task if isinstance(task, dict) else {}
+                _ctx = f"{_task.get('title', '')} {_task.get('description', '')}".strip()
+                if _ctx:
+                    _qvm_record(
+                        context=_ctx[:500],
+                        skill=skill,
+                        score=score,
+                        tokens_used=int(tokens or 0),
+                        project=project,
+                    )
+            except Exception:
+                pass
+
+        # ─── DISPATCH COT POST-MORTEM (Upgrade 9 — cognitive audit Sprint 4)
+        # If a CoT trace exists for this task, evaluate it against actual
+        # outcome. Catches overconfident dispatches (HIGH confidence + bad
+        # outcome) so signals get recalibrated over time.
+        if score > 0:
+            try:
+                from dispatch_cot import postmortem as _cot_postmortem
+                _outcome = "success" if status == "done" else "revision"
+                _cot_postmortem(task_id, score, _outcome)
+            except Exception:
+                pass
+
         # ─── AUTO-LEARN (capture insights from high-quality tasks) ────────
         if score >= 90:
             try:
                 from memory_blocks import auto_learn
                 auto_learn(output[:200], scope=project or "global", skill=skill, score=score)
+            except Exception:
+                pass
+
+            # Episode → Semantic promotion (Upgrade 8 — cognitive audit Sprint 3)
+            # When a task hits excellence, scan the recent episodes window and
+            # promote new candidates to semantic memory. Idempotent: existing
+            # SEM-*.yaml entries are skipped, so re-runs are safe.
+            try:
+                from episode_promoter import promote as _promote_episodes
+                _promote_episodes(days=7, generate_rules=True, verbose=False)
             except Exception:
                 pass
 
@@ -360,6 +432,23 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
             registry.emit("task_complete", task=task, output=output[:200], score=score)
             if score >= 90:
                 registry.emit("quality_scored", task=task, score=score)
+        except Exception:
+            pass
+
+        # ─── EPISODIC MEMORY (Memory & Dreaming subsystem) ────────────────
+        try:
+            from memory import hooks as mem_hooks
+            mem_hooks.on_task_complete(
+                task_id=task_id,
+                skill=skill,
+                outcome="success" if status == "done" else "revision",
+                score=score if score else None,
+                project=project,
+                duration_seconds=float(result.get("duration_seconds", 0.0)),
+                tokens_used=int(tokens or 0),
+                model=result.get("recommended_model", "opus"),
+                output_summary=output[:500],
+            )
         except Exception:
             pass
 

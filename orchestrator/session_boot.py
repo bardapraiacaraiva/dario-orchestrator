@@ -100,6 +100,24 @@ def main():
         "-d", summary
     ])
 
+    # 6. Cron daily (NEW — Upgrade 12). Runs episode promotion, regression
+    # detection, CoT stats, and state snapshot. Only fires if >22h since
+    # last run (cooldown handled inside cron_daily). Non-blocking — failures
+    # never block session boot.
+    try:
+        cron_result = run_engine("cron_daily.py", ["--maybe-run", "--json"])
+        if cron_result.get("skipped"):
+            output["cron_daily"] = {"skipped": True}
+        else:
+            output["cron_daily"] = {
+                "status": cron_result.get("status", "ok"),
+                "alerts": len(cron_result.get("alerts", [])),
+                "warnings": len(cron_result.get("warnings", [])),
+                "duration": cron_result.get("duration_seconds"),
+            }
+    except Exception:
+        output["cron_daily"] = {"error": "unavailable"}
+
     print(json.dumps(output, indent=2))
     return 0
 

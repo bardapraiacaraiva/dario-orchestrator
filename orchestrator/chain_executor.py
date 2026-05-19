@@ -355,10 +355,56 @@ def save_checkpoint(run_id: str, wave: int, step_index: int,
         "error": error,
     }
 
-    # Validate artifact against schema
+    # Gate 1: Validate artifact against skill schema (artifact_schemas.py)
     validation = validate_artifact(skill, output_artifact)
     checkpoint["artifact_valid"] = validation["valid"]
     checkpoint["artifact_missing"] = validation["missing_required"]
+
+    # Gate 2: Validate pass_to_next fields declared in skill_chains.yaml
+    # (Upgrade 6 — cognitive audit Sprint 2). Previously, chains advanced
+    # silently even when a step produced none of the fields the next step
+    # needed. Now we explicitly check and surface the gap.
+    chain_name = None
+    try:
+        run_dir = RUNS_DIR / run_id
+        plan_data = load_yaml(str(run_dir / "plan.yaml")) if (run_dir / "plan.yaml").exists() else {}
+        chain_name = plan_data.get("chain_def", {}).get("_chain_name") or None
+        if not chain_name:
+            state = load_yaml(str(run_dir / "state.yaml")) if (run_dir / "state.yaml").exists() else {}
+            chain_name = state.get("chain_name")
+        if chain_name:
+            from chain_validator import validate_step_output
+            chain_gate = validate_step_output(chain_name, step_index, output_artifact)
+            checkpoint["pass_to_next_valid"] = chain_gate["valid"]
+            checkpoint["pass_to_next_verdict"] = chain_gate["verdict"]
+            checkpoint["pass_to_next_missing"] = chain_gate["missing"]
+            if chain_gate.get("escalation"):
+                checkpoint["pass_to_next_escalation"] = chain_gate["escalation"]
+    except Exception as _e:
+        checkpoint["pass_to_next_valid"] = None  # validator unavailable, don't block
+
+    # Gate 3: Dynamic branching decision (Upgrade 10 — cognitive audit Sprint 4)
+    # Static chains advanced no matter how each step performed. This call
+    # inspects the score and chain context to produce one of:
+    #   CONTINUE_SERIAL | REVISION_LOOP | PARALLELIZE_NEXT | EARLY_STOP | ESCALATE
+    # The chain runner can read `branch_decision` from the checkpoint and act
+    # on it instead of blindly proceeding to step_index + 1.
+    if chain_name and score:
+        try:
+            from dynamic_branch import decide_next_action
+            decision = decide_next_action(
+                chain_name=chain_name,
+                step_index=step_index,
+                score=score,
+                revision_count=0,  # caller could track this in state.yaml
+            )
+            checkpoint["branch_decision"] = {
+                "action": decision["action"],
+                "next_steps": decision["next_steps"],
+                "rationale": decision["rationale"],
+            }
+        except Exception:
+            pass
 
     # Save step checkpoint
     step_file = run_dir / f"step_{wave}_{step_index}.yaml"
