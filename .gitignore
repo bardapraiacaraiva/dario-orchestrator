@@ -32,6 +32,18 @@
 !orchestrator/quality/domain-playbooks.yaml
 !orchestrator/quality/eval-baseline.yaml
 
+# --- Allow tests, LEX-BR agent, DEMETER squad ---
+!orchestrator/tests/
+!orchestrator/tests/**
+!orchestrator/lex-br/
+!orchestrator/lex-br/**
+!orchestrator/demeter/
+!orchestrator/demeter/**
+
+# --- But never commit pycache ---
+**/__pycache__/
+*.pyc
+
 # --- Exclude orchestrator personal/generated data ---
 orchestrator/company.yaml
 orchestrator/last_pulse.yaml

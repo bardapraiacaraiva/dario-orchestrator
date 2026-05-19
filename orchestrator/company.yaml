@@ -3143,3 +3143,127 @@ mcp_servers_br:
     status: planned
     repo: github.com/dario-legal-br/mcp-projuris
     priority: medium
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DEMETER — Data Engineering & Analytics Squad (v1.0.0, 2026-05-19)
+# 15 skills de data engineering profissional. Eleva todos os outros squads.
+# Manifesto: ~/.claude/orchestrator/demeter/manifesto.yaml
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_data:
+  demeter_director:
+    id: demeter-director
+    name: D.E.M.E.T.E.R.
+    title: Data Engineering Squad Lead
+    type: domain_specialist
+    adapter: demeter-agent
+    parent: dario-ceo
+    capabilities:
+      - etl_pipelines
+      - data_warehousing
+      - bi_dashboards
+      - data_quality
+      - ml_pipelines
+      - ab_testing_rigor
+      - cohort_analysis
+      - predictive_analytics
+      - realtime_streaming
+      - data_catalog_governance
+      - dataops
+      - dbt_expert
+      - metrics_layer
+      - event_tracking
+      - data_storytelling
+    language: pt-br-en
+    compliance_required:
+      - lgpd_by_design
+      - pii_detection_anonimization
+      - data_lineage_tracking
+
+workers_demeter:
+  worker-demeter-etl:
+    id: worker-demeter-etl
+    skill: demeter-etl
+    reports_to: demeter-director
+    security_tier: 2
+  worker-demeter-warehouse:
+    id: worker-demeter-warehouse
+    skill: demeter-warehouse
+    reports_to: demeter-director
+    security_tier: 2
+  worker-demeter-bi-dashboard:
+    id: worker-demeter-bi-dashboard
+    skill: demeter-bi-dashboard
+    reports_to: demeter-director
+    security_tier: 3
+  worker-demeter-data-quality:
+    id: worker-demeter-data-quality
+    skill: demeter-data-quality
+    reports_to: demeter-director
+    security_tier: 2
+  worker-demeter-ml-pipelines:
+    id: worker-demeter-ml-pipelines
+    skill: demeter-ml-pipelines
+    reports_to: demeter-director
+    security_tier: 2
+  worker-demeter-ab-testing:
+    id: worker-demeter-ab-testing
+    skill: demeter-ab-testing
+    reports_to: demeter-director
+    security_tier: 3
+  worker-demeter-cohort-analysis:
+    id: worker-demeter-cohort-analysis
+    skill: demeter-cohort-analysis
+    reports_to: demeter-director
+    security_tier: 3
+  worker-demeter-predictive:
+    id: worker-demeter-predictive
+    skill: demeter-predictive
+    reports_to: demeter-director
+    security_tier: 2
+  worker-demeter-realtime-streaming:
+    id: worker-demeter-realtime-streaming
+    skill: demeter-realtime-streaming
+    reports_to: demeter-director
+    security_tier: 2
+  worker-demeter-data-catalog:
+    id: worker-demeter-data-catalog
+    skill: demeter-data-catalog
+    reports_to: demeter-director
+    security_tier: 3
+  worker-demeter-dataops:
+    id: worker-demeter-dataops
+    skill: demeter-dataops
+    reports_to: demeter-director
+    security_tier: 2
+  worker-demeter-dbt-workflows:
+    id: worker-demeter-dbt-workflows
+    skill: demeter-dbt-workflows
+    reports_to: demeter-director
+    security_tier: 2
+  worker-demeter-metrics-layer:
+    id: worker-demeter-metrics-layer
+    skill: demeter-metrics-layer
+    reports_to: demeter-director
+    security_tier: 2
+  worker-demeter-event-tracking:
+    id: worker-demeter-event-tracking
+    skill: demeter-event-tracking
+    reports_to: demeter-director
+    security_tier: 2
+  worker-demeter-data-storytelling:
+    id: worker-demeter-data-storytelling
+    skill: demeter-data-storytelling
+    reports_to: demeter-director
+    security_tier: 3
+
+squads_demeter:
+  full_analytics_stack:
+    description: "Stack analytics completo: data warehouse → dbt → BI dashboard"
+    workers: [worker-demeter-warehouse, worker-demeter-dbt-workflows, worker-demeter-metrics-layer, worker-demeter-bi-dashboard]
+  ab_testing_program:
+    description: "A/B testing rigoroso end-to-end"
+    workers: [worker-demeter-event-tracking, worker-demeter-ab-testing, worker-demeter-cohort-analysis, worker-demeter-data-storytelling]
+  ml_production:
+    description: "ML em produção: data → pipeline → model → monitoring"
+    workers: [worker-demeter-warehouse, worker-demeter-data-quality, worker-demeter-ml-pipelines, worker-demeter-predictive, worker-demeter-dataops]
