@@ -63,10 +63,15 @@ log = logging.getLogger("license")
 
 TIERS = {
     "trial": {
-        "name": "Trial (7 dias — acesso completo)",
+        "name": "Trial (7 dias — acesso completo DARIO + DIVA + LEX-BR)",
         "duration_days": 7,
         "max_parallel": 3,
         "engines_allowed": "all",
+        # LEX-BR — trial dá acesso aos 15 skills + 3 MCP servers + 50 peças
+        # Após 7 dias: tudo bloqueado até VIP key ou expira definitivamente
+        "lex_br_skills_count": 15,
+        "lex_br_mcp_servers": ["jusbrasil", "cnj_datajud", "stf"],
+        "lex_br_pieces_month": 50,
         "features": {
             "api_execution": True,
             "evolution_engine": True,
@@ -79,6 +84,13 @@ TIERS = {
             "adaptive_rubrics": True,
             "dashboard": True,
             "task_templates": True,
+            # LEX-BR features acessíveis durante trial (acesso completo)
+            "lex_br_agent": True,
+            "oab_205_gate": True,
+            "lgpd_marker": True,
+            "audit_oab": True,
+            "lex_memory_multi_client": True,
+            "dms_integration": True,
         },
     },
     "pro": {
