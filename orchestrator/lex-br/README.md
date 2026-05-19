@@ -100,12 +100,42 @@ Log imutável em `memory/compliance_log/YYYY-MM-DD.yaml`:
 
 | Tier | Preço | Para | Inclui |
 |---|---|---|---|
-| **Trial** | Grátis 7d | Avaliação | 5 skills, sem MCP, 10 peças |
+| **Trial** | Grátis 7d | Avaliação | 15 skills + 3 MCP + 50 peças (acesso completo) |
 | **LEX-BR Solo** | R$ 297/mês | Advogado individual | 15 skills + 3 MCP + 50 peças/mês |
 | **LEX-BR Office** | R$ 997/mês | Escritório <10 advs | + 5 MCP + 200 peças + multi-client memory + DMS |
 | **LEX-BR Enterprise** | R$ 4-12K/mês | Escritório/Dept. jurídico | + 8 MCP + ilimitado + multi-tenant + DPA Anthropic + SLA 4h |
 
-## Quick Start
+## Quick Start — 2 opções de instalação
+
+### Opção A — Installer dedicado LEX-BR (recomendado para advogados)
+
+```bash
+npx github:bardapraiacaraiva/lex-br-installer
+```
+
+Descarrega APENAS o subset jurídico:
+- 15 skills BR-native
+- 3 MCP servers (JusBrasil, CNJ DataJud, STF)
+- 6 módulos compliance (OAB + LGPD + ZDR + cite + privilege + audit)
+- License manager + guard
+
+**Vantagem:** branding LEX-BR puro, menor footprint, focado em advocacia.
+
+### Opção B — Installer DARIO completo (super-product)
+
+```bash
+npx github:bardapraiacaraiva/dario-orchestrator-installer
+```
+
+Descarrega TUDO:
+- LEX-BR (idem opção A)
+- + 269 skills DARIO (marketing, SEO, dev, design, contabilidade PT)
+- + 28 skills DIVA (arquitectura, design de interiores, obras)
+- + 18 cognitive modules + 6 operational modules
+
+**Vantagem:** suite completa. Útil se escritório também precisa de marketing/social media/web dev.
+
+### Após instalar (qualquer opção)
 
 ### Install
 ```bash
