@@ -1,0 +1,33 @@
+identity:
+  name: "EUTERPE"
+  full: "Engagement, Unified Targeting, ER&D, Reach, Performance, Experiments (Marketing Excellence)"
+  version: "1.0.0"
+  parent: "dario-ceo"
+  squad_number: 31
+
+description: |
+  Squad de Marketing Excellence avançado. MMM, attribution, CRO, CDP,
+  paid search/social, programmatic, affiliate, MarTech stack.
+  Para CMOs, performance marketing leads, growth teams.
+
+coverage:
+  - mmm_modeling, attribution_multi_touch, cro_advanced, brand_tracking,
+    customer_data_platform, email_marketing_mass, sms_marketing, push_marketing,
+    viral_marketing, influencer_marketing, content_distribution, paid_search,
+    paid_social, programmatic, affiliate_marketing
+
+compliance:
+  - lgpd_marketing, gdpr_marketing, no_dark_patterns, audit_trail
+
+skills_count: 15
+
+pricing_tiers:
+  solo: {price_brl_month: 297, target: "Growth marketer freelance", skills_included: 8}
+  team: {price_brl_month: 997, target: "Growth agencies, in-house", skills_included: 15}
+  enterprise: {price_brl_month_from: 3997, target: "E-commerce, mass advertisers", skills_included: 15}
+
+agent:
+  director: euterpe-director
+  workers: 15
+  reports_to: dario-ceo
+  language: en-pt-pt-br

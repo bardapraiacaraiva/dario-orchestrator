@@ -116,3 +116,19 @@ orchestrator/dev.flag
 !orchestrator/gaia/**
 !orchestrator/nomos/
 !orchestrator/nomos/**
+
+# v12.0 — 7 new squads
+!orchestrator/mercurius/
+!orchestrator/mercurius/**
+!orchestrator/atlas-fin/
+!orchestrator/atlas-fin/**
+!orchestrator/helios/
+!orchestrator/helios/**
+!orchestrator/kirion/
+!orchestrator/kirion/**
+!orchestrator/sphinx/
+!orchestrator/sphinx/**
+!orchestrator/euterpe/
+!orchestrator/euterpe/**
+!orchestrator/oraculo/
+!orchestrator/oraculo/**

@@ -1,0 +1,33 @@
+identity:
+  name: "MERCURIUS"
+  full: "Methodology, Execution, Revenue, Conversion, Upsell, Renewals, Insights, Underwriting, Sales (Sales Excellence Squad)"
+  version: "1.0.0"
+  parent: "dario-ceo"
+  squad_number: 26
+
+description: |
+  Squad de Sales Excellence. Metodologia + execução + análise + ops.
+  BANT/MEDDIC/Challenger/SPIN/Sandler. Para AEs, SDRs, sales managers,
+  VPs, CROs, RevOps. Complement (não competitor) a Outreach/Gong.
+
+coverage:
+  - sales_methodology, prospecting, discovery_call, demo_script,
+    objection_handling, negotiation_prep, closing, account_management,
+    expansion_revenue, sales_enablement, pipeline_forecasting,
+    territory_design, comp_plan, sales_ops, customer_success_handoff
+
+compliance:
+  - no_dark_patterns, ethics_in_sales, lgpd_lead_data, audit_trail
+
+skills_count: 15
+
+pricing_tiers:
+  solo: {price_brl_month: 297, target: "Founder/AE solo", skills_included: 8}
+  team: {price_brl_month: 997, target: "Sales team 5-50 reps", skills_included: 15}
+  enterprise: {price_brl_month_from: 4997, target: "Sales org 50+ reps + RevOps", skills_included: 15}
+
+agent:
+  director: mercurius-director
+  workers: 15
+  reports_to: dario-ceo
+  language: en-pt-pt-br

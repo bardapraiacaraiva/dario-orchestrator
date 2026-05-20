@@ -420,6 +420,30 @@ TIERS = {
             "cmvm_disclosure": True, "bdp_reporting": True,
             "dora_full_compliance": True, "mifid_ii_suitability": True,
             "psd2_open_banking": True, "support_chat": True}},
+    # =========================================================================
+    # v12.0 — MERCURIUS, ATLAS-FIN, HELIOS, KIRION, SPHINX, EUTERPE, ORACULO
+    # =========================================================================
+    "mercurius_solo": {"name": "MERCURIUS Solo (Founder/AE solo)", "price_brl_month": 297, "max_parallel": 1, "engines_allowed": ["sales_core"], "duration_days": None},
+    "mercurius_team": {"name": "MERCURIUS Team (Sales team 5-50 reps)", "price_brl_month": 997, "max_parallel": 3, "engines_allowed": "all", "duration_days": None},
+    "mercurius_enterprise": {"name": "MERCURIUS Enterprise (Sales org 50+ reps)", "price_brl_month_from": 4997, "max_parallel": 5, "engines_allowed": "all", "duration_days": None},
+    "atlas_fin_solo": {"name": "ATLAS-FIN Solo (Fintech founder)", "price_brl_month": 997, "max_parallel": 1, "engines_allowed": ["fintech_core"], "duration_days": None},
+    "atlas_fin_team": {"name": "ATLAS-FIN Team (Fintechs small-medium)", "price_brl_month": 2997, "max_parallel": 3, "engines_allowed": "all", "duration_days": None},
+    "atlas_fin_enterprise": {"name": "ATLAS-FIN Enterprise (Digital banks, BaaS)", "price_brl_month_from": 9997, "max_parallel": 5, "engines_allowed": "all", "duration_days": None},
+    "helios_solo": {"name": "HELIOS Solo (Energy consultant, ESCO solo)", "price_brl_month": 1997, "max_parallel": 1, "engines_allowed": ["energy_core"], "duration_days": None},
+    "helios_team": {"name": "HELIOS Team (Consultorias energia)", "price_brl_month": 4997, "max_parallel": 3, "engines_allowed": "all", "duration_days": None},
+    "helios_enterprise": {"name": "HELIOS Enterprise (Indústrias, utilities, oil&gas)", "price_brl_month_from": 14997, "max_parallel": 5, "engines_allowed": "all", "duration_days": None},
+    "kirion_solo": {"name": "KIRION Solo (RE broker, analyst)", "price_brl_month": 997, "max_parallel": 1, "engines_allowed": ["realestate_core"], "duration_days": None},
+    "kirion_team": {"name": "KIRION Team (Consultancies, family offices)", "price_brl_month": 2997, "max_parallel": 3, "engines_allowed": "all", "duration_days": None},
+    "kirion_enterprise": {"name": "KIRION Enterprise (REITs, developers, banks RE)", "price_brl_month_from": 7997, "max_parallel": 5, "engines_allowed": "all", "duration_days": None},
+    "sphinx_solo": {"name": "SPHINX Solo (Senior pentest)", "price_brl_month": 4997, "max_parallel": 1, "engines_allowed": ["cyber_advanced_core"], "duration_days": None},
+    "sphinx_team": {"name": "SPHINX Team (Red team / advanced SOC)", "price_brl_month": 12997, "max_parallel": 3, "engines_allowed": "all", "duration_days": None},
+    "sphinx_enterprise": {"name": "SPHINX Enterprise (Defense, gov, F500 CISO)", "price_brl_month_from": 29997, "max_parallel": 5, "engines_allowed": "all", "duration_days": None},
+    "euterpe_solo": {"name": "EUTERPE Solo (Growth marketer freelance)", "price_brl_month": 297, "max_parallel": 1, "engines_allowed": ["marketing_core"], "duration_days": None},
+    "euterpe_team": {"name": "EUTERPE Team (Growth agencies, in-house)", "price_brl_month": 997, "max_parallel": 3, "engines_allowed": "all", "duration_days": None},
+    "euterpe_enterprise": {"name": "EUTERPE Enterprise (E-commerce, mass advertisers)", "price_brl_month_from": 3997, "max_parallel": 5, "engines_allowed": "all", "duration_days": None},
+    "oraculo_solo": {"name": "ORACULO Solo (Independent researcher, PhD)", "price_brl_month": 997, "max_parallel": 1, "engines_allowed": ["ai_research_core"], "duration_days": None},
+    "oraculo_team": {"name": "ORACULO Team (Research labs, R&D)", "price_brl_month": 2997, "max_parallel": 3, "engines_allowed": "all", "duration_days": None},
+    "oraculo_enterprise": {"name": "ORACULO Enterprise (AI companies, universities)", "price_brl_month_from": 9997, "max_parallel": 5, "engines_allowed": "all", "duration_days": None},
     "nomos_enterprise": {"name": "NOMOS Enterprise (Bancos PT, seguradoras, fintechs)",
         "price_brl_month_from": 9997, "duration_days": None, "max_parallel": 5,
         "engines_allowed": "all", "nomos_skills_count": 15,
@@ -459,6 +483,14 @@ TIER_SUFFIXES = {
     "gaia_solo": "GAS", "gaia_team": "GAT", "gaia_enterprise": "GAE",
     # NOMOS tiers (v11.5.0+) — Compliance PT
     "nomos_solo": "NMS", "nomos_team": "NMT", "nomos_enterprise": "NME",
+    # v12.0 squads
+    "mercurius_solo": "MES", "mercurius_team": "MET", "mercurius_enterprise": "MEE",
+    "atlas_fin_solo": "AFS", "atlas_fin_team": "AFT", "atlas_fin_enterprise": "AFE",
+    "helios_solo": "HES", "helios_team": "HET", "helios_enterprise": "HEE",
+    "kirion_solo": "KIS", "kirion_team": "KIT", "kirion_enterprise": "KIE",
+    "sphinx_solo": "SPS", "sphinx_team": "SPT", "sphinx_enterprise": "SPE",
+    "euterpe_solo": "EUS", "euterpe_team": "EUT", "euterpe_enterprise": "EUE",
+    "oraculo_solo": "OCS", "oraculo_team": "OCT", "oraculo_enterprise": "OCE",
 }
 TIER_MAP = {v: k for k, v in TIER_SUFFIXES.items()}
 
@@ -875,7 +907,14 @@ def main():
                        "aegis_solo", "aegis_team", "aegis_enterprise",
                        "zenith_solo", "zenith_team", "zenith_enterprise",
                        "gaia_solo", "gaia_team", "gaia_enterprise",
-                       "nomos_solo", "nomos_team", "nomos_enterprise")
+                       "nomos_solo", "nomos_team", "nomos_enterprise",
+                       "mercurius_solo", "mercurius_team", "mercurius_enterprise",
+                       "atlas_fin_solo", "atlas_fin_team", "atlas_fin_enterprise",
+                       "helios_solo", "helios_team", "helios_enterprise",
+                       "kirion_solo", "kirion_team", "kirion_enterprise",
+                       "sphinx_solo", "sphinx_team", "sphinx_enterprise",
+                       "euterpe_solo", "euterpe_team", "euterpe_enterprise",
+                       "oraculo_solo", "oraculo_team", "oraculo_enterprise")
         if tier not in valid_tiers:
             print(f"Tier must be one of: {', '.join(valid_tiers)}")
             return 1
