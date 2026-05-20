@@ -1,0 +1,34 @@
+identity:
+  name: "ATLAS-FIN"
+  full: "Authority, Transactions, Liquidity, Authorization, Security — Financial Services Squad"
+  version: "1.0.0"
+  jurisdiction: "Brasil + EU"
+  parent: "dario-ceo"
+  squad_number: 27
+
+description: |
+  Squad fintech — Open Banking BR + PSD2 EU + PIX + payments orchestration.
+  Para fintechs, payment companies, BaaS providers, digital banks.
+
+coverage:
+  - open_banking_br, pix_rules_bcb, psd2_eu, payment_orchestration,
+    fraud_prevention, chargeback_management, kyc_onboarding, aml_monitoring,
+    sanctions_screening, foreign_exchange, instant_payments, banking_as_a_service,
+    embedded_finance, regulatory_reporting_bcb, lgpd_financial
+
+compliance:
+  - bcb_compliance_gate, ecb_compliance_gate, audit_immutable,
+    pci_dss_scope, sanctions_realtime
+
+skills_count: 15
+
+pricing_tiers:
+  solo: {price_brl_month: 997, target: "Fintech founder, payment engineer", skills_included: 8}
+  team: {price_brl_month: 2997, target: "Fintechs small-medium", skills_included: 15}
+  enterprise: {price_brl_month_from: 9997, target: "Digital banks, BaaS providers", skills_included: 15}
+
+agent:
+  director: atlas-fin-director
+  workers: 15
+  reports_to: dario-ceo
+  language: en-pt-br

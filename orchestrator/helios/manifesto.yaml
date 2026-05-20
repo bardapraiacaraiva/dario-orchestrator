@@ -1,0 +1,35 @@
+identity:
+  name: "HELIOS"
+  full: "Hub for Energy, Low-carbon, Industrial, Optimization, Sustainability"
+  version: "1.0.0"
+  jurisdiction: "Brasil + Global"
+  parent: "dario-ceo"
+  squad_number: 28
+
+description: |
+  Squad Energy & Utilities — Mercado Livre Energia BR, ANEEL compliance,
+  PPAs, BESS, hydrogen, microgrids, EV charging, energy efficiency.
+  Para utilities, ESCOs, large industrial consumers, energy traders.
+
+coverage:
+  - mercado_livre_br, aneel_compliance, ppa_power_purchase, energy_storage,
+    grid_integration, hydrogen_strategy, carbon_credits_energy,
+    renewable_financing, smart_meter_data, demand_response,
+    ev_charging_strategy, microgrid_design, energy_efficiency_iso50001,
+    climate_pricing, utility_rate_design
+
+compliance:
+  - aneel_compliance_gate, iso50001_certification_ready, audit_immutable
+
+skills_count: 15
+
+pricing_tiers:
+  solo: {price_brl_month: 1997, target: "Energy consultant, ESCO solo", skills_included: 8}
+  team: {price_brl_month: 4997, target: "Consultorias, comercializadoras pequenas", skills_included: 15}
+  enterprise: {price_brl_month_from: 14997, target: "Indústrias grandes, utilities, oil&gas", skills_included: 15}
+
+agent:
+  director: helios-director
+  workers: 15
+  reports_to: dario-ceo
+  language: en-pt-br

@@ -3616,3 +3616,291 @@ squads_nomos:
   ai_data_compliance: {workers: [worker-nomos-ai-act, worker-nomos-rgpd, worker-nomos-dora]}
   aml_fraud_pt: {workers: [worker-nomos-aml, worker-nomos-fraude, worker-nomos-bdp]}
   sector_compliance_pt: {workers: [worker-nomos-asae, worker-nomos-acss, worker-nomos-igac, worker-nomos-anac, worker-nomos-digital]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# MERCURIUS — Sales Excellence Squad (v1.0.0, 2026-05-20)
+# 15 skills sales methodology + execution + ops. v12.0 release.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_sales:
+  mercurius_director:
+    id: mercurius-director
+    name: MERCURIUS
+    title: Sales Excellence Squad Lead
+    parent: dario-ceo
+    capabilities: [sales_methodology, prospecting, discovery_call, demo_script,
+      objection_handling, negotiation_prep, closing, account_management,
+      expansion_revenue, sales_enablement, pipeline_forecasting,
+      territory_design, comp_plan, sales_ops, customer_success_handoff]
+    compliance_required: [no_dark_patterns, lgpd_lead_data, audit_trail]
+
+workers_mercurius:
+  worker-mercurius-method: {id: worker-mercurius-method, skill: mercurius-sales-methodology, reports_to: mercurius-director}
+  worker-mercurius-prospecting: {id: worker-mercurius-prospecting, skill: mercurius-prospecting, reports_to: mercurius-director}
+  worker-mercurius-discovery: {id: worker-mercurius-discovery, skill: mercurius-discovery-call, reports_to: mercurius-director}
+  worker-mercurius-demo: {id: worker-mercurius-demo, skill: mercurius-demo-script, reports_to: mercurius-director}
+  worker-mercurius-objections: {id: worker-mercurius-objections, skill: mercurius-objection-handling, reports_to: mercurius-director}
+  worker-mercurius-negotiate: {id: worker-mercurius-negotiate, skill: mercurius-negotiation-prep, reports_to: mercurius-director}
+  worker-mercurius-close: {id: worker-mercurius-close, skill: mercurius-closing, reports_to: mercurius-director}
+  worker-mercurius-am: {id: worker-mercurius-am, skill: mercurius-account-management, reports_to: mercurius-director}
+  worker-mercurius-expansion: {id: worker-mercurius-expansion, skill: mercurius-expansion-revenue, reports_to: mercurius-director}
+  worker-mercurius-enable: {id: worker-mercurius-enable, skill: mercurius-sales-enablement, reports_to: mercurius-director}
+  worker-mercurius-forecast: {id: worker-mercurius-forecast, skill: mercurius-pipeline-forecasting, reports_to: mercurius-director}
+  worker-mercurius-territory: {id: worker-mercurius-territory, skill: mercurius-territory-design, reports_to: mercurius-director}
+  worker-mercurius-comp: {id: worker-mercurius-comp, skill: mercurius-comp-plan, reports_to: mercurius-director}
+  worker-mercurius-ops: {id: worker-mercurius-ops, skill: mercurius-sales-ops, reports_to: mercurius-director}
+  worker-mercurius-handoff: {id: worker-mercurius-handoff, skill: mercurius-customer-success-handoff, reports_to: mercurius-director}
+
+squads_mercurius:
+  prospecting_to_close: {workers: [worker-mercurius-method, worker-mercurius-prospecting, worker-mercurius-discovery, worker-mercurius-demo, worker-mercurius-close]}
+  account_expansion: {workers: [worker-mercurius-am, worker-mercurius-expansion, worker-mercurius-handoff]}
+  sales_ops_revops: {workers: [worker-mercurius-forecast, worker-mercurius-territory, worker-mercurius-comp, worker-mercurius-ops]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ATLAS-FIN — Fintech Services Squad (v1.0.0, 2026-05-20)
+# 15 skills Open Banking BR + PSD2 + PIX + payments + AML + BaaS. v12.0 release.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_fintech:
+  atlas_fin_director:
+    id: atlas-fin-director
+    name: ATLAS-FIN
+    title: Fintech Services Squad Lead
+    parent: dario-ceo
+    jurisdiction: Brasil + EU
+    capabilities: [open_banking_br, pix_rules_bcb, psd2_eu, payment_orchestration,
+      fraud_prevention, chargeback_management, kyc_onboarding, aml_monitoring,
+      sanctions_screening, foreign_exchange, instant_payments, banking_as_a_service,
+      embedded_finance, regulatory_reporting_bcb, lgpd_financial]
+    compliance_required: [bcb_compliance_gate, ecb_compliance_gate, audit_immutable,
+      pci_dss_scope, sanctions_realtime]
+
+workers_atlas_fin:
+  worker-atlas-fin-ob-br: {id: worker-atlas-fin-ob-br, skill: atlas-fin-open-banking-br, reports_to: atlas-fin-director}
+  worker-atlas-fin-pix: {id: worker-atlas-fin-pix, skill: atlas-fin-pix-rules-bcb, reports_to: atlas-fin-director}
+  worker-atlas-fin-psd2: {id: worker-atlas-fin-psd2, skill: atlas-fin-psd2-eu, reports_to: atlas-fin-director}
+  worker-atlas-fin-orch: {id: worker-atlas-fin-orch, skill: atlas-fin-payment-orchestration, reports_to: atlas-fin-director}
+  worker-atlas-fin-fraud: {id: worker-atlas-fin-fraud, skill: atlas-fin-fraud-prevention, reports_to: atlas-fin-director}
+  worker-atlas-fin-cb: {id: worker-atlas-fin-cb, skill: atlas-fin-chargeback-management, reports_to: atlas-fin-director}
+  worker-atlas-fin-kyc: {id: worker-atlas-fin-kyc, skill: atlas-fin-kyc-onboarding, reports_to: atlas-fin-director}
+  worker-atlas-fin-aml: {id: worker-atlas-fin-aml, skill: atlas-fin-aml-monitoring, reports_to: atlas-fin-director}
+  worker-atlas-fin-sanctions: {id: worker-atlas-fin-sanctions, skill: atlas-fin-sanctions-screening, reports_to: atlas-fin-director}
+  worker-atlas-fin-fx: {id: worker-atlas-fin-fx, skill: atlas-fin-foreign-exchange, reports_to: atlas-fin-director}
+  worker-atlas-fin-instant: {id: worker-atlas-fin-instant, skill: atlas-fin-instant-payments, reports_to: atlas-fin-director}
+  worker-atlas-fin-baas: {id: worker-atlas-fin-baas, skill: atlas-fin-banking-as-a-service, reports_to: atlas-fin-director}
+  worker-atlas-fin-embed: {id: worker-atlas-fin-embed, skill: atlas-fin-embedded-finance, reports_to: atlas-fin-director}
+  worker-atlas-fin-bcb: {id: worker-atlas-fin-bcb, skill: atlas-fin-regulatory-reporting-bcb, reports_to: atlas-fin-director}
+  worker-atlas-fin-lgpd: {id: worker-atlas-fin-lgpd, skill: atlas-fin-lgpd-financial, reports_to: atlas-fin-director}
+
+squads_atlas_fin:
+  open_banking_full: {workers: [worker-atlas-fin-ob-br, worker-atlas-fin-psd2, worker-atlas-fin-instant, worker-atlas-fin-pix]}
+  payments_ops: {workers: [worker-atlas-fin-orch, worker-atlas-fin-fraud, worker-atlas-fin-cb, worker-atlas-fin-fx]}
+  kyc_aml_full: {workers: [worker-atlas-fin-kyc, worker-atlas-fin-aml, worker-atlas-fin-sanctions, worker-atlas-fin-lgpd]}
+  baas_embedded: {workers: [worker-atlas-fin-baas, worker-atlas-fin-embed, worker-atlas-fin-bcb]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# HELIOS — Energy & Utilities Squad (v1.0.0, 2026-05-20)
+# 15 skills mercado livre BR + ANEEL + PPA + BESS + H2. v12.0 release.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_energy:
+  helios_director:
+    id: helios-director
+    name: HELIOS
+    title: Energy & Utilities Squad Lead
+    parent: dario-ceo
+    capabilities: [mercado_livre_br, aneel_compliance, ppa_power_purchase,
+      energy_storage, grid_integration, hydrogen_strategy, carbon_credits_energy,
+      renewable_financing, smart_meter_data, demand_response,
+      ev_charging_strategy, microgrid_design, energy_efficiency_iso50001,
+      climate_pricing, utility_rate_design]
+    compliance_required: [aneel_compliance_gate, iso50001_certification_ready, audit_immutable]
+
+workers_helios:
+  worker-helios-acl: {id: worker-helios-acl, skill: helios-mercado-livre-br, reports_to: helios-director}
+  worker-helios-aneel: {id: worker-helios-aneel, skill: helios-aneel-compliance, reports_to: helios-director}
+  worker-helios-ppa: {id: worker-helios-ppa, skill: helios-ppa-power-purchase, reports_to: helios-director}
+  worker-helios-storage: {id: worker-helios-storage, skill: helios-energy-storage, reports_to: helios-director}
+  worker-helios-grid: {id: worker-helios-grid, skill: helios-grid-integration, reports_to: helios-director}
+  worker-helios-h2: {id: worker-helios-h2, skill: helios-hydrogen-strategy, reports_to: helios-director}
+  worker-helios-carbon: {id: worker-helios-carbon, skill: helios-carbon-credits-energy, reports_to: helios-director}
+  worker-helios-finance: {id: worker-helios-finance, skill: helios-renewable-financing, reports_to: helios-director}
+  worker-helios-meter: {id: worker-helios-meter, skill: helios-smart-meter-data, reports_to: helios-director}
+  worker-helios-dr: {id: worker-helios-dr, skill: helios-demand-response, reports_to: helios-director}
+  worker-helios-ev: {id: worker-helios-ev, skill: helios-ev-charging-strategy, reports_to: helios-director}
+  worker-helios-microgrid: {id: worker-helios-microgrid, skill: helios-microgrid-design, reports_to: helios-director}
+  worker-helios-eff: {id: worker-helios-eff, skill: helios-energy-efficiency-iso50001, reports_to: helios-director}
+  worker-helios-pricing: {id: worker-helios-pricing, skill: helios-climate-pricing, reports_to: helios-director}
+  worker-helios-tariff: {id: worker-helios-tariff, skill: helios-utility-rate-design, reports_to: helios-director}
+
+squads_helios:
+  industrial_migration: {workers: [worker-helios-acl, worker-helios-ppa, worker-helios-aneel, worker-helios-tariff]}
+  renewable_projects: {workers: [worker-helios-finance, worker-helios-carbon, worker-helios-grid, worker-helios-storage]}
+  energy_efficiency: {workers: [worker-helios-eff, worker-helios-meter, worker-helios-dr]}
+  emerging_tech: {workers: [worker-helios-h2, worker-helios-ev, worker-helios-microgrid, worker-helios-pricing]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# KIRION — Real Estate & PropTech Squad (v1.0.0, 2026-05-20)
+# 15 skills RE valuation, REITs/FIIs, golden visa, smart building. v12.0.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_realestate:
+  kirion_director:
+    id: kirion-director
+    name: KIRION
+    title: Real Estate & PropTech Squad Lead
+    parent: dario-ceo
+    jurisdiction: Portugal + Brasil + Global
+    capabilities: [real_estate_valuation, market_comparables, dcf_property,
+      reit_analysis, mortgage_underwriting, property_management, leasing_strategy,
+      build_to_rent, hospitality_management, golden_visa_pt,
+      portuguese_renda_vitalicia, fii_br, ifrs_16_leases, esg_real_estate,
+      smart_building]
+    compliance_required: [cvm_compliance, anbima_alignment, ifrs_16_reporting, audit_immutable]
+
+workers_kirion:
+  worker-kirion-valuation: {id: worker-kirion-valuation, skill: kirion-real-estate-valuation, reports_to: kirion-director}
+  worker-kirion-cma: {id: worker-kirion-cma, skill: kirion-market-comparables, reports_to: kirion-director}
+  worker-kirion-dcf: {id: worker-kirion-dcf, skill: kirion-dcf-property, reports_to: kirion-director}
+  worker-kirion-reit: {id: worker-kirion-reit, skill: kirion-reit-analysis, reports_to: kirion-director}
+  worker-kirion-mortgage: {id: worker-kirion-mortgage, skill: kirion-mortgage-underwriting, reports_to: kirion-director}
+  worker-kirion-pm: {id: worker-kirion-pm, skill: kirion-property-management, reports_to: kirion-director}
+  worker-kirion-lease: {id: worker-kirion-lease, skill: kirion-leasing-strategy, reports_to: kirion-director}
+  worker-kirion-btr: {id: worker-kirion-btr, skill: kirion-build-to-rent, reports_to: kirion-director}
+  worker-kirion-hotel: {id: worker-kirion-hotel, skill: kirion-hospitality-management, reports_to: kirion-director}
+  worker-kirion-gv: {id: worker-kirion-gv, skill: kirion-golden-visa-pt, reports_to: kirion-director}
+  worker-kirion-viager: {id: worker-kirion-viager, skill: kirion-portuguese-renda-vitalicia, reports_to: kirion-director}
+  worker-kirion-fii: {id: worker-kirion-fii, skill: kirion-fii-br, reports_to: kirion-director}
+  worker-kirion-ifrs16: {id: worker-kirion-ifrs16, skill: kirion-ifrs-16-leases, reports_to: kirion-director}
+  worker-kirion-esg: {id: worker-kirion-esg, skill: kirion-esg-real-estate, reports_to: kirion-director}
+  worker-kirion-smart: {id: worker-kirion-smart, skill: kirion-smart-building, reports_to: kirion-director}
+
+squads_kirion:
+  valuation_diligence: {workers: [worker-kirion-valuation, worker-kirion-cma, worker-kirion-dcf, worker-kirion-mortgage]}
+  reit_fii_investing: {workers: [worker-kirion-reit, worker-kirion-fii, worker-kirion-ifrs16]}
+  property_operations: {workers: [worker-kirion-pm, worker-kirion-lease, worker-kirion-btr, worker-kirion-hotel]}
+  pt_specific: {workers: [worker-kirion-gv, worker-kirion-viager]}
+  proptech_innovation: {workers: [worker-kirion-esg, worker-kirion-smart]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SPHINX — Cybersecurity Advanced Squad (v1.0.0, 2026-05-20)
+# 15 skills TIER-1 cyber elite. Red team, APT, PQC, AI security. v12.0.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_cyber_advanced:
+  sphinx_director:
+    id: sphinx-director
+    name: SPHINX
+    title: Cybersecurity Advanced (TIER 1) Squad Lead
+    parent: dario-ceo
+    capabilities: [red_team_ops, threat_intel_platforms, osint_investigations,
+      deception_honeypots, mobile_forensics, malware_analysis, reverse_engineering,
+      dark_web_monitoring, social_engineering_defense, quantum_crypto_prep,
+      zero_day_management, advanced_persistent_threat, cloud_incident_response,
+      post_quantum_cryptography, ai_security]
+    compliance_required: [iso27001_audit, soc2_type2, audit_immutable,
+      responsible_disclosure, classified_handling]
+
+workers_sphinx:
+  worker-sphinx-redteam: {id: worker-sphinx-redteam, skill: sphinx-red-team-ops, reports_to: sphinx-director}
+  worker-sphinx-tip: {id: worker-sphinx-tip, skill: sphinx-threat-intel-platforms, reports_to: sphinx-director}
+  worker-sphinx-osint: {id: worker-sphinx-osint, skill: sphinx-osint-investigations, reports_to: sphinx-director}
+  worker-sphinx-deception: {id: worker-sphinx-deception, skill: sphinx-deception-honeypots, reports_to: sphinx-director}
+  worker-sphinx-mobile: {id: worker-sphinx-mobile, skill: sphinx-mobile-forensics, reports_to: sphinx-director}
+  worker-sphinx-malware: {id: worker-sphinx-malware, skill: sphinx-malware-analysis, reports_to: sphinx-director}
+  worker-sphinx-re: {id: worker-sphinx-re, skill: sphinx-reverse-engineering, reports_to: sphinx-director}
+  worker-sphinx-dark: {id: worker-sphinx-dark, skill: sphinx-dark-web-monitoring, reports_to: sphinx-director}
+  worker-sphinx-se: {id: worker-sphinx-se, skill: sphinx-social-engineering-defense, reports_to: sphinx-director}
+  worker-sphinx-qcrypto: {id: worker-sphinx-qcrypto, skill: sphinx-quantum-crypto-prep, reports_to: sphinx-director}
+  worker-sphinx-0day: {id: worker-sphinx-0day, skill: sphinx-zero-day-management, reports_to: sphinx-director}
+  worker-sphinx-apt: {id: worker-sphinx-apt, skill: sphinx-advanced-persistent-threat, reports_to: sphinx-director}
+  worker-sphinx-cloud-ir: {id: worker-sphinx-cloud-ir, skill: sphinx-cloud-incident-response, reports_to: sphinx-director}
+  worker-sphinx-pqc: {id: worker-sphinx-pqc, skill: sphinx-post-quantum-cryptography, reports_to: sphinx-director}
+  worker-sphinx-ai-sec: {id: worker-sphinx-ai-sec, skill: sphinx-ai-security, reports_to: sphinx-director}
+
+squads_sphinx:
+  offensive_research: {workers: [worker-sphinx-redteam, worker-sphinx-re, worker-sphinx-0day, worker-sphinx-malware]}
+  threat_intel_advanced: {workers: [worker-sphinx-tip, worker-sphinx-osint, worker-sphinx-dark, worker-sphinx-apt]}
+  forensics_ir_elite: {workers: [worker-sphinx-mobile, worker-sphinx-cloud-ir, worker-sphinx-deception]}
+  emerging_threats: {workers: [worker-sphinx-qcrypto, worker-sphinx-pqc, worker-sphinx-ai-sec, worker-sphinx-se]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# EUTERPE — Marketing Excellence Squad (v1.0.0, 2026-05-20)
+# 15 skills MMM, attribution, CRO, CDP, paid + programmatic. v12.0.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_marketing_advanced:
+  euterpe_director:
+    id: euterpe-director
+    name: EUTERPE
+    title: Marketing Excellence Squad Lead
+    parent: dario-ceo
+    capabilities: [mmm_modeling, attribution_multi_touch, cro_advanced,
+      brand_tracking, customer_data_platform, email_marketing_mass,
+      sms_marketing, push_marketing, viral_marketing, influencer_marketing,
+      content_distribution, paid_search, paid_social, programmatic,
+      affiliate_marketing]
+    compliance_required: [lgpd_marketing, gdpr_marketing, no_dark_patterns, audit_trail]
+
+workers_euterpe:
+  worker-euterpe-mmm: {id: worker-euterpe-mmm, skill: euterpe-mmm-modeling, reports_to: euterpe-director}
+  worker-euterpe-mta: {id: worker-euterpe-mta, skill: euterpe-attribution-multi-touch, reports_to: euterpe-director}
+  worker-euterpe-cro: {id: worker-euterpe-cro, skill: euterpe-cro-advanced, reports_to: euterpe-director}
+  worker-euterpe-brand: {id: worker-euterpe-brand, skill: euterpe-brand-tracking, reports_to: euterpe-director}
+  worker-euterpe-cdp: {id: worker-euterpe-cdp, skill: euterpe-customer-data-platform, reports_to: euterpe-director}
+  worker-euterpe-email: {id: worker-euterpe-email, skill: euterpe-email-marketing-mass, reports_to: euterpe-director}
+  worker-euterpe-sms: {id: worker-euterpe-sms, skill: euterpe-sms-marketing, reports_to: euterpe-director}
+  worker-euterpe-push: {id: worker-euterpe-push, skill: euterpe-push-marketing, reports_to: euterpe-director}
+  worker-euterpe-viral: {id: worker-euterpe-viral, skill: euterpe-viral-marketing, reports_to: euterpe-director}
+  worker-euterpe-influencer: {id: worker-euterpe-influencer, skill: euterpe-influencer-marketing, reports_to: euterpe-director}
+  worker-euterpe-content: {id: worker-euterpe-content, skill: euterpe-content-distribution, reports_to: euterpe-director}
+  worker-euterpe-search: {id: worker-euterpe-search, skill: euterpe-paid-search, reports_to: euterpe-director}
+  worker-euterpe-social: {id: worker-euterpe-social, skill: euterpe-paid-social, reports_to: euterpe-director}
+  worker-euterpe-prog: {id: worker-euterpe-prog, skill: euterpe-programmatic, reports_to: euterpe-director}
+  worker-euterpe-affiliate: {id: worker-euterpe-affiliate, skill: euterpe-affiliate-marketing, reports_to: euterpe-director}
+
+squads_euterpe:
+  measurement_analytics: {workers: [worker-euterpe-mmm, worker-euterpe-mta, worker-euterpe-cro, worker-euterpe-cdp]}
+  paid_media: {workers: [worker-euterpe-search, worker-euterpe-social, worker-euterpe-prog]}
+  owned_engagement: {workers: [worker-euterpe-email, worker-euterpe-sms, worker-euterpe-push, worker-euterpe-content]}
+  organic_partnerships: {workers: [worker-euterpe-viral, worker-euterpe-influencer, worker-euterpe-affiliate, worker-euterpe-brand]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ORACULO — AI Research & Frontier Squad (v1.0.0, 2026-05-20)
+# 15 skills paper reading, benchmarking, alignment, fine-tuning, AI safety. v12.0.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_ai_research:
+  oraculo_director:
+    id: oraculo-director
+    name: ORACULO
+    title: AI Research & Frontier Squad Lead
+    parent: dario-ceo
+    capabilities: [paper_reading_extraction, replication_studies, model_evaluation,
+      benchmarking, alignment_research, agentic_research, multimodal_research,
+      llm_fine_tuning, rag_research, evaluation_frameworks, paper_writing,
+      peer_review, conference_tracking, model_card_generation, ai_safety_research]
+    compliance_required: [audit_immutable, research_integrity, responsible_disclosure, ai_governance]
+
+workers_oraculo:
+  worker-oraculo-paper: {id: worker-oraculo-paper, skill: oraculo-paper-reading-extraction, reports_to: oraculo-director}
+  worker-oraculo-replication: {id: worker-oraculo-replication, skill: oraculo-replication-studies, reports_to: oraculo-director}
+  worker-oraculo-eval: {id: worker-oraculo-eval, skill: oraculo-model-evaluation, reports_to: oraculo-director}
+  worker-oraculo-bench: {id: worker-oraculo-bench, skill: oraculo-benchmarking, reports_to: oraculo-director}
+  worker-oraculo-align: {id: worker-oraculo-align, skill: oraculo-alignment-research, reports_to: oraculo-director}
+  worker-oraculo-agent: {id: worker-oraculo-agent, skill: oraculo-agentic-research, reports_to: oraculo-director}
+  worker-oraculo-multimodal: {id: worker-oraculo-multimodal, skill: oraculo-multimodal-research, reports_to: oraculo-director}
+  worker-oraculo-ft: {id: worker-oraculo-ft, skill: oraculo-llm-fine-tuning, reports_to: oraculo-director}
+  worker-oraculo-rag: {id: worker-oraculo-rag, skill: oraculo-rag-research, reports_to: oraculo-director}
+  worker-oraculo-evalfx: {id: worker-oraculo-evalfx, skill: oraculo-evaluation-frameworks, reports_to: oraculo-director}
+  worker-oraculo-writing: {id: worker-oraculo-writing, skill: oraculo-paper-writing, reports_to: oraculo-director}
+  worker-oraculo-review: {id: worker-oraculo-review, skill: oraculo-peer-review, reports_to: oraculo-director}
+  worker-oraculo-conf: {id: worker-oraculo-conf, skill: oraculo-conference-tracking, reports_to: oraculo-director}
+  worker-oraculo-card: {id: worker-oraculo-card, skill: oraculo-model-card-generation, reports_to: oraculo-director}
+  worker-oraculo-safety: {id: worker-oraculo-safety, skill: oraculo-ai-safety-research, reports_to: oraculo-director}
+
+squads_oraculo:
+  research_to_paper: {workers: [worker-oraculo-paper, worker-oraculo-writing, worker-oraculo-review, worker-oraculo-conf]}
+  evaluation_benchmarks: {workers: [worker-oraculo-eval, worker-oraculo-bench, worker-oraculo-evalfx, worker-oraculo-replication]}
+  ml_engineering: {workers: [worker-oraculo-ft, worker-oraculo-rag, worker-oraculo-multimodal, worker-oraculo-agent]}
+  safety_alignment: {workers: [worker-oraculo-align, worker-oraculo-safety, worker-oraculo-card]}

@@ -1,0 +1,35 @@
+identity:
+  name: "KIRION"
+  full: "Knowledge, Investment, Real-estate, Income, Optimization, Networks (Real Estate & PropTech Squad)"
+  version: "1.0.0"
+  jurisdiction: "Portugal + Brasil + Global"
+  parent: "dario-ceo"
+  squad_number: 29
+
+description: |
+  Squad imobiliário PT/BR + global. Valuation, REITs/FIIs, golden visa,
+  property mgmt, ESG real estate, smart buildings. Para RE brokers,
+  FII managers, family offices, REITs, developers, banks RE lending.
+
+coverage:
+  - real_estate_valuation, market_comparables, dcf_property, reit_analysis,
+    mortgage_underwriting, property_management, leasing_strategy,
+    build_to_rent, hospitality_management, golden_visa_pt,
+    portuguese_renda_vitalicia, fii_br, ifrs_16_leases, esg_real_estate,
+    smart_building
+
+compliance:
+  - cvm_compliance, anbima_alignment, ifrs_16_reporting, audit_immutable
+
+skills_count: 15
+
+pricing_tiers:
+  solo: {price_brl_month: 997, target: "RE broker, RE analyst", skills_included: 8}
+  team: {price_brl_month: 2997, target: "Consultancies, FII managers, family offices", skills_included: 15}
+  enterprise: {price_brl_month_from: 7997, target: "REITs, large developers, banks RE", skills_included: 15}
+
+agent:
+  director: kirion-director
+  workers: 15
+  reports_to: dario-ceo
+  language: en-pt-pt-br

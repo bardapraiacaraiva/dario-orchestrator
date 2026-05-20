@@ -1,0 +1,33 @@
+identity:
+  name: "SPHINX"
+  full: "Strategic Penetration, Hunting, Intelligence, Network-defense, Xploit-management"
+  version: "1.0.0"
+  parent: "dario-ceo"
+  squad_number: 30
+
+description: |
+  Squad TIER-1 cybersec elite. Red team, advanced threat intel, deep forensics,
+  AI security, quantum prep. Para F500 CISO, government, defense.
+
+coverage:
+  - red_team_ops, threat_intel_platforms, osint_investigations, deception_honeypots,
+    mobile_forensics, malware_analysis, reverse_engineering, dark_web_monitoring,
+    social_engineering_defense, quantum_crypto_prep, zero_day_management,
+    advanced_persistent_threat, cloud_incident_response, post_quantum_cryptography,
+    ai_security
+
+compliance:
+  - iso27001_audit, soc2_type2, audit_immutable, responsible_disclosure, classified_handling
+
+skills_count: 15
+
+pricing_tiers:
+  solo: {price_brl_month: 4997, target: "Senior pentest professional", skills_included: 8}
+  team: {price_brl_month: 12997, target: "Red team / advanced SOC", skills_included: 15}
+  enterprise: {price_brl_month_from: 29997, target: "Defense, government, F500 CISO", skills_included: 15}
+
+agent:
+  director: sphinx-director
+  workers: 15
+  reports_to: dario-ceo
+  language: en
