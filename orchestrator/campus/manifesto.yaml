@@ -1,0 +1,57 @@
+identity:
+  name: "CAMPUS"
+  full: "Curriculum, Assessment, Mentoring, Pedagogy, User-Experience, Scaling (Education BR)"
+  version: "1.0.0"
+  jurisdiction: "Brasil"
+  parent: "dario-ceo"
+  squad_number: 21
+
+description: |
+  Squad de Educação Brasil. MEC/LDB/BNCC compliance, EAD regulação, instructional
+  design, LMS architecture, learning analytics. Para escolas, universidades,
+  EAD providers, edtech, treinamento corporativo.
+
+coverage:
+  - mec_regulation             # MEC, INEP, Sinaes, ENADE
+  - ldb_compliance             # LDB 9.394/96
+  - bncc_alignment             # Base Nacional Comum Curricular
+  - enem_enade_prep            # Avaliações nacionais
+  - ead_regulation             # Portaria MEC 2.117/2019, Decreto 9.057/2017
+  - instructional_design       # ADDIE, SAM, Bloom, Backward Design
+  - learning_experience        # LXD, microlearning
+  - education_analytics        # Learning analytics, predictive
+  - lms_architecture           # Moodle, Canvas, Open edX, Google Classroom
+  - online_course_pedagogy     # Cohort-based, async, hybrid
+  - gamification               # Octalysis, badges, progression
+  - microlearning              # Spaced repetition, just-in-time
+  - assessment_design          # Bloom, Webb's DOK, rubrics
+  - certification              # IMS Open Badges, accreditation
+  - corporate_learning         # Onboarding, upskilling, reskilling
+
+compliance:
+  - mec_credenciamento
+  - lgpd_education_marker      # Dados de menor
+  - certification_audit
+  - bncc_curriculum_alignment
+
+skills_count: 15
+
+pricing_tiers:
+  solo:
+    price_brl_month: 297
+    target: "Educador / curso individual"
+    skills_included: 8
+  team:
+    price_brl_month: 1497
+    target: "EAD provider / escola"
+    skills_included: 15
+  enterprise:
+    price_brl_month_from: 5000
+    target: "Universidade / sistema EAD nacional"
+    skills_included: 15
+
+agent:
+  director: campus-director
+  workers: 15
+  reports_to: dario-ceo
+  language: pt-br

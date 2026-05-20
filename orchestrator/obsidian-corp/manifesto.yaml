@@ -1,0 +1,56 @@
+identity:
+  name: "OBSIDIAN-CORP"
+  full: "Organized Brain System: Information Discovery, Indexing, Architecture, Navigation (Corporate)"
+  version: "1.0.0"
+  parent: "dario-ceo"
+  squad_number: 19
+
+description: |
+  Squad de Knowledge Graph & Second Brain corporativo. Transforma docs dispersos
+  em conhecimento estruturado, navegável, pesquisável semanticamente. Base de
+  RAG enterprise e onboarding accelerado.
+
+coverage:
+  - knowledge_graph_design       # Nodes, edges, ontology
+  - second_brain_method          # Tiago Forte's BASB
+  - atomic_notes                 # Zettelkasten (Luhmann)
+  - moc_design                   # Maps of Content
+  - para_organization            # Projects/Areas/Resources/Archive
+  - zettelkasten_method          # IDs, links, evergreen
+  - rag_corpus_engineering       # Chunking, embedding, retrieval
+  - taxonomy_design              # Controlled vocabulary
+  - ontology_modeling            # Classes, properties, relations
+  - search_relevance             # BM25, hybrid, reranking
+  - semantic_search               # Vector search, ANN
+  - embedding_models             # OpenAI, Cohere, BGE, nomic
+  - knowledge_base_curation      # Maintenance, decay, quality
+  - cross_referencing            # Backlinks, citations
+  - knowledge_compaction         # Summarization, compression
+
+compliance:
+  - data_classification          # Public/Internal/Confidential/Restricted
+  - access_control               # RBAC, ABAC
+  - retention_policies
+  - audit_trail
+
+skills_count: 15
+
+pricing_tiers:
+  solo:
+    price_brl_month: 297
+    target: "Knowledge worker individual"
+    skills_included: 8
+  team:
+    price_brl_month: 997
+    target: "Knowledge team / consultoria"
+    skills_included: 15
+  enterprise:
+    price_brl_month_from: 4000
+    target: "Knowledge org / enterprise search"
+    skills_included: 15
+
+agent:
+  director: obsidian-director
+  workers: 15
+  reports_to: dario-ceo
+  language: en-pt-pt-br

@@ -3267,3 +3267,262 @@ squads_demeter:
   ml_production:
     description: "ML em produção: data → pipeline → model → monitoring"
     workers: [worker-demeter-warehouse, worker-demeter-data-quality, worker-demeter-ml-pipelines, worker-demeter-predictive, worker-demeter-dataops]
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ORION — Product Excellence Squad (v1.0.0, 2026-05-19)
+# 15 skills product management. Eleva agências/SaaS para outcome-driven.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_product:
+  orion_director:
+    id: orion-director
+    name: O.R.I.O.N.
+    title: Product Excellence Squad Lead
+    type: domain_specialist
+    adapter: orion-agent
+    parent: dario-ceo
+    capabilities: [product_strategy, product_discovery, prd_writing, user_research,
+      jobs_to_be_done, product_analytics, roadmap_planning, prioritization,
+      feature_flags, beta_program, product_launch, growth_product,
+      retention_engineering, pricing_strategy, product_ops]
+    language: en-pt-pt-br
+    compliance_required: [data_privacy_by_design, user_consent_explicit, no_dark_patterns]
+
+workers_orion:
+  worker-orion-strategy: {id: worker-orion-strategy, skill: orion-product-strategy, reports_to: orion-director}
+  worker-orion-discovery: {id: worker-orion-discovery, skill: orion-product-discovery, reports_to: orion-director}
+  worker-orion-prd: {id: worker-orion-prd, skill: orion-prd-writing, reports_to: orion-director}
+  worker-orion-research: {id: worker-orion-research, skill: orion-user-research, reports_to: orion-director}
+  worker-orion-jtbd: {id: worker-orion-jtbd, skill: orion-jobs-to-be-done, reports_to: orion-director}
+  worker-orion-analytics: {id: worker-orion-analytics, skill: orion-product-analytics, reports_to: orion-director}
+  worker-orion-roadmap: {id: worker-orion-roadmap, skill: orion-roadmap-planning, reports_to: orion-director}
+  worker-orion-prio: {id: worker-orion-prio, skill: orion-prioritization, reports_to: orion-director}
+  worker-orion-flags: {id: worker-orion-flags, skill: orion-feature-flags, reports_to: orion-director}
+  worker-orion-beta: {id: worker-orion-beta, skill: orion-beta-program, reports_to: orion-director}
+  worker-orion-launch: {id: worker-orion-launch, skill: orion-product-launch, reports_to: orion-director}
+  worker-orion-growth: {id: worker-orion-growth, skill: orion-growth-product, reports_to: orion-director}
+  worker-orion-retention: {id: worker-orion-retention, skill: orion-retention-engineering, reports_to: orion-director}
+  worker-orion-pricing: {id: worker-orion-pricing, skill: orion-pricing-strategy, reports_to: orion-director}
+  worker-orion-ops: {id: worker-orion-ops, skill: orion-product-ops, reports_to: orion-director}
+
+squads_orion:
+  product_discovery_to_launch:
+    workers: [worker-orion-discovery, worker-orion-jtbd, worker-orion-research, worker-orion-prd, worker-orion-launch]
+  product_strategy_planning:
+    workers: [worker-orion-strategy, worker-orion-roadmap, worker-orion-prio, worker-orion-pricing]
+  product_growth_retention:
+    workers: [worker-orion-analytics, worker-orion-growth, worker-orion-retention, worker-orion-flags]
+
+# ═══════════════════════════════════════════════════════════════════════════
+# OBSIDIAN-CORP — Knowledge Graph Squad (v1.0.0, 2026-05-19)
+# 15 skills knowledge management, RAG engineering, semantic search.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_knowledge:
+  obsidian_director:
+    id: obsidian-director
+    name: OBSIDIAN-CORP
+    title: Knowledge Graph Squad Lead
+    type: domain_specialist
+    adapter: obsidian-agent
+    parent: dario-ceo
+    capabilities: [knowledge_graph_design, second_brain, atomic_notes, moc_design,
+      para_organization, zettelkasten, rag_corpus, taxonomy, ontology,
+      search_relevance, semantic_search, embedding_models,
+      kb_curation, cross_referencing, knowledge_compaction]
+    compliance_required: [data_classification, access_control, audit_trail]
+
+workers_obsidian:
+  worker-obsidian-graph: {id: worker-obsidian-graph, skill: obsidian-knowledge-graph, reports_to: obsidian-director}
+  worker-obsidian-basb: {id: worker-obsidian-basb, skill: obsidian-second-brain, reports_to: obsidian-director}
+  worker-obsidian-atomic: {id: worker-obsidian-atomic, skill: obsidian-atomic-notes, reports_to: obsidian-director}
+  worker-obsidian-moc: {id: worker-obsidian-moc, skill: obsidian-moc-design, reports_to: obsidian-director}
+  worker-obsidian-para: {id: worker-obsidian-para, skill: obsidian-para-organization, reports_to: obsidian-director}
+  worker-obsidian-zettel: {id: worker-obsidian-zettel, skill: obsidian-zettelkasten-method, reports_to: obsidian-director}
+  worker-obsidian-rag: {id: worker-obsidian-rag, skill: obsidian-rag-corpus-engineering, reports_to: obsidian-director}
+  worker-obsidian-tax: {id: worker-obsidian-tax, skill: obsidian-taxonomy-design, reports_to: obsidian-director}
+  worker-obsidian-ont: {id: worker-obsidian-ont, skill: obsidian-ontology-modeling, reports_to: obsidian-director}
+  worker-obsidian-rel: {id: worker-obsidian-rel, skill: obsidian-search-relevance, reports_to: obsidian-director}
+  worker-obsidian-sem: {id: worker-obsidian-sem, skill: obsidian-semantic-search, reports_to: obsidian-director}
+  worker-obsidian-emb: {id: worker-obsidian-emb, skill: obsidian-embedding-models, reports_to: obsidian-director}
+  worker-obsidian-kbc: {id: worker-obsidian-kbc, skill: obsidian-knowledge-base-curation, reports_to: obsidian-director}
+  worker-obsidian-cite: {id: worker-obsidian-cite, skill: obsidian-cross-referencing, reports_to: obsidian-director}
+  worker-obsidian-comp: {id: worker-obsidian-comp, skill: obsidian-knowledge-compaction, reports_to: obsidian-director}
+
+squads_obsidian:
+  pkm_setup: {workers: [worker-obsidian-basb, worker-obsidian-para, worker-obsidian-atomic, worker-obsidian-zettel]}
+  rag_engineering: {workers: [worker-obsidian-rag, worker-obsidian-sem, worker-obsidian-emb, worker-obsidian-rel]}
+  knowledge_graph_full: {workers: [worker-obsidian-graph, worker-obsidian-ont, worker-obsidian-tax, worker-obsidian-cite]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# MEDIK — Healthcare BR Squad (v1.0.0, 2026-05-20)
+# 15 skills saúde digital Brasil. ANS+ANVISA+CFM+LGPD-saúde compliance.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_healthcare:
+  medik_director:
+    id: medik-director
+    name: MEDIK
+    title: Healthcare BR Squad Lead
+    type: domain_specialist
+    adapter: medik-agent
+    parent: dario-ceo
+    jurisdiction: Brasil
+    capabilities: [ans_compliance, anvisa_regulatory, cfm_resolutions,
+      lgpd_healthcare, telemedicine, clinical_protocols, emr_integration,
+      medical_billing_tuss, clinical_decision_support, health_insurance_ops,
+      hospital_management, primary_care, mental_health_digital,
+      rcm_revenue_cycle, claim_management]
+    compliance_required: [cfm_205_2021_gate, lgpd_healthcare_marker,
+      zdr_healthcare, audit_cfm, privilege_clinical]
+
+workers_medik:
+  worker-medik-ans: {id: worker-medik-ans, skill: medik-ans-compliance, reports_to: medik-director}
+  worker-medik-anvisa: {id: worker-medik-anvisa, skill: medik-anvisa-regulatory, reports_to: medik-director}
+  worker-medik-cfm: {id: worker-medik-cfm, skill: medik-cfm-resolutions, reports_to: medik-director}
+  worker-medik-lgpd: {id: worker-medik-lgpd, skill: medik-lgpd-healthcare, reports_to: medik-director}
+  worker-medik-tele: {id: worker-medik-tele, skill: medik-telemedicine, reports_to: medik-director}
+  worker-medik-protocols: {id: worker-medik-protocols, skill: medik-clinical-protocols, reports_to: medik-director}
+  worker-medik-emr: {id: worker-medik-emr, skill: medik-emr-integration, reports_to: medik-director}
+  worker-medik-tuss: {id: worker-medik-tuss, skill: medik-medical-billing-tuss, reports_to: medik-director}
+  worker-medik-cdss: {id: worker-medik-cdss, skill: medik-clinical-decision-support, reports_to: medik-director}
+  worker-medik-insurance: {id: worker-medik-insurance, skill: medik-health-insurance-operations, reports_to: medik-director}
+  worker-medik-hosp: {id: worker-medik-hosp, skill: medik-hospital-management, reports_to: medik-director}
+  worker-medik-aps: {id: worker-medik-aps, skill: medik-primary-care, reports_to: medik-director}
+  worker-medik-mental: {id: worker-medik-mental, skill: medik-mental-health-digital, reports_to: medik-director}
+  worker-medik-rcm: {id: worker-medik-rcm, skill: medik-rcm-revenue-cycle, reports_to: medik-director}
+  worker-medik-claims: {id: worker-medik-claims, skill: medik-claim-management, reports_to: medik-director}
+
+squads_medik:
+  clinic_setup: {workers: [worker-medik-cfm, worker-medik-lgpd, worker-medik-emr, worker-medik-tele]}
+  hospital_excellence: {workers: [worker-medik-hosp, worker-medik-protocols, worker-medik-cdss, worker-medik-rcm]}
+  operadora_ops: {workers: [worker-medik-ans, worker-medik-insurance, worker-medik-tuss, worker-medik-claims]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CAMPUS — Education BR Squad (v1.0.0, 2026-05-20)
+# 15 skills educação digital Brasil. MEC+LDB+BNCC+EAD compliance.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_education:
+  campus_director:
+    id: campus-director
+    name: CAMPUS
+    title: Education BR Squad Lead
+    type: domain_specialist
+    adapter: campus-agent
+    parent: dario-ceo
+    jurisdiction: Brasil
+    capabilities: [mec_regulation, ldb_compliance, bncc_alignment, enem_enade_prep,
+      ead_regulation, instructional_design, learning_experience, education_analytics,
+      lms_architecture, online_course_pedagogy, gamification, microlearning,
+      assessment_design, certification, corporate_learning]
+    compliance_required: [mec_credenciamento, lgpd_education_marker, certification_audit]
+
+workers_campus:
+  worker-campus-mec: {id: worker-campus-mec, skill: campus-mec-regulation, reports_to: campus-director}
+  worker-campus-ldb: {id: worker-campus-ldb, skill: campus-ldb-compliance, reports_to: campus-director}
+  worker-campus-bncc: {id: worker-campus-bncc, skill: campus-bncc-alignment, reports_to: campus-director}
+  worker-campus-enem: {id: worker-campus-enem, skill: campus-enem-enade-prep, reports_to: campus-director}
+  worker-campus-ead: {id: worker-campus-ead, skill: campus-ead-regulation, reports_to: campus-director}
+  worker-campus-id: {id: worker-campus-id, skill: campus-instructional-design, reports_to: campus-director}
+  worker-campus-lxd: {id: worker-campus-lxd, skill: campus-learning-experience, reports_to: campus-director}
+  worker-campus-analytics: {id: worker-campus-analytics, skill: campus-education-analytics, reports_to: campus-director}
+  worker-campus-lms: {id: worker-campus-lms, skill: campus-lms-architecture, reports_to: campus-director}
+  worker-campus-pedagogy: {id: worker-campus-pedagogy, skill: campus-online-course-pedagogy, reports_to: campus-director}
+  worker-campus-gamif: {id: worker-campus-gamif, skill: campus-gamification, reports_to: campus-director}
+  worker-campus-micro: {id: worker-campus-micro, skill: campus-microlearning, reports_to: campus-director}
+  worker-campus-assess: {id: worker-campus-assess, skill: campus-assessment-design, reports_to: campus-director}
+  worker-campus-cert: {id: worker-campus-cert, skill: campus-certification, reports_to: campus-director}
+  worker-campus-corp: {id: worker-campus-corp, skill: campus-corporate-learning, reports_to: campus-director}
+
+squads_campus:
+  ies_setup: {workers: [worker-campus-mec, worker-campus-ldb, worker-campus-ead, worker-campus-lms]}
+  course_design: {workers: [worker-campus-id, worker-campus-lxd, worker-campus-pedagogy, worker-campus-assess]}
+  edtech_growth: {workers: [worker-campus-gamif, worker-campus-micro, worker-campus-analytics, worker-campus-cert]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# AEGIS — Cybersecurity Squad (v1.0.0, 2026-05-20)
+# 15 skills cybersecurity defensive+offensive. ISO27001+SOC2+PCI compliance.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_security:
+  aegis_director:
+    id: aegis-director
+    name: AEGIS
+    title: Cybersecurity Squad Lead
+    type: domain_specialist
+    adapter: aegis-agent
+    parent: dario-ceo
+    capabilities: [threat_modeling, pentest_methodology, vulnerability_management,
+      soc_operations, siem_integration, edr_management, zero_trust_architecture,
+      iam_identity, secrets_management, incident_response, digital_forensics,
+      compliance_frameworks, security_awareness, secure_sdlc, cloud_security]
+    compliance_required: [iso27001_audit, soc2_type2, audit_immutable, responsible_disclosure]
+
+workers_aegis:
+  worker-aegis-tm: {id: worker-aegis-tm, skill: aegis-threat-modeling, reports_to: aegis-director}
+  worker-aegis-pt: {id: worker-aegis-pt, skill: aegis-pentest-methodology, reports_to: aegis-director}
+  worker-aegis-vm: {id: worker-aegis-vm, skill: aegis-vulnerability-management, reports_to: aegis-director}
+  worker-aegis-soc: {id: worker-aegis-soc, skill: aegis-soc-operations, reports_to: aegis-director}
+  worker-aegis-siem: {id: worker-aegis-siem, skill: aegis-siem-integration, reports_to: aegis-director}
+  worker-aegis-edr: {id: worker-aegis-edr, skill: aegis-edr-management, reports_to: aegis-director}
+  worker-aegis-zt: {id: worker-aegis-zt, skill: aegis-zero-trust-architecture, reports_to: aegis-director}
+  worker-aegis-iam: {id: worker-aegis-iam, skill: aegis-iam-identity, reports_to: aegis-director}
+  worker-aegis-secrets: {id: worker-aegis-secrets, skill: aegis-secrets-management, reports_to: aegis-director}
+  worker-aegis-ir: {id: worker-aegis-ir, skill: aegis-incident-response, reports_to: aegis-director}
+  worker-aegis-fo: {id: worker-aegis-fo, skill: aegis-digital-forensics, reports_to: aegis-director}
+  worker-aegis-comp: {id: worker-aegis-comp, skill: aegis-compliance-frameworks, reports_to: aegis-director}
+  worker-aegis-aware: {id: worker-aegis-aware, skill: aegis-security-awareness, reports_to: aegis-director}
+  worker-aegis-sdlc: {id: worker-aegis-sdlc, skill: aegis-secure-sdlc, reports_to: aegis-director}
+  worker-aegis-cloud: {id: worker-aegis-cloud, skill: aegis-cloud-security, reports_to: aegis-director}
+  worker-aegis-tpr: {id: worker-aegis-tpr, skill: aegis-third-party-risk, reports_to: aegis-director}
+  worker-aegis-supply: {id: worker-aegis-supply, skill: aegis-supply-chain-security, reports_to: aegis-director}
+  worker-aegis-bas: {id: worker-aegis-bas, skill: aegis-breach-simulation, reports_to: aegis-director}
+
+squads_aegis:
+  pentest_full: {workers: [worker-aegis-tm, worker-aegis-pt, worker-aegis-vm, worker-aegis-sdlc, worker-aegis-bas]}
+  soc_24x7: {workers: [worker-aegis-soc, worker-aegis-siem, worker-aegis-edr, worker-aegis-ir, worker-aegis-fo]}
+  ciso_office: {workers: [worker-aegis-zt, worker-aegis-iam, worker-aegis-comp, worker-aegis-aware, worker-aegis-cloud]}
+  trust_compliance: {workers: [worker-aegis-tpr, worker-aegis-supply, worker-aegis-comp, worker-aegis-bas]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ZENITH — Executive Decision Support Squad (v1.0.0, 2026-05-20)
+# 15 skills C-level, founders, boards, PE. Strategy, M&A, war games, dashboards.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_executive:
+  zenith_director:
+    id: zenith-director
+    name: ZENITH
+    title: Executive Decision Support Squad Lead
+    type: domain_specialist
+    adapter: zenith-agent
+    parent: dario-ceo
+    capabilities: [strategic_planning, okr_design, board_pack, ma_evaluation,
+      scenario_planning, war_gaming, executive_dashboard, sensitivity_analysis,
+      monte_carlo, decision_intelligence, risk_assessment, strategic_options,
+      competitive_intelligence, capital_allocation, succession_planning]
+    compliance_required: [privilege_executive, insider_trading_safeguard,
+      board_confidentiality, audit_immutable]
+
+workers_zenith:
+  worker-zenith-strat: {id: worker-zenith-strat, skill: zenith-strategic-planning, reports_to: zenith-director}
+  worker-zenith-okr: {id: worker-zenith-okr, skill: zenith-okr-design, reports_to: zenith-director}
+  worker-zenith-board: {id: worker-zenith-board, skill: zenith-board-pack-generation, reports_to: zenith-director}
+  worker-zenith-ma: {id: worker-zenith-ma, skill: zenith-ma-evaluation, reports_to: zenith-director}
+  worker-zenith-scenario: {id: worker-zenith-scenario, skill: zenith-scenario-planning, reports_to: zenith-director}
+  worker-zenith-wargame: {id: worker-zenith-wargame, skill: zenith-war-gaming, reports_to: zenith-director}
+  worker-zenith-dash: {id: worker-zenith-dash, skill: zenith-executive-dashboard, reports_to: zenith-director}
+  worker-zenith-sens: {id: worker-zenith-sens, skill: zenith-sensitivity-analysis, reports_to: zenith-director}
+  worker-zenith-mc: {id: worker-zenith-mc, skill: zenith-monte-carlo, reports_to: zenith-director}
+  worker-zenith-decint: {id: worker-zenith-decint, skill: zenith-decision-intelligence, reports_to: zenith-director}
+  worker-zenith-risk: {id: worker-zenith-risk, skill: zenith-risk-assessment, reports_to: zenith-director}
+  worker-zenith-opt: {id: worker-zenith-opt, skill: zenith-strategic-options, reports_to: zenith-director}
+  worker-zenith-ci: {id: worker-zenith-ci, skill: zenith-competitive-intelligence, reports_to: zenith-director}
+  worker-zenith-cap: {id: worker-zenith-cap, skill: zenith-capital-allocation, reports_to: zenith-director}
+  worker-zenith-succ: {id: worker-zenith-succ, skill: zenith-succession-planning, reports_to: zenith-director}
+
+squads_zenith:
+  ceo_strategic_office: {workers: [worker-zenith-strat, worker-zenith-okr, worker-zenith-scenario, worker-zenith-opt, worker-zenith-dash]}
+  ma_diligence: {workers: [worker-zenith-ma, worker-zenith-mc, worker-zenith-sens, worker-zenith-risk, worker-zenith-cap]}
+  board_governance: {workers: [worker-zenith-board, worker-zenith-decint, worker-zenith-ci, worker-zenith-wargame, worker-zenith-succ]}

@@ -1,0 +1,56 @@
+identity:
+  name: "ZENITH"
+  full: "Zone of Executive Navigation, Insight & Tactical Holistics"
+  version: "1.0.0"
+  parent: "dario-ceo"
+  squad_number: 23
+
+description: |
+  Squad de Executive Decision Support. Strategic planning, OKR, board pack,
+  M&A, scenario planning, war gaming, decision intelligence. Para founders,
+  C-level, board members, PE funds, holding companies.
+
+coverage:
+  - strategic_planning         # Long-term strategy + 3 horizons
+  - okr_design                 # Doerr OKR + Christina Wodtke RPM
+  - board_pack_generation      # Board materials, board memos
+  - ma_evaluation              # M&A diligence, integration
+  - scenario_planning          # Shell scenarios, alternative futures
+  - war_gaming                 # Strategic war games, red team
+  - executive_dashboard        # KPI dashboards C-level
+  - sensitivity_analysis       # Tornado, what-if
+  - monte_carlo                # Risk + uncertainty quantification
+  - decision_intelligence      # Decision trees, multi-criteria
+  - risk_assessment            # Enterprise risk, COSO
+  - strategic_options          # Real options, optionality
+  - competitive_intelligence   # CI, market intelligence, war room
+  - capital_allocation         # Capital budgeting, portfolio
+  - succession_planning        # Leadership succession, talent grid
+
+compliance:
+  - privilege_executive         # Material non-public info
+  - insider_trading_safeguard
+  - board_confidentiality
+  - audit_immutable
+
+skills_count: 15
+
+pricing_tiers:
+  solo:
+    price_brl_month: 997
+    target: "Founder / solo executive / advisor"
+    skills_included: 8
+  team:
+    price_brl_month: 2997
+    target: "C-level / management team / mid-market"
+    skills_included: 15
+  enterprise:
+    price_brl_month_from: 12000
+    target: "Board / PE fund / family office / holding"
+    skills_included: 15
+
+agent:
+  director: zenith-director
+  workers: 15
+  reports_to: dario-ceo
+  language: en-pt-pt-br

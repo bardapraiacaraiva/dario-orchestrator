@@ -1,0 +1,59 @@
+identity:
+  name: "MEDIK"
+  full: "Medical Excellence, Diagnostics, Information, Knowledge (Healthcare Squad — Brasil)"
+  version: "1.0.0"
+  jurisdiction: "Brasil"
+  parent: "dario-ceo"
+  squad_number: 20
+
+description: |
+  Squad de saúde digital Brasil. Compliance ANS + ANVISA + CFM + LGPD-saúde.
+  Cobre clínicas, hospitais, operadoras, telemedicina, biotech. EHR/EMR,
+  protocolos clínicos, billing TUSS, RCM, claim management.
+
+coverage:
+  - ans_compliance              # Operadoras saúde + Rol procedimentos
+  - anvisa_regulatory           # Devices médicos, biotech, RDC
+  - cfm_resolutions             # 2.314/2022 telemedicina, prontuário
+  - lgpd_healthcare             # Art. 11 dados sensíveis saúde
+  - telemedicine                # CFM 2.314/2022, RDC ANVISA
+  - clinical_protocols          # PCDT, guidelines, evidence-based
+  - emr_integration             # OpenEHR, HL7 FHIR, CDA
+  - medical_billing_tuss        # Tabela TUSS + AMB + CBHPM
+  - clinical_decision_support   # CDSS, drug-drug interactions
+  - health_insurance_operations # Operadoras, sinistros, autorização
+  - hospital_management         # NSP, NSI, KPIs hospitalares
+  - primary_care                # APS, ESF, prevenção
+  - mental_health_digital       # Telepsiquiatria, RDC 466
+  - rcm_revenue_cycle           # Revenue cycle management
+  - claim_management            # Glosas, recursos, denials
+
+compliance:
+  - cfm_205_2021_gate           # Outputs externos exigem revisão médica
+  - lgpd_healthcare_marker      # Art. 11 dados sensíveis
+  - zdr_healthcare              # CPF, prontuário, exames
+  - cite_checker_anvisa_cfm     # Validar RDCs e resoluções CFM
+  - audit_cfm                   # Log imutável com CRM do médico
+  - privilege_clinical          # Sigilo médico
+
+skills_count: 15
+
+pricing_tiers:
+  solo:
+    price_brl_month: 497
+    target: "Médico/dentista solo + 1 clínica"
+    skills_included: 8
+  team:
+    price_brl_month: 1497
+    target: "Clínica multi-especialidade / corpo clínico"
+    skills_included: 15
+  enterprise:
+    price_brl_month_from: 6000
+    target: "Hospital / operadora / rede"
+    skills_included: 15
+
+agent:
+  director: medik-director
+  workers: 15
+  reports_to: dario-ceo
+  language: pt-br

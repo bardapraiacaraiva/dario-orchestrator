@@ -1,0 +1,60 @@
+identity:
+  name: "AEGIS"
+  full: "Active Enterprise Guard, Intelligence, Security"
+  version: "1.0.0"
+  parent: "dario-ceo"
+  squad_number: 22
+
+description: |
+  Squad de Cybersecurity. Defensive + offensive security, SOC, IR, threat
+  intel, IAM/zero-trust, compliance frameworks. Para CISOs, security teams,
+  pentest companies, SOCs.
+
+coverage:
+  - threat_modeling           # STRIDE, PASTA, attack trees
+  - pentest_methodology       # PTES, OWASP, OSSTMM
+  - vulnerability_management  # Tenable, Qualys, OpenVAS
+  - soc_operations            # SIEM, SOAR, MITRE ATT&CK
+  - siem_integration          # Splunk, ELK, Sentinel, QRadar
+  - edr_management            # CrowdStrike, SentinelOne, Defender
+  - zero_trust_architecture   # NIST 800-207, BeyondCorp
+  - iam_identity              # Okta, Auth0, Keycloak, RBAC/ABAC
+  - secrets_management        # HashiCorp Vault, AWS Secrets, age
+  - incident_response         # NIST SP 800-61, playbooks
+  - digital_forensics         # FTK, Autopsy, Volatility
+  - compliance_frameworks     # ISO 27001, SOC 2, PCI-DSS, HIPAA
+  - security_awareness        # KnowBe4, phishing simulation
+  - secure_sdlc               # SAST/DAST/SCA, threat modeling
+  - cloud_security            # CSPM, CWPP, CIEM
+  - third_party_risk          # TPRM, SIG, vendor security
+  - supply_chain_security     # SLSA, SBOM, Sigstore
+  - breach_simulation         # BAS, AttackIQ, Caldera, purple team
+
+compliance:
+  - iso27001_audit
+  - soc2_type2
+  - lgpd_security_marker
+  - audit_immutable
+  - responsible_disclosure
+
+skills_count: 18
+
+pricing_tiers:
+  solo:
+    price_brl_month: 1497
+    target: "Solo CISO / security freelance / pentest professional"
+    skills_included: 10
+  team:
+    price_brl_month: 2997
+    target: "Security team / SOC pequeno-médio / compliance officers"
+    skills_included: 18
+  enterprise:
+    price_brl_month_from: 4997
+    target: "Enterprise CISO org / SOC 24×7 / Fortune 500"
+    skills_included: 18
+
+agent:
+  director: aegis-director
+  workers: 18
+  reports_to: dario-ceo
+  language: en-pt-pt-br

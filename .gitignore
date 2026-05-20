@@ -96,3 +96,17 @@ orchestrator/.master_secret
 orchestrator/.trial_fingerprint
 orchestrator/dev.flag
 
+
+# v11.4 — 6 new squads
+!orchestrator/orion/
+!orchestrator/orion/**
+!orchestrator/obsidian-corp/
+!orchestrator/obsidian-corp/**
+!orchestrator/medik/
+!orchestrator/medik/**
+!orchestrator/campus/
+!orchestrator/campus/**
+!orchestrator/aegis/
+!orchestrator/aegis/**
+!orchestrator/zenith/
+!orchestrator/zenith/**
