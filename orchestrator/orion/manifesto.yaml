@@ -1,0 +1,63 @@
+identity:
+  name: "ORION"
+  full: "Outcomes, Research, Iteration, Operations, Navigation (Product Excellence Squad)"
+  version: "1.0.0"
+  jurisdiction: "Global"
+  parent: "dario-ceo"
+  squad_number: 18
+
+description: |
+  Squad de Product Excellence. Cobre todo o ciclo de produto: discovery, definição,
+  delivery, growth, retention. Eleva qualquer agência/SaaS de "feature factory" para
+  produto orientado a outcomes mensuráveis.
+
+coverage:
+  - product_strategy           # Vision, mission, OKRs de produto
+  - product_discovery          # Continuous discovery (Teresa Torres)
+  - prd_writing                # PRDs, specs técnicas
+  - user_research              # Entrevistas, surveys, usability testing
+  - jobs_to_be_done            # JTBD framework + outcome-driven innovation
+  - product_analytics          # Mixpanel, Amplitude, PostHog instrumentation
+  - roadmap_planning           # Now/Next/Later, no Gantt fiction
+  - prioritization             # RICE, ICE, MoSCoW, Kano, WSJF
+  - feature_flags              # LaunchDarkly, GrowthBook, progressive delivery
+  - beta_program               # Closed/open beta, alpha tester management
+  - product_launch             # Launch playbooks, GTM coordination
+  - growth_product             # PLG loops, activation, expansion
+  - retention_engineering      # Habit formation, hooks, lifecycle
+  - pricing_strategy           # Tiering, packaging, value metric
+  - product_ops                # Tooling, rituals, scaling product orgs
+
+compliance:
+  - data_privacy_by_design
+  - user_consent_explicit
+  - feature_flag_audit
+  - experimentation_ethics
+
+skills_count: 15
+
+pricing_tiers:
+  solo:
+    price_brl_month: 297
+    target: "PM solo / founder produto"
+    skills_included: 8
+    features: ["discovery", "prd_writing", "prioritization", "roadmap_planning",
+               "user_research_basic", "analytics_basic", "single_product"]
+  team:
+    price_brl_month: 997
+    target: "Product team / startup série A+"
+    skills_included: 15
+    features: ["all_solo", "feature_flags", "beta_program", "growth_product",
+               "retention_engineering", "pricing_strategy", "multi_product"]
+  enterprise:
+    price_brl_month_from: 4000
+    target: "Product org / scale-up"
+    skills_included: 15
+    features: ["all_team", "product_ops", "portfolio_management", "executive_dashboard",
+               "sla_4h_support", "dedicated_strategist"]
+
+agent:
+  director: orion-director
+  workers: 15
+  reports_to: dario-ceo
+  language: en-pt-pt-br

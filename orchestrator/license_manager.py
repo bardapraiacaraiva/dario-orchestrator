@@ -250,6 +250,135 @@ TIERS = {
             "dpa_anthropic": True, "sla_4h_support": True,
         },
     },
+    # =========================================================================
+    # ORION tiers (v11.4.0+) — Product Excellence
+    # =========================================================================
+    "orion_solo": {"name": "ORION Solo (PM solo / founder produto)",
+        "price_brl_month": 297, "duration_days": None, "max_parallel": 1,
+        "engines_allowed": ["product_core"], "orion_skills_count": 8,
+        "features": {"orion_agent": True, "prd_writing": True, "prioritization_basic": True,
+            "discovery_lite": True, "single_product": True, "support_email": True}},
+    "orion_team": {"name": "ORION Team (Product team / startup)",
+        "price_brl_month": 997, "duration_days": None, "max_parallel": 3,
+        "engines_allowed": "all", "orion_skills_count": 15,
+        "features": {"orion_agent": True, "all_skills": True, "feature_flags_integration": True,
+            "beta_program_mgmt": True, "growth_loops": True, "retention_playbooks": True,
+            "pricing_strategy": True, "multi_product": True, "support_chat": True}},
+    "orion_enterprise": {"name": "ORION Enterprise (Product org)",
+        "price_brl_month_from": 4000, "duration_days": None, "max_parallel": 5,
+        "engines_allowed": "all", "orion_skills_count": 15,
+        "features": {"orion_agent": True, "all_skills": True, "product_ops": True,
+            "portfolio_management": True, "executive_dashboard": True,
+            "dedicated_strategist": True, "sla_4h_support": True, "dpa_anthropic": True}},
+    # =========================================================================
+    # OBSIDIAN-CORP tiers (v11.4.0+) — Knowledge Graph & Second Brain
+    # =========================================================================
+    "obsidian_solo": {"name": "OBSIDIAN-CORP Solo (Knowledge worker individual)",
+        "price_brl_month": 297, "duration_days": None, "max_parallel": 1,
+        "engines_allowed": ["knowledge_core"], "obsidian_skills_count": 8,
+        "features": {"obsidian_agent": True, "second_brain_setup": True, "PARA_method": True,
+            "atomic_notes": True, "single_vault": True, "support_email": True}},
+    "obsidian_team": {"name": "OBSIDIAN-CORP Team (Knowledge team)",
+        "price_brl_month": 997, "duration_days": None, "max_parallel": 3,
+        "engines_allowed": "all", "obsidian_skills_count": 15,
+        "features": {"obsidian_agent": True, "all_skills": True, "knowledge_graph": True,
+            "rag_corpus_mgmt": True, "semantic_search": True, "embedding_models": True,
+            "multi_vault_sync": True, "ontology_design": True, "support_chat": True}},
+    "obsidian_enterprise": {"name": "OBSIDIAN-CORP Enterprise (Knowledge org)",
+        "price_brl_month_from": 4000, "duration_days": None, "max_parallel": 5,
+        "engines_allowed": "all", "obsidian_skills_count": 15,
+        "features": {"obsidian_agent": True, "all_skills": True, "enterprise_search": True,
+            "knowledge_graph_federation": True, "compliance_audit": True,
+            "sla_4h_support": True, "dpa_anthropic": True}},
+    # =========================================================================
+    # MEDIK tiers (v11.4.0+) — Healthcare BR (LGPD-saúde, ANS, ANVISA, CFM)
+    # =========================================================================
+    "medik_solo": {"name": "MEDIK Solo (Médico/dentista solo)",
+        "price_brl_month": 497, "duration_days": None, "max_parallel": 1,
+        "engines_allowed": ["healthcare_core"], "medik_skills_count": 8,
+        "features": {"medik_agent": True, "lgpd_healthcare_marker": True,
+            "cfm_205_gate": True, "tuss_codes": True, "single_clinic": True,
+            "support_email": True}},
+    "medik_team": {"name": "MEDIK Team (Clínica / corpo clínico)",
+        "price_brl_month": 1497, "duration_days": None, "max_parallel": 3,
+        "engines_allowed": "all", "medik_skills_count": 15,
+        "features": {"medik_agent": True, "all_skills": True, "ans_compliance": True,
+            "anvisa_regulatory": True, "telemedicine_protocols": True,
+            "emr_integration": True, "clinical_protocols": True, "multi_clinic": True,
+            "support_chat": True}},
+    "medik_enterprise": {"name": "MEDIK Enterprise (Hospital/Operadora)",
+        "price_brl_month_from": 6000, "duration_days": None, "max_parallel": 5,
+        "engines_allowed": "all", "medik_skills_count": 15,
+        "features": {"medik_agent": True, "all_skills": True, "hospital_management": True,
+            "claim_management": True, "rcm_revenue_cycle": True,
+            "audit_compliance_full": True, "dpo_dedicated": True,
+            "sla_4h_support": True, "dpa_anthropic": True}},
+    # =========================================================================
+    # CAMPUS tiers (v11.4.0+) — Education BR (MEC, LDB, BNCC, EAD)
+    # =========================================================================
+    "campus_solo": {"name": "CAMPUS Solo (Educador / curso solo)",
+        "price_brl_month": 297, "duration_days": None, "max_parallel": 1,
+        "engines_allowed": ["education_core"], "campus_skills_count": 8,
+        "features": {"campus_agent": True, "instructional_design": True,
+            "assessment_basic": True, "single_course": True, "support_email": True}},
+    "campus_team": {"name": "CAMPUS Team (EAD provider)",
+        "price_brl_month": 1497, "duration_days": None, "max_parallel": 3,
+        "engines_allowed": "all", "campus_skills_count": 15,
+        "features": {"campus_agent": True, "all_skills": True, "lms_architecture": True,
+            "mec_compliance": True, "bncc_alignment": True, "enade_prep": True,
+            "gamification": True, "multi_course": True, "support_chat": True}},
+    "campus_enterprise": {"name": "CAMPUS Enterprise (Universidade/Sistema EAD)",
+        "price_brl_month_from": 5000, "duration_days": None, "max_parallel": 5,
+        "engines_allowed": "all", "campus_skills_count": 15,
+        "features": {"campus_agent": True, "all_skills": True, "ead_credenciamento": True,
+            "education_analytics_full": True, "certification_engine": True,
+            "sla_4h_support": True, "dpa_anthropic": True}},
+    # =========================================================================
+    # AEGIS tiers (v11.4.0+) — Cybersecurity
+    # =========================================================================
+    "aegis_solo": {"name": "AEGIS Solo (Solo CISO / pentest professional)",
+        "price_brl_month": 1497, "duration_days": None, "max_parallel": 1,
+        "engines_allowed": ["security_core"], "aegis_skills_count": 10,
+        "features": {"aegis_agent": True, "threat_modeling": True,
+            "pentest_methodology": True, "vuln_scan_basic": True,
+            "iam_basic": True, "secure_sdlc_lite": True,
+            "single_org": True, "support_email": True}},
+    "aegis_team": {"name": "AEGIS Team (Security team / SOC / Compliance officers)",
+        "price_brl_month": 2997, "duration_days": None, "max_parallel": 3,
+        "engines_allowed": "all", "aegis_skills_count": 18,
+        "features": {"aegis_agent": True, "all_18_skills": True, "soc_operations": True,
+            "siem_integration": True, "edr_xdr_management": True, "iam_zero_trust": True,
+            "incident_response_full": True, "iso27001_soc2_prep": True,
+            "third_party_risk": True, "supply_chain_slsa": True,
+            "breach_simulation_bas": True, "support_chat": True}},
+    "aegis_enterprise": {"name": "AEGIS Enterprise (Fortune 500 CISO org / SOC 24×7)",
+        "price_brl_month_from": 4997, "duration_days": None, "max_parallel": 5,
+        "engines_allowed": "all", "aegis_skills_count": 18,
+        "features": {"aegis_agent": True, "all_18_skills": True, "forensics_advanced": True,
+            "threat_intel": True, "purple_team_continuous": True, "compliance_full": True,
+            "tprm_continuous": True, "sbom_attestation_l4": True,
+            "bas_continuous_validation": True, "incident_24x7": True,
+            "sla_2h_support": True, "dpa_anthropic": True}},
+    # =========================================================================
+    # ZENITH tiers (v11.4.0+) — Executive Decision Support
+    # =========================================================================
+    "zenith_solo": {"name": "ZENITH Solo (Founder / solo executive)",
+        "price_brl_month": 997, "duration_days": None, "max_parallel": 1,
+        "engines_allowed": ["executive_core"], "zenith_skills_count": 8,
+        "features": {"zenith_agent": True, "okr_design": True, "scenario_planning_basic": True,
+            "executive_brief": True, "single_org": True, "support_email": True}},
+    "zenith_team": {"name": "ZENITH Team (C-level / management team)",
+        "price_brl_month": 2997, "duration_days": None, "max_parallel": 3,
+        "engines_allowed": "all", "zenith_skills_count": 15,
+        "features": {"zenith_agent": True, "all_skills": True, "strategic_planning": True,
+            "board_pack_gen": True, "ma_evaluation": True, "war_gaming": True,
+            "monte_carlo": True, "competitive_intel": True, "support_chat": True}},
+    "zenith_enterprise": {"name": "ZENITH Enterprise (Board / PE / Holding)",
+        "price_brl_month_from": 12000, "duration_days": None, "max_parallel": 5,
+        "engines_allowed": "all", "zenith_skills_count": 15,
+        "features": {"zenith_agent": True, "all_skills": True, "portfolio_decision": True,
+            "capital_allocation": True, "succession_planning": True,
+            "dedicated_strategist": True, "sla_4h_support": True, "dpa_anthropic": True}},
 }
 
 
@@ -266,6 +395,18 @@ TIER_SUFFIXES = {
     "lex_solo": "LXS", "lex_office": "LXO", "lex_enterprise": "LXE",
     # DEMETER tiers (v11.3.0+)
     "demeter_solo": "DMS", "demeter_team": "DMT", "demeter_enterprise": "DME",
+    # ORION tiers (v11.4.0+) — Product Excellence
+    "orion_solo": "ORS", "orion_team": "ORT", "orion_enterprise": "ORE",
+    # OBSIDIAN-CORP tiers (v11.4.0+) — Knowledge Graph
+    "obsidian_solo": "OBS", "obsidian_team": "OBT", "obsidian_enterprise": "OBE",
+    # MEDIK tiers (v11.4.0+) — Healthcare BR
+    "medik_solo": "MDS", "medik_team": "MDT", "medik_enterprise": "MDE",
+    # CAMPUS tiers (v11.4.0+) — Education BR
+    "campus_solo": "CPS", "campus_team": "CPT", "campus_enterprise": "CPE",
+    # AEGIS tiers (v11.4.0+) — Cybersecurity
+    "aegis_solo": "AGS", "aegis_team": "AGT", "aegis_enterprise": "AGE",
+    # ZENITH tiers (v11.4.0+) — Executive Decision Support
+    "zenith_solo": "ZNS", "zenith_team": "ZNT", "zenith_enterprise": "ZNE",
 }
 TIER_MAP = {v: k for k, v in TIER_SUFFIXES.items()}
 
@@ -674,7 +815,13 @@ def main():
         tier, email = args.generate_key
         valid_tiers = ("starter", "pro", "enterprise",
                        "lex_solo", "lex_office", "lex_enterprise",
-                       "demeter_solo", "demeter_team", "demeter_enterprise")
+                       "demeter_solo", "demeter_team", "demeter_enterprise",
+                       "orion_solo", "orion_team", "orion_enterprise",
+                       "obsidian_solo", "obsidian_team", "obsidian_enterprise",
+                       "medik_solo", "medik_team", "medik_enterprise",
+                       "campus_solo", "campus_team", "campus_enterprise",
+                       "aegis_solo", "aegis_team", "aegis_enterprise",
+                       "zenith_solo", "zenith_team", "zenith_enterprise")
         if tier not in valid_tiers:
             print(f"Tier must be one of: {', '.join(valid_tiers)}")
             return 1
