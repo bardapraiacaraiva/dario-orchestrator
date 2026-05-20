@@ -1,0 +1,59 @@
+identity:
+  name: "NOMOS"
+  full: "National Oversight, Markets, Operations, Sectors (PT Regulatory Compliance Squad)"
+  version: "1.0.0"
+  jurisdiction: "Portugal + EU"
+  parent: "dario-ceo"
+  squad_number: 25
+
+description: |
+  Squad de Compliance Regulatório Portugal-specific + EU-aware. Cobre CMVM,
+  Banco de Portugal, ASAE, ACSS, CNPD, IGAC, ANAC, AdC + EU AI Act, DORA,
+  MiFID II, PSD2. Para Compliance Officers PT, fintechs PT, regulated industries.
+
+coverage:
+  - cmvm_compliance              # CMVM mercado capitais PT
+  - bdp_banking_pt               # Banco de Portugal prudencial
+  - asae_food_safety             # ASAE segurança alimentar PT
+  - acss_healthcare_pt           # ACSS SNS, convenções
+  - rgpd_pt_marker               # RGPD + Lei 58/2019 + CNPD orientações
+  - igac_events_pt               # IGAC direitos autor PT
+  - anac_aviation_pt             # ANAC drones, aviation
+  - concorrencia_pt              # Autoridade da Concorrência PT
+  - eu_ai_act_pt                 # EU AI Act transposição PT
+  - dora_resilience              # DORA Digital Operational Resilience
+  - mifid_ii_pt                  # MiFID II investment services PT
+  - psd2_open_banking_pt         # PSD2 + SCA + Open Banking PT
+  - anti_fraude_pt               # Lei 35/2010 + Lei 5/2002 BC
+  - kyc_aml_pt                   # UIF Portugal, KYC/AML
+  - dl_79_2024_digital           # DL 79/2024 digital transition PT
+
+compliance:
+  - cmvm_disclosure_gate
+  - bdp_regulatory_reporting_gate
+  - ai_act_risk_classification
+  - dora_testing_schedule
+  - cnpd_consultation_marker
+  - audit_immutable
+
+skills_count: 15
+
+pricing_tiers:
+  solo:
+    price_brl_month: 997
+    target: "Compliance officer interno, advogado solo PT"
+    skills_included: 8
+  team:
+    price_brl_month: 2997
+    target: "Departments compliance, mid-market PT"
+    skills_included: 15
+  enterprise:
+    price_brl_month_from: 9997
+    target: "Bancos PT, seguradoras, fintechs grandes"
+    skills_included: 15
+
+agent:
+  director: nomos-director
+  workers: 15
+  reports_to: dario-ceo
+  language: pt-pt

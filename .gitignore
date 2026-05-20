@@ -110,3 +110,9 @@ orchestrator/dev.flag
 !orchestrator/aegis/**
 !orchestrator/zenith/
 !orchestrator/zenith/**
+
+# v11.5 — GAIA + NOMOS squads
+!orchestrator/gaia/
+!orchestrator/gaia/**
+!orchestrator/nomos/
+!orchestrator/nomos/**

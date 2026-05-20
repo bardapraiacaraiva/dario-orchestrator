@@ -1,0 +1,57 @@
+identity:
+  name: "GAIA"
+  full: "Global Accountability for Impact & Adaptation (Sustainability & ESG Squad)"
+  version: "1.0.0"
+  parent: "dario-ceo"
+  squad_number: 24
+
+description: |
+  Squad de Sustainability & ESG Reporting. Automatiza CSRD/ESRS, TCFD,
+  GRI, SASB, GHG Protocol, B-Corp, SBTi. Para Chief Sustainability Officers,
+  ESG managers, IR, listed companies B3/Euronext, Big4 consultants.
+
+coverage:
+  - carbon_accounting           # GHG Protocol Scope 1+2+3
+  - csrd_reporting              # ESRS E1-E5, S1-S4, G1
+  - esg_rating                  # MSCI/Sustainalytics/CDP optimization
+  - sustainability_strategy     # Materiality assessment, roadmap
+  - supply_chain_esg            # Supplier ESG, Scope 3, modern slavery
+  - social_impact               # SROI, Theory of Change, B-Corp
+  - governance_frameworks       # Board ESG, executive comp alignment
+  - sbti_targets                # Science-Based Targets, 1.5°C pathway
+  - climate_risk_tcfd           # TCFD physical/transition risk
+  - ungc_reporting              # UN Global Compact CoP
+  - sasb_standards              # Industry-specific (77 SICS sectors)
+  - gri_reporting               # GRI Universal + Sector standards
+  - b_corp_certification        # B Impact Assessment
+  - esg_due_diligence           # M&A ESG diligence
+  - transition_planning         # Net-zero, decarbonization, CapEx
+
+compliance:
+  - csrd_disclosure_gate         # ESRS mandatory disclosures verified
+  - tcfd_assurance_ready
+  - audit_immutable
+  - ghg_protocol_verification
+  - cdp_disclosure_ready
+
+skills_count: 15
+
+pricing_tiers:
+  solo:
+    price_brl_month: 1497
+    target: "ESG consultant freelance"
+    skills_included: 8
+  team:
+    price_brl_month: 3997
+    target: "Consultorias mid-size, family offices, mid-cap BR"
+    skills_included: 15
+  enterprise:
+    price_brl_month_from: 12997
+    target: "Listed companies B3/Euronext, F500"
+    skills_included: 15
+
+agent:
+  director: gaia-director
+  workers: 15
+  reports_to: dario-ceo
+  language: en-pt-pt-br

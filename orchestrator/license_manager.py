@@ -379,6 +379,54 @@ TIERS = {
         "features": {"zenith_agent": True, "all_skills": True, "portfolio_decision": True,
             "capital_allocation": True, "succession_planning": True,
             "dedicated_strategist": True, "sla_4h_support": True, "dpa_anthropic": True}},
+    # =========================================================================
+    # GAIA tiers (v11.5.0+) — Sustainability & ESG
+    # =========================================================================
+    "gaia_solo": {"name": "GAIA Solo (ESG consultant freelance)",
+        "price_brl_month": 1497, "duration_days": None, "max_parallel": 1,
+        "engines_allowed": ["esg_core"], "gaia_skills_count": 8,
+        "features": {"gaia_agent": True, "carbon_accounting": True,
+            "csrd_basic": True, "esg_rating_lite": True,
+            "single_org": True, "support_email": True}},
+    "gaia_team": {"name": "GAIA Team (Consultorias mid-size, family offices)",
+        "price_brl_month": 3997, "duration_days": None, "max_parallel": 3,
+        "engines_allowed": "all", "gaia_skills_count": 15,
+        "features": {"gaia_agent": True, "all_15_skills": True,
+            "csrd_full_esrs": True, "tcfd_scenario_analysis": True,
+            "sbti_validation": True, "b_corp_prep": True,
+            "esg_due_diligence": True, "transition_planning": True,
+            "support_chat": True}},
+    "gaia_enterprise": {"name": "GAIA Enterprise (Listed companies B3/Euronext, F500)",
+        "price_brl_month_from": 12997, "duration_days": None, "max_parallel": 5,
+        "engines_allowed": "all", "gaia_skills_count": 15,
+        "features": {"gaia_agent": True, "all_15_skills": True,
+            "csrd_reasonable_assurance": True, "double_materiality_advanced": True,
+            "audit_trail_assurance_ready": True, "multi_jurisdiction_reporting": True,
+            "dedicated_sustainability_lead": True, "sla_4h_support": True,
+            "dpa_anthropic": True}},
+    # =========================================================================
+    # NOMOS tiers (v11.5.0+) — Compliance Regulatório PT
+    # =========================================================================
+    "nomos_solo": {"name": "NOMOS Solo (Compliance officer, advogado PT)",
+        "price_brl_month": 997, "duration_days": None, "max_parallel": 1,
+        "engines_allowed": ["regulatory_core"], "nomos_skills_count": 8,
+        "features": {"nomos_agent": True, "rgpd_pt_marker": True,
+            "ai_act_classification": True, "kyc_aml_basic": True,
+            "single_org": True, "support_email": True}},
+    "nomos_team": {"name": "NOMOS Team (Departments compliance, mid-market PT)",
+        "price_brl_month": 2997, "duration_days": None, "max_parallel": 3,
+        "engines_allowed": "all", "nomos_skills_count": 15,
+        "features": {"nomos_agent": True, "all_15_skills": True,
+            "cmvm_disclosure": True, "bdp_reporting": True,
+            "dora_full_compliance": True, "mifid_ii_suitability": True,
+            "psd2_open_banking": True, "support_chat": True}},
+    "nomos_enterprise": {"name": "NOMOS Enterprise (Bancos PT, seguradoras, fintechs)",
+        "price_brl_month_from": 9997, "duration_days": None, "max_parallel": 5,
+        "engines_allowed": "all", "nomos_skills_count": 15,
+        "features": {"nomos_agent": True, "all_15_skills": True,
+            "regulator_simulator": True, "audit_trail_immutable": True,
+            "multi_regulator_coordination": True, "dedicated_compliance_advisor": True,
+            "sla_2h_support": True, "dpa_anthropic": True}},
 }
 
 
@@ -407,6 +455,10 @@ TIER_SUFFIXES = {
     "aegis_solo": "AGS", "aegis_team": "AGT", "aegis_enterprise": "AGE",
     # ZENITH tiers (v11.4.0+) — Executive Decision Support
     "zenith_solo": "ZNS", "zenith_team": "ZNT", "zenith_enterprise": "ZNE",
+    # GAIA tiers (v11.5.0+) — Sustainability & ESG
+    "gaia_solo": "GAS", "gaia_team": "GAT", "gaia_enterprise": "GAE",
+    # NOMOS tiers (v11.5.0+) — Compliance PT
+    "nomos_solo": "NMS", "nomos_team": "NMT", "nomos_enterprise": "NME",
 }
 TIER_MAP = {v: k for k, v in TIER_SUFFIXES.items()}
 
@@ -821,7 +873,9 @@ def main():
                        "medik_solo", "medik_team", "medik_enterprise",
                        "campus_solo", "campus_team", "campus_enterprise",
                        "aegis_solo", "aegis_team", "aegis_enterprise",
-                       "zenith_solo", "zenith_team", "zenith_enterprise")
+                       "zenith_solo", "zenith_team", "zenith_enterprise",
+                       "gaia_solo", "gaia_team", "gaia_enterprise",
+                       "nomos_solo", "nomos_team", "nomos_enterprise")
         if tier not in valid_tiers:
             print(f"Tier must be one of: {', '.join(valid_tiers)}")
             return 1
