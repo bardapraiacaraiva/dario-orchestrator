@@ -3526,3 +3526,93 @@ squads_zenith:
   ceo_strategic_office: {workers: [worker-zenith-strat, worker-zenith-okr, worker-zenith-scenario, worker-zenith-opt, worker-zenith-dash]}
   ma_diligence: {workers: [worker-zenith-ma, worker-zenith-mc, worker-zenith-sens, worker-zenith-risk, worker-zenith-cap]}
   board_governance: {workers: [worker-zenith-board, worker-zenith-decint, worker-zenith-ci, worker-zenith-wargame, worker-zenith-succ]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# GAIA — Sustainability & ESG Squad (v1.0.0, 2026-05-20)
+# 15 skills CSRD/TCFD/GRI/SASB/SBTi/B-Corp. Premium compliance squad.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_sustainability:
+  gaia_director:
+    id: gaia-director
+    name: GAIA
+    title: Sustainability & ESG Squad Lead
+    type: domain_specialist
+    adapter: gaia-agent
+    parent: dario-ceo
+    capabilities: [carbon_accounting, csrd_reporting, esg_rating,
+      sustainability_strategy, supply_chain_esg, social_impact,
+      governance_frameworks, sbti_targets, climate_risk_tcfd,
+      ungc_reporting, sasb_standards, gri_reporting, b_corp_certification,
+      esg_due_diligence, transition_planning]
+    compliance_required: [csrd_disclosure_gate, tcfd_assurance_ready,
+      audit_immutable, ghg_protocol_verification, cdp_disclosure_ready]
+
+workers_gaia:
+  worker-gaia-carbon: {id: worker-gaia-carbon, skill: gaia-carbon-accounting, reports_to: gaia-director}
+  worker-gaia-csrd: {id: worker-gaia-csrd, skill: gaia-csrd-reporting, reports_to: gaia-director}
+  worker-gaia-rating: {id: worker-gaia-rating, skill: gaia-esg-rating, reports_to: gaia-director}
+  worker-gaia-strategy: {id: worker-gaia-strategy, skill: gaia-sustainability-strategy, reports_to: gaia-director}
+  worker-gaia-supply: {id: worker-gaia-supply, skill: gaia-supply-chain-esg, reports_to: gaia-director}
+  worker-gaia-social: {id: worker-gaia-social, skill: gaia-social-impact, reports_to: gaia-director}
+  worker-gaia-gov: {id: worker-gaia-gov, skill: gaia-governance-frameworks, reports_to: gaia-director}
+  worker-gaia-sbti: {id: worker-gaia-sbti, skill: gaia-sbti-targets, reports_to: gaia-director}
+  worker-gaia-tcfd: {id: worker-gaia-tcfd, skill: gaia-climate-risk-tcfd, reports_to: gaia-director}
+  worker-gaia-ungc: {id: worker-gaia-ungc, skill: gaia-ungc-reporting, reports_to: gaia-director}
+  worker-gaia-sasb: {id: worker-gaia-sasb, skill: gaia-sasb-standards, reports_to: gaia-director}
+  worker-gaia-gri: {id: worker-gaia-gri, skill: gaia-gri-reporting, reports_to: gaia-director}
+  worker-gaia-bcorp: {id: worker-gaia-bcorp, skill: gaia-b-corp-certification, reports_to: gaia-director}
+  worker-gaia-dd: {id: worker-gaia-dd, skill: gaia-esg-due-diligence, reports_to: gaia-director}
+  worker-gaia-transition: {id: worker-gaia-transition, skill: gaia-transition-planning, reports_to: gaia-director}
+
+squads_gaia:
+  csrd_compliance: {workers: [worker-gaia-csrd, worker-gaia-tcfd, worker-gaia-sasb, worker-gaia-gri]}
+  carbon_decarbonization: {workers: [worker-gaia-carbon, worker-gaia-sbti, worker-gaia-transition, worker-gaia-supply]}
+  esg_strategy_ratings: {workers: [worker-gaia-strategy, worker-gaia-rating, worker-gaia-gov, worker-gaia-ungc]}
+  ma_certification: {workers: [worker-gaia-dd, worker-gaia-bcorp, worker-gaia-social]}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# NOMOS — Compliance Regulatório PT Squad (v1.0.0, 2026-05-20)
+# 15 skills CMVM/BdP/CNPD/ASAE/ACSS + EU AI Act + DORA + MiFID II + PSD2.
+# ═══════════════════════════════════════════════════════════════════════════
+
+agents_regulatory_pt:
+  nomos_director:
+    id: nomos-director
+    name: NOMOS
+    title: Compliance Regulatório PT Squad Lead
+    type: domain_specialist
+    adapter: nomos-agent
+    parent: dario-ceo
+    jurisdiction: Portugal + EU
+    capabilities: [cmvm_compliance, bdp_banking_pt, asae_food_safety,
+      acss_healthcare_pt, rgpd_pt_marker, igac_events_pt, anac_aviation_pt,
+      concorrencia_pt, eu_ai_act_pt, dora_resilience, mifid_ii_pt,
+      psd2_open_banking_pt, anti_fraude_pt, kyc_aml_pt, dl_79_2024_digital]
+    compliance_required: [cmvm_disclosure_gate, bdp_regulatory_reporting_gate,
+      ai_act_risk_classification, dora_testing_schedule,
+      cnpd_consultation_marker, audit_immutable]
+
+workers_nomos:
+  worker-nomos-cmvm: {id: worker-nomos-cmvm, skill: nomos-cmvm-compliance, reports_to: nomos-director}
+  worker-nomos-bdp: {id: worker-nomos-bdp, skill: nomos-bdp-banking-pt, reports_to: nomos-director}
+  worker-nomos-asae: {id: worker-nomos-asae, skill: nomos-asae-food-safety, reports_to: nomos-director}
+  worker-nomos-acss: {id: worker-nomos-acss, skill: nomos-acss-healthcare-pt, reports_to: nomos-director}
+  worker-nomos-rgpd: {id: worker-nomos-rgpd, skill: nomos-rgpd-pt-marker, reports_to: nomos-director}
+  worker-nomos-igac: {id: worker-nomos-igac, skill: nomos-igac-events-pt, reports_to: nomos-director}
+  worker-nomos-anac: {id: worker-nomos-anac, skill: nomos-anac-aviation-pt, reports_to: nomos-director}
+  worker-nomos-adc: {id: worker-nomos-adc, skill: nomos-concorrencia-pt, reports_to: nomos-director}
+  worker-nomos-ai-act: {id: worker-nomos-ai-act, skill: nomos-eu-ai-act-pt, reports_to: nomos-director}
+  worker-nomos-dora: {id: worker-nomos-dora, skill: nomos-dora-resilience, reports_to: nomos-director}
+  worker-nomos-mifid: {id: worker-nomos-mifid, skill: nomos-mifid-ii-pt, reports_to: nomos-director}
+  worker-nomos-psd2: {id: worker-nomos-psd2, skill: nomos-psd2-open-banking-pt, reports_to: nomos-director}
+  worker-nomos-fraude: {id: worker-nomos-fraude, skill: nomos-anti-fraude-pt, reports_to: nomos-director}
+  worker-nomos-aml: {id: worker-nomos-aml, skill: nomos-kyc-aml-pt, reports_to: nomos-director}
+  worker-nomos-digital: {id: worker-nomos-digital, skill: nomos-dl-79-2024-digital, reports_to: nomos-director}
+
+squads_nomos:
+  banking_finance_pt: {workers: [worker-nomos-bdp, worker-nomos-mifid, worker-nomos-psd2, worker-nomos-dora]}
+  capital_markets_pt: {workers: [worker-nomos-cmvm, worker-nomos-adc, worker-nomos-mifid]}
+  ai_data_compliance: {workers: [worker-nomos-ai-act, worker-nomos-rgpd, worker-nomos-dora]}
+  aml_fraud_pt: {workers: [worker-nomos-aml, worker-nomos-fraude, worker-nomos-bdp]}
+  sector_compliance_pt: {workers: [worker-nomos-asae, worker-nomos-acss, worker-nomos-igac, worker-nomos-anac, worker-nomos-digital]}
