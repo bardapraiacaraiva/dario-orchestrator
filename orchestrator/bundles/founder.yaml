@@ -1,0 +1,105 @@
+# DARIO Founder Bundle
+# Cross-squad pack para founders pre-PMF e early-stage
+# Version: 1.0
+# Created: 2026-05-20
+
+bundle:
+  id: founder
+  name: "Founder Bundle — Pre-PMF to Early Stage"
+  description: |
+    Pacote completo para founders levarem uma ideia validada até primeira tração.
+    Combina A360 (battle-tested em SAQUEI, Cuidaí, Atrium), Brand Squad (positioning),
+    Copy Squad (sales letter + emails), e Cognitive Layer (memory + dreaming).
+
+  target_user:
+    - solo founder ou 2-founder bootstrappable
+    - pre-PMF ou recém-PMF
+    - capital R$ 30-200K
+    - horizon 0-12 meses ao lançamento
+
+  pricing:
+    tier_1_starter: { price_brl: 297, includes: ["a360_pre_pmf", "brand_starter"] }
+    tier_2_pro: { price_brl: 997, includes: ["a360_pre_pmf", "a360_offer_pack", "brand_pro", "copy_starter"] }
+    tier_3_full: { price_brl: 2997, includes: ["a360_full_lifecycle", "brand_pro", "copy_full", "1on1_support"] }
+
+  squads_included:
+    a360:
+      role: "primary — business architecture"
+      skills: [a360-director, a360-nicho, a360-avatar, a360-validacao, a360-modelo,
+               a360-oferta, a360-funil, a360-lancamento, a360-pitch,
+               a360-metricas, a360-growth, a360-scale, a360-case-study]
+      chains: [a360_pre_pmf, a360_offer_pack, a360_launch_pack, a360_growth_pack, a360_full_lifecycle]
+
+    brand:
+      role: "supporting — positioning + identity"
+      skills: [dario-brand, dario-naming]
+
+    copy:
+      role: "supporting — conversion writing"
+      skills: [dario-sales-letter, dario-email-seq, dario-content]
+
+    cognitive:
+      role: "infrastructure — learning loop"
+      skills: [dario-orchestrator, dream]
+      auto: true  # always enabled, no user toggle
+
+  preferred_sequence:
+    description: "Recommended order when user buys tier_3_full"
+    steps:
+      - phase: "1. Discovery (1-2 weeks)"
+        chain: a360_pre_pmf
+        skills_used: [a360-nicho, a360-avatar, a360-validacao, a360-modelo]
+        outcome: "Go/No-Go decision with smoke test result"
+
+      - phase: "2. Brand foundation (3 days)"
+        skills_used: [dario-brand, dario-naming]
+        outcome: "Positioning, archetype, name, domain"
+
+      - phase: "3. Offer construction (1 week)"
+        chain: a360_offer_pack
+        skills_used: [a360-oferta, a360-funil]
+        outcome: "Grand Slam Offer + Funnel architecture"
+
+      - phase: "4. Conversion layer (1 week)"
+        skills_used: [dario-sales-letter, dario-email-seq]
+        outcome: "Sales page + 7-email indoctrination sequence"
+
+      - phase: "5. Launch (4 weeks)"
+        chain: a360_launch_pack
+        skills_used: [a360-lancamento, a360-pitch, a360-metricas]
+        outcome: "PLF sequence + pitch deck + dashboard"
+
+      - phase: "6. Growth + Retention (ongoing)"
+        chain: a360_growth_pack
+        skills_used: [a360-metricas, a360-growth, a360-case-study]
+        outcome: "Growth engine + first case study"
+
+  battle_tested_on:
+    - client: SAQUEI
+      project: credito
+      result: "score 90-93 across nicho, modelo, validacao. Bootstrappable confirmed."
+      semantic_memory: [SEM-a360_nicho_credito_excellence, SEM-a360_modelo_credito_excellence, SEM-a360_validacao_credito_excellence]
+
+    - client: Cuidaí
+      project: cuidai
+      result: "score 99 on nicho (v1.1 after self-correction loop). Defensible BR combo identified."
+      semantic_memory: [SEM-a360_nicho_cuidai_excellence]
+
+    - client: Atrium Premium RE
+      project: atrium_premium
+      result: "A360 framework implemented, score 182.5/200 system-wide. Blocked by founder decisions, not framework."
+
+  cross_sell_triggers:
+    - if_user_completes: a360_pre_pmf
+      offer: "Brand Foundation pack (R$ 597) ou Tier 2 upgrade"
+
+    - if_user_completes: a360_launch_pack
+      offer: "Growth Engine pack (R$ 797) ou full 1-on-1 advisory"
+
+    - if_score_above_90_on_validation:
+      offer: "Direct intro to investor network (R$ 4997 success fee)"
+
+  enforcement:
+    - "Bundle invocation only via /founder-bundle command or explicit upgrade flow"
+    - "Skills A360 individually still available a la carte"
+    - "Cognitive layer (orchestrator + dream) always-on regardless of tier"

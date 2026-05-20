@@ -1,0 +1,206 @@
+# PROMETHEUS Deprecations Knowledge Base
+# Maintained by user + auto-suggestions from paper-tracker / regulatory-watch
+# Format: each term has severity, deprecated_since, replacement, source
+# Search is case-insensitive substring match
+
+last_updated: '2026-05-20'
+schema_version: '1.0'
+
+terms:
+  # Tools / Services
+  - term: 'Google Optimize'
+    severity: high
+    deprecated_since: '2023-09-30'
+    replacement: 'VWO, Optimizely, PostHog, GrowthBook'
+    source: 'Google official sunset announcement'
+    category: tooling
+
+  - term: 'Universal Analytics'
+    severity: high
+    deprecated_since: '2023-07-01'
+    replacement: 'GA4'
+    source: 'Google official sunset'
+    category: analytics
+
+  - term: 'Google Analytics 3'
+    severity: high
+    deprecated_since: '2023-07-01'
+    replacement: 'GA4'
+    source: 'Google official sunset'
+    category: analytics
+
+  - term: 'Heroku free tier'
+    severity: medium
+    deprecated_since: '2022-11-28'
+    replacement: 'Render, Railway, Fly.io, Vercel'
+    source: 'Salesforce sunset'
+    category: hosting
+
+  - term: 'Adobe Flash'
+    severity: critical
+    deprecated_since: '2020-12-31'
+    replacement: 'HTML5'
+    source: 'Adobe end-of-life'
+    category: runtime
+
+  - term: 'Internet Explorer 11'
+    severity: critical
+    deprecated_since: '2022-06-15'
+    replacement: 'Edge, Chrome, Firefox'
+    source: 'Microsoft sunset'
+    category: browser
+
+  - term: 'Carrd or Framer for landing (speed)'
+    severity: low
+    deprecated_since: null
+    replacement: null
+    source: null
+    category: tooling
+    note: 'context check — this is a deliberate template recommendation, not deprecated'
+
+  # ESLint legacy config
+  - term: '.eslintrc'
+    severity: medium
+    deprecated_since: '2024-09'
+    replacement: 'eslint.config.js (flat config)'
+    source: 'ESLint v9 release notes — legacy config removed in v10'
+    category: dev-tooling
+
+  # APIs
+  - term: 'Twitter API v1.1'
+    severity: critical
+    deprecated_since: '2023-06'
+    replacement: 'X API v2'
+    source: 'X/Twitter official'
+    category: api
+
+  - term: 'Facebook Graph API v16'
+    severity: high
+    deprecated_since: '2024-05'
+    replacement: 'Graph API v19+'
+    source: 'Meta dev docs'
+    category: api
+
+  - term: 'Facebook Graph API v15'
+    severity: critical
+    deprecated_since: '2023-11'
+    replacement: 'Graph API v19+'
+    source: 'Meta dev docs'
+    category: api
+
+  # Products
+  - term: 'CareZone'
+    severity: high
+    deprecated_since: '2021-05'
+    replacement: 'Lotsa Helping Hands, Famileo, CaringBridge'
+    source: 'Walmart discontinued the product 2021-05'
+    category: product
+
+  - term: 'LogMeIn (CareZone product)'
+    severity: high
+    deprecated_since: '2021-05'
+    replacement: 'See CareZone replacements'
+    source: 'Same as CareZone'
+    category: product
+
+  - term: 'Mailchimp free tier 2000'
+    severity: low
+    deprecated_since: '2022-05'
+    replacement: 'Mailchimp free tier reduced to 500 contacts (current)'
+    source: 'Mailchimp pricing page 2022 change'
+    category: pricing-fact
+
+  # AI / LLM
+  - term: 'GPT-3.5'
+    severity: medium
+    deprecated_since: '2025-07-25'
+    replacement: 'GPT-4o-mini, GPT-5, Claude Haiku 4.5'
+    source: 'OpenAI deprecation announcement'
+    category: llm
+
+  - term: 'Claude 3 Sonnet'
+    severity: medium
+    deprecated_since: '2025-10'
+    replacement: 'Claude Sonnet 4.x'
+    source: 'Anthropic model lifecycle'
+    category: llm
+
+  - term: 'Claude 3 Opus'
+    severity: medium
+    deprecated_since: '2025-10'
+    replacement: 'Claude Opus 4.x'
+    source: 'Anthropic model lifecycle'
+    category: llm
+
+  - term: 'GPT-4'
+    severity: low
+    deprecated_since: '2025-04'
+    replacement: 'GPT-5'
+    source: 'OpenAI lifecycle'
+    category: llm
+    note: 'still available but newer alternatives exist'
+
+  # Standards / Regulations (older versions)
+  - term: 'WCAG 2.0'
+    severity: medium
+    deprecated_since: '2018-06'
+    replacement: 'WCAG 2.1 or 2.2'
+    source: 'W3C'
+    category: standard
+
+  - term: 'OAuth 1.0'
+    severity: high
+    deprecated_since: '2012'
+    replacement: 'OAuth 2.0 (most), OAuth 2.1 (in progress)'
+    source: 'IETF'
+    category: standard
+
+  - term: 'TLS 1.0'
+    severity: critical
+    deprecated_since: '2020-03'
+    replacement: 'TLS 1.2 or 1.3'
+    source: 'PCI DSS + RFC 8996'
+    category: standard
+
+  - term: 'TLS 1.1'
+    severity: critical
+    deprecated_since: '2020-03'
+    replacement: 'TLS 1.2 or 1.3'
+    source: 'PCI DSS + RFC 8996'
+    category: standard
+
+  # Frameworks (older versions still in use)
+  - term: 'Next.js 12'
+    severity: high
+    deprecated_since: '2023-10'
+    replacement: 'Next.js 15+'
+    source: 'Vercel'
+    category: framework
+
+  - term: 'Next.js 13'
+    severity: medium
+    deprecated_since: '2024-10'
+    replacement: 'Next.js 15+'
+    source: 'Vercel'
+    category: framework
+
+  - term: 'React 17'
+    severity: medium
+    deprecated_since: '2024-12'
+    replacement: 'React 19+'
+    source: 'Meta React team'
+    category: framework
+
+  - term: 'Tailwind v2'
+    severity: high
+    deprecated_since: '2024-09'
+    replacement: 'Tailwind v4'
+    source: 'Tailwind Labs'
+    category: framework
+
+  - term: 'AngularJS'
+    severity: critical
+    deprecated_since: '2022-01-01'
+    replacement: 'Angular (v2+)'
+    source: 'Google sunset'
+    category: framework

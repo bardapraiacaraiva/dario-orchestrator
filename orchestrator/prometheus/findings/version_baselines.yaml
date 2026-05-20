@@ -1,0 +1,139 @@
+# PROMETHEUS Version Baselines
+# Latest stable versions known. Updated quando paper-tracker / repo-scanner detecta releases.
+# Used by prometheus-version-drift to flag skills referencing older versions.
+
+last_updated: '2026-05-20'
+schema_version: '1.0'
+
+frameworks:
+  next.js:
+    current: '15'
+    released: '2024-10'
+    major_drift_severity_per_step: high
+  react:
+    current: '19'
+    released: '2024-12'
+    major_drift_severity_per_step: high
+  tailwind:
+    current: '4'
+    released: '2024-09'
+    major_drift_severity_per_step: high
+  vue:
+    current: '3.5'
+    released: '2024-09'
+    major_drift_severity_per_step: high
+  svelte:
+    current: '5'
+    released: '2024-10'
+    major_drift_severity_per_step: high
+  nuxt:
+    current: '3'
+    released: '2022-11'
+    major_drift_severity_per_step: medium
+  angular:
+    current: '19'
+    released: '2024-11'
+    major_drift_severity_per_step: medium
+  remix:
+    current: '2.x'
+    released: '2023-10'
+    note: 'merging into React Router 7 — watch for migration'
+  nestjs:
+    current: '11'
+    released: '2025-01'
+    major_drift_severity_per_step: medium
+  fastapi:
+    current: '0.115+'
+    released: 'rolling'
+    major_drift_severity_per_step: low
+  django:
+    current: '5.x'
+    released: '2023-12'
+    major_drift_severity_per_step: medium
+
+llm_models:
+  anthropic:
+    current: 'claude-opus-4-7'
+    other_active: ['claude-sonnet-4-6', 'claude-haiku-4-5']
+    released: '2026-04-16'
+    deprecated_recent: ['claude-3-opus', 'claude-3-sonnet']
+  openai:
+    current: 'gpt-5'
+    released: '2026-04'
+    deprecated_recent: ['gpt-3.5-turbo', 'gpt-4']
+  google:
+    current: 'gemini-3'
+    released: '2026-04'
+
+mcp:
+  typescript_sdk_alpha: '2.0.0-alpha.2'
+  typescript_sdk_stable: '1.x'
+  python_sdk: '1.27.1'
+  servers_repo_last_release: '2026.1.26'
+  stable_v2_expected: '2026-Q3'
+
+standards:
+  wcag:
+    current: '2.2'
+    released: '2023-10'
+    eu_accessibility_act_requires: '2.1 minimum, 2.2 recommended'
+  oauth:
+    stable: '2.0'
+    in_progress: '2.1'
+  http:
+    current: 'HTTP/3'
+    most_used: 'HTTP/2'
+  tls:
+    minimum_acceptable: '1.2'
+    recommended: '1.3'
+
+regulations:
+  rgpd:
+    in_force: '2018-05-25'
+    last_amendment: 'EDPB guidelines 2023'
+  ai_act:
+    eu_regulation_number: '2024/1689'
+    in_force_general: '2024-08'
+    full_compliance: '2026-08'
+    risk_classification_standard_pending: '2026-08+'
+  dora:
+    in_force: '2025-01-17'
+  lgpd:
+    in_force: '2020-08-15'
+    last_anpd_resolution: '2025'
+  csrd:
+    eu_directive: '2022/2464'
+    first_reports_due: '2025 (FY2024)'
+
+build_tools:
+  vite:
+    current: '6'
+    released: '2024-11'
+  webpack:
+    current: '5.x'
+    note: 'maintenance mode, prefer vite/rspack/turbopack'
+  rspack:
+    current: '1.x'
+    released: '2024-08'
+  bun:
+    current: '1.1+'
+    released: 'rolling'
+
+databases:
+  postgres:
+    current: '17'
+    released: '2024-09'
+  prisma:
+    current: '6'
+    released: '2024-11'
+
+testing:
+  vitest:
+    current: '2.x'
+    released: '2024-08'
+  playwright:
+    current: '1.49+'
+    released: 'rolling'
+  jest:
+    current: '30'
+    released: '2025'
