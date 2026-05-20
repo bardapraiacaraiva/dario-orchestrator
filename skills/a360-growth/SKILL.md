@@ -4,6 +4,9 @@ description: "Design the growth engine — viral loops, referral programs, partn
 version: "1.0"
 agent: "A360 — Accelera 360"
 category: "Phase 5 — Scale"
+license: SEE-LICENSE
+parent_agent: a360-director
+compliance: [audit_immutable]
 ---
 
 # A360 Growth Engine

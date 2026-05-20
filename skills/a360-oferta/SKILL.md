@@ -4,6 +4,9 @@ description: "Build an irresistible Grand Slam Offer using Hormozi's value equat
 version: "1.0"
 agent: "A360 — Accelera 360"
 category: "Phase 3 — Build"
+license: SEE-LICENSE
+parent_agent: a360-director
+compliance: [audit_immutable]
 ---
 
 # A360 Offer Construction (Grand Slam)

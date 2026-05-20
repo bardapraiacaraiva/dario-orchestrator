@@ -4,6 +4,9 @@ description: "Scaling roadmap from 0 to 10K, 10K to 100K, 100K to 1M revenue mil
 version: "1.0"
 agent: "A360 — Accelera 360"
 category: "Phase 5 — Scale"
+license: SEE-LICENSE
+parent_agent: a360-director
+compliance: [audit_immutable]
 ---
 
 # A360 Scaling Playbook

@@ -24,7 +24,7 @@ parent_agent: oraculo-director
 - **LLaMA-Factory** — training UI
 - **Unsloth** — 2x speed fine-tuning
 - **Together.AI / Replicate** — managed fine-tuning
-- **OpenAI fine-tuning** — managed (GPT-4o-mini, GPT-3.5)
+- **OpenAI fine-tuning** — managed (GPT-4o-mini, GPT-4.1; ~~GPT-3.5~~ deprecated 2025-07)
 
 ## Hardware
 - **Consumer:** RTX 4090 (24GB) — QLoRA 7-13B

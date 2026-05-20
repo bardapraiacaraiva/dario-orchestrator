@@ -4,6 +4,9 @@ description: "Deep niche research and market validation — TAM/SAM/SOM sizing, 
 version: "1.0"
 agent: "A360 — Accelera 360"
 category: "Phase 1 — Discovery"
+license: SEE-LICENSE
+parent_agent: a360-director
+compliance: [audit_immutable]
 ---
 
 # A360 Niche Research & Validation

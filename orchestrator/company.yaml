@@ -3904,3 +3904,139 @@ squads_oraculo:
   evaluation_benchmarks: {workers: [worker-oraculo-eval, worker-oraculo-bench, worker-oraculo-evalfx, worker-oraculo-replication]}
   ml_engineering: {workers: [worker-oraculo-ft, worker-oraculo-rag, worker-oraculo-multimodal, worker-oraculo-agent]}
   safety_alignment: {workers: [worker-oraculo-align, worker-oraculo-safety, worker-oraculo-card]}
+
+# ═══════════════════════════════════════════════════════════════
+# A360 — Business Acceleration Squad (battle-tested em SAQUEI, Cuidaí, Atrium)
+# Score patterns: nicho 90-99 · modelo 92 · validacao 93
+# 4 semantic excellence memories já promovidas (only squad com proof)
+# ═══════════════════════════════════════════════════════════════
+
+agents_acceleration:
+  a360-director:
+    id: a360-director
+    name: A360 Director
+    title: Business Acceleration Squad Lead
+    parent: dario-ceo
+    capabilities: [diagnostic_routing, lifecycle_phase_detection, niche_research, avatar_research,
+      idea_validation, business_modeling, offer_construction, funnel_design, launch_sequencing,
+      pitch_deck, metrics_dashboard, growth_engineering, scaling_roadmap, case_study_generation]
+    compliance_required: [audit_immutable]
+    bundle_anchor: founder
+    license_tier_min: starter  # R$ 297
+
+workers_a360:
+  # Phase 1 — Discovery
+  worker-a360-nicho: {id: worker-a360-nicho, skill: a360-nicho, reports_to: a360-director, phase: discovery}
+  worker-a360-avatar: {id: worker-a360-avatar, skill: a360-avatar, reports_to: a360-director, phase: discovery}
+  # Phase 2 — Validation
+  worker-a360-validacao: {id: worker-a360-validacao, skill: a360-validacao, reports_to: a360-director, phase: validation}
+  worker-a360-modelo: {id: worker-a360-modelo, skill: a360-modelo, reports_to: a360-director, phase: validation}
+  # Phase 3 — Offer
+  worker-a360-oferta: {id: worker-a360-oferta, skill: a360-oferta, reports_to: a360-director, phase: offer}
+  worker-a360-funil: {id: worker-a360-funil, skill: a360-funil, reports_to: a360-director, phase: offer}
+  # Phase 4 — Launch
+  worker-a360-lancamento: {id: worker-a360-lancamento, skill: a360-lancamento, reports_to: a360-director, phase: launch}
+  worker-a360-pitch: {id: worker-a360-pitch, skill: a360-pitch, reports_to: a360-director, phase: launch}
+  # Phase 5 — Growth
+  worker-a360-metricas: {id: worker-a360-metricas, skill: a360-metricas, reports_to: a360-director, phase: growth}
+  worker-a360-growth: {id: worker-a360-growth, skill: a360-growth, reports_to: a360-director, phase: growth}
+  # Phase 6 — Scale
+  worker-a360-scale: {id: worker-a360-scale, skill: a360-scale, reports_to: a360-director, phase: scale}
+  worker-a360-case-study: {id: worker-a360-case-study, skill: a360-case-study, reports_to: a360-director, phase: scale}
+
+squads_a360:
+  discovery: {workers: [worker-a360-nicho, worker-a360-avatar], description: "Niche research + ICP definition"}
+  validation: {workers: [worker-a360-validacao, worker-a360-modelo], description: "Smoke tests + business model design"}
+  offer: {workers: [worker-a360-oferta, worker-a360-funil], description: "Grand Slam Offer + acquisition funnel"}
+  launch: {workers: [worker-a360-lancamento, worker-a360-pitch, worker-a360-metricas], description: "PLF sequence + pitch deck + baseline metrics"}
+  growth: {workers: [worker-a360-metricas, worker-a360-growth, worker-a360-case-study], description: "Growth engine + retention + portfolio proof"}
+  scale: {workers: [worker-a360-scale, worker-a360-growth, worker-a360-metricas], description: "0-to-1M ARR roadmap"}
+
+dispatch_a360:
+  # Trigger keyword → preferred chain or skill
+  "valida minha ideia": {chain: a360_pre_pmf, fallback: a360-validacao}
+  "tenho uma ideia": {chain: a360_pre_pmf}
+  "qual o mercado": {skill: a360-nicho}
+  "quem e meu cliente": {skill: a360-avatar}
+  "modelo de negocio": {skill: a360-modelo}
+  "grand slam offer": {skill: a360-oferta}
+  "constroi minha oferta": {chain: a360_offer_pack}
+  "funil de aquisicao": {skill: a360-funil}
+  "lancamento plf": {chain: a360_launch_pack}
+  "pitch deck": {skill: a360-pitch}
+  "dashboard metricas saas": {skill: a360-metricas}
+  "growth engine": {skill: a360-growth}
+  "escalar para 1m arr": {chain: a360_scale_pack}
+  "case study cliente": {skill: a360-case-study}
+  "a360 completo": {chain: a360_full_lifecycle}
+  "diagnostica meu negocio": {skill: a360-director}
+  "ajuda com o meu negocio": {skill: a360-director}
+
+# ═══════════════════════════════════════════════════════════════
+# PROMETHEUS — External Knowledge & Evolution Squad (Wave 1)
+# Passive monitoring only. ZERO autonomous action.
+# Diferenciação: dream = internal consolidation · ORACULO = deep research · PROMETHEUS = breadth external sweep
+# ═══════════════════════════════════════════════════════════════
+
+agents_meta_evolution:
+  prometheus-director:
+    id: prometheus-director
+    name: PROMETHEUS Director
+    title: External Knowledge & Evolution Squad Lead
+    parent: dario-ceo
+    capabilities: [external_monitoring, repo_scanning, mcp_discovery, paper_tracking,
+      regulatory_watch, signal_filtering, weekly_digest, change_impact_analysis]
+    compliance_required: [audit_immutable, responsible_disclosure, regulatory_tracking]
+    autonomy_tier: 0  # T0 passive monitoring only — Waves 2-3 escalate
+    no_auto_action: true  # cannot write outside prometheus/digests + prometheus/state
+
+workers_prometheus:
+  worker-prometheus-repos: {id: worker-prometheus-repos, skill: prometheus-repo-scanner, reports_to: prometheus-director, sensor_type: repos}
+  worker-prometheus-mcp: {id: worker-prometheus-mcp, skill: prometheus-mcp-discovery, reports_to: prometheus-director, sensor_type: mcp_marketplaces}
+  worker-prometheus-papers: {id: worker-prometheus-papers, skill: prometheus-paper-tracker, reports_to: prometheus-director, sensor_type: research}
+  worker-prometheus-regulatory: {id: worker-prometheus-regulatory, skill: prometheus-regulatory-watch, reports_to: prometheus-director, sensor_type: regulatory}
+
+squads_prometheus:
+  external_sensors: {workers: [worker-prometheus-repos, worker-prometheus-mcp, worker-prometheus-papers, worker-prometheus-regulatory], description: "Wave 1 — 4 passive sensors"}
+  # decay_detectors: pending Wave 2
+  # experimenters: pending Wave 3
+  # curator_self_updater: pending Wave 3
+
+dispatch_prometheus:
+  "scan mundo": {chain: prometheus_weekly_scan}
+  "prometheus weekly": {chain: prometheus_weekly_scan}
+  "weekly digest": {chain: prometheus_weekly_scan}
+  "novidades semana": {chain: prometheus_weekly_scan}
+  "scan repos": {skill: prometheus-repo-scanner}
+  "novos releases": {skill: prometheus-repo-scanner}
+  "scan mcp": {skill: prometheus-mcp-discovery}
+  "novos mcp": {skill: prometheus-mcp-discovery}
+  "scan papers": {skill: prometheus-paper-tracker}
+  "arxiv weekly": {skill: prometheus-paper-tracker}
+  "novidades anthropic": {skill: prometheus-paper-tracker}
+  "scan regulatorio": {skill: prometheus-regulatory-watch}
+  "novas leis": {skill: prometheus-regulatory-watch}
+  "regulatory watch": {skill: prometheus-regulatory-watch}
+
+prometheus_governance:
+  wave: 1
+  autonomy_tier: 0
+  green_list_auto_actions: []  # Wave 1 = nothing auto
+  yellow_list_post_review: []  # Wave 2 introduction
+  red_list_always_user_approval:
+    - edit_any_skill
+    - edit_company_yaml
+    - edit_skill_chains_yaml
+    - delete_memory_entry
+    - push_to_repos
+    - modify_license_files
+  write_allowed_paths:
+    - "~/.claude/orchestrator/prometheus/digests/*.md"
+    - "~/.claude/orchestrator/prometheus/state/*.yaml"
+  read_only_paths_external:
+    - "https://api.github.com/*"
+    - "https://export.arxiv.org/*"
+    - "https://www.anthropic.com/*"
+    - "https://dre.pt/*"
+    - "https://eur-lex.europa.eu/*"
+    - "https://www.gov.br/anpd/*"

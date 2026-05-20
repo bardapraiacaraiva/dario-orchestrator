@@ -36,7 +36,7 @@ compliance: [audit_immutable, ai_governance, responsible_disclosure]
 - **Redwood Research** — safety research
 
 ## Key papers/projects 2024-2026
-- "Mapping the Mind of a Large Language Model" (Anthropic, Claude 3 Sonnet features)
+- "Mapping the Mind of a Large Language Model" (Anthropic 2024, paper estudou Claude 3 Sonnet — referência histórica)
 - "Sleeper Agents" (Anthropic — deceptive AI)
 - "Sparse Autoencoders" — feature discovery
 - "Constitutional AI" — alignment without RLHF

@@ -4,6 +4,9 @@ description: "Build a compelling investor or partner pitch — problem-solution-
 version: "1.0"
 agent: "A360 — Accelera 360"
 category: "Phase 5 — Scale"
+license: SEE-LICENSE
+parent_agent: a360-director
+compliance: [audit_immutable]
 ---
 
 # A360 Investor/Partner Pitch

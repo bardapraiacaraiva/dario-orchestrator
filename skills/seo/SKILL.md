@@ -1,146 +1,527 @@
 ---
 name: seo
-description: >
-  Comprehensive SEO analysis for any website or business type. Performs full site
-  audits, single-page deep analysis, technical SEO checks (crawlability, indexability,
-  Core Web Vitals with INP), schema markup detection/validation/generation, content
-  quality assessment (E-E-A-T framework per Dec 2025 update extending to all
-  competitive queries), image optimization, sitemap analysis, and Generative Engine
-  Optimization (GEO) for AI Overviews, ChatGPT, and Perplexity citations. Analyzes
-  AI crawler accessibility (GPTBot, ClaudeBot, PerplexityBot), llms.txt compliance,
-  brand mention signals, and passage-level citability. Industry detection for SaaS,
-  e-commerce, local business, publishers, agencies. Triggers on: "SEO", "audit",
-  "schema", "Core Web Vitals", "sitemap", "E-E-A-T", "AI Overviews", "GEO",
-  "technical SEO", "content quality", "page speed", "structured data".
-user-invokable: true
-argument-hint: "[command] [url]"
+description: Optimize for search engine visibility and ranking. Use when asked to "improve SEO", "optimize for search", "fix meta tags", "add structured data", "sitemap optimization", or "search engine optimization".
+license: MIT
+metadata:
+  author: web-quality-skills
+  version: "1.0"
 ---
 
-# SEO: Universal SEO Analysis Skill
+# SEO optimization
 
-Comprehensive SEO analysis across all industries (SaaS, local services,
-e-commerce, publishers, agencies). Orchestrates 13 specialized sub-skills and 8 subagents
-(+ optional extension sub-skills like seo-dataforseo).
+Search engine optimization based on Lighthouse SEO audits and Google Search guidelines. Focus on technical SEO, on-page optimization, and structured data.
 
-## Quick Reference
+## SEO fundamentals
 
-| Command | What it does |
-|---------|-------------|
-| `/seo audit <url>` | Full website audit with parallel subagent delegation |
-| `/seo page <url>` | Deep single-page analysis |
-| `/seo sitemap <url or generate>` | Analyze or generate XML sitemaps |
-| `/seo schema <url>` | Detect, validate, and generate Schema.org markup |
-| `/seo images <url>` | Image optimization analysis |
-| `/seo technical <url>` | Technical SEO audit (9 categories) |
-| `/seo content <url>` | E-E-A-T and content quality analysis |
-| `/seo geo <url>` | AI Overviews / Generative Engine Optimization |
-| `/seo plan <business-type>` | Strategic SEO planning |
-| `/seo programmatic [url\|plan]` | Programmatic SEO analysis and planning |
-| `/seo competitor-pages [url\|generate]` | Competitor comparison page generation |
-| `/seo local <url>` | Local SEO analysis (GBP, citations, reviews, map pack) |
-| `/seo hreflang [url]` | Hreflang/i18n SEO audit and generation |
-| `/seo dataforseo [command]` | Live SEO data via DataForSEO (extension) |
-| `/seo image-gen [use-case] <description>` | AI image generation for SEO assets (extension) |
+Search ranking factors (approximate influence):
 
-## Orchestration Logic
+| Factor | Influence | This Skill |
+|--------|-----------|------------|
+| Content quality & relevance | ~40% | Partial (structure) |
+| Backlinks & authority | ~25% | ✗ |
+| Technical SEO | ~15% | ✓ |
+| Page experience (Core Web Vitals) | ~10% | See [Core Web Vitals](../core-web-vitals/SKILL.md) |
+| On-page SEO | ~10% | ✓ |
 
-When the user invokes `/seo audit`, delegate to subagents in parallel:
-1. Detect business type (SaaS, local, ecommerce, publisher, agency, other)
-2. Spawn subagents: seo-technical, seo-content, seo-schema, seo-sitemap, seo-performance, seo-visual, seo-geo
-3. Collect results and generate unified report with SEO Health Score (0-100)
-4. Create prioritized action plan (Critical -> High -> Medium -> Low)
+---
 
-For individual commands, load the relevant sub-skill directly.
+## Technical SEO
 
-## Industry Detection
+### Crawlability
 
-Detect business type from homepage signals:
-- **SaaS**: pricing page, /features, /integrations, /docs, "free trial", "sign up"
-- **Local Service**: phone number, address, service area, "serving [city]", Google Maps embed --> auto-suggest `/seo local` for deeper analysis
-- **E-commerce**: /products, /collections, /cart, "add to cart", product schema
-- **Publisher**: /blog, /articles, /topics, article schema, author pages, publication dates
-- **Agency**: /case-studies, /portfolio, /industries, "our work", client logos
+**robots.txt:**
+```text
+# /robots.txt
+User-agent: *
+Allow: /
 
-## Quality Gates
+# Block admin/private areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
 
-Read `references/quality-gates.md` for thin content thresholds per page type.
-Hard rules:
-- WARNING at 30+ location pages (enforce 60%+ unique content)
-- HARD STOP at 50+ location pages (require user justification)
-- Never recommend HowTo schema (deprecated Sept 2023)
-- FAQ schema for Google rich results: only government and healthcare sites (Aug 2023 restriction); existing FAQPage on commercial sites -> flag Info priority (not Critical), noting AI/LLM citation benefit; adding new FAQPage -> not recommended for Google benefit
-- All Core Web Vitals references use INP, never FID
+# Don't block resources needed for rendering
+# ❌ Disallow: /static/
 
-## Reference Files
+Sitemap: https://example.com/sitemap.xml
+```
 
-Load these on-demand as needed (do NOT load all at startup):
-- `references/cwv-thresholds.md`: Current Core Web Vitals thresholds and measurement details
-- `references/schema-types.md`: All supported schema types with deprecation status
-- `references/eeat-framework.md`: E-E-A-T evaluation criteria (Sept 2025 QRG update)
-- `references/quality-gates.md`: Content length minimums, uniqueness thresholds
-- `references/local-seo-signals.md`: Local ranking factors, review benchmarks, citation tiers, GBP status
-- `references/local-schema-types.md`: LocalBusiness subtypes, industry-specific schema and citation sources
+**Meta robots:**
+```html
+<!-- Default: indexable, followable -->
+<meta name="robots" content="index, follow">
 
-## Scoring Methodology
+<!-- Noindex specific pages -->
+<meta name="robots" content="noindex, nofollow">
 
-### SEO Health Score (0-100)
-Weighted aggregate of all categories:
+<!-- Indexable but don't follow links -->
+<meta name="robots" content="index, nofollow">
 
-| Category | Weight |
-|----------|--------|
-| Technical SEO | 22% |
-| Content Quality | 23% |
-| On-Page SEO | 20% |
-| Schema / Structured Data | 10% |
-| Performance (CWV) | 10% |
-| AI Search Readiness | 10% |
-| Images | 5% |
+<!-- Control snippets -->
+<meta name="robots" content="max-snippet:150, max-image-preview:large">
+```
 
-### Priority Levels
-- **Critical**: Blocks indexing or causes penalties (immediate fix required)
-- **High**: Significantly impacts rankings (fix within 1 week)
-- **Medium**: Optimization opportunity (fix within 1 month)
-- **Low**: Nice to have (backlog)
+**Canonical URLs:**
+```html
+<!-- Prevent duplicate content issues -->
+<link rel="canonical" href="https://example.com/page">
 
-## Sub-Skills
+<!-- Self-referencing canonical (recommended) -->
+<link rel="canonical" href="https://example.com/current-page">
 
-This skill orchestrates 13 specialized sub-skills (+ 2 extensions):
+<!-- For paginated content -->
+<link rel="canonical" href="https://example.com/products">
+<!-- Or use rel="prev" / rel="next" for explicit pagination -->
+```
 
-1. **seo-audit** -- Full website audit with parallel delegation
-2. **seo-page** -- Deep single-page analysis
-3. **seo-technical** -- Technical SEO (9 categories)
-4. **seo-content** -- E-E-A-T and content quality
-5. **seo-schema** -- Schema markup detection and generation
-6. **seo-images** -- Image optimization
-7. **seo-sitemap** -- Sitemap analysis and generation
-8. **seo-geo** -- AI Overviews / GEO optimization
-9. **seo-plan** -- Strategic planning with templates
-10. **seo-programmatic** -- Programmatic SEO analysis and planning
-11. **seo-competitor-pages** -- Competitor comparison page generation
-12. **seo-hreflang** -- Hreflang/i18n SEO audit and generation
-13. **seo-local** -- Local SEO (GBP, NAP, citations, reviews, local schema, multi-location)
-14. **seo-dataforseo** -- Live SEO data via DataForSEO MCP (extension)
-15. **seo-image-gen** -- AI image generation for SEO assets via Gemini (extension)
+### XML sitemap
 
-## Subagents
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://example.com/</loc>
+    <lastmod>2024-01-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://example.com/products</loc>
+    <lastmod>2024-01-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>
+```
 
-For parallel analysis during audits:
-- `seo-technical` -- Crawlability, indexability, security, CWV
-- `seo-content` -- E-E-A-T, readability, thin content
-- `seo-schema` -- Detection, validation, generation
-- `seo-sitemap` -- Structure, coverage, quality gates
-- `seo-performance` -- Core Web Vitals measurement
-- `seo-visual` -- Screenshots, mobile testing, above-fold
-- `seo-geo` -- AI crawler access, llms.txt, citability, brand mention signals
-- `seo-local` -- GBP signals, NAP consistency, reviews, local schema, industry-specific local factors (conditional: spawned when Local Service detected)
-- `seo-dataforseo` -- Live SERP, keyword, backlink, local SEO data (extension, optional)
-- `seo-image-gen` -- SEO image audit and generation plan (extension, optional)
+**Sitemap best practices:**
+- Maximum 50,000 URLs or 50MB per sitemap
+- Use sitemap index for larger sites
+- Include only canonical, indexable URLs
+- Update `lastmod` when content changes
+- Submit to Google Search Console
 
-## Error Handling
+### URL structure
 
-| Scenario | Action |
-|----------|--------|
-| Unrecognized command | List available commands from the Quick Reference table. Suggest the closest matching command. |
-| URL unreachable | Report the error and suggest the user verify the URL. Do not attempt to guess site content. |
-| Sub-skill fails during audit | Report partial results from successful sub-skills. Clearly note which sub-skill failed and why. Suggest re-running the failed sub-skill individually. |
-| Ambiguous business type detection | Present the top two detected types with supporting signals. Ask the user to confirm before proceeding with industry-specific recommendations. |
+```
+✅ Good URLs:
+https://example.com/products/blue-widget
+https://example.com/blog/how-to-use-widgets
+
+❌ Poor URLs:
+https://example.com/p?id=12345
+https://example.com/products/item/category/subcategory/blue-widget-2024-sale-discount
+```
+
+**URL guidelines:**
+- Use hyphens, not underscores
+- Lowercase only
+- Keep short (< 75 characters)
+- Include target keywords naturally
+- Avoid parameters when possible
+- Use HTTPS always
+
+### HTTPS & security
+
+```html
+<!-- Ensure all resources use HTTPS -->
+<img src="https://example.com/image.jpg">
+
+<!-- Not: -->
+<img src="http://example.com/image.jpg">
+```
+
+**Security headers for SEO trust signals:**
+```
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+```
+
+---
+
+## On-page SEO
+
+### Title tags
+
+```html
+<!-- ❌ Missing or generic -->
+<title>Page</title>
+<title>Home</title>
+
+<!-- ✅ Descriptive with primary keyword -->
+<title>Blue Widgets for Sale | Premium Quality | Example Store</title>
+```
+
+**Title tag guidelines:**
+- 50-60 characters (Google truncates ~60)
+- Primary keyword near the beginning
+- Unique for every page
+- Brand name at end (unless homepage)
+- Action-oriented when appropriate
+
+### Meta descriptions
+
+```html
+<!-- ❌ Missing or duplicate -->
+<meta name="description" content="">
+
+<!-- ✅ Compelling and unique -->
+<meta name="description" content="Shop premium blue widgets with free shipping. 30-day returns. Rated 4.9/5 by 10,000+ customers. Order today and save 20%.">
+```
+
+**Meta description guidelines:**
+- 150-160 characters
+- Include primary keyword naturally
+- Compelling call-to-action
+- Unique for every page
+- Matches page content
+
+### Heading structure
+
+```html
+<!-- ❌ Poor structure -->
+<h2>Welcome to Our Store</h2>
+<h4>Products</h4>
+<h1>Contact Us</h1>
+
+<!-- ✅ Proper hierarchy -->
+<h1>Blue Widgets - Premium Quality</h1>
+  <h2>Product Features</h2>
+    <h3>Durability</h3>
+    <h3>Design</h3>
+  <h2>Customer Reviews</h2>
+  <h2>Pricing</h2>
+```
+
+**Heading guidelines:**
+- Single `<h1>` per page (the main topic)
+- Logical hierarchy (don't skip levels)
+- Include keywords naturally
+- Descriptive, not generic
+
+### Image SEO
+
+```html
+<!-- ❌ Poor image SEO -->
+<img src="IMG_12345.jpg">
+
+<!-- ✅ Optimized image -->
+<img src="blue-widget-product-photo.webp"
+     alt="Blue widget with chrome finish, side view showing control panel"
+     width="800"
+     height="600"
+     loading="lazy">
+```
+
+**Image guidelines:**
+- Descriptive filenames with keywords
+- Alt text describes the image content
+- Compressed and properly sized
+- WebP/AVIF with fallbacks
+- Lazy load below-fold images
+
+### Internal linking
+
+```html
+<!-- ❌ Non-descriptive -->
+<a href="/products">Click here</a>
+<a href="/widgets">Read more</a>
+
+<!-- ✅ Descriptive anchor text -->
+<a href="/products/blue-widgets">Browse our blue widget collection</a>
+<a href="/guides/widget-maintenance">Learn how to maintain your widgets</a>
+```
+
+**Linking guidelines:**
+- Descriptive anchor text with keywords
+- Link to relevant internal pages
+- Reasonable number of links per page
+- Fix broken links promptly
+- Use breadcrumbs for hierarchy
+
+---
+
+## Structured data (JSON-LD)
+
+### Organization
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Example Company",
+  "url": "https://example.com",
+  "logo": "https://example.com/logo.png",
+  "sameAs": [
+    "https://twitter.com/example",
+    "https://linkedin.com/company/example"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+1-555-123-4567",
+    "contactType": "customer service"
+  }
+}
+</script>
+```
+
+### Article
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "How to Choose the Right Widget",
+  "description": "Complete guide to selecting widgets for your needs.",
+  "image": "https://example.com/article-image.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Jane Smith",
+    "url": "https://example.com/authors/jane-smith"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Example Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://example.com/logo.png"
+    }
+  },
+  "datePublished": "2024-01-15",
+  "dateModified": "2024-01-20"
+}
+</script>
+```
+
+### Product
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Blue Widget Pro",
+  "image": "https://example.com/blue-widget.jpg",
+  "description": "Premium blue widget with advanced features.",
+  "brand": {
+    "@type": "Brand",
+    "name": "WidgetCo"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "49.99",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "url": "https://example.com/products/blue-widget"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "reviewCount": "1250"
+  }
+}
+</script>
+```
+
+### FAQ
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What colors are available?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Our widgets come in blue, red, and green."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the warranty?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "All widgets include a 2-year warranty."
+      }
+    }
+  ]
+}
+</script>
+```
+
+### Breadcrumbs
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://example.com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Products",
+      "item": "https://example.com/products"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Blue Widgets",
+      "item": "https://example.com/products/blue-widgets"
+    }
+  ]
+}
+</script>
+```
+
+### Validation
+
+Test structured data at:
+- [Google Rich Results Test](https://search.google.com/test/rich-results)
+- [Schema.org Validator](https://validator.schema.org/)
+
+---
+
+## AI search visibility (emerging)
+
+A class of AI search engines (ChatGPT search, Perplexity, Gemini Overviews) cite web pages from their training and retrieval pipelines, not from the classic ranked results. As of 2026 this is an unstable area — there are no confirmed ranking signals — but a few things are low-cost and won't hurt:
+
+- **Don't block AI crawlers wholesale.** `OAI-SearchBot`, `PerplexityBot`, `GoogleOther`, `Google-Extended`, `ClaudeBot`, etc. each have separate `robots.txt` user-agents. Decide per-bot rather than blanket-blocking — a `Disallow` removes you from that bot's citations.
+- **Lean on schema.org `Article`/`Product`/`FAQPage`.** AI summarizers parse structured data more reliably than they parse prose layouts. The structured-data examples above are the same ones that help here.
+- **Make first-paragraph answers self-contained.** Both featured snippets and AI summaries pull short, coherent passages. A definition or direct answer in the first 1-2 sentences is more extractable than the same content buried under marketing prose.
+
+### `llms.txt` — emerging, unproven
+
+[`llms.txt`](https://llmstxt.org/) is a proposed convention (a Markdown index of your site's important pages, served at `/llms.txt`) for LLMs to consume. As of mid-2026 adoption is ~0.015% of sites and **no major AI vendor has confirmed they read it**. Treat it as a 5-minute speculative add for content sites — not a meaningful ranking or citation factor — and don't reorganize content around it.
+
+---
+
+## Mobile SEO
+
+### Responsive design
+
+```html
+<!-- ❌ Not mobile-friendly -->
+<meta name="viewport" content="width=1024">
+
+<!-- ✅ Responsive viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+```
+
+### Tap targets
+
+```css
+/* ❌ Too small for mobile */
+.small-link {
+  padding: 4px;
+  font-size: 12px;
+}
+
+/* ✅ Adequate tap target */
+.mobile-friendly-link {
+  padding: 12px;
+  font-size: 16px;
+  min-height: 48px;
+  min-width: 48px;
+}
+```
+
+### Font sizes
+
+```css
+/* ❌ Too small on mobile */
+body {
+  font-size: 10px;
+}
+
+/* ✅ Readable without zooming */
+body {
+  font-size: 16px;
+  line-height: 1.5;
+}
+```
+
+---
+
+## International SEO
+
+### Hreflang tags
+
+```html
+<!-- For multi-language sites -->
+<link rel="alternate" hreflang="en" href="https://example.com/page">
+<link rel="alternate" hreflang="es" href="https://example.com/es/page">
+<link rel="alternate" hreflang="fr" href="https://example.com/fr/page">
+<link rel="alternate" hreflang="x-default" href="https://example.com/page">
+```
+
+### Language declaration
+
+```html
+<html lang="en">
+<!-- or -->
+<html lang="es-MX">
+```
+
+---
+
+## SEO audit checklist
+
+### Critical
+- [ ] HTTPS enabled
+- [ ] robots.txt allows crawling
+- [ ] No `noindex` on important pages
+- [ ] Title tags present and unique
+- [ ] Single `<h1>` per page
+
+### High priority
+- [ ] Meta descriptions present
+- [ ] Sitemap submitted
+- [ ] Canonical URLs set
+- [ ] Mobile-responsive
+- [ ] Core Web Vitals passing
+
+### Medium priority
+- [ ] Structured data implemented
+- [ ] Internal linking strategy
+- [ ] Image alt text
+- [ ] Descriptive URLs
+- [ ] Breadcrumb navigation
+
+### Ongoing
+- [ ] Fix crawl errors in Search Console
+- [ ] Update sitemap when content changes
+- [ ] Monitor ranking changes
+- [ ] Check for broken links
+- [ ] Review Search Console insights
+
+---
+
+## Tools
+
+| Tool | Use |
+|------|-----|
+| Google Search Console | Monitor indexing, fix issues |
+| Google PageSpeed Insights | Performance + Core Web Vitals |
+| Rich Results Test | Validate structured data |
+| Lighthouse | Full SEO audit |
+| Screaming Frog | Crawl analysis |
+
+## References
+
+- [Google Search Central](https://developers.google.com/search)
+- [Schema.org](https://schema.org/)
+- [Core Web Vitals](../core-web-vitals/SKILL.md)
+- [Web Quality Audit](../web-quality-audit/SKILL.md)

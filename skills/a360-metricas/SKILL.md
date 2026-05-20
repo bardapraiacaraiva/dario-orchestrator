@@ -4,6 +4,9 @@ description: "Comprehensive business metrics tracking — CAC, LTV, MRR, churn, 
 version: "1.0"
 agent: "A360 — Accelera 360"
 category: "Phase 5 — Scale"
+license: SEE-LICENSE
+parent_agent: a360-director
+compliance: [audit_immutable]
 ---
 
 # A360 Business Metrics Dashboard

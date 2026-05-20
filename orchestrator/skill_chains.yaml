@@ -233,6 +233,229 @@ chains:
     on_complete: "Pacote onboarding: Diagnóstico + Audit + Brand Analysis + Proposta 3 opções"
     estimated_tokens: 30000
 
+  # ── A360 — BUSINESS ACCELERATION (battle-tested em SAQUEI, Cuidaí, Atrium) ──
+
+  a360_pre_pmf:
+    name: "A360 Pre-PMF Pack"
+    description: "Discovery + Validação completa: Niche → Avatar → Validação Smoke Test → Modelo de Negócio"
+    trigger_keywords: ["valida minha ideia", "pre-pmf", "tenho uma ideia", "preciso validar", "a360 validacao"]
+    steps:
+      - skill: a360-nicho
+        receives: "briefing da ideia (problema, palpite de solução, mercado intuido)"
+        produces: "TAM/SAM/SOM 3 cenários, competitor sweep 9+ produtos, whitespace verificado, categoria proposta"
+        pass_to_next: [tam_sam_som, competidores, whitespace, categoria, viabilidade_score]
+
+      - skill: a360-avatar
+        receives: "categoria + whitespace + viabilidade do nicho"
+        produces: "ICP detalhado, day-in-the-life, dores específicas, objections map, congregation analysis"
+        pass_to_next: [icp_completo, dores_top3, objections, congregation]
+
+      - skill: a360-validacao
+        receives: "ICP + categoria + dores"
+        produces: "Smoke test plan 17 dias R$ 550-630, 5 headlines, hooks A+B+C, decision tree (GO/PIVOT/KILL)"
+        pass_to_next: [smoke_test_plan, headlines, decision_tree, kpis_alvo]
+
+      - skill: a360-modelo
+        receives: "ICP + smoke test outputs (se disponíveis) + categoria"
+        produces: "P&L 36m 3 cenários, unit economics, pricing tiers, moat assessment Helmer, valuation framework"
+        pass_to_next: null
+
+    on_complete: "Pacote Pre-PMF: Nicho + Avatar + Smoke Test + Modelo. Decisão GO/NO-GO informada."
+    estimated_tokens: 40000
+
+  a360_offer_pack:
+    name: "A360 Offer + Funnel Pack"
+    description: "Construção da Grand Slam Offer + Funnel completo (Brunson Value Ladder)"
+    trigger_keywords: ["a360 oferta", "grand slam offer completo", "oferta e funil", "constroi minha oferta"]
+    steps:
+      - skill: a360-oferta
+        receives: "ICP + posicionamento + categoria (do pre-pmf ou contexto)"
+        produces: "Grand Slam Offer (Hormozi value equation, dream outcome, bonuses, garantia, pricing tiers)"
+        pass_to_next: [oferta_completa, value_equation, pricing, bonuses, garantia]
+
+      - skill: a360-funil
+        receives: "oferta completa + ICP + pricing"
+        produces: "Funnel architecture (lead magnet → tripwire → core → profit maximizer → value ladder), traffic sources"
+        pass_to_next: null
+
+    on_complete: "Pacote Oferta+Funil: Grand Slam Offer + Value Ladder + Traffic Plan"
+    estimated_tokens: 22000
+
+  a360_launch_pack:
+    name: "A360 Launch Pack"
+    description: "Sequência de lançamento Jeff Walker PLF + Pitch + Métricas baseline"
+    trigger_keywords: ["a360 lancamento", "launch sequence completo", "lancar produto", "jeff walker plf"]
+    steps:
+      - skill: a360-lancamento
+        receives: "oferta completa + funil + ICP"
+        produces: "PLF 4-week sequence (pre-launch seed/anticipation + launch week + post-launch follow-up)"
+        pass_to_next: [plf_sequence, emails, social_calendar, ads_calendar]
+
+      - skill: a360-pitch
+        receives: "oferta + funil + métricas alvo + traction (se houver)"
+        produces: "Pitch deck (Klaff STRONG + Duarte Sparkline) com problem/solution/market/traction/team/ask"
+        pass_to_next: [pitch_deck, financial_projections, valuation, ask_amount]
+
+      - skill: a360-metricas
+        receives: "modelo de negócio + funil + pitch deck"
+        produces: "Dashboard de métricas (CAC/LTV/MRR/churn/runway/break-even) com benchmarks setor"
+        pass_to_next: null
+
+    on_complete: "Pacote Launch: PLF Sequence + Pitch Deck + Metrics Dashboard"
+    estimated_tokens: 32000
+
+  a360_growth_pack:
+    name: "A360 Growth Pack"
+    description: "Métricas + Growth Engine + Case Study (post-launch tracção)"
+    trigger_keywords: ["a360 growth", "crescimento sistematico", "viral loops", "growth engine"]
+    steps:
+      - skill: a360-metricas
+        receives: "estado actual (revenue, users, churn, costs)"
+        produces: "Health check unit econ + North Star Metric + 3 KPIs alvo próximos 90 dias"
+        pass_to_next: [health_status, north_star, kpis_90d, gaps]
+
+      - skill: a360-growth
+        receives: "métricas + gaps + ICP"
+        produces: "Growth engine (viral loops, referral program, partnerships, content flywheel, paid amplification, retention loops)"
+        pass_to_next: [growth_engine, loops, retention_strategy]
+
+      - skill: a360-case-study
+        receives: "métricas + outcomes reais + growth strategy"
+        produces: "Case study transformation narrative (before/after metrics, process, testimonials) — portfolio-ready"
+        pass_to_next: null
+
+    on_complete: "Pacote Growth: Metrics + Growth Engine + Case Study"
+    estimated_tokens: 26000
+
+  a360_scale_pack:
+    name: "A360 Scale Pack"
+    description: "Roadmap escala 0→10K→100K→1M com métricas e growth como input"
+    trigger_keywords: ["a360 scale", "escalar negocio", "0 a 1m arr", "playbook escala"]
+    steps:
+      - skill: a360-metricas
+        receives: "estado financeiro actual + organograma + projecções"
+        produces: "Métricas de escala (Rule of 40, Magic Number, NRR, payback period, gross margin trend)"
+        pass_to_next: [metricas_escala, bottlenecks, ratios_saudaveis]
+
+      - skill: a360-growth
+        receives: "métricas escala + bottlenecks"
+        produces: "Growth loops de alto leverage + diversificação canais + retention defense"
+        pass_to_next: [growth_loops_escala, canais, retention_defense]
+
+      - skill: a360-scale
+        receives: "tudo acima + estado actual"
+        produces: "Scaling roadmap 0→10K→100K→1M com hiring triggers, systems needed, delegation framework, operations maturity"
+        pass_to_next: null
+
+    on_complete: "Pacote Scale: Métricas Escala + Growth Loops + Roadmap 0→1M"
+    estimated_tokens: 30000
+
+  a360_full_lifecycle:
+    name: "A360 Full Lifecycle (12 skills)"
+    description: "Diagnóstico completo end-to-end: Discovery + Validação + Oferta + Launch + Growth + Scale (12 skills sequenciais)"
+    trigger_keywords: ["a360 completo", "full lifecycle", "negocio do zero ao scale", "a360 end to end"]
+    steps:
+      - skill: a360-nicho
+        receives: "briefing"
+        produces: "nicho completo"
+        pass_to_next: [tam_sam_som, categoria, whitespace]
+
+      - skill: a360-avatar
+        receives: "nicho"
+        produces: "ICP completo"
+        pass_to_next: [icp, dores, congregation]
+
+      - skill: a360-validacao
+        receives: "nicho + ICP"
+        produces: "smoke test plan"
+        pass_to_next: [smoke_plan, decision_tree]
+
+      - skill: a360-modelo
+        receives: "nicho + ICP + smoke plan"
+        produces: "modelo + P&L + pricing"
+        pass_to_next: [modelo, pricing, unit_econ]
+
+      - skill: a360-oferta
+        receives: "modelo + ICP"
+        produces: "Grand Slam Offer"
+        pass_to_next: [oferta, value_equation]
+
+      - skill: a360-funil
+        receives: "oferta + ICP"
+        produces: "funnel architecture"
+        pass_to_next: [funil, traffic_plan]
+
+      - skill: a360-lancamento
+        receives: "oferta + funil"
+        produces: "PLF sequence"
+        pass_to_next: [plf, calendar]
+
+      - skill: a360-pitch
+        receives: "oferta + funil + métricas alvo"
+        produces: "pitch deck"
+        pass_to_next: [pitch, ask]
+
+      - skill: a360-metricas
+        receives: "modelo + funil + pitch"
+        produces: "dashboard métricas"
+        pass_to_next: [dashboard, north_star]
+
+      - skill: a360-growth
+        receives: "métricas + ICP"
+        produces: "growth engine"
+        pass_to_next: [growth_engine, loops]
+
+      - skill: a360-scale
+        receives: "tudo acima"
+        produces: "scaling roadmap"
+        pass_to_next: [roadmap_scale]
+
+      - skill: a360-case-study
+        receives: "tudo acima (assumindo execução parcial)"
+        produces: "portfolio case study"
+        pass_to_next: null
+
+    on_complete: "FULL A360 LIFECYCLE: 12 skills, ~6-fase business blueprint completo end-to-end"
+    estimated_tokens: 75000
+
+  # ── PROMETHEUS — External Knowledge & Evolution (Wave 1: passive monitoring) ──
+
+  prometheus_weekly_scan:
+    name: "PROMETHEUS Weekly External Sweep"
+    description: "4 sensores externos rodam em sequência: repos GitHub → MCP marketplaces → papers/research → regulatory updates. Output: weekly master digest com signal-filtered findings."
+    trigger_keywords: ["scan mundo", "prometheus weekly", "weekly digest", "novidades semana", "external sweep", "scan externo"]
+    autonomy_tier: 0
+    steps:
+      - skill: prometheus-repo-scanner
+        receives: "watchlist de repos GitHub (Tier 1-5)"
+        produces: "digest YYYY-WW-repos.md com new releases tagged 🔥/⚠️/💤"
+        pass_to_next: [findings_repos, high_signal_count]
+
+      - skill: prometheus-mcp-discovery
+        receives: "state de MCP servers conhecidos"
+        produces: "digest YYYY-WW-mcp.md com novos servers categorizados + coverage gaps"
+        pass_to_next: [findings_mcp, new_servers, gaps_resolved]
+
+      - skill: prometheus-paper-tracker
+        receives: "arxiv + Anthropic blog + key conferences"
+        produces: "digest YYYY-WW-papers.md com papers relevantes para DARIO modules"
+        pass_to_next: [findings_papers, anthropic_releases]
+
+      - skill: prometheus-regulatory-watch
+        receives: "sources regulatórias PT/BR/EU"
+        produces: "digest YYYY-WW-regulatory.md com mudanças mapeadas a squads afectados"
+        pass_to_next: [findings_regulatory, mandatory_updates]
+
+      - skill: prometheus-director
+        receives: "todos os 4 outputs anteriores"
+        produces: "master digest YYYY-WW-master.md com TOP 5 actionable + ratio signal:noise"
+        pass_to_next: null
+
+    on_complete: "Weekly digest pronto. ZERO auto-action. User decide implementação."
+    on_step_failure: "Continuar para próximo sensor — chain robusta a falhas individuais (e.g. gh CLI não autenticado pula repo-scanner)."
+    estimated_tokens: 18000
+    schedule_suggestion: "Domingo 22h00 BRT / Sex 18h00 para regulatory"
+
 # ═══════════════════════════════════════════════════════════════
 # PROTOCOLO DE EXECUÇÃO
 # ═══════════════════════════════════════════════════════════════

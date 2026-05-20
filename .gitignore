@@ -32,18 +32,6 @@
 !orchestrator/quality/domain-playbooks.yaml
 !orchestrator/quality/eval-baseline.yaml
 
-# --- Allow tests, LEX-BR agent, DEMETER squad ---
-!orchestrator/tests/
-!orchestrator/tests/**
-!orchestrator/lex-br/
-!orchestrator/lex-br/**
-!orchestrator/demeter/
-!orchestrator/demeter/**
-
-# --- But never commit pycache ---
-**/__pycache__/
-*.pyc
-
 # --- Exclude orchestrator personal/generated data ---
 orchestrator/company.yaml
 orchestrator/last_pulse.yaml
@@ -96,39 +84,3 @@ orchestrator/.master_secret
 orchestrator/.trial_fingerprint
 orchestrator/dev.flag
 
-
-# v11.4 — 6 new squads
-!orchestrator/orion/
-!orchestrator/orion/**
-!orchestrator/obsidian-corp/
-!orchestrator/obsidian-corp/**
-!orchestrator/medik/
-!orchestrator/medik/**
-!orchestrator/campus/
-!orchestrator/campus/**
-!orchestrator/aegis/
-!orchestrator/aegis/**
-!orchestrator/zenith/
-!orchestrator/zenith/**
-
-# v11.5 — GAIA + NOMOS squads
-!orchestrator/gaia/
-!orchestrator/gaia/**
-!orchestrator/nomos/
-!orchestrator/nomos/**
-
-# v12.0 — 7 new squads
-!orchestrator/mercurius/
-!orchestrator/mercurius/**
-!orchestrator/atlas-fin/
-!orchestrator/atlas-fin/**
-!orchestrator/helios/
-!orchestrator/helios/**
-!orchestrator/kirion/
-!orchestrator/kirion/**
-!orchestrator/sphinx/
-!orchestrator/sphinx/**
-!orchestrator/euterpe/
-!orchestrator/euterpe/**
-!orchestrator/oraculo/
-!orchestrator/oraculo/**

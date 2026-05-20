@@ -50,6 +50,7 @@ except ImportError:
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 TASKS_DIR = ORCH_DIR / "tasks" / "active"
+DONE_DIR = ORCH_DIR / "tasks" / "done"
 COMPANY_FILE = ORCH_DIR / "company.yaml"
 QUALITY_FILE = ORCH_DIR / "quality" / "skill-metrics.yaml"
 BUDGET_DIR = ORCH_DIR / "budgets"
@@ -90,6 +91,62 @@ def load_all_tasks() -> list:
     return tasks
 
 
+def persist_task_changes(t: dict) -> bool:
+    """Persist task changes to whichever source the task came from.
+
+    YAML-loaded tasks have '_file' key — write back to that file.
+    DB-loaded tasks lack '_file' — update via db.update_task (column whitelist).
+
+    Returns True on success. Logs warning on failure but does not raise.
+    """
+    if "_file" in t and t.get("_file"):
+        try:
+            dump_yaml({k: v for k, v in t.items() if k != "_file"}, t["_file"])
+            return True
+        except Exception as e:
+            log.warning(f"YAML persist failed for {t.get('id')}: {e}")
+            return False
+
+    # DB-loaded task — update via DB API (respects column whitelist + transitions)
+    try:
+        sys.path.insert(0, str(ORCH_DIR))
+        from db import DB
+        db_inst = DB()
+        # Serialize depends_on if it's a list (DB stores TEXT JSON)
+        fields = dict(t)
+        deps = fields.get("depends_on")
+        if isinstance(deps, list):
+            import json as _json
+            fields["depends_on"] = _json.dumps(deps)
+        # Remove non-column metadata
+        for k in ("id", "_file"):
+            fields.pop(k, None)
+        return db_inst.update_task(t["id"], fields)
+    except Exception as e:
+        log.warning(f"DB persist failed for {t.get('id')}: {e}")
+        return False
+
+
+def load_done_task_ids_with_status() -> dict:
+    """Return mapping of task_id -> status for tasks in done/ folder.
+
+    Used by dependency_integrity and false_cascade_correction checks to
+    distinguish 'dep moved to done/ folder after completion' (valid)
+    from 'dep never existed' (invalid).
+    """
+    result = {}
+    if not DONE_DIR.exists():
+        return result
+    for f in DONE_DIR.glob("*.yaml"):
+        try:
+            data = load_yaml(str(f))
+            if data and data.get("id"):
+                result[data["id"]] = data.get("status", "done")
+        except Exception:
+            pass
+    return result
+
+
 def load_company_workers() -> set:
     if not COMPANY_FILE.exists():
         return set()
@@ -108,20 +165,28 @@ def load_company_workers() -> set:
 # =============================================================================
 
 def check_coherence(tasks: list, workers: set, fix: bool) -> dict:
-    """Verify all assignees exist in company.yaml."""
+    """Verify all assignees exist in company.yaml.
+
+    Skip done/cancelled tasks — their assignee history is immaterial once
+    the work is complete. Re-blocking a done task would corrupt outcomes.
+    """
+    TERMINAL_STATUSES = {"done", "cancelled"}
     issues = []
     for t in tasks:
+        if t.get("status") in TERMINAL_STATUSES:
+            continue
         assignee = t.get("assignee")
         if assignee and assignee != "null" and assignee not in workers:
             issue = {
                 "task": t.get("id"),
                 "assignee": assignee,
                 "problem": "assignee not in company.yaml",
+                "current_status": t.get("status"),
             }
             if fix:
                 t["status"] = "blocked"
                 t["blocked_reason"] = f"assignee '{assignee}' not found in hierarchy"
-                dump_yaml({k: v for k, v in t.items() if k != "_file"}, t["_file"])
+                persist_task_changes(t)
                 issue["fixed"] = True
             issues.append(issue)
 
@@ -143,31 +208,104 @@ def check_orphans(tasks: list, fix: bool) -> dict:
                 t.setdefault("notes", [])
                 if isinstance(t.get("notes"), list):
                     t["notes"].append("orphaned — parent removed by autodiag")
-                dump_yaml({k: v for k, v in t.items() if k != "_file"}, t["_file"])
+                persist_task_changes(t)
                 issue["fixed"] = True
             issues.append(issue)
 
     return {"id": "orphan_detection", "severity": "info", "passed": len(issues) == 0, "issues": issues}
 
 
-def check_dependencies(tasks: list, fix: bool) -> dict:
-    """Verify all depends_on references exist."""
-    task_ids = {t.get("id") for t in tasks}
+def check_dependencies(tasks: list, done_ids: dict, fix: bool) -> dict:
+    """Verify all depends_on references exist in active/ OR done/.
+
+    A dep moved to done/ is still a valid reference (historical lineage).
+    Only deps that exist in NEITHER folder are truly broken.
+    """
+    active_ids = {t.get("id") for t in tasks}
+    all_ids = active_ids | set(done_ids.keys())
     issues = []
     for t in tasks:
         deps = t.get("depends_on", [])
         if not isinstance(deps, list):
             continue
-        broken = [d for d in deps if d not in task_ids]
+        broken = [d for d in deps if d not in all_ids]
         if broken:
             issue = {"task": t.get("id"), "broken_deps": broken}
             if fix:
-                t["depends_on"] = [d for d in deps if d in task_ids]
-                dump_yaml({k: v for k, v in t.items() if k != "_file"}, t["_file"])
+                t["depends_on"] = [d for d in deps if d in all_ids]
+                persist_task_changes(t)
                 issue["fixed"] = True
             issues.append(issue)
 
     return {"id": "dependency_integrity", "severity": "warning", "passed": len(issues) == 0, "issues": issues}
+
+
+def check_false_cascade(tasks: list, done_ids: dict, fix: bool) -> dict:
+    """Detect tasks blocked by cascade reason whose deps are actually done.
+
+    Background: a previous one-off audit bulk-marked tasks status:blocked with
+    blocked_reason 'awaiting_upstream' under the assumption their deps were
+    still pending. When the deps later moved to done/, the cascade-block never
+    got reconciled. This check finds and (optionally) unblocks them.
+
+    A task is considered false-cascade if:
+      - status == 'blocked'
+      - blocked_reason indicates cascade (awaiting_upstream / cascade / awaiting_founder_day_0)
+      - ALL items in depends_on have status:done in done/ folder
+
+    Partial cascades (some deps done, some not) are reported but NOT auto-fixed —
+    they need human review to decide if the remaining gates are real.
+    """
+    CASCADE_MARKERS = ("awaiting_upstream", "awaiting_founder_day_0", "cascade")
+    issues = []
+    for t in tasks:
+        if t.get("status") != "blocked":
+            continue
+        reason = (t.get("blocked_reason") or "")
+        reason_lower = reason.lower() if isinstance(reason, str) else ""
+        is_cascade = any(marker in reason_lower for marker in CASCADE_MARKERS)
+        if not is_cascade:
+            continue
+        deps = t.get("depends_on") or []
+        if not isinstance(deps, list) or not deps:
+            continue
+
+        unfinished = [d for d in deps if done_ids.get(d) != "done"]
+        all_done = len(unfinished) == 0
+
+        if all_done:
+            issue = {
+                "task": t.get("id"),
+                "deps": deps,
+                "old_reason": reason,
+                "action": "unblock (all deps done)",
+            }
+            if fix:
+                t["status"] = "todo"
+                t["blocked_reason"] = None
+                t.setdefault("notes", [])
+                if isinstance(t.get("notes"), list):
+                    ts = datetime.now(timezone.utc).isoformat()
+                    t["notes"].append(
+                        f"[{ts}] AutoDiag false_cascade_correction: deps {deps} "
+                        f"confirmed status:done in done/. status: blocked->todo, "
+                        f"blocked_reason cleared."
+                    )
+                t["updated_at"] = datetime.now(timezone.utc).isoformat()
+                persist_task_changes(t)
+                issue["fixed"] = True
+            issues.append(issue)
+        elif len(unfinished) < len(deps):
+            # Partial: some deps done, some not — flag for human review
+            issues.append({
+                "task": t.get("id"),
+                "partial_cascade": True,
+                "done_deps": [d for d in deps if done_ids.get(d) == "done"],
+                "unfinished_deps": unfinished,
+                "action": "review_manually_or_refine_blocked_reason",
+            })
+
+    return {"id": "false_cascade_correction", "severity": "warning", "passed": len(issues) == 0, "issues": issues}
 
 
 def check_budget_drift(tasks: list, fix: bool) -> dict:
@@ -191,12 +329,20 @@ def check_budget_drift(tasks: list, fix: bool) -> dict:
     issues = []
     if drift > 1000:  # >1K token drift
         issue = {"recorded": recorded_total, "calculated": task_sum, "drift": drift}
-        if fix and task_sum > 0:
+        # NEVER downgrade the budget — many tasks may lack actual_tokens
+        # (e.g. assigned manually, dispatched outside orchestrator).
+        # The recorded total reflects real Anthropic API spend; auto-fixing
+        # downward would lose unattributed history.
+        if fix and task_sum > recorded_total:
+            issue["direction"] = "upgrade"
             budget["total_tokens_used"] = task_sum
             budget["percentage"] = round(task_sum / int(budget.get("limit", 50000000)) * 100, 2)
             budget["last_updated"] = now.isoformat()
             dump_yaml(budget, str(budget_file))
             issue["fixed"] = True
+        elif task_sum < recorded_total:
+            issue["direction"] = "no_fix (would_downgrade)"
+            issue["note"] = "task_sum < recorded — likely tasks without actual_tokens attribution; recorded preserved"
         issues.append(issue)
 
     return {"id": "budget_drift", "severity": "warning", "passed": len(issues) == 0, "issues": issues}
@@ -225,7 +371,7 @@ def check_stale_review(tasks: list, fix: bool) -> dict:
                     score = t.get("quality_score", 0)
                     if score and int(score) >= 75:
                         t["status"] = "done"
-                        dump_yaml({k: v for k, v in t.items() if k != "_file"}, t["_file"])
+                        persist_task_changes(t)
                         issue["fixed"] = True
                         issue["action"] = "auto-approved (score >= 75)"
                 issues.append(issue)
@@ -298,11 +444,13 @@ def check_memory_staleness(fix: bool) -> dict:
 def run_all_checks(fix: bool = False, single: str = None) -> list:
     tasks = load_all_tasks()
     workers = load_company_workers()
+    done_ids = load_done_task_ids_with_status()
 
     all_checks = {
         "coherence_check": lambda: check_coherence(tasks, workers, fix),
         "orphan_detection": lambda: check_orphans(tasks, fix),
-        "dependency_integrity": lambda: check_dependencies(tasks, fix),
+        "dependency_integrity": lambda: check_dependencies(tasks, done_ids, fix),
+        "false_cascade_correction": lambda: check_false_cascade(tasks, done_ids, fix),
         "budget_drift": lambda: check_budget_drift(tasks, fix),
         "stale_review": lambda: check_stale_review(tasks, fix),
         "quality_regression": lambda: check_quality_regression(tasks, fix),
