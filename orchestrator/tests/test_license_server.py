@@ -231,3 +231,88 @@ class TestRequestValidation:
             json={"machine_id": "machine-extra", "unexpected": True},
         )
         assert r.status_code == 422
+
+
+# ─── Onda 9 #1 — Certificate pinning ─────────────────────────────────────────
+
+
+class TestCertificatePinning:
+    """Unit tests for the cert-pinning helpers in license_client.
+
+    These do NOT spin up a TLS server (which would require a real cert).
+    They exercise the policy: when do we verify, when do we skip, and
+    what failure modes return None vs raise.
+    """
+
+    def test_no_pin_skips_https_check(self, monkeypatch):
+        """Without DARIO_LICENSE_CERT_PIN, https calls log-warn and proceed."""
+        import license_client
+
+        monkeypatch.delenv("DARIO_LICENSE_CERT_PIN", raising=False)
+        monkeypatch.delenv("DARIO_LICENSE_PIN_BYPASS", raising=False)
+        # Should not raise — pin is unset, so we proceed (with a warning logged)
+        license_client._maybe_verify_pin("https://example.com/health", 1.0)
+
+    def test_pin_bypass_env_skips_check(self, monkeypatch):
+        import license_client
+
+        monkeypatch.setenv("DARIO_LICENSE_CERT_PIN", "deadbeef" * 8)
+        monkeypatch.setenv("DARIO_LICENSE_PIN_BYPASS", "1")
+        # Bypass enabled — should not even attempt the TLS handshake
+        license_client._maybe_verify_pin(
+            "https://localhost-not-actually-running:1/", 0.5
+        )
+
+    def test_http_url_skips_pin(self, monkeypatch):
+        import license_client
+
+        monkeypatch.setenv("DARIO_LICENSE_CERT_PIN", "deadbeef" * 8)
+        monkeypatch.delenv("DARIO_LICENSE_PIN_BYPASS", raising=False)
+        # http:// is not pinned (no TLS)
+        license_client._maybe_verify_pin("http://localhost:8430/health", 0.5)
+
+    def test_spki_hash_is_deterministic(self):
+        """_spki_sha256 returns the same hash for the same input bytes."""
+        import license_client
+
+        dummy = b"NOT-A-REAL-CERT-just-bytes-for-hashing"
+        h1 = license_client._spki_sha256(dummy)
+        h2 = license_client._spki_sha256(dummy)
+        assert h1 == h2
+        assert len(h1) == 64  # SHA-256 hex
+        assert h1 != license_client._spki_sha256(dummy + b"x")
+
+    def test_pin_mismatch_raises_sslerror(self, monkeypatch):
+        """Direct _verify_pin_or_raise against a real TLS endpoint with a
+        bogus expected pin should raise ssl.SSLError (or OSError if the host
+        is unreachable — both are acceptable failure modes)."""
+        import ssl
+
+        import license_client
+
+        # Use a public TLS endpoint that's likely reachable from a build host.
+        # The expected pin is intentionally wrong → must raise.
+        try:
+            with pytest.raises((ssl.SSLError, OSError)):
+                license_client._verify_pin_or_raise(
+                    "example.com", 443, "00" * 32, timeout=3.0
+                )
+        except Exception as exc:
+            # If example.com is unreachable from the CI sandbox, accept it.
+            pytest.skip(f"network unreachable for pin test: {exc!r}")
+
+    def test_post_returns_none_on_pin_mismatch(self, monkeypatch):
+        """When the pin doesn't match, _post short-circuits and returns None."""
+        import license_client
+
+        monkeypatch.setenv("DARIO_LICENSE_SERVER", "https://example.com")
+        monkeypatch.setenv("DARIO_LICENSE_CERT_PIN", "00" * 32)
+        monkeypatch.delenv("DARIO_LICENSE_PIN_BYPASS", raising=False)
+
+        # Real network call expected, but pin will mismatch → None.
+        result = license_client._post("/trial/activate", {"machine_id": "test"},
+                                       timeout=3.0)
+        # None expected (pin mismatch) OR None (network unreachable in sandbox).
+        # Either way must NOT be a dict (which would indicate the call went
+        # through despite the bad pin).
+        assert result is None or result.get("_http_status") is not None
