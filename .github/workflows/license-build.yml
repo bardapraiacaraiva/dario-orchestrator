@@ -167,15 +167,40 @@ jobs:
           pyinstaller scripts/dario_license.spec --clean --noconfirm
           ls -lh dist/
 
-      - name: Sign the bundle with the self-signed cert
+      - name: Locate signtool.exe (Windows SDK)
+        id: locate-signtool
+        shell: pwsh
+        run: |
+          $signtool = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -like '*x64*' } |
+            Select-Object -First 1 -ExpandProperty FullName
+          if ($signtool) {
+            echo "signtool=$signtool" >> $env:GITHUB_OUTPUT
+            echo "Found: $signtool"
+          } else {
+            echo "signtool=" >> $env:GITHUB_OUTPUT
+            echo "Not found — will skip signing"
+          }
+
+      - name: Sign the bundle with the self-signed cert (fail-soft)
         shell: bash
         env:
           DARIO_CERT_PFX_PASSWORD: ci-build
+          SIGNTOOL: ${{ steps.locate-signtool.outputs.signtool }}
+        continue-on-error: true
         run: |
-          python scripts/sign_bundle.py dist/dario-license.exe --pfx ci-cert.pfx
+          if [ -z "$SIGNTOOL" ]; then
+            echo "signtool.exe not located — skipping signing step."
+            echo "(Bundle uploaded unsigned; real signing happens in release flow with operator's cert.)"
+            exit 0
+          fi
+          # Add signtool to PATH so sign_bundle.py finds it
+          export PATH="$(dirname "$SIGNTOOL"):$PATH"
+          python scripts/sign_bundle.py dist/dario-license.exe --pfx ci-cert.pfx || \
+            { echo "Signing failed — continuing (bundle uploaded unsigned)"; exit 0; }
           echo "=== signtool verify ==="
-          "/c/Program Files (x86)/Windows Kits/10/bin/x64/signtool.exe" \
-              verify /pa /v dist/dario-license.exe || echo "Verify warns for self-signed (expected)"
+          "$SIGNTOOL" verify /pa /v dist/dario-license.exe || \
+            echo "Verify warns for self-signed (expected)"
 
       - name: Upload Windows artefacts
         uses: actions/upload-artifact@v4
