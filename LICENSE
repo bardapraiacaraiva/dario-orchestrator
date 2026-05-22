@@ -1,0 +1,32 @@
+DARIO Orchestrator — Commercial Software License
+Copyright (c) 2026 Barda / Automation Solution AI (marco@automationsolutionai.com)
+
+ALL RIGHTS RESERVED. This is proprietary software, not open-source.
+
+The full license text is in `orchestrator/LICENSE`. A short summary:
+
+  1. EVALUATION LICENSE (7-day trial)
+     - One copy on one device for evaluation purposes
+     - Reading the source code to understand behavior is permitted
+     - Automatic termination after 7 days
+
+  2. COMMERCIAL LICENSE (after purchase of a valid key)
+     - Scope determined by the tier suffix in the key (DARIO-XXXX-...-SUF)
+     - 59 tiers available, including 5 Onda 12 bundles
+     - Includes updates for the duration of the paid subscription
+
+  3. PROHIBITED under both licenses
+     - Redistribution of the Software, in whole or in part
+     - Derivative works (ports, clean-room reimplementations, rebranding)
+     - Reverse engineering of license enforcement
+     - Sublicensing, lease, or sale to third parties
+     - Building competing products that reuse the architecture, skill
+       catalog organisation, or pricing tier model
+
+For commercial inquiries, license purchases, partnerships, or written
+authorisation to redistribute:
+
+    Email: barda@automationsolutionai.com
+    Web:   https://github.com/bardapraiacaraiva/dario-orchestrator
+
+See `orchestrator/LICENSE` for the complete legally-binding text.

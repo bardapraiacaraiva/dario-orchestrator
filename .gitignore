@@ -18,6 +18,11 @@
 # --- Allow README ---
 !README.md
 
+# --- Allow LICENSE (root) ---
+!LICENSE
+!COPYING
+!NOTICE
+
 # --- Allow orchestrator (the product) ---
 !orchestrator/
 !orchestrator/install.sh
@@ -26,6 +31,9 @@
 !orchestrator/*.html
 !orchestrator/*.md
 !orchestrator/.license
+!orchestrator/LICENSE
+!orchestrator/COPYING
+!orchestrator/NOTICE
 !orchestrator/tasks/
 !orchestrator/tasks/templates/
 !orchestrator/tasks/templates/**
