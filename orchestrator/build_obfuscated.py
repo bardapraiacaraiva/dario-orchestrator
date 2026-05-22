@@ -100,18 +100,18 @@ setup(
         compiler_directives={{
             # Onda 10 #3 — Cython hardening directives.
             #
-            # The goal here is NOT to make decompilation impossible (it isn't),
-            # but to remove every easy footgun that a casual reverser would
-            # grep for first: function docstrings, signature objects, source
-            # line annotations, raised-exception messages tied to source.
+            # Goal: remove easy footgun that a casual reverser would grep for
+            # first (signature objects, source line annotations, raised-
+            # exception messages tied to source). NOT cryptographically secure.
+            #
+            # Fix 2 (2026-05-23): removed invalid `docstrings` and
+            # `embedsignature.format` directives which Cython rejects with
+            # "unknown compiler directive". Use `python -OO` at runtime to
+            # actually drop docstrings if needed.
             "language_level": "3",
 
-            # Strip all .__doc__ attributes — function/class docstrings are
-            # the easiest source of human-readable hints in compiled .so/.pyd.
+            # No embedded signatures (would leak Python signature info).
             "embedsignature": False,
-            "embedsignature.format": "c",    # if anything sneaks through,
-                                              # use the C-style without prose
-            "docstrings": False,             # drop Python docstrings entirely
 
             # No PEP 657 fine-grained line numbers — they leak source structure
             # via tracebacks. Stripped tracebacks point only to function name.
