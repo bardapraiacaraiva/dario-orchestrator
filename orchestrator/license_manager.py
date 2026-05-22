@@ -1260,8 +1260,8 @@ def main():
 ║                                                                      ║
 ║  ─── VERTICAL SQUADS (not bundled in PRO/ENT — add-on) ───           ║
 ║                                                                      ║
-║    LEX-BR (legal BR, 15 skills + JusBrasil/CNJ/STF MCPs)             ║
-║        Solo   R$    297/mo   Office  R$    997/mo   Enterprise  TBD  ║
+║    LEX-BR (legal BR, 15 skills + up to 8 MCPs incl. ANPD/Projuris)   ║
+║        Solo   R$    297/mo   Office  R$    997/mo   ENT R$ 4.000+/mo ║
 ║                                                                      ║
 ║    GAIA (ESG/CSRD/B-Corp)                                            ║
 ║        Solo   R$    297/mo   Team    R$    997/mo   ENT R$ 4.000+/mo ║
