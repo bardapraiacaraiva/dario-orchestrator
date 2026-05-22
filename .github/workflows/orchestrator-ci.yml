@@ -58,7 +58,7 @@ jobs:
               "opentelemetry-exporter-otlp>=1.30" "temporalio>=1.10" \
               "dspy>=2.5"
 
-      - name: Mypy strict on 48 foundational modules
+      - name: Mypy strict on 52 foundational modules
         run: |
           python -m mypy --follow-imports=skip \
               schemas otel_setup.py chain_graph.py chain_schemas.py config optimization \
@@ -69,7 +69,8 @@ jobs:
               upgrades/core_handoff.py upgrades/core_messagebus.py \
               upgrades/core_checkpoints.py upgrades/core_engines.py \
               upgrades/execution_parallel.py \
-              durable memory dream
+              durable memory dream \
+              license_server license_client.py
 
   pytest-fast:
     name: Pytest fast suite (not slow)

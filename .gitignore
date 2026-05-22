@@ -105,6 +105,13 @@
 # --- Allow Temporal self-host yml (Onda 6 #4) ---
 !orchestrator/scripts/temporal-self-host.yml
 
+# --- Allow license server (Onda 8) ---
+!orchestrator/license_server/
+!orchestrator/license_server/*.py
+!orchestrator/license_server/*.md
+!orchestrator/license_server/Dockerfile
+!orchestrator/license_client.py
+
 # --- Exclude orchestrator personal/generated data ---
 orchestrator/company.yaml
 orchestrator/last_pulse.yaml

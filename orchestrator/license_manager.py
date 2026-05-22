@@ -815,14 +815,18 @@ def _check_fingerprint() -> dict:
 def init_trial(force: bool = False) -> dict:
     """Initialize a 7-day trial license.
 
-    Refuses to reinitialize if a previous trial was already used on this
-    machine (anti-bypass). Use `force=True` only during development with the
-    dev.flag enabled.
+    Defence layers (in order):
+        1. Local 3-layer fingerprint (Onda 7) — refuses if any layer present.
+        2. License server (Onda 8) — when `DARIO_LICENSE_SERVER` is set,
+           server is the source of truth. Server says "machine_id already
+           activated 5 days ago" → refused even if all local layers were
+           wiped (e.g. fresh OS install on the same hardware).
+
+    Use `force=True` only with the dev bypass active.
     """
-    # Anti-bypass check (v11.1.1+)
+    # Layer 1: local fingerprint check (Onda 7)
     fp_check = _check_fingerprint()
     if fp_check.get("used") and not force:
-        # Allow force only if dev bypass active
         try:
             sys.path.insert(0, str(ORCH_DIR))
             from license_guard import _bypass_active
@@ -837,6 +841,7 @@ def init_trial(force: bool = False) -> dict:
             "reason": "trial_already_used",
             "first_init_at": fp_check.get("first_init_at"),
             "tampered": fp_check.get("tampered", False),
+            "found_in": fp_check.get("found_in", []),
             "message": (
                 "A trial was already used on this machine. "
                 "Trials are one-time per machine. "
@@ -844,21 +849,70 @@ def init_trial(force: bool = False) -> dict:
             ),
         }
 
+    # Layer 2: license server check (Onda 8)
+    server_record: dict | None = None
+    try:
+        import license_client
+        if license_client.is_enabled():
+            machine = _machine_id()
+            server_record = license_client.activate_trial(machine)
+            if server_record and not force:
+                # Server may say this machine_id was already activated
+                # in the past. Server is the source of truth.
+                if server_record.get("status") == "expired":
+                    return {
+                        "status": "refused",
+                        "reason": "server_trial_expired",
+                        "first_init_at": server_record.get("first_init_at"),
+                        "expires_at": server_record.get("expires_at"),
+                        "message": (
+                            "The license server records a previous trial on "
+                            "this machine that has expired. Activate a VIP key."
+                        ),
+                    }
+                if (server_record.get("status") == "active"
+                        and server_record.get("days_remaining", 0) < 7
+                        and server_record.get("heartbeat_count", 0) > 1):
+                    # Server records an existing trial in progress — return it
+                    # rather than restarting the clock.
+                    pass  # fall through; we'll persist server values below
+    except Exception as e:
+        # Server unreachable / misconfigured — fall back to local-only.
+        try:
+            log.warning(f"[license-server] activation failed, offline mode: {e}")
+        except Exception:
+            pass
+        server_record = None
+
+    # Construct the local license — prefer server values when present.
     now = datetime.now(UTC)
+    if server_record:
+        activated_at = server_record.get("first_init_at", now.isoformat())
+        expires_at = server_record.get("expires_at") or \
+            (now + timedelta(days=7)).isoformat()
+        server_token = server_record.get("token")
+    else:
+        activated_at = now.isoformat()
+        expires_at = (now + timedelta(days=7)).isoformat()
+        server_token = None
+
     lic = {
         "tier": "trial",
         "name": TIERS["trial"]["name"],
         "key": None,
         "email": None,
-        "activated_at": now.isoformat(),
-        "expires_at": (now + timedelta(days=7)).isoformat(),
+        "activated_at": activated_at,
+        "expires_at": expires_at,
         "max_parallel": TIERS["trial"]["max_parallel"],
         "features": TIERS["trial"]["features"],
         "engines_allowed": TIERS["trial"]["engines_allowed"],
         "status": "active",
+        "server_token": server_token,
+        "server_bound": server_token is not None,
     }
     save_license(lic)
-    # Write persistent marker (only on FIRST activation — don't overwrite if already exists)
+
+    # Write all 3 local fingerprint layers (Onda 7)
     if not TRIAL_FINGERPRINT.exists():
         _write_fingerprint()
     return lic
@@ -890,13 +944,101 @@ def activate_key(key: str) -> dict:
     return {"success": True, "tier": tier, "name": tier_config["name"]}
 
 
+def _server_revalidate(lic: dict) -> dict | None:
+    """If the license server is configured AND this license has a server
+    token, revalidate against the server (source of truth). Returns the
+    server's validation response, or None when offline / unconfigured.
+
+    Side effect: stamps `last_server_check_at` on the local license so
+    callers can rate-limit revalidations.
+    """
+    try:
+        import license_client
+        if not license_client.is_enabled():
+            return None
+        token = lic.get("server_token")
+        if not token:
+            return None
+        machine = _machine_id()
+        result = license_client.validate_trial(
+            machine_id=machine,
+            token=token,
+            client_first_init_at=lic.get("activated_at"),
+        )
+        if result is None:
+            # Unreachable — degrade gracefully to offline.
+            return None
+        # Record check timestamp + server-reported status
+        lic["last_server_check_at"] = datetime.now(UTC).isoformat()
+        lic["last_server_status"] = result.get("status")
+        if result.get("rollback_detected"):
+            lic["status"] = "tampered"
+        elif result.get("status") == "expired":
+            lic["status"] = "expired"
+        save_license(lic)
+        return result
+    except Exception:
+        return None
+
+
 def check_license() -> dict:
-    """Check if current license is valid. Returns status."""
+    """Check if current license is valid. Returns status.
+
+    Order of operations:
+        1. Load local license.json
+        2. If license is trial AND has server_token AND env DARIO_LICENSE_SERVER
+           is set → revalidate against server (truth source). Rate-limited
+           to once per hour to avoid hammering the server.
+        3. Apply local expiration check (works offline too).
+
+    Anti-snapshot rollback: the server response includes
+    `rollback_detected=True` when the client-reported `client_first_init_at`
+    diverges from the server's record by more than tolerance. We honour it.
+    """
     lic = load_license()
 
     if not lic:
         return {"valid": False, "reason": "No license found. Run: python license_manager.py --init-trial",
                 "tier": "none", "action": "init_trial"}
+
+    # Server revalidation (Onda 8): once per hour, if configured + trial + bound
+    if (lic.get("tier") == "trial" and lic.get("server_bound")):
+        last_check = lic.get("last_server_check_at")
+        do_check = True
+        if last_check:
+            try:
+                last = datetime.fromisoformat(last_check)
+                if (datetime.now(UTC) - last).total_seconds() < 3600:
+                    do_check = False
+            except Exception:
+                pass
+        if do_check:
+            server_result = _server_revalidate(lic)
+            if server_result and server_result.get("rollback_detected"):
+                return {
+                    "valid": False,
+                    "tier": "trial",
+                    "reason": "snapshot_rollback_detected",
+                    "message": (
+                        "License server detected a clock or install rollback "
+                        "on this machine (VM snapshot or local time tamper). "
+                        "Trial revoked. Activate a VIP key to continue."
+                    ),
+                    "action": "activate_key",
+                }
+            if server_result and server_result.get("status") == "expired":
+                return {
+                    "valid": False,
+                    "tier": "trial",
+                    "reason": "server_says_expired",
+                    "expired_at": server_result.get("expires_at"),
+                    "message": (
+                        "License server records this trial as expired. "
+                        "Activate a VIP key: python license_manager.py "
+                        "--activate DARIO-XXXX-XXXX-XXXX-PRO"
+                    ),
+                    "action": "activate_key",
+                }
 
     tier = lic.get("tier", "trial")
     status = lic.get("status", "unknown")
