@@ -3,7 +3,6 @@
 
 import sqlite3
 import sys
-import tempfile
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"

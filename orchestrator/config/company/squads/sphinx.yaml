@@ -1,0 +1,85 @@
+workers_sphinx:
+  worker-sphinx-redteam:
+    id: worker-sphinx-redteam
+    skill: sphinx-red-team-ops
+    reports_to: sphinx-director
+  worker-sphinx-tip:
+    id: worker-sphinx-tip
+    skill: sphinx-threat-intel-platforms
+    reports_to: sphinx-director
+  worker-sphinx-osint:
+    id: worker-sphinx-osint
+    skill: sphinx-osint-investigations
+    reports_to: sphinx-director
+  worker-sphinx-deception:
+    id: worker-sphinx-deception
+    skill: sphinx-deception-honeypots
+    reports_to: sphinx-director
+  worker-sphinx-mobile:
+    id: worker-sphinx-mobile
+    skill: sphinx-mobile-forensics
+    reports_to: sphinx-director
+  worker-sphinx-malware:
+    id: worker-sphinx-malware
+    skill: sphinx-malware-analysis
+    reports_to: sphinx-director
+  worker-sphinx-re:
+    id: worker-sphinx-re
+    skill: sphinx-reverse-engineering
+    reports_to: sphinx-director
+  worker-sphinx-dark:
+    id: worker-sphinx-dark
+    skill: sphinx-dark-web-monitoring
+    reports_to: sphinx-director
+  worker-sphinx-se:
+    id: worker-sphinx-se
+    skill: sphinx-social-engineering-defense
+    reports_to: sphinx-director
+  worker-sphinx-qcrypto:
+    id: worker-sphinx-qcrypto
+    skill: sphinx-quantum-crypto-prep
+    reports_to: sphinx-director
+  worker-sphinx-0day:
+    id: worker-sphinx-0day
+    skill: sphinx-zero-day-management
+    reports_to: sphinx-director
+  worker-sphinx-apt:
+    id: worker-sphinx-apt
+    skill: sphinx-advanced-persistent-threat
+    reports_to: sphinx-director
+  worker-sphinx-cloud-ir:
+    id: worker-sphinx-cloud-ir
+    skill: sphinx-cloud-incident-response
+    reports_to: sphinx-director
+  worker-sphinx-pqc:
+    id: worker-sphinx-pqc
+    skill: sphinx-post-quantum-cryptography
+    reports_to: sphinx-director
+  worker-sphinx-ai-sec:
+    id: worker-sphinx-ai-sec
+    skill: sphinx-ai-security
+    reports_to: sphinx-director
+squads_sphinx:
+  offensive_research:
+    workers:
+    - worker-sphinx-redteam
+    - worker-sphinx-re
+    - worker-sphinx-0day
+    - worker-sphinx-malware
+  threat_intel_advanced:
+    workers:
+    - worker-sphinx-tip
+    - worker-sphinx-osint
+    - worker-sphinx-dark
+    - worker-sphinx-apt
+  forensics_ir_elite:
+    workers:
+    - worker-sphinx-mobile
+    - worker-sphinx-cloud-ir
+    - worker-sphinx-deception
+  emerging_threats:
+    workers:
+    - worker-sphinx-qcrypto
+    - worker-sphinx-pqc
+    - worker-sphinx-ai-sec
+    - worker-sphinx-se

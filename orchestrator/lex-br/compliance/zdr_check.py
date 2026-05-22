@@ -152,7 +152,8 @@ def enforce(text: str, zdr_required_levels: tuple = ("CPF", "RG", "DADOS_CLINICO
 
 
 if __name__ == "__main__":
-    import sys, json
+    import json
+    import sys
     sample = sys.argv[1] if len(sys.argv) > 1 else (
         "Cliente João Silva, CPF 123.456.789-00, processo "
         "1234567-89.2026.5.02.0001 contra empresa CNPJ 12.345.678/0001-90."

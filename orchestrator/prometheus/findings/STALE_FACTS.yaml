@@ -1,0 +1,35 @@
+scan_at: '2026-05-20T19:09:28.406710+00:00'
+schema_version: '1.0'
+total_skills_scanned: 764
+total_findings: 2
+by_severity:
+  medium: 2
+by_type:
+  deprecation: 2
+  version_drift: 0
+  stale_fact: 0
+findings:
+- type: deprecation
+  file: .claude/skills/shadcn-ui/references/official-ui-reference.md
+  line: 1358
+  term: .eslintrc
+  context: This JSON configuration defines a shadcn/ui registry item named 'my-eslint-config'
+    for a custom ESLint configuration. It specifies a single file with an explicit
+    target path (~/.eslintrc.json), enabli
+  section: '### define universal registry item for eslint configuration (shadcn/ui)'
+  severity: medium
+  replacement: eslint.config.js (flat config)
+  source: ESLint v9 release notes — legacy config removed in v10
+  category: dev-tooling
+- type: deprecation
+  file: .claude/skills/shadcn-ui/references/ui-reference.md
+  line: 166
+  term: .eslintrc
+  context: This example shows a universal registry item for installing a custom ESLint
+    configuration. It uses an explicit `target` to place the `.eslintrc.json` file
+    in the user's home directory, ensuring framew
+  section: '### universal item for eslint configuration (json)'
+  severity: medium
+  replacement: eslint.config.js (flat config)
+  source: ESLint v9 release notes — legacy config removed in v10
+  category: dev-tooling

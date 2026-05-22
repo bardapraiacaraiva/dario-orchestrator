@@ -29,7 +29,6 @@ import json
 import logging
 import subprocess
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -103,8 +102,13 @@ Response format:
 {{"score": <int 0-100>, "action": "<ship|revision|success_pattern>", "dimensions": {{"<name>": <float 0.0-1.0>}}, "feedback": "<one specific improvement suggestion>"}}"""
 
 
-def score_via_api(prompt: str) -> dict:
-    """Call Haiku API for scoring."""
+def score_via_api(prompt: str, retries: int = 1) -> dict:
+    """Call Haiku API for scoring.
+
+    `retries` was previously referenced inside the except handler but was
+    not in scope, so the retry path was dead. Added as a parameter — caller
+    can disable retry with retries=0 or escalate with retries=2.
+    """
     try:
         import anthropic
         client = anthropic.Anthropic()
@@ -141,7 +145,7 @@ def score_via_api(prompt: str) -> dict:
         if retries > 0 and ("rate" in str(e).lower() or "timeout" in str(e).lower() or "connection" in str(e).lower()):
             import time
             time.sleep(1.5)
-            return score_via_api(prompt)
+            return score_via_api(prompt, retries=retries - 1)
         return {"score": -1, "error": str(e)[:300]}
 
 

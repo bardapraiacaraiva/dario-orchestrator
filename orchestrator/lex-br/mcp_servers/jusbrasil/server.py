@@ -26,9 +26,8 @@ import argparse
 import json
 import os
 import sys
-import urllib.request
 import urllib.parse
-from typing import Optional
+import urllib.request
 
 JUSBRASIL_API_BASE = "https://api.jusbrasil.com.br/v1"
 API_KEY = os.environ.get("JUSBRASIL_API_KEY")  # set in environment
@@ -83,7 +82,7 @@ SUMULAS = {
 }
 
 
-def search_jurisprudence(query: str, court: Optional[str] = None,
+def search_jurisprudence(query: str, court: str | None = None,
                          limit: int = 10) -> dict:
     """Search jurisprudência on JusBrasil API.
 
@@ -155,7 +154,7 @@ def get_sumula(tribunal: str, numero: str) -> dict:
         return {"mode": "ERROR", "error": str(e)}
 
 
-def search_legislation(query: str, lei_numero: Optional[str] = None) -> dict:
+def search_legislation(query: str, lei_numero: str | None = None) -> dict:
     """Search legislação consolidada."""
     if not API_KEY:
         return {

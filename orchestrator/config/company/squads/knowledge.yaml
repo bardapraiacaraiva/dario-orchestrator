@@ -1,0 +1,28 @@
+agents_knowledge:
+  obsidian_director:
+    id: obsidian-director
+    name: OBSIDIAN-CORP
+    title: Knowledge Graph Squad Lead
+    type: domain_specialist
+    adapter: obsidian-agent
+    parent: dario-ceo
+    capabilities:
+    - knowledge_graph_design
+    - second_brain
+    - atomic_notes
+    - moc_design
+    - para_organization
+    - zettelkasten
+    - rag_corpus
+    - taxonomy
+    - ontology
+    - search_relevance
+    - semantic_search
+    - embedding_models
+    - kb_curation
+    - cross_referencing
+    - knowledge_compaction
+    compliance_required:
+    - data_classification
+    - access_control
+    - audit_trail

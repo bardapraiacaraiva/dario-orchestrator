@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 """Tests for Upgrade 7 golden eval / regression detection."""
 
-import shutil
 import sys
-import tempfile
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 import golden_eval
-
 
 # Use a sandbox eval id so we don't pollute real goldens
 TEST_EVAL_ID = "test-eval-golden-xyz-123"

@@ -34,7 +34,7 @@ Principles:
 import argparse
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 try:
@@ -44,7 +44,7 @@ try:
     yaml_engine.width = 200
 
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml_engine.load(f)
 
     def dump_yaml_list(data, path):
@@ -56,7 +56,7 @@ try:
 except ImportError:
     import yaml
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
     def dump_yaml_list(data, path):
         with open(path, 'w', encoding='utf-8') as f:
@@ -84,7 +84,7 @@ VALID_ACTIONS = [
 
 def get_today_file() -> Path:
     AUDIT_DIR.mkdir(parents=True, exist_ok=True)
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(UTC).strftime("%Y-%m-%d")
     return AUDIT_DIR / f"{today}.yaml"
 
 
@@ -92,7 +92,7 @@ def log_event(actor: str, action: str, entity_type: str = "",
               entity_id: str = "", details: str = "") -> dict:
     """Append a structured event to today's audit log."""
     entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "actor": actor,
         "action": action,
     }
@@ -128,7 +128,7 @@ def log_event(actor: str, action: str, entity_type: str = "",
 
 def consolidate():
     """Merge today's per-engine logs into the unified trail."""
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(UTC).strftime("%Y-%m-%d")
     merged = 0
 
     # 1. Dispatch log
@@ -193,7 +193,7 @@ def show_today(as_json: bool):
         import json
         print(json.dumps(data, indent=2, default=str))
     else:
-        print(f"=== AUDIT TRAIL — {datetime.now(timezone.utc).strftime('%Y-%m-%d')} ({len(data)} entries) ===\n")
+        print(f"=== AUDIT TRAIL — {datetime.now(UTC).strftime('%Y-%m-%d')} ({len(data)} entries) ===\n")
         for entry in data:
             ts = entry.get("timestamp", "?")
             # Short timestamp

@@ -25,7 +25,7 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -46,7 +46,7 @@ def save_checkpoint(task_id: str, checkpoint_data: dict) -> dict:
 
     checkpoint = {
         "task_id": task_id,
-        "saved_at": datetime.now(timezone.utc).isoformat(),
+        "saved_at": datetime.now(UTC).isoformat(),
         "step_index": checkpoint_data.get("step_index", 0),
         "partial_output": checkpoint_data.get("partial_output", ""),
         "accumulated_tokens": checkpoint_data.get("tokens", 0),
@@ -86,7 +86,7 @@ def suspend_task(task_id: str) -> dict:
         except json.JSONDecodeError:
             pass
 
-        checkpoint["suspended_at"] = datetime.now(timezone.utc).isoformat()
+        checkpoint["suspended_at"] = datetime.now(UTC).isoformat()
         checkpoint["previous_status"] = "in_progress"
 
         conn.execute(
@@ -117,7 +117,7 @@ def resume_task(task_id: str) -> dict:
     except json.JSONDecodeError:
         pass
 
-    checkpoint["resumed_at"] = datetime.now(timezone.utc).isoformat()
+    checkpoint["resumed_at"] = datetime.now(UTC).isoformat()
 
     with db._conn() as conn:
         conn.execute(

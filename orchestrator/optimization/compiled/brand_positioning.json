@@ -1,0 +1,82 @@
+{
+  "generate.predict": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "briefing": "Startup SaaS B2B: ferramenta de observability para agentes de IA em produção. Target: VP Engineering em scale-ups com 100+ engenheiros que correm LangChain/LangGraph. Concorrem com LangSmith e Helicone.",
+        "reasoning": "O target é um VP Engineering em scale-ups que já domina observability tradicional mas enfrenta um novo problema: agentes de IA são caixas-negras em produção. LangSmith é a ferramenta nativa do ecossistema LangChain, Helicone é genérica. O diferencial deve ser: profundidade em rastreamento de decisões de agentes (não apenas tokens/latência), integração sem fricção com stacks LangChain/LangGraph, e insights acionáveis para debug de comportamentos emergentes. O tom deve ser técnico, direto, sem hype de IA—fala a linguagem de quem já sofreu com production incidents.",
+        "posicionamento": "A ferramenta de observability que transforma agentes de IA de caixas-negras em sistemas debugáveis, permitindo que VPs de Engineering vejam cada decisão, cada alucinação, cada desvio—antes que o cliente veja.",
+        "archetype": "Mentor",
+        "tom_de_voz": "Técnico, direto, sem hype. Como um staff engineer a partilhar hard-won lessons sobre production debugging.",
+        "diferenciadores": [
+          "Rastreamento de cadeia de pensamento do agente (reasoning traces) com visualização de cada passo de decisão",
+          "Integração zero-config com LangChain/LangGraph—não requer refactoring de código",
+          "Alertas inteligentes para alucinações e desvios de comportamento esperado, não apenas latência/tokens"
+        ]
+      },
+      {
+        "augmented": true,
+        "briefing": "Hotel boutique 14 quartos em Lisboa, Príncipe Real. Edifício Pombalino restaurado. Hóspede-tipo: viajante de negócios premium 40-60 que troca cadeias por experiência. Preço €280-450/noite.",
+        "reasoning": "O hóspede-tipo é um viajante experiente, sofisticado, que valoriza autenticidade e contexto histórico sobre comodidades genéricas. Príncipe Real é um bairro com identidade cultural forte (design, arte, gastronomia). A restauração de um Pombalino é um ativo narrativo poderoso. O posicionamento deve evocar pertença a um lugar com história, não apenas hospedagem. O archetype é o Lover (conexão emocional com lugar/comunidade) ou o Sage (conhecimento, autenticidade). Tom deve ser refinado mas acessível, sem pretensão. Diferenciadores devem focar: localização única, restauro respeitoso, acesso a comunidade local, experiência de lugar.",
+        "posicionamento": "Um refúgio de 14 quartos no coração de Príncipe Real onde a história arquitectónica do século XVIII encontra a Lisboa contemporânea de design e cultura — para o viajante que escolhe estar *num* lugar, não apenas *passar por* um.",
+        "archetype": "Lover",
+        "tom_de_voz": "Refinado, acolhedor, com subtil erudição. Conversação entre pessoas que apreciam detalhe e contexto, sem pedantismo.",
+        "diferenciadores": [
+          "Pombalino original restaurado com rigor histórico — cada quarto conta a geometria e luz do século XVIII",
+          "Localização no epicentro cultural de Lisboa: galerias, ateliers, restaurantes de chef a 50m",
+          "Acesso curado à comunidade local: apresentações a proprietários de espaços, artistas, produtores de bairro"
+        ]
+      },
+      {
+        "briefing": "SaaS de gestão financeira para PMEs portuguesas. Concorre com Moloni/SAGE. Target: 50-250 colaboradores, CFO ou contabilista. Diferencial: integração nativa com Banco de Portugal e SAFT automatizado.",
+        "posicionamento": "O parceiro financeiro digital das PMEs portuguesas que tratam contabilidade como vantagem competitiva, não como burocracia obrigatória.",
+        "archetype": "Sage",
+        "tom_de_voz": "Confiante, técnico, sem jargão. Como um CFO sénior a explicar a um colega.",
+        "diferenciadores": [
+          "Conformidade SAFT-PT validada em tempo real, não no fecho do mês",
+          "Integração nativa com Banco de Portugal (SIBS/IBAN)",
+          "Dashboards focados em decisão de tesouraria, não em compliance"
+        ]
+      }
+    ],
+    "signature": {
+      "instructions": "Generate a brand positioning statement plus archetype, tone of voice,\nand 3-5 differentiators for a client described by the input briefing.\n\nThe output MUST follow the Kapferer Identity Prism dimensions where\nrelevant (physique, personality, culture, relationship, reflection,\nself-image) and propose a Jungian archetype that anchors the brand.",
+      "fields": [
+        {
+          "prefix": "Briefing:",
+          "description": "Free-text brief: company, market, customer, goal, constraints."
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Posicionamento:",
+          "description": "One-paragraph positioning statement (PT/EN, follow input language)."
+        },
+        {
+          "prefix": "Archetype:",
+          "description": "Jungian archetype name (one of the 12 standard archetypes)."
+        },
+        {
+          "prefix": "Tom De Voz:",
+          "description": "Tone of voice descriptor (2-4 adjectives + 1-line guidance)."
+        },
+        {
+          "prefix": "Diferenciadores:",
+          "description": "3 to 5 concrete differentiators (each a short phrase)."
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.2.1",
+      "cloudpickle": "3.1"
+    }
+  }
+}

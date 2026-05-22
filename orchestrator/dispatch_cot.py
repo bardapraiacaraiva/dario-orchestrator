@@ -30,9 +30,8 @@ CLI:
 
 import argparse
 import json
-import sqlite3
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 try:
@@ -41,7 +40,7 @@ try:
     _yaml.preserve_quotes = True
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 
     def _dump_yaml(data, path):
@@ -51,7 +50,7 @@ except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
     def _dump_yaml(data, path):
@@ -107,7 +106,7 @@ def _gather_signals(task: dict) -> dict:
 
     # Signal 2: semantic
     try:
-        from semantic_dispatch import infer_skill_semantic, semantic_match
+        from semantic_dispatch import semantic_match
         text = f"{task.get('title', '')} {task.get('description', '')}".strip()
         if text:
             top_matches = semantic_match(text, top_k=3)
@@ -304,7 +303,7 @@ def reason(task: dict, persist: bool = True) -> dict:
     signals = _gather_signals(task)
     decision = _synthesise(signals)
     trace = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "task_id": task.get("id") or task.get("task_id"),
         "task_title": task.get("title", "")[:200],
         "task_project": task.get("project"),
@@ -370,7 +369,7 @@ def postmortem(task_id: str, actual_score: int, actual_outcome: str = "unknown")
     }
 
     trace["postmortem"] = learning
-    trace["postmortem_at"] = datetime.now(timezone.utc).isoformat()
+    trace["postmortem_at"] = datetime.now(UTC).isoformat()
     _dump_yaml(trace, str(path))
     return {"status": "complete", **learning}
 

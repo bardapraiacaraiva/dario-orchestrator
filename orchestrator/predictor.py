@@ -73,7 +73,7 @@ def predict(task_id: str = "", skill: str = "", model: str = "sonnet",
         y = YAML()
         qf = ORCH_DIR / "quality" / "skill-metrics.yaml"
         if qf.exists():
-            with open(str(qf), 'r', encoding='utf-8') as _qf:
+            with open(str(qf), encoding='utf-8') as _qf:
                 yaml_metrics = y.load(_qf)
             skill_yaml = (yaml_metrics or {}).get("skills", {}).get(skill, {})
         else:
@@ -189,7 +189,7 @@ def main():
         print(f"  Cost:       ${p['cost']:.4f}")
         print(f"  Revision:   {p['revision_risk']:.0%} risk")
         print(f"  Recommend:  {result['recommended_model']}\n")
-        print(f"  Model comparison:")
+        print("  Model comparison:")
         for m, d in result["model_comparison"].items():
             marker = " <--" if m == result["recommended_model"] else ""
             print(f"    {m:8s} quality={d['predicted_quality']:3d}  cost=${d['estimated_cost']:.4f}{marker}")

@@ -1,0 +1,29 @@
+agents_education:
+  campus_director:
+    id: campus-director
+    name: CAMPUS
+    title: Education BR Squad Lead
+    type: domain_specialist
+    adapter: campus-agent
+    parent: dario-ceo
+    jurisdiction: Brasil
+    capabilities:
+    - mec_regulation
+    - ldb_compliance
+    - bncc_alignment
+    - enem_enade_prep
+    - ead_regulation
+    - instructional_design
+    - learning_experience
+    - education_analytics
+    - lms_architecture
+    - online_course_pedagogy
+    - gamification
+    - microlearning
+    - assessment_design
+    - certification
+    - corporate_learning
+    compliance_required:
+    - mec_credenciamento
+    - lgpd_education_marker
+    - certification_audit

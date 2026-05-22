@@ -34,9 +34,9 @@ import json
 import logging
 import time
 from collections import defaultdict
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import AsyncGenerator, Optional
+from collections.abc import AsyncGenerator
+from dataclasses import dataclass
+from datetime import UTC, datetime
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("sse_streaming")
@@ -164,7 +164,7 @@ async def stream_task_events(
     task_id: str,
     modes: list[str] = None,
     timeout: float = 300,
-) -> AsyncGenerator[str, None]:
+) -> AsyncGenerator[str]:
     """
     Async generator for SSE streaming. Use with FastAPI StreamingResponse.
 
@@ -196,9 +196,9 @@ async def stream_task_events(
                 event = await asyncio.wait_for(queue.get(), timeout=30)
                 if event.mode in modes:
                     yield event.to_sse()
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Send keepalive
-                yield f": keepalive {datetime.now(timezone.utc).isoformat()}\n\n"
+                yield f": keepalive {datetime.now(UTC).isoformat()}\n\n"
 
     finally:
         bus.unsubscribe(queue, task_id)

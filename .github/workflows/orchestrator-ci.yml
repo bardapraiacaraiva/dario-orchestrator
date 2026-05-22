@@ -1,0 +1,146 @@
+name: DARIO Orchestrator CI
+
+on:
+  push:
+    paths:
+      - "orchestrator/**"
+      - ".github/workflows/orchestrator-ci.yml"
+  pull_request:
+    paths:
+      - "orchestrator/**"
+      - ".github/workflows/orchestrator-ci.yml"
+
+# Cancel in-progress runs when a new push lands.
+concurrency:
+  group: orchestrator-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: orchestrator
+
+jobs:
+  ruff:
+    name: Ruff (lint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install ruff
+        run: pip install "ruff>=0.13"
+
+      - name: Ruff check
+        run: python -m ruff check .
+
+  mypy:
+    name: Mypy (foundational modules)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install runtime + mypy
+        run: |
+          pip install "mypy>=1.13" "pydantic>=2.12" "fastapi>=0.135" \
+              "pyyaml>=6.0" "langgraph>=1.1" "langgraph-checkpoint-sqlite>=2.0" \
+              "opentelemetry-api>=1.30" "opentelemetry-sdk>=1.30" \
+              "opentelemetry-exporter-otlp>=1.30" "temporalio>=1.10" \
+              "dspy>=2.5"
+
+      - name: Mypy strict on 48 foundational modules
+        run: |
+          python -m mypy --follow-imports=skip \
+              schemas otel_setup.py chain_graph.py chain_schemas.py config optimization \
+              upgrades/intelligence_qvalue.py upgrades/intelligence_tiered.py \
+              upgrades/intelligence_kg.py upgrades/intelligence_router.py \
+              upgrades/intelligence_tools.py upgrades/intelligence_benchmark.py \
+              upgrades/intelligence_metrics.py \
+              upgrades/core_handoff.py upgrades/core_messagebus.py \
+              upgrades/core_checkpoints.py upgrades/core_engines.py \
+              upgrades/execution_parallel.py \
+              durable memory dream
+
+  pytest-fast:
+    name: Pytest fast suite (not slow)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install with test extras
+        run: |
+          pip install -e ".[test,observability]" \
+              "langgraph-checkpoint-sqlite>=2.0" "temporalio>=1.10" \
+              "dspy>=2.5" "deepeval>=3.9"
+
+      - name: Run fast tests
+        env:
+          # Skip Ollama-dependent paths; conftest auto-mocks _embed by default.
+          DARIO_TEST_MODE: "1"
+        run: |
+          python -m pytest tests/ -m "not slow" \
+              --maxfail=5 \
+              --tb=short \
+              -q
+
+  pytest-slow:
+    name: Pytest slow suite (pre-push equivalent)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Slow suite runs only on PRs and main pushes — not on every feature branch.
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install with test extras
+        run: |
+          pip install -e ".[test,observability]" \
+              "langgraph-checkpoint-sqlite>=2.0" "temporalio>=1.10" \
+              "dspy>=2.5" "deepeval>=3.9"
+
+      - name: Run slow tests
+        env:
+          DARIO_TEST_MODE: "1"
+        run: |
+          python -m pytest tests/ -m "slow" \
+              --maxfail=5 \
+              --tb=short \
+              -q
+
+  summary:
+    name: CI summary
+    runs-on: ubuntu-latest
+    needs: [ruff, mypy, pytest-fast]
+    if: always()
+    steps:
+      - name: Report
+        run: |
+          echo "Ruff:         ${{ needs.ruff.result }}"
+          echo "Mypy:         ${{ needs.mypy.result }}"
+          echo "Pytest fast:  ${{ needs.pytest-fast.result }}"
+          if [ "${{ needs.ruff.result }}" != "success" ] || \
+             [ "${{ needs.mypy.result }}" != "success" ] || \
+             [ "${{ needs.pytest-fast.result }}" != "success" ]; then
+            exit 1
+          fi

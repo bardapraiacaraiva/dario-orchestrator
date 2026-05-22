@@ -29,22 +29,22 @@ Integration:
 
 import os
 import sys
+
 import pytest
 
 # Add orchestrator to path
 sys.path.insert(0, os.path.expanduser("~/.claude/orchestrator"))
 
-from deepeval import assert_test
-from deepeval.test_case import LLMTestCase
+from deepeval.dataset import EvaluationDataset
 from deepeval.metrics import (
-    AnswerRelevancyMetric,
     GEval,
 )
-from deepeval.dataset import EvaluationDataset
+from deepeval.test_case import LLMTestCase
 
 # Import DARIO's existing golden test cases
 from eval_suite import EVAL_CASES
 
+pytestmark = pytest.mark.slow
 
 # =============================================================================
 # CONVERT DARIO EVAL_CASES → DeepEval LLMTestCase format
@@ -67,7 +67,7 @@ def build_test_cases() -> list[LLMTestCase]:
         )
         actual_output = ""
         if os.path.exists(output_file):
-            with open(output_file, "r", encoding="utf-8") as f:
+            with open(output_file, encoding="utf-8") as f:
                 actual_output = f.read().strip()
 
         # If no saved output, use a placeholder for structural testing
@@ -141,7 +141,7 @@ class TestDARIOEvalStructure:
     def test_all_cases_have_required_fields(self):
         """Every eval case must have id, skill, input, expected_keywords, min_score."""
         for case in EVAL_CASES:
-            assert "id" in case, f"Missing 'id' in eval case"
+            assert "id" in case, "Missing 'id' in eval case"
             assert "skill" in case, f"Missing 'skill' in {case.get('id', '?')}"
             assert "input" in case, f"Missing 'input' in {case['id']}"
             assert "expected_keywords" in case, f"Missing 'expected_keywords' in {case['id']}"
@@ -176,7 +176,7 @@ class TestDARIOEvalStructure:
     def test_unique_ids(self):
         """All eval case IDs must be unique."""
         ids = [c["id"] for c in EVAL_CASES]
-        assert len(ids) == len(set(ids)), f"Duplicate eval IDs found"
+        assert len(ids) == len(set(ids)), "Duplicate eval IDs found"
 
     def test_financial_cases_exist(self):
         """At least 1 financial eval case should exist."""
@@ -199,7 +199,7 @@ class TestDARIOKeywordCoverage:
         )
         # This is informational — we don't fail if output doesn't exist yet
         if os.path.exists(output_file):
-            with open(output_file, "r", encoding="utf-8") as f:
+            with open(output_file, encoding="utf-8") as f:
                 content = f.read().strip()
             assert len(content) >= case.get("min_length", 100), (
                 f"{case['id']}: output too short ({len(content)} < {case.get('min_length', 100)})"
@@ -260,5 +260,5 @@ if __name__ == "__main__":
     print(f"\n{passed} passed, {failed} failed, {passed + failed} total")
     print(f"\nEval cases: {len(EVAL_CASES)}")
     print(f"Skills covered: {len(set(c['skill'] for c in EVAL_CASES))}")
-    print(f"\nTo run with pytest: pytest tests/test_deepeval_suite.py -v")
-    print(f"To run DeepEval: deepeval test run tests/test_deepeval_suite.py")
+    print("\nTo run with pytest: pytest tests/test_deepeval_suite.py -v")
+    print("To run DeepEval: deepeval test run tests/test_deepeval_suite.py")

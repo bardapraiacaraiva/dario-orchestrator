@@ -22,7 +22,7 @@ Exit codes:
 import argparse
 import logging
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 # --- YAML handling ---
@@ -33,7 +33,7 @@ try:
     yaml_engine.width = 200
 
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml_engine.load(f)
 
     def dump_yaml(data, path):
@@ -44,7 +44,7 @@ except ImportError:
     import yaml
 
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
 
     def dump_yaml(data, path):
@@ -104,7 +104,7 @@ def get_default_state():
     return {
         "current_state": "ACTIVE",
         "autonomy_level": "P-A2",
-        "entered_at": datetime.now(timezone.utc).isoformat(),
+        "entered_at": datetime.now(UTC).isoformat(),
         "previous_state": None,
         "transition_reason": "Initial boot — default state",
         "guardian_triggers_30d": 0,
@@ -140,7 +140,7 @@ def save_state(state: dict):
 
 def get_budget_percentage() -> float:
     """Get current month's budget usage percentage."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     budget_file = BUDGET_DIR / f"{now.strftime('%Y-%m')}.yaml"
     if budget_file.exists():
         data = load_yaml(str(budget_file))
@@ -203,7 +203,7 @@ def get_task_metrics() -> dict:
             counts[status] += 1
 
     # Stale detection: in_progress > 24h without update
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     for t in tasks:
         if t.get("status") == "in_progress":
             checked_out = t.get("checked_out_at") or t.get("assigned_at")
@@ -345,7 +345,7 @@ def transition_state(state: dict, new_state: str, reason: str) -> dict:
         "from": old_state,
         "to": new_state,
         "reason": reason,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
     if "history" not in state:
@@ -358,7 +358,7 @@ def transition_state(state: dict, new_state: str, reason: str) -> dict:
     # Update state
     state["previous_state"] = old_state
     state["current_state"] = new_state
-    state["entered_at"] = datetime.now(timezone.utc).isoformat()
+    state["entered_at"] = datetime.now(UTC).isoformat()
     state["transition_reason"] = reason
 
     # Track guardian triggers
@@ -374,11 +374,11 @@ def transition_state(state: dict, new_state: str, reason: str) -> dict:
 def log_transition(old_state: str, new_state: str, reason: str):
     """Append transition to audit log."""
     AUDIT_DIR.mkdir(parents=True, exist_ok=True)
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(UTC).strftime("%Y-%m-%d")
     log_file = AUDIT_DIR / f"state_{today}.log"
 
     with open(log_file, 'a', encoding='utf-8') as f:
-        ts = datetime.now(timezone.utc).isoformat()
+        ts = datetime.now(UTC).isoformat()
         f.write(f"[{ts}] STATE_TRANSITION: {old_state} → {new_state} | {reason}\n")
 
 
@@ -423,7 +423,7 @@ def cmd_show(args):
         }
         print(json.dumps(result, indent=2))
     else:
-        print(f"=== DARIO STATE MACHINE ===\n")
+        print("=== DARIO STATE MACHINE ===\n")
         print(f"  State:           {state['current_state']}")
         print(f"  Autonomy:        {autonomy} ({AUTONOMY_LEVELS[autonomy]['name']})")
         print(f"  Max Parallel:    {config['max_parallel']}")

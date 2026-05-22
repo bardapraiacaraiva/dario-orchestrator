@@ -42,7 +42,7 @@ import hashlib
 import json
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 try:
@@ -51,7 +51,7 @@ try:
     _yaml.preserve_quotes = True
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 
     def _dump_yaml(data, path):
@@ -61,7 +61,7 @@ except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
     def _dump_yaml(data, path):
@@ -86,7 +86,7 @@ LENGTH_RATIO_MAX = 2.5
 _STOP = {
     "a", "o", "as", "os", "um", "uma", "de", "da", "do", "das", "dos",
     "em", "na", "no", "nas", "nos", "para", "por", "com", "sem", "que",
-    "se", "e", "ou", "mas", "como", "the", "a", "an", "of", "to", "for",
+    "se", "e", "ou", "mas", "como", "the", "an", "of", "to", "for",
     "and", "or", "but", "in", "on", "at", "by", "with", "from", "is",
     "are", "was", "were", "be", "this", "that", "these", "those",
 }
@@ -121,7 +121,7 @@ def _semantic_similarity(text_a: str, text_b: str) -> float:
     """Cosine similarity via Ollama nomic-embed-text. Returns 0.0 on failure."""
     try:
         sys.path.insert(0, str(ORCH_DIR))
-        from semantic_dispatch import _embed, _cosine
+        from semantic_dispatch import _cosine, _embed
         va = _embed(text_a[:4000])
         vb = _embed(text_b[:4000])
         if not va or not vb:
@@ -164,7 +164,7 @@ def capture_golden(eval_id: str, output_text: str, human_score: int,
         "content_hash": new_hash,
         "human_score": int(human_score),
         "human_dimensions": human_dimensions or {},
-        "captured_at": datetime.now(timezone.utc).isoformat(),
+        "captured_at": datetime.now(UTC).isoformat(),
         "char_count": len(output_text),
         "token_count": len(_tokens(output_text)),
         "notes": notes,
@@ -264,7 +264,7 @@ def _log_calibration(action: str, eval_id: str, meta: dict, notes: str = ""):
         except Exception:
             pass
     entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "action": action,
         "eval_id": eval_id,
         "version": meta.get("version", 1),

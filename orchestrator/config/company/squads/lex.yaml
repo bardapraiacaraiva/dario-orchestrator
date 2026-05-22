@@ -1,0 +1,205 @@
+workers_lex:
+  worker-lex-civil:
+    id: worker-lex-civil
+    skill: lex-civil
+    reports_to: lex-br-director
+    security_tier: 3
+    domain: civil
+    legislation_primary:
+    - CC/2002
+    - Lei 10.406/02
+  worker-lex-commercial:
+    id: worker-lex-commercial
+    skill: lex-commercial
+    reports_to: lex-br-director
+    security_tier: 3
+    domain: empresarial
+    legislation_primary:
+    - CC livro II
+    - Lei 8.955/94
+    - Lei 13.874/19
+  worker-lex-corporate:
+    id: worker-lex-corporate
+    skill: lex-corporate
+    reports_to: lex-br-director
+    security_tier: 2
+    domain: societario_ma
+    legislation_primary:
+    - Lei 6.404/76
+    - CC livro II
+    - CVM regulamentos
+  worker-lex-trabalhista:
+    id: worker-lex-trabalhista
+    skill: lex-trabalhista
+    reports_to: lex-br-director
+    security_tier: 3
+    domain: trabalhista
+    legislation_primary:
+    - CLT
+    - Lei 13.467/17
+    - Sumulas TST
+  worker-lex-tributario:
+    id: worker-lex-tributario
+    skill: lex-tributario
+    reports_to: lex-br-director
+    security_tier: 2
+    domain: tributario
+    legislation_primary:
+    - CTN
+    - EC 132/2023
+    - LC 116/03
+  worker-lex-lgpd:
+    id: worker-lex-lgpd
+    skill: lex-lgpd
+    reports_to: lex-br-director
+    security_tier: 2
+    domain: protecao_dados
+    legislation_primary:
+    - Lei 13.709/18
+    - Resoluções ANPD
+    - GDPR (comparativo)
+  worker-lex-regulatorio:
+    id: worker-lex-regulatorio
+    skill: lex-regulatorio
+    reports_to: lex-br-director
+    security_tier: 2
+    domain: regulatorio_setorial
+    legislation_primary:
+    - BACEN
+    - CVM
+    - ANVISA
+    - ANATEL
+    - ANEEL
+    - ANP
+    - ANS
+  worker-lex-ai-governance:
+    id: worker-lex-ai-governance
+    skill: lex-ai-governance
+    reports_to: lex-br-director
+    security_tier: 2
+    domain: ia_governance
+    legislation_primary:
+    - PL 2338/2023
+    - Lei 13.709/18
+    - regulamentos UE comparativo
+  worker-lex-ip:
+    id: worker-lex-ip
+    skill: lex-ip
+    reports_to: lex-br-director
+    security_tier: 3
+    domain: propriedade_intelectual
+    legislation_primary:
+    - Lei 9.279/96
+    - Lei 9.609/98
+    - Lei 9.610/98
+  worker-lex-litigation:
+    id: worker-lex-litigation
+    skill: lex-litigation
+    reports_to: lex-br-director
+    security_tier: 2
+    domain: contencioso_civel
+    legislation_primary:
+    - CPC/2015
+    - Sumulas STJ
+    - Sumulas STF
+  worker-lex-consumidor:
+    id: worker-lex-consumidor
+    skill: lex-consumidor
+    reports_to: lex-br-director
+    security_tier: 3
+    domain: consumo
+    legislation_primary:
+    - CDC Lei 8.078/90
+    - Decreto 7.962/13
+  worker-lex-administrativo:
+    id: worker-lex-administrativo
+    skill: lex-administrativo
+    reports_to: lex-br-director
+    security_tier: 2
+    domain: administrativo
+    legislation_primary:
+    - Lei 14.133/21
+    - Lei 8.987/95
+    - Lei 9.784/99
+  worker-lex-imobiliario:
+    id: worker-lex-imobiliario
+    skill: lex-imobiliario
+    reports_to: lex-br-director
+    security_tier: 3
+    domain: imobiliario
+    legislation_primary:
+    - Lei 8.245/91
+    - Lei 4.591/64
+    - Lei 6.766/79
+  worker-lex-familia:
+    id: worker-lex-familia
+    skill: lex-familia
+    reports_to: lex-br-director
+    security_tier: 2
+    domain: familia_sucessoes
+    legislation_primary:
+    - CC livro IV
+    - Lei 5.478/68
+    - Lei 11.340/06
+  worker-lex-criminal:
+    id: worker-lex-criminal
+    skill: lex-criminal
+    reports_to: lex-br-director
+    security_tier: 1
+    domain: criminal
+    legislation_primary:
+    - CP
+    - CPP
+    - Lei 13.964/19 (Anticrime)
+    - Lei 9.099/95
+squads_lex:
+  contrato_completo:
+    description: Análise + negociação + revisão final de contrato
+    workers:
+    - worker-lex-commercial
+    - worker-lex-lgpd
+    - worker-lex-civil
+    chain_skill_order:
+    - lex-commercial
+    - lex-lgpd
+    - lex-civil
+  due_diligence_ma:
+    description: Due diligence corporate completa
+    workers:
+    - worker-lex-corporate
+    - worker-lex-tributario
+    - worker-lex-trabalhista
+    - worker-lex-lgpd
+    - worker-lex-regulatorio
+    chain_skill_order:
+    - lex-corporate
+    - lex-tributario
+    - lex-trabalhista
+    - lex-lgpd
+    - lex-regulatorio
+  lgpd_compliance_full:
+    description: Programa LGPD end-to-end (RIPD + política + DPA + DSR)
+    workers:
+    - worker-lex-lgpd
+    - worker-lex-commercial
+    chain_skill_order:
+    - lex-lgpd
+    - lex-commercial
+  reclamacao_trabalhista_defesa:
+    description: Defesa empresa em reclamação trabalhista
+    workers:
+    - worker-lex-trabalhista
+    - worker-lex-litigation
+    chain_skill_order:
+    - lex-trabalhista
+    - lex-litigation
+  consumidor_recall:
+    description: Recall + comunicação consumidor + defesa em ações
+    workers:
+    - worker-lex-consumidor
+    - worker-lex-regulatorio
+    - worker-lex-litigation
+    chain_skill_order:
+    - lex-consumidor
+    - lex-regulatorio
+    - lex-litigation

@@ -1,0 +1,81 @@
+workers_orion:
+  worker-orion-strategy:
+    id: worker-orion-strategy
+    skill: orion-product-strategy
+    reports_to: orion-director
+  worker-orion-discovery:
+    id: worker-orion-discovery
+    skill: orion-product-discovery
+    reports_to: orion-director
+  worker-orion-prd:
+    id: worker-orion-prd
+    skill: orion-prd-writing
+    reports_to: orion-director
+  worker-orion-research:
+    id: worker-orion-research
+    skill: orion-user-research
+    reports_to: orion-director
+  worker-orion-jtbd:
+    id: worker-orion-jtbd
+    skill: orion-jobs-to-be-done
+    reports_to: orion-director
+  worker-orion-analytics:
+    id: worker-orion-analytics
+    skill: orion-product-analytics
+    reports_to: orion-director
+  worker-orion-roadmap:
+    id: worker-orion-roadmap
+    skill: orion-roadmap-planning
+    reports_to: orion-director
+  worker-orion-prio:
+    id: worker-orion-prio
+    skill: orion-prioritization
+    reports_to: orion-director
+  worker-orion-flags:
+    id: worker-orion-flags
+    skill: orion-feature-flags
+    reports_to: orion-director
+  worker-orion-beta:
+    id: worker-orion-beta
+    skill: orion-beta-program
+    reports_to: orion-director
+  worker-orion-launch:
+    id: worker-orion-launch
+    skill: orion-product-launch
+    reports_to: orion-director
+  worker-orion-growth:
+    id: worker-orion-growth
+    skill: orion-growth-product
+    reports_to: orion-director
+  worker-orion-retention:
+    id: worker-orion-retention
+    skill: orion-retention-engineering
+    reports_to: orion-director
+  worker-orion-pricing:
+    id: worker-orion-pricing
+    skill: orion-pricing-strategy
+    reports_to: orion-director
+  worker-orion-ops:
+    id: worker-orion-ops
+    skill: orion-product-ops
+    reports_to: orion-director
+squads_orion:
+  product_discovery_to_launch:
+    workers:
+    - worker-orion-discovery
+    - worker-orion-jtbd
+    - worker-orion-research
+    - worker-orion-prd
+    - worker-orion-launch
+  product_strategy_planning:
+    workers:
+    - worker-orion-strategy
+    - worker-orion-roadmap
+    - worker-orion-prio
+    - worker-orion-pricing
+  product_growth_retention:
+    workers:
+    - worker-orion-analytics
+    - worker-orion-growth
+    - worker-orion-retention
+    - worker-orion-flags

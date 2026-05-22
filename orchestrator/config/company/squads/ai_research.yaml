@@ -1,0 +1,27 @@
+agents_ai_research:
+  oraculo_director:
+    id: oraculo-director
+    name: ORACULO
+    title: AI Research & Frontier Squad Lead
+    parent: dario-ceo
+    capabilities:
+    - paper_reading_extraction
+    - replication_studies
+    - model_evaluation
+    - benchmarking
+    - alignment_research
+    - agentic_research
+    - multimodal_research
+    - llm_fine_tuning
+    - rag_research
+    - evaluation_frameworks
+    - paper_writing
+    - peer_review
+    - conference_tracking
+    - model_card_generation
+    - ai_safety_research
+    compliance_required:
+    - audit_immutable
+    - research_integrity
+    - responsible_disclosure
+    - ai_governance

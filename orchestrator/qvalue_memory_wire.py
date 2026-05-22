@@ -30,9 +30,10 @@ import argparse
 import json
 import sqlite3
 import sys
-import yaml
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
+
+import yaml
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 DB_PATH = ORCH_DIR / "orchestrator.db"
@@ -67,7 +68,7 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
 def _load_qvm():
     """Construct a QValueMemory instance loaded with persisted episodes."""
     sys.path.insert(0, str(ORCH_DIR))
-    from intelligence_upgrades import QValueMemory, Episode
+    from upgrades.intelligence import Episode, QValueMemory
 
     qvm = QValueMemory(learning_rate=0.1, discount=0.95)
     if not DB_PATH.exists():
@@ -88,7 +89,7 @@ def _load_qvm():
             tokens_used=int(r[5] or 0),
             q_value=float(r[6] or 0),
             visits=int(r[7] or 1),
-            created_at=r[8] or datetime.now(timezone.utc).isoformat(),
+            created_at=r[8] or datetime.now(UTC).isoformat(),
         )
         qvm._episodes.append(ep)
     return qvm
@@ -106,7 +107,7 @@ def _persist_episode(ep) -> None:
         getattr(ep, "project", None),
         float(ep.outcome_score), int(ep.tokens_used),
         float(ep.q_value), int(ep.visits),
-        ep.created_at, datetime.now(timezone.utc).isoformat(),
+        ep.created_at, datetime.now(UTC).isoformat(),
     ))
     conn.commit()
     conn.close()
@@ -128,7 +129,7 @@ def record_outcome(context: str, skill: str, score: float,
     ep = qvm.record(context=context, strategy=strategy, skill=skill,
                     outcome_score=float(score), tokens_used=int(tokens_used))
     # Attach project for retrieval filtering
-    setattr(ep, "project", project)
+    ep.project = project
     _persist_episode(ep)
     return {
         "recorded": True,
@@ -150,9 +151,9 @@ STOP_WORDS = {
     "meu", "minha", "seu", "sua", "este", "esse", "aquele", "esta", "essa",
     "ao", "à", "aos", "às", "pelo", "pela", "pelos", "pelas",
     # EN
-    "the", "a", "an", "of", "to", "for", "and", "or", "but", "in", "on",
-    "at", "by", "with", "from", "as", "is", "are", "was", "were", "be",
-    "been", "being", "have", "has", "had", "do", "does", "did", "will",
+    "the", "an", "of", "to", "for", "and", "or", "but", "in", "on",
+    "at", "by", "with", "from", "is", "are", "was", "were", "be",
+    "been", "being", "have", "has", "had", "does", "did", "will",
     "would", "could", "should", "may", "might", "can", "this", "that",
     "these", "those", "i", "you", "we", "they", "it", "create", "make",
     "want", "need", "my", "your", "our", "their",
@@ -266,7 +267,7 @@ def bootstrap_from_history(verbose: bool = False) -> dict:
                 """, (
                     ep_id, context, strategy, skill, project,
                     float(score), int(tokens or 0), float(score) / 100.0, 1,
-                    completed or datetime.now(timezone.utc).isoformat(),
+                    completed or datetime.now(UTC).isoformat(),
                 ))
                 stats["db_tasks"] += 1
                 if verbose:
@@ -284,7 +285,7 @@ def bootstrap_from_history(verbose: bool = False) -> dict:
                 continue
             for ep_file in day_dir.glob("*.yaml"):
                 try:
-                    with open(ep_file, "r", encoding="utf-8") as f:
+                    with open(ep_file, encoding="utf-8") as f:
                         data = yaml.safe_load(f)
                     if not isinstance(data, dict):
                         continue
@@ -308,7 +309,7 @@ def bootstrap_from_history(verbose: bool = False) -> dict:
                         ep_id, context, strategy, skill, project,
                         float(score), int(data.get("tokens_used", 0) or 0),
                         float(score) / 100.0, 1,
-                        data.get("timestamp") or datetime.now(timezone.utc).isoformat(),
+                        data.get("timestamp") or datetime.now(UTC).isoformat(),
                     ))
                     stats["yaml_episodes"] += 1
                 except Exception:

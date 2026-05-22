@@ -106,18 +106,18 @@ def enforce_or_exit(component: str = "orchestrator", quiet: bool = False) -> Non
             f"│ Reason:  {reason:<50s} │\n"
         )
         if msg:
-            sys.stderr.write(f"│                                                             │\n")
+            sys.stderr.write("│                                                             │\n")
             sys.stderr.write(f"│ {msg[:59]:<59s} │\n")
         sys.stderr.write(
-            f"├─────────────────────────────────────────────────────────────┤\n"
-            f"│ To activate VIP:                                            │\n"
-            f"│   python ~/.claude/orchestrator/license_manager.py \\        │\n"
-            f"│     --activate DARIO-XXXX-XXXX-XXXX-PRO                     │\n"
-            f"│                                                             │\n"
-            f"│ To start a fresh 7-day trial:                               │\n"
-            f"│   python ~/.claude/orchestrator/license_manager.py \\        │\n"
-            f"│     --init-trial                                            │\n"
-            f"└─────────────────────────────────────────────────────────────┘\n\n"
+            "├─────────────────────────────────────────────────────────────┤\n"
+            "│ To activate VIP:                                            │\n"
+            "│   python ~/.claude/orchestrator/license_manager.py \\        │\n"
+            "│     --activate DARIO-XXXX-XXXX-XXXX-PRO                     │\n"
+            "│                                                             │\n"
+            "│ To start a fresh 7-day trial:                               │\n"
+            "│   python ~/.claude/orchestrator/license_manager.py \\        │\n"
+            "│     --init-trial                                            │\n"
+            "└─────────────────────────────────────────────────────────────┘\n\n"
         )
     sys.exit(2)
 

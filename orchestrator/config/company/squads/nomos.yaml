@@ -1,0 +1,90 @@
+workers_nomos:
+  worker-nomos-cmvm:
+    id: worker-nomos-cmvm
+    skill: nomos-cmvm-compliance
+    reports_to: nomos-director
+  worker-nomos-bdp:
+    id: worker-nomos-bdp
+    skill: nomos-bdp-banking-pt
+    reports_to: nomos-director
+  worker-nomos-asae:
+    id: worker-nomos-asae
+    skill: nomos-asae-food-safety
+    reports_to: nomos-director
+  worker-nomos-acss:
+    id: worker-nomos-acss
+    skill: nomos-acss-healthcare-pt
+    reports_to: nomos-director
+  worker-nomos-rgpd:
+    id: worker-nomos-rgpd
+    skill: nomos-rgpd-pt-marker
+    reports_to: nomos-director
+  worker-nomos-igac:
+    id: worker-nomos-igac
+    skill: nomos-igac-events-pt
+    reports_to: nomos-director
+  worker-nomos-anac:
+    id: worker-nomos-anac
+    skill: nomos-anac-aviation-pt
+    reports_to: nomos-director
+  worker-nomos-adc:
+    id: worker-nomos-adc
+    skill: nomos-concorrencia-pt
+    reports_to: nomos-director
+  worker-nomos-ai-act:
+    id: worker-nomos-ai-act
+    skill: nomos-eu-ai-act-pt
+    reports_to: nomos-director
+  worker-nomos-dora:
+    id: worker-nomos-dora
+    skill: nomos-dora-resilience
+    reports_to: nomos-director
+  worker-nomos-mifid:
+    id: worker-nomos-mifid
+    skill: nomos-mifid-ii-pt
+    reports_to: nomos-director
+  worker-nomos-psd2:
+    id: worker-nomos-psd2
+    skill: nomos-psd2-open-banking-pt
+    reports_to: nomos-director
+  worker-nomos-fraude:
+    id: worker-nomos-fraude
+    skill: nomos-anti-fraude-pt
+    reports_to: nomos-director
+  worker-nomos-aml:
+    id: worker-nomos-aml
+    skill: nomos-kyc-aml-pt
+    reports_to: nomos-director
+  worker-nomos-digital:
+    id: worker-nomos-digital
+    skill: nomos-dl-79-2024-digital
+    reports_to: nomos-director
+squads_nomos:
+  banking_finance_pt:
+    workers:
+    - worker-nomos-bdp
+    - worker-nomos-mifid
+    - worker-nomos-psd2
+    - worker-nomos-dora
+  capital_markets_pt:
+    workers:
+    - worker-nomos-cmvm
+    - worker-nomos-adc
+    - worker-nomos-mifid
+  ai_data_compliance:
+    workers:
+    - worker-nomos-ai-act
+    - worker-nomos-rgpd
+    - worker-nomos-dora
+  aml_fraud_pt:
+    workers:
+    - worker-nomos-aml
+    - worker-nomos-fraude
+    - worker-nomos-bdp
+  sector_compliance_pt:
+    workers:
+    - worker-nomos-asae
+    - worker-nomos-acss
+    - worker-nomos-igac
+    - worker-nomos-anac
+    - worker-nomos-digital

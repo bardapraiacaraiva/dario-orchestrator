@@ -7,6 +7,7 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
+
 import episode_promoter as ep_module
 
 
@@ -107,7 +108,6 @@ def test_pattern_content_builder():
 
 def test_scan_is_dry_run():
     """Scan must not write to filesystem."""
-    import os
     before = list(ep_module.SEMANTIC_DIR.glob("SEM-*.yaml")) if ep_module.SEMANTIC_DIR.exists() else []
     r = ep_module.scan(days=7)
     after = list(ep_module.SEMANTIC_DIR.glob("SEM-*.yaml")) if ep_module.SEMANTIC_DIR.exists() else []

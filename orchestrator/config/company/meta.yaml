@@ -1,0 +1,9 @@
+company:
+  name: BARDA Digital Agency
+  goal: Deliver world-class digital transformation, SEO, web development, architecture, and AI solutions for Portuguese and international clients
+  owner: barda
+  budget:
+    monthly_limit_tokens: 50000000
+    alert_threshold: 0.8
+    auto_pause_threshold: 0.95
+  created: '2026-04-26'

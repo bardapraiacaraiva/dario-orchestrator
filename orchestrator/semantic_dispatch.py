@@ -24,7 +24,6 @@ import sqlite3
 import sys
 import urllib.request
 from pathlib import Path
-from typing import Optional
 
 try:
     import yaml

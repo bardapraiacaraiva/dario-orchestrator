@@ -7,8 +7,11 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
+import pytest
+
 import dispatch_cot
 
+pytestmark = pytest.mark.slow
 
 # Use sandbox task ids so we don't pollute production CoT dir
 SANDBOX_PREFIX = "test-cot-sandbox-"

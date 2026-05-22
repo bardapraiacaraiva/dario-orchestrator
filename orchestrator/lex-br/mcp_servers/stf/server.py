@@ -8,9 +8,9 @@ Repo: github.com/dario-legal-br/mcp-stf (planned)
 
 import argparse
 import json
+import re
 import sys
 import urllib.request
-import re
 
 STF_RSS_BASE = "https://www.stf.jus.br/portal/cms/listarSiteRSS.asp"
 

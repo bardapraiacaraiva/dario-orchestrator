@@ -1,0 +1,110 @@
+heartbeat_defaults:
+  manager:
+    interval_minutes: 30
+    cooldown_minutes: 5
+    coalesce_if_active: true
+  worker:
+    interval_minutes: 0
+    cooldown_minutes: 2
+    coalesce_if_active: true
+  service:
+    interval_minutes: 5
+    cooldown_minutes: 1
+    coalesce_if_active: true
+routines:
+  daily_standup:
+    trigger: schedule
+    schedule: 0 9 * * 1-5
+    timezone: Europe/Lisbon
+    action: Review all in_progress tasks, flag stale (>24h no update), report blockers
+    concurrency: skip_if_active
+  weekly_review:
+    trigger: schedule
+    schedule: 0 18 * * 5
+    timezone: Europe/Lisbon
+    action: 'Summarize week: tasks completed, tasks carried, budget spent, blockers, next week priorities'
+    concurrency: skip_if_active
+  knowledge_refresh:
+    trigger: schedule
+    schedule: 0 3 * * 0
+    timezone: Europe/Lisbon
+    action: Run knowledge decay check, flag stale sources, trigger RAG self-improvement
+    concurrency: skip_if_active
+  client_pulse:
+    type: worker
+    trigger: schedule
+    schedule: 0 10 * * 1
+    timezone: Europe/Lisbon
+    action: Check all active projects for stale tasks, pending client responses, approaching deadlines
+    concurrency: skip_if_active
+mcp_servers_br:
+- name: mcp-jusbrasil
+  api: api.jusbrasil.com.br/docs
+  domain: jurisprudencia
+  status: planned
+  repo: github.com/dario-legal-br/mcp-jusbrasil
+  priority: critical
+- name: mcp-cnj-datajud
+  api: datajud-wiki.cnj.jus.br
+  domain: dados_processuais_oficiais
+  status: planned
+  repo: github.com/dario-legal-br/mcp-cnj-datajud
+  priority: critical
+- name: mcp-stf
+  api: STF RSS + decisoes APIs
+  domain: precedentes_supremo
+  status: planned
+  repo: github.com/dario-legal-br/mcp-stf
+  priority: high
+- name: mcp-diario-oficial
+  api: DOU + diarios estaduais (PDF parsing)
+  domain: alertas_legislativos
+  status: planned
+  repo: github.com/dario-legal-br/mcp-diario-oficial
+  priority: high
+- name: mcp-anpd
+  api: site ANPD (scrape estruturado)
+  domain: sancoes_lgpd_orientacoes
+  status: planned
+  repo: github.com/dario-legal-br/mcp-anpd
+  priority: medium
+- name: mcp-receita-federal
+  api: eCAC + Consulta CNPJ
+  domain: due_diligence_empresas
+  status: planned
+  repo: github.com/dario-legal-br/mcp-receita-federal
+  priority: medium
+- name: mcp-advbox
+  api: api.softwareadvbox.com.br/docs
+  domain: gestao_processual
+  status: planned
+  repo: github.com/dario-legal-br/mcp-advbox
+  priority: medium
+- name: mcp-projuris
+  api: projurishelp.atlassian.net
+  domain: gestao_processual
+  status: planned
+  repo: github.com/dario-legal-br/mcp-projuris
+  priority: medium
+prometheus_governance:
+  wave: 1
+  autonomy_tier: 0
+  green_list_auto_actions: []
+  yellow_list_post_review: []
+  red_list_always_user_approval:
+  - edit_any_skill
+  - edit_company_yaml
+  - edit_skill_chains_yaml
+  - delete_memory_entry
+  - push_to_repos
+  - modify_license_files
+  write_allowed_paths:
+  - ~/.claude/orchestrator/prometheus/digests/*.md
+  - ~/.claude/orchestrator/prometheus/state/*.yaml
+  read_only_paths_external:
+  - https://api.github.com/*
+  - https://export.arxiv.org/*
+  - https://www.anthropic.com/*
+  - https://dre.pt/*
+  - https://eur-lex.europa.eu/*
+  - https://www.gov.br/anpd/*

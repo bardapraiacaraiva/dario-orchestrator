@@ -37,7 +37,7 @@ def load_yaml_safe(path):
     """Load YAML file safely, return empty dict if missing."""
     if not Path(path).exists():
         return {}
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
 
 
@@ -51,7 +51,7 @@ def query_db(sql):
         rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
         return rows
-    except Exception as e:
+    except Exception:
         return []
 
 

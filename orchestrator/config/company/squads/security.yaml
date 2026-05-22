@@ -1,0 +1,29 @@
+agents_security:
+  aegis_director:
+    id: aegis-director
+    name: AEGIS
+    title: Cybersecurity Squad Lead
+    type: domain_specialist
+    adapter: aegis-agent
+    parent: dario-ceo
+    capabilities:
+    - threat_modeling
+    - pentest_methodology
+    - vulnerability_management
+    - soc_operations
+    - siem_integration
+    - edr_management
+    - zero_trust_architecture
+    - iam_identity
+    - secrets_management
+    - incident_response
+    - digital_forensics
+    - compliance_frameworks
+    - security_awareness
+    - secure_sdlc
+    - cloud_security
+    compliance_required:
+    - iso27001_audit
+    - soc2_type2
+    - audit_immutable
+    - responsible_disclosure

@@ -1,0 +1,28 @@
+agents_realestate:
+  kirion_director:
+    id: kirion-director
+    name: KIRION
+    title: Real Estate & PropTech Squad Lead
+    parent: dario-ceo
+    jurisdiction: Portugal + Brasil + Global
+    capabilities:
+    - real_estate_valuation
+    - market_comparables
+    - dcf_property
+    - reit_analysis
+    - mortgage_underwriting
+    - property_management
+    - leasing_strategy
+    - build_to_rent
+    - hospitality_management
+    - golden_visa_pt
+    - portuguese_renda_vitalicia
+    - fii_br
+    - ifrs_16_leases
+    - esg_real_estate
+    - smart_building
+    compliance_required:
+    - cvm_compliance
+    - anbima_alignment
+    - ifrs_16_reporting
+    - audit_immutable

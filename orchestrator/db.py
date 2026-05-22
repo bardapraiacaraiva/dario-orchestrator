@@ -37,7 +37,7 @@ import logging
 import sqlite3
 import sys
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -147,7 +147,7 @@ class DB:
         if not task_id or not title:
             raise ValueError("Task requires 'id' and 'title'")
 
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         deps = kwargs.get("depends_on", "[]")
         if isinstance(deps, list):
             deps = json.dumps(deps)
@@ -180,7 +180,7 @@ class DB:
 
     def assign_task(self, task_id: str, worker_id: str, reason: str = "") -> bool:
         """Atomically assign a task (CAS: only if todo and unassigned)."""
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         with self._conn() as conn:
             cursor = conn.execute("""
                 UPDATE tasks SET assignee = ?, assigned_at = ?, dispatch_reason = ?,
@@ -195,7 +195,7 @@ class DB:
 
     def checkout_task(self, task_id: str) -> bool:
         """Atomic assign+checkout: todo → in_progress (requires assignee)."""
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         with self._conn() as conn:
             cursor = conn.execute("""
                 UPDATE tasks SET status = 'in_progress', checked_out_at = ?, updated_at = ?
@@ -210,7 +210,7 @@ class DB:
         """Complete a task. Only from in_progress."""
         if status not in ("done", "in_review"):
             status = "done"
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         with self._conn() as conn:
             cursor = conn.execute("""
                 UPDATE tasks SET status = ?, quality_score = ?, actual_tokens = ?,
@@ -226,7 +226,7 @@ class DB:
 
     def block_task(self, task_id: str, reason: str) -> bool:
         """Block a task. Only from todo or in_progress (fixed: was unguarded)."""
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         with self._conn() as conn:
             cursor = conn.execute("""
                 UPDATE tasks SET status = 'blocked', blocked_reason = ?, updated_at = ?
@@ -238,7 +238,7 @@ class DB:
 
     def reset_task(self, task_id: str, reason: str = "") -> bool:
         """Reset a task back to todo for re-execution (new: was missing)."""
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         with self._conn() as conn:
             cursor = conn.execute("""
                 UPDATE tasks SET status = 'todo', quality_score = NULL, actual_tokens = NULL,
@@ -263,7 +263,7 @@ class DB:
         safe = {k: v for k, v in fields.items() if k in ALLOWED_TASK_COLUMNS}
         if not safe:
             return False
-        safe["updated_at"] = datetime.now(timezone.utc).isoformat()
+        safe["updated_at"] = datetime.now(UTC).isoformat()
 
         with self._conn() as conn:
             sets = ", ".join(f"{k} = ?" for k in safe)
@@ -320,7 +320,7 @@ class DB:
     def _log(self, conn, actor: str, action: str, task_id: str = "",
              entity_type: str = "", details: str = ""):
         """Internal: log within existing transaction (fixed: was separate connection)."""
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         conn.execute("""
             INSERT INTO audit (timestamp, actor, action, task_id, entity_type, details)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -360,13 +360,13 @@ class DB:
 
     def _add_budget(self, conn, tokens: int, task_id: str = "", model: str = ""):
         """Add tokens to current month budget (within existing transaction)."""
-        month = datetime.now(timezone.utc).strftime("%Y-%m")
+        month = datetime.now(UTC).strftime("%Y-%m")
         conn.execute("""
             INSERT INTO budget (month, tokens_used) VALUES (?, ?)
             ON CONFLICT(month) DO UPDATE SET
                 tokens_used = tokens_used + ?,
                 updated_at = ?
-        """, (month, tokens, tokens, datetime.now(timezone.utc).isoformat()))
+        """, (month, tokens, tokens, datetime.now(UTC).isoformat()))
 
     def update_budget(self, tokens: int, model: str = ""):
         """Public budget update (new connection)."""
@@ -376,7 +376,7 @@ class DB:
     def get_budget(self, month: str = None) -> dict:
         """Get budget for a month."""
         if not month:
-            month = datetime.now(timezone.utc).strftime("%Y-%m")
+            month = datetime.now(UTC).strftime("%Y-%m")
         with self._conn() as conn:
             row = conn.execute("SELECT * FROM budget WHERE month = ?", (month,)).fetchone()
             if row:
@@ -390,7 +390,7 @@ class DB:
     def record_score(self, task_id: str, skill: str, score: int,
                      project: str = "", dimensions: dict = None, model: str = ""):
         """Record a quality score with model tracking."""
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         dims_json = json.dumps(dimensions or {})
         with self._conn() as conn:
             conn.execute("""
@@ -432,7 +432,7 @@ class DB:
 
     def create_chain_run(self, run_id: str, chain_name: str, project: str,
                          context: str, total_steps: int) -> dict:
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         with self._conn() as conn:
             conn.execute("""
                 INSERT INTO chain_runs (run_id, chain_name, project, context,
@@ -443,7 +443,7 @@ class DB:
 
     def complete_chain_run(self, run_id: str, status: str = "completed") -> bool:
         """Mark chain run as completed/failed (new: was missing)."""
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         with self._conn() as conn:
             cursor = conn.execute("""
                 UPDATE chain_runs SET status = ?, completed_at = ?, updated_at = ?
@@ -453,7 +453,7 @@ class DB:
 
     def save_chain_checkpoint(self, run_id: str, step: int, skill: str,
                               artifact_json: str, score: int = 0, status: str = "success"):
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         with self._conn() as conn:
             conn.execute("""
                 INSERT INTO chain_checkpoints (run_id, step_num, skill, artifact, score, status, timestamp)
@@ -471,7 +471,7 @@ class DB:
         try:
             import yaml
             def _load(p):
-                with open(p, 'r', encoding='utf-8') as f:
+                with open(p, encoding='utf-8') as f:
                     return yaml.safe_load(f)
         except ImportError:
             return 0

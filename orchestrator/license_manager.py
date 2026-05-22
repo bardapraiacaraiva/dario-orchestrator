@@ -29,7 +29,7 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -612,7 +612,7 @@ def _machine_id() -> str:
 def _write_fingerprint() -> dict:
     """Persistent trial-used marker. Survives license.json deletion.
     Contains: machine_id + first_init_timestamp + signature."""
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     machine = _machine_id()
     sig_payload = f"{MASTER_SECRET}:{machine}:{now}"
     signature = hashlib.sha256(sig_payload.encode()).hexdigest()
@@ -677,7 +677,7 @@ def init_trial(force: bool = False) -> dict:
             ),
         }
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     lic = {
         "tier": "trial",
         "name": TIERS["trial"]["name"],
@@ -705,7 +705,7 @@ def activate_key(key: str) -> dict:
 
     tier = validation["tier"]
     tier_config = TIERS[tier]
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     lic = {
         "tier": tier,
@@ -738,7 +738,7 @@ def check_license() -> dict:
     if tier == "trial" and lic.get("expires_at"):
         try:
             expires = datetime.fromisoformat(lic["expires_at"])
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             if now > expires:
                 lic["status"] = "expired"
                 save_license(lic)
@@ -924,7 +924,7 @@ def main():
         else:
             print(f"  Generated key for {email} ({tier}):")
             print(f"  {key}")
-            print(f"\n  Send to customer. They run:")
+            print("\n  Send to customer. They run:")
             print(f"  python license_manager.py --activate {key}")
         return 0
 
@@ -946,7 +946,7 @@ def main():
                     if result.get("days_remaining") is not None:
                         print(f"  Remaining: {result['days_remaining']} days")
                 else:
-                    print(f"  Expires:   NEVER (permanent)")
+                    print("  Expires:   NEVER (permanent)")
                 if lic.get("key"):
                     print(f"  Key:       {lic['key'][:15]}...")
                 # Feature summary

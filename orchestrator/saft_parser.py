@@ -29,10 +29,9 @@ import logging
 import os
 import sys
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 ORCH_DIR = Path(os.path.expanduser("~/.claude/orchestrator"))
 FINANCE_DIR = ORCH_DIR / "finance"
@@ -467,7 +466,7 @@ def main():
         # Full summary
         c = data.get("company", {})
         t = data.get("totals", {})
-        print(f"\n=== SAF-T Summary ===")
+        print("\n=== SAF-T Summary ===")
         print(f"  Company: {c.get('name', '')} (NIF {c.get('nif', '')})")
         print(f"  Period: {c.get('start_date', '')} → {c.get('end_date', '')}")
         print(f"  Customers: {t.get('total_customers', 0)}")

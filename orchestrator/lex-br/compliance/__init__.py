@@ -10,12 +10,12 @@ LEX-BR Compliance Layer
   - audit_oab: log imutável compatível com fiscalização OAB
 """
 
-from .oab_205_gate import check as oab_205_check
-from .lgpd_marker import add_marker as lgpd_add_marker
-from .zdr_check import enforce as zdr_enforce
-from .cite_checker import validate as cite_validate
-from .privilege_marker import mark as privilege_mark
 from .audit_oab import log as audit_log
+from .cite_checker import validate as cite_validate
+from .lgpd_marker import add_marker as lgpd_add_marker
+from .oab_205_gate import check as oab_205_check
+from .privilege_marker import mark as privilege_mark
+from .zdr_check import enforce as zdr_enforce
 
 __all__ = [
     "oab_205_check",

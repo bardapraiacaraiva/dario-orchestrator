@@ -24,7 +24,6 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 try:
@@ -33,7 +32,7 @@ try:
     yaml_engine.preserve_quotes = True
     yaml_engine.width = 200
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml_engine.load(f)
     def dump_yaml(data, path):
         with open(path, 'w', encoding='utf-8') as f:
@@ -41,7 +40,7 @@ try:
 except ImportError:
     import yaml
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
     def dump_yaml(data, path):
         with open(path, 'w', encoding='utf-8') as f:

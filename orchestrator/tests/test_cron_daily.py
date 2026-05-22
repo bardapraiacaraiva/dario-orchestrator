@@ -3,14 +3,17 @@
 
 import shutil
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
+import pytest
+
 import cron_daily
 
+pytestmark = pytest.mark.slow
 
 def _backup_last_run():
     if cron_daily.LAST_RUN_FILE.exists():
@@ -79,7 +82,7 @@ def test_maybe_run_executes_when_stale():
     """If we manually backdate last_run to >22h ago, maybe_run should execute."""
     backup = _backup_last_run()
     try:
-        old = (datetime.now(timezone.utc) - timedelta(hours=30)).isoformat()
+        old = (datetime.now(UTC) - timedelta(hours=30)).isoformat()
         cron_daily._dump_yaml(
             {"ran_at": old, "alerts": 0, "warnings": 0},
             str(cron_daily.LAST_RUN_FILE)
@@ -194,7 +197,7 @@ def test_job_error_becomes_alert():
 def test_hours_since_last_run_calculation():
     backup = _backup_last_run()
     try:
-        old = (datetime.now(timezone.utc) - timedelta(hours=5)).isoformat()
+        old = (datetime.now(UTC) - timedelta(hours=5)).isoformat()
         cron_daily._dump_yaml(
             {"ran_at": old, "alerts": 0, "warnings": 0},
             str(cron_daily.LAST_RUN_FILE)

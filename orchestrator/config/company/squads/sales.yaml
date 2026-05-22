@@ -1,0 +1,26 @@
+agents_sales:
+  mercurius_director:
+    id: mercurius-director
+    name: MERCURIUS
+    title: Sales Excellence Squad Lead
+    parent: dario-ceo
+    capabilities:
+    - sales_methodology
+    - prospecting
+    - discovery_call
+    - demo_script
+    - objection_handling
+    - negotiation_prep
+    - closing
+    - account_management
+    - expansion_revenue
+    - sales_enablement
+    - pipeline_forecasting
+    - territory_design
+    - comp_plan
+    - sales_ops
+    - customer_success_handoff
+    compliance_required:
+    - no_dark_patterns
+    - lgpd_lead_data
+    - audit_trail

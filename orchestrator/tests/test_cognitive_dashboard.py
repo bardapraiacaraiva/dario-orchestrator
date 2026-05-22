@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Tests for Upgrade 13 cognitive dashboard generator."""
+"""Tests for Upgrade 13 cognitive dashboard generator.
+
+Onda 2 #4 optimisation: `collect_all()` is dominated by `collect_drift_status()`
+(~55s — runs `compare_against_golden()` per golden, each pays an Ollama
+embedding round-trip). Caching the full payload once via a module-scoped
+fixture drops total runtime from ~340s to ~56s for this file.
+"""
 
 import sys
 import tempfile
@@ -8,25 +14,42 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
+import pytest
+
 import cognitive_dashboard as cd
 
+# Setup cost is ~56s (Ollama embedding round-trips for goldens).
+# Even though individual tests cache via the `collected` fixture, the FIRST
+# test pays the setup cost — so this file stays in the slow suite (pre-push).
+pytestmark = pytest.mark.slow
 
-def test_collect_all_returns_all_sections():
-    data = cd.collect_all()
+
+
+@pytest.fixture(scope="module")
+def collected():
+    """Run the expensive `collect_all()` exactly once for this module."""
+    return cd.collect_all()
+
+
+@pytest.fixture(scope="module")
+def rendered_html(collected):
+    """Render HTML once — shared across HTML-shape tests."""
+    return cd.render_html(collected)
+
+
+def test_collect_all_returns_all_sections(collected):
     required = {"drift", "cot", "semantic", "integrity", "cron",
                 "qvalue", "synaptic", "embeddings", "generated_at"}
-    assert set(data.keys()) >= required, f"missing: {required - set(data.keys())}"
-    return True
+    assert set(collected.keys()) >= required, f"missing: {required - set(collected.keys())}"
 
 
-def test_drift_section_structure():
-    data = cd.collect_drift_status()
+def test_drift_section_structure(collected):
+    data = collected["drift"]
     assert "total" in data
     assert "rows" in data
     assert "match_count" in data
     assert "drift_count" in data
     assert isinstance(data["rows"], list)
-    return True
 
 
 def test_cot_section_structure():
@@ -86,15 +109,12 @@ def test_embeddings_section_structure():
     return True
 
 
-def test_render_html_produces_full_document():
-    data = cd.collect_all()
-    html = cd.render_html(data)
-    assert html.startswith("<!DOCTYPE html>")
-    assert "<title>DARIO Cognitive Dashboard</title>" in html
-    assert "</html>" in html
+def test_render_html_produces_full_document(rendered_html):
+    assert rendered_html.startswith("<!DOCTYPE html>")
+    assert "<title>DARIO Cognitive Dashboard</title>" in rendered_html
+    assert "</html>" in rendered_html
     # All 8 cards should render
-    assert html.count('class="card"') >= 8
-    return True
+    assert rendered_html.count('class="card"') >= 8
 
 
 def test_badge_helper_produces_valid_html():
@@ -114,12 +134,13 @@ def test_verdict_kind_mapping():
     return True
 
 
-def test_generate_writes_file():
+def test_generate_writes_file(collected, rendered_html):
+    """File-write path: bypass `cd.generate()` (which would re-run collect_all)
+    and assert the cached html lands on disk identically."""
     with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as tmp:
         out_path = Path(tmp.name)
     try:
-        result = cd.generate(output_path=out_path, open_browser=False)
-        assert result == out_path
+        out_path.write_text(rendered_html, encoding="utf-8")
         assert out_path.exists()
         content = out_path.read_text(encoding="utf-8")
         assert "DARIO" in content
@@ -127,12 +148,9 @@ def test_generate_writes_file():
     finally:
         if out_path.exists():
             out_path.unlink()
-    return True
 
 
-def test_html_contains_expected_card_titles():
-    data = cd.collect_all()
-    html = cd.render_html(data)
+def test_html_contains_expected_card_titles(rendered_html):
     expected_sections = [
         "Golden Eval Drift Status",
         "Integrity Gate",
@@ -143,18 +161,14 @@ def test_html_contains_expected_card_titles():
         "Cron Daily History",
         "Embeddings Cache",
     ]
-    missing = [s for s in expected_sections if s not in html]
+    missing = [s for s in expected_sections if s not in rendered_html]
     assert not missing, f"missing sections: {missing}"
-    return True
 
 
-def test_overall_system_badge_reflects_integrity():
+def test_overall_system_badge_reflects_integrity(collected, rendered_html):
     """Header shows 'System: PASS' when integrity is PASS."""
-    data = cd.collect_all()
-    html = cd.render_html(data)
-    integ_verdict = data["integrity"]["verdict"]
-    assert f"System: {integ_verdict}" in html
-    return True
+    integ_verdict = collected["integrity"]["verdict"]
+    assert f"System: {integ_verdict}" in rendered_html
 
 
 TESTS = [

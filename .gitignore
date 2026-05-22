@@ -44,6 +44,67 @@
 !orchestrator/quality/domain-playbooks.yaml
 !orchestrator/quality/eval-baseline.yaml
 
+# --- Allow test suite + pytest config ---
+!orchestrator/tests/
+!orchestrator/tests/*.py
+!orchestrator/pytest.ini
+
+# --- Allow tool scripts ---
+!orchestrator/tools/
+!orchestrator/tools/*.py
+
+# --- Allow project config + lock (Onda 1 #1) ---
+!orchestrator/pyproject.toml
+!orchestrator/uv.lock
+
+# --- Allow Pydantic schemas package (Onda 1 #2) ---
+!orchestrator/schemas/
+!orchestrator/schemas/*.py
+
+# --- Allow upgrades package (Onda 2 #1 — relocated from *_upgrades.py) ---
+!orchestrator/upgrades/
+!orchestrator/upgrades/*.py
+
+# --- Allow Onda 7 #1 core sub-modules ---
+!orchestrator/upgrades/core_checkpoints.py
+!orchestrator/upgrades/core_engines.py
+
+# --- Allow runners + providers packages (Onda 2 #2 — relocated *_runner.py / api_executor.py) ---
+!orchestrator/runners/
+!orchestrator/runners/*.py
+!orchestrator/providers/
+!orchestrator/providers/*.py
+
+# --- Allow segmented config (Onda 2 #3 — split from company.yaml monolith) ---
+# Note: orchestrator/company.yaml itself stays excluded (line ~48: contains
+# personal data and is now a generated artefact of config/company_loader.py).
+!orchestrator/config/
+!orchestrator/config/*.py
+!orchestrator/config/company/
+!orchestrator/config/company/*.yaml
+!orchestrator/config/company/squads/
+!orchestrator/config/company/squads/*.yaml
+
+# --- Allow Langfuse self-host config + other yml/yaml scripts (Onda 1 #4) ---
+!orchestrator/scripts/*.yml
+!orchestrator/scripts/*.yaml
+
+# --- Allow optimization package (Onda 4 #5 — DSPy pilot) ---
+!orchestrator/optimization/
+!orchestrator/optimization/*.py
+!orchestrator/optimization/*.md
+!orchestrator/optimization/compiled/
+!orchestrator/optimization/compiled/*.json
+
+# --- Allow chain_schemas extracted from chain_executor (Onda 5 #2) ---
+!orchestrator/chain_schemas.py
+
+# --- Allow durable execution pilot package (Onda 5 #5) ---
+!orchestrator/durable/
+!orchestrator/durable/*.py
+# --- Allow Temporal self-host yml (Onda 6 #4) ---
+!orchestrator/scripts/temporal-self-host.yml
+
 # --- Exclude orchestrator personal/generated data ---
 orchestrator/company.yaml
 orchestrator/last_pulse.yaml

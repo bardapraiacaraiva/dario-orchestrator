@@ -24,7 +24,7 @@ import json
 import os
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -92,7 +92,7 @@ def step_state_files(dry_run: bool) -> None:
     state_init = {
         "last_run.yaml": {
             "prometheus_wave": 1,
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
             "last_weekly_scan": None,
             "total_digests_produced": 0,
             "total_findings_flagged_high": 0,

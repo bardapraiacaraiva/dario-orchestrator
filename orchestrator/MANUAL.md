@@ -1,4 +1,4 @@
-# DARIO ORCHESTRATOR v12.0 — MANUAL (Offline Reference)
+# DARIO ORCHESTRATOR v12.1 — MANUAL (Offline Reference)
 
 > Quick offline reference. Para manual completo (4 partes detalhadas) ver Obsidian:
 > `~/OneDrive/Documents/D.A.R.I.O/05 - Claude - IA/Outputs/2026-05-20 - DARIO v12.0 MANUAL*.md`
@@ -7,7 +7,7 @@
 
 ## SISTEMA EM 1 LINHA
 
-**DARIO Orchestrator v12.0** = AI Enterprise OS com 32 squads / 536+ skills / 54 license tiers / 18 cognitive modules / 66+ engines / 5 jurisdições (PT+BR+EU+US+Global).
+**DARIO Orchestrator v12.1** = AI Enterprise OS com 32 squads / 536+ skills / 54 license tiers / 18 cognitive modules / 66+ engines / 5 jurisdições (PT+BR+EU+US+Global). v12.1 adiciona Meta-Evolution Layer (PROMETHEUS Squad) + A360 Premium upgrade + NASA Mission Control dashboard.
 
 ---
 

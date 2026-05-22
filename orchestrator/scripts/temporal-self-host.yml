@@ -1,0 +1,42 @@
+# DARIO Orchestrator — Temporal self-host (Onda 6 #4)
+# ====================================================
+# Stand up a single-node Temporal Server with bundled UI for local development
+# and the DARIO durable execution piloto.
+#
+# Usage:
+#     cd ~/.claude/orchestrator/scripts
+#     docker compose -f temporal-self-host.yml up -d
+#
+# Endpoints:
+#     - Temporal gRPC: localhost:7233
+#     - Temporal Web UI: http://localhost:8233
+#
+# After it is up, start the worker:
+#     python -m durable.worker
+#
+# Default env vars (override if you change ports/namespace):
+#     export TEMPORAL_TARGET=localhost:7233
+#     export TEMPORAL_NAMESPACE=default
+#     export TEMPORAL_TASK_QUEUE=dario-chains
+#
+# Stop:
+#     docker compose -f temporal-self-host.yml down
+# Wipe data:
+#     docker compose -f temporal-self-host.yml down -v
+services:
+  temporal:
+    image: temporalio/auto-setup:1.25
+    container_name: dario-temporal
+    restart: unless-stopped
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    environment:
+      DB: sqlite
+      ENABLE_ES: "false"
+      TEMPORAL_ADDRESS: 0.0.0.0:7233
+    volumes:
+      - temporal-data:/etc/temporal/persistence
+
+volumes:
+  temporal-data:

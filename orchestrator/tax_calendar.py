@@ -37,7 +37,7 @@ def load_calendar():
     if not CALENDAR_FILE.exists():
         log.error(f"Tax calendar not found: {CALENDAR_FILE}")
         sys.exit(1)
-    with open(CALENDAR_FILE, "r", encoding="utf-8") as f:
+    with open(CALENDAR_FILE, encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 

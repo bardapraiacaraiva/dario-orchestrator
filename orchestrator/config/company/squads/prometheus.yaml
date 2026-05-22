@@ -1,0 +1,58 @@
+workers_prometheus:
+  worker-prometheus-repos:
+    id: worker-prometheus-repos
+    skill: prometheus-repo-scanner
+    reports_to: prometheus-director
+    sensor_type: repos
+  worker-prometheus-mcp:
+    id: worker-prometheus-mcp
+    skill: prometheus-mcp-discovery
+    reports_to: prometheus-director
+    sensor_type: mcp_marketplaces
+  worker-prometheus-papers:
+    id: worker-prometheus-papers
+    skill: prometheus-paper-tracker
+    reports_to: prometheus-director
+    sensor_type: research
+  worker-prometheus-regulatory:
+    id: worker-prometheus-regulatory
+    skill: prometheus-regulatory-watch
+    reports_to: prometheus-director
+    sensor_type: regulatory
+squads_prometheus:
+  external_sensors:
+    workers:
+    - worker-prometheus-repos
+    - worker-prometheus-mcp
+    - worker-prometheus-papers
+    - worker-prometheus-regulatory
+    description: Wave 1 — 4 passive sensors
+dispatch_prometheus:
+  scan mundo:
+    chain: prometheus_weekly_scan
+  prometheus weekly:
+    chain: prometheus_weekly_scan
+  weekly digest:
+    chain: prometheus_weekly_scan
+  novidades semana:
+    chain: prometheus_weekly_scan
+  scan repos:
+    skill: prometheus-repo-scanner
+  novos releases:
+    skill: prometheus-repo-scanner
+  scan mcp:
+    skill: prometheus-mcp-discovery
+  novos mcp:
+    skill: prometheus-mcp-discovery
+  scan papers:
+    skill: prometheus-paper-tracker
+  arxiv weekly:
+    skill: prometheus-paper-tracker
+  novidades anthropic:
+    skill: prometheus-paper-tracker
+  scan regulatorio:
+    skill: prometheus-regulatory-watch
+  novas leis:
+    skill: prometheus-regulatory-watch
+  regulatory watch:
+    skill: prometheus-regulatory-watch

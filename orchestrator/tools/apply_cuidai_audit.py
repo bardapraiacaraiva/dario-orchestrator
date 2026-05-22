@@ -20,8 +20,7 @@ CLI:
 
 import argparse
 import sys
-import shutil
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -35,7 +34,7 @@ try:
     _yaml.width = 200
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 
     def _dump_yaml(data, path):
@@ -45,7 +44,7 @@ except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
     def _dump_yaml(data, path):
@@ -75,7 +74,7 @@ BUCKET_3 = {
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def apply_bucket_1(dry_run: bool) -> dict:

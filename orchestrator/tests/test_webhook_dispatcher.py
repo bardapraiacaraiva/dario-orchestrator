@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """Tests for Upgrade 15 webhook dispatcher."""
 
-import json
 import shutil
 import sys
-import tempfile
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
+
 
 import webhook_dispatcher as wd
 
@@ -166,7 +165,7 @@ def test_dedup_expires_after_window():
     """Send older than 24h should NOT dedup."""
     backup = _backup_log()
     try:
-        old_ts = (datetime.now(timezone.utc) - timedelta(hours=30)).isoformat()
+        old_ts = (datetime.now(UTC) - timedelta(hours=30)).isoformat()
         wd._dump_yaml({
             "sends": [{
                 "timestamp": old_ts,

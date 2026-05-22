@@ -44,13 +44,13 @@ try:
     _yaml = YAML()
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
 

@@ -28,7 +28,7 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -132,7 +132,7 @@ def request_approval(task_id: str, reason: str = "") -> dict:
         return {"status": "auto_approved", "task_id": task_id, "level": approval_info["level"]}
 
     approval_record = {
-        "requested_at": datetime.now(timezone.utc).isoformat(),
+        "requested_at": datetime.now(UTC).isoformat(),
         "level": approval_info["level"],
         "reason": reason or f"Skill '{task.get('skill', '')}' requires {approval_info['level']} approval",
         "timeout_seconds": approval_info["timeout_seconds"],
@@ -177,7 +177,7 @@ def approve_task(task_id: str, approved_by: str, notes: str = "") -> dict:
 
     record["approvals"].append({
         "by": approved_by,
-        "at": datetime.now(timezone.utc).isoformat(),
+        "at": datetime.now(UTC).isoformat(),
         "decision": "approved",
         "notes": notes,
     })
@@ -231,7 +231,7 @@ def reject_task(task_id: str, rejected_by: str, reason: str = "") -> dict:
 
     record["status"] = "rejected"
     record["rejected_by"] = rejected_by
-    record["rejected_at"] = datetime.now(timezone.utc).isoformat()
+    record["rejected_at"] = datetime.now(UTC).isoformat()
     record["rejection_reason"] = reason
 
     with db._conn() as conn:
@@ -303,7 +303,7 @@ def main():
             print("Skill approvals:")
             for skill, level in sorted(SKILL_APPROVAL.items()):
                 print(f"  {skill:35s} → {level}")
-            print(f"\nPolicy approvals:")
+            print("\nPolicy approvals:")
             for policy, level in sorted(POLICY_APPROVAL.items()):
                 print(f"  {policy:20s} → {level}")
         return 0

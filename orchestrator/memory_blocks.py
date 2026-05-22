@@ -30,7 +30,7 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -88,7 +88,7 @@ def _log_mutation(name: str, scope: str, action: str, size: int):
     """Log block mutations for audit trail."""
     log_file = BLOCKS_DIR / "mutations.jsonl"
     entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "block": name,
         "scope": scope,
         "action": action,

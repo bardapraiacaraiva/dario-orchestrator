@@ -33,7 +33,7 @@ import argparse
 import json
 import sys
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -48,7 +48,7 @@ try:
     _yaml.preserve_quotes = True
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 
     def _dump_yaml(data, path):
@@ -58,7 +58,7 @@ except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
     def _dump_yaml(data, path):
@@ -138,7 +138,7 @@ def _collect_drilldown_patterns() -> dict:
                 continue
             entry = by_skill[skill]
             entry["evals_observed"].add(eval_id)
-            entry["last_seen"] = datetime.now(timezone.utc)
+            entry["last_seen"] = datetime.now(UTC)
             for sec in diff["sections"]["missing_in_candidate"]:
                 normalized = sec.lower().strip()
                 if normalized:
@@ -198,8 +198,8 @@ def _hint_for_section(skill: str, section: str, occurrences: int) -> dict:
         "confidence": min(0.5 + 0.15 * occurrences, 0.95),
         "hint": f'Always include a section titled "{section}" — '
                 f'observed missing in {occurrences} regression case(s)',
-        "first_seen": datetime.now(timezone.utc).isoformat(),
-        "last_seen": datetime.now(timezone.utc).isoformat(),
+        "first_seen": datetime.now(UTC).isoformat(),
+        "last_seen": datetime.now(UTC).isoformat(),
     }
 
 
@@ -212,8 +212,8 @@ def _hint_for_token(skill: str, token: str, occurrences: int) -> dict:
         "confidence": min(0.4 + 0.10 * occurrences, 0.80),
         "hint": f'Ensure coverage of "{token}" — recurrent high-frequency '
                 f'token from golden missing in {occurrences} case(s)',
-        "first_seen": datetime.now(timezone.utc).isoformat(),
-        "last_seen": datetime.now(timezone.utc).isoformat(),
+        "first_seen": datetime.now(UTC).isoformat(),
+        "last_seen": datetime.now(UTC).isoformat(),
     }
 
 
@@ -233,7 +233,7 @@ def _load_existing(skill: str) -> dict:
 def _save(skill: str, data: dict):
     _ensure_dirs()
     data["skill"] = skill
-    data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    data["updated_at"] = datetime.now(UTC).isoformat()
     _dump_yaml(data, str(HINTS_DIR / f"{skill}.yaml"))
 
 

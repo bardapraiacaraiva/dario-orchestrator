@@ -37,7 +37,7 @@ Usage:
 
 import logging
 from collections import defaultdict
-from typing import Any, Callable
+from collections.abc import Callable
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("lifecycle_hooks")
@@ -217,5 +217,5 @@ if __name__ == "__main__":
     registry.emit("task_complete", task=test_task, output="Brand output here...")
     registry.emit("tripwire", task=test_task, reason="API key leaked")
 
-    print(f"\n--- Stats ---")
+    print("\n--- Stats ---")
     print(json.dumps(registry.stats(), indent=2))

@@ -57,21 +57,20 @@ import json
 import logging
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-from db import DB
-from filter_pipeline import FilterPipeline, LoggingFilter, BudgetFilter, QualityGateFilter, TokenBudgetFilter
-from output_guardrails import OutputGuardrailFilter
-from model_router import ModelRouterFilter
-from artifact_schemas import SchemaValidationFilter
-from checkpoint_interrupt import should_interrupt, interrupt_task
 from approval_gates import get_approval_level, request_approval
+from artifact_schemas import SchemaValidationFilter
+from checkpoint_interrupt import interrupt_task, should_interrupt
+from db import DB
+from filter_pipeline import BudgetFilter, FilterPipeline, LoggingFilter, QualityGateFilter, TokenBudgetFilter
 from guardrails import validate_task
-from termination import default_task_conditions
+from model_router import ModelRouterFilter
+from output_guardrails import OutputGuardrailFilter
 
 PYTHON = sys.executable
 
@@ -614,7 +613,7 @@ def execute_pulse(dry_run: bool = False) -> dict:
     """
     db = DB()
     pulse = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "steps": {},
         "status": "ok",
     }

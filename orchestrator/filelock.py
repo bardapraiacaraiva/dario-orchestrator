@@ -25,11 +25,9 @@ Mechanism:
     - Timeout: 5s default, raises TimeoutError if can't acquire
 """
 
-import os
 import sys
 import time
 from pathlib import Path
-from contextlib import contextmanager
 
 # YAML engine (same as other orchestrator modules)
 try:
@@ -39,7 +37,7 @@ try:
     _yaml.width = 200
 
     def _load(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return _yaml.load(f)
 
     def _dump(data, path):
@@ -48,7 +46,7 @@ try:
 except ImportError:
     import yaml
     def _load(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
     def _dump(data, path):
         with open(path, 'w', encoding='utf-8') as f:
@@ -65,7 +63,7 @@ if sys.platform == 'win32':
             try:
                 msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
                 return
-            except (IOError, OSError):
+            except OSError:
                 if time.time() > deadline:
                     raise TimeoutError(f"Could not acquire lock within {timeout}s")
                 time.sleep(0.05)
@@ -73,7 +71,7 @@ if sys.platform == 'win32':
     def _unlock_file(f):
         try:
             msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
-        except (IOError, OSError):
+        except OSError:
             pass
 else:
     import fcntl
@@ -84,7 +82,7 @@ else:
             try:
                 fcntl.flock(f.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
                 return
-            except (IOError, OSError):
+            except OSError:
                 if time.time() > deadline:
                     raise TimeoutError(f"Could not acquire lock within {timeout}s")
                 time.sleep(0.05)
@@ -271,7 +269,7 @@ def wal_write(filepath, data, timeout=5):
             lock.write(data)
         # Success — commit WAL
         wal_commit(wal_id)
-    except Exception as e:
+    except Exception:
         # Failed — WAL stays pending for recovery
         wal_rollback(wal_id)
         raise

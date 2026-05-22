@@ -29,7 +29,7 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -64,6 +64,11 @@ EVAL_CASES = [
         "min_score": 70,
         "min_length": 500,
     },
+    # Note: 3 DSPy-pilot brand goldens (brand-fintech-pt-01, brand-boutique-hotel-01,
+    # brand-ai-devtools-01) live in `evals/golden/` but deliberately are NOT in
+    # EVAL_CASES — they exist only to seed `optimization.optimize_skill dario-brand`.
+    # They are excluded from the golden_skills_alive integrity check via the
+    # `_is_dspy_pilot_golden` allow-list in tools/integrity_gate.py.
     # --- OFFER ---
     {
         "id": "eval-offer-01",
@@ -236,7 +241,7 @@ def run_suite(skill_filter: str = "", outputs: dict = None) -> dict:
             skipped += 1
 
     return {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "total": len(cases),
         "passed": passed,
         "failed": failed,

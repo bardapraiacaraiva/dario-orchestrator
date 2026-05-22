@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """Tests for LEX-BR agent — 15 skills + compliance + MCP servers."""
 
-import json
-import os
-import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 LEX_DIR = ORCH_DIR / "lex-br"
@@ -28,7 +27,7 @@ def test_lex_br_directory_exists():
 
 def test_manifesto_loads():
     import yaml
-    with open(LEX_DIR / "manifesto.yaml", "r", encoding="utf-8") as f:
+    with open(LEX_DIR / "manifesto.yaml", encoding="utf-8") as f:
         m = yaml.safe_load(f)
     assert m["identity"]["name"] == "LEX-BR"
     assert m["identity"]["jurisdiction"] == "Brasil"
@@ -54,7 +53,6 @@ def test_all_15_skills_exist():
 
 
 def test_skills_have_compliance_in_frontmatter():
-    import re
     for skill_name in ["lex-civil", "lex-trabalhista", "lex-lgpd", "lex-criminal"]:
         skill_md = SKILLS_DIR / skill_name / "SKILL.md"
         content = skill_md.read_text(encoding="utf-8")
@@ -182,7 +180,7 @@ def test_privilege_marker_skips_non_privileged_type():
 
 
 def test_audit_oab_logs_event():
-    from audit_oab import log, count_today
+    from audit_oab import count_today, log
     before = count_today()
     log(
         skill="lex-test", task_id="TEST-001",
@@ -268,7 +266,10 @@ def test_lex_skills_in_semantic_corpus():
     return True
 
 
+@pytest.mark.real_embedding
 def test_semantic_dispatch_routes_to_lex_trabalhista():
+    """End-to-end semantic routing — requires real Ollama. The mock returns
+    hash-derived vectors that defeat ranking by meaning."""
     from semantic_dispatch import semantic_match
     matches = semantic_match("reclamação trabalhista verbas rescisórias", top_k=5)
     top_skills = [m[0] for m in matches]
@@ -279,7 +280,7 @@ def test_semantic_dispatch_routes_to_lex_trabalhista():
 
 def test_company_yaml_includes_lex_br():
     import yaml
-    with open(ORCH_DIR / "company.yaml", "r", encoding="utf-8") as f:
+    with open(ORCH_DIR / "company.yaml", encoding="utf-8") as f:
         company = yaml.safe_load(f)
     # New sections appended
     assert "agents_legal" in company

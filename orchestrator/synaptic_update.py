@@ -26,7 +26,7 @@ import argparse
 import json
 import sqlite3
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 try:
@@ -36,7 +36,7 @@ try:
     _yaml.width = 200
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 
     def _dump_yaml(data, path):
@@ -46,7 +46,7 @@ except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
     def _dump_yaml(data, path):
@@ -181,7 +181,7 @@ def _recent_companions_db(project: str, skill: str, window_hours: int) -> list:
         return []
     try:
         conn = sqlite3.connect(str(DB_PATH))
-        cutoff = (datetime.now(timezone.utc) - timedelta(hours=window_hours)).isoformat()
+        cutoff = (datetime.now(UTC) - timedelta(hours=window_hours)).isoformat()
         rows = conn.execute(
             """SELECT skill, score, completed_at
                FROM tasks
@@ -202,7 +202,7 @@ def _recent_companions_yaml(project: str, skill: str, window_hours: int) -> list
     done_dir = ORCH_DIR / "tasks" / "done"
     if not done_dir.exists():
         return []
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=window_hours)
+    cutoff = datetime.now(UTC) - timedelta(hours=window_hours)
     companions = []
     for tf in done_dir.glob("*.yaml"):
         try:

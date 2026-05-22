@@ -15,9 +15,6 @@ Usage:
 """
 
 import argparse
-import os
-import subprocess
-import sys
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -50,7 +47,7 @@ def check_status():
         import urllib.request
         with urllib.request.urlopen("http://127.0.0.1:8422/health", timeout=3) as r:
             data = r.read().decode()
-            print(f"Runtime is RUNNING on :8422")
+            print("Runtime is RUNNING on :8422")
             return True
     except Exception:
         print("Runtime is NOT running")

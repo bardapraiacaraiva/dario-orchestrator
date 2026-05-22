@@ -38,9 +38,8 @@ CLI:
 
 import argparse
 import json
-import subprocess
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 
 try:
@@ -50,7 +49,7 @@ try:
     _yaml.width = 200
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 
     def _dump_yaml(data, path):
@@ -60,7 +59,7 @@ except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
     def _dump_yaml(data, path):
@@ -87,7 +86,7 @@ def _ensure_dirs():
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _last_run() -> dict:
@@ -163,7 +162,7 @@ def job_promote_episodes() -> dict:
 def job_regression_check() -> dict:
     """Golden eval regression detection."""
     sys.path.insert(0, str(ORCH_DIR))
-    from golden_eval import regression_check, list_goldens
+    from golden_eval import list_goldens, regression_check
     r = regression_check()
     goldens = list_goldens()
     return {
@@ -241,7 +240,7 @@ def job_prompt_hints_promote() -> dict:
     """Prompt Hints (Upgrade 17) — extract recurring drilldown patterns
     into learned hints injected by context_injector."""
     sys.path.insert(0, str(ORCH_DIR))
-    from prompt_hints import promote, list_hints
+    from prompt_hints import list_hints, promote
     pre_count = len(list_hints())
     stats = promote(verbose=False)
     post_count = len(list_hints())

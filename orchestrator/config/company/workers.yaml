@@ -1,0 +1,1991 @@
+workers:
+  worker-brand:
+    type: worker
+    skill: dario-brand
+    reports_to: dir-marketing
+    capabilities:
+    - brand_positioning
+    - archetype_mapping
+    - messaging_hierarchy
+    - differentiation
+  worker-offer:
+    type: worker
+    skill: dario-offer
+    reports_to: dir-marketing
+    capabilities:
+    - offer_creation
+    - value_equation
+    - pricing_tiers
+    - guarantees
+    watches:
+    - dario-brand
+    watch_condition: score >= 70
+  worker-sales-letter:
+    type: worker
+    skill: dario-sales-letter
+    reports_to: dir-marketing
+    capabilities:
+    - long_form_copy
+    - headline_writing
+    - cta_design
+    - vsl_scripting
+    watches:
+    - dario-offer
+    watch_condition: score >= 70
+  worker-ads:
+    type: worker
+    skill: dario-ads-blueprint
+    reports_to: dir-marketing
+    capabilities:
+    - facebook_ads
+    - google_ads
+    - youtube_ads
+    - audience_targeting
+    - funnel_traffic
+  worker-funnel:
+    type: worker
+    skill: dario-funnel
+    reports_to: dir-marketing
+    capabilities:
+    - funnel_design
+    - value_ladder
+    - tripwire
+    - lead_magnet
+    - upsell
+  worker-pipeline:
+    type: worker
+    skill: dario-pipeline
+    reports_to: dir-marketing
+    capabilities:
+    - sales_pipeline
+    - icp_definition
+    - outbound_cadence
+    - proposal_framework
+  worker-email-seq:
+    type: worker
+    skill: dario-email-seq
+    reports_to: dir-marketing
+    capabilities:
+    - email_sequences
+    - welcome_series
+    - launch_sequence
+    - nurture
+    watches:
+    - dario-offer
+  worker-naming:
+    type: worker
+    skill: dario-naming
+    reports_to: dir-marketing
+    capabilities:
+    - brand_naming
+    - linguistic_analysis
+    - domain_check
+    - trademark_screening
+    watches:
+    - dario-brand
+  worker-story-circle:
+    type: worker
+    skill: dario-story-circle
+    reports_to: dir-marketing
+    capabilities:
+    - brand_story
+    - origin_narrative
+    - about_page
+    - hero_journey
+    watches:
+    - dario-brand
+  worker-pitch:
+    type: worker
+    skill: dario-pitch
+    reports_to: dir-marketing
+    capabilities:
+    - pitch_deck
+    - investor_pitch
+    - speaker_notes
+    - hook_script
+  worker-proposal:
+    type: worker
+    skill: dario-proposal
+    reports_to: dir-marketing
+    capabilities:
+    - commercial_proposal
+    - three_option_pricing
+    - scope_definition
+    - value_framing
+    watches:
+    - dario-diagnose
+    watch_condition: score >= 70
+  worker-negotiation:
+    type: worker
+    skill: dario-negotiation
+    reports_to: dir-marketing
+    capabilities:
+    - negotiation_prep
+    - tactical_empathy
+    - objection_handling
+    - closing
+  worker-legal:
+    type: worker
+    skill: dario-legal
+    reports_to: dir-legal
+    capabilities:
+    - client_contracts
+    - rgpd_compliance
+    - nda
+    - terms_of_service
+    - privacy_policy
+    - ip_protection
+    - dispute_resolution
+    - pt_labor_law
+  worker-hr:
+    type: worker
+    skill: dario-hr
+    reports_to: dir-hr
+    capabilities:
+    - job_descriptions
+    - capacity_planning
+    - onboarding_sop
+    - performance_review
+    - freelancer_management
+    - training_plans
+    - team_culture
+  worker-social:
+    type: worker
+    skill: dario-social
+    reports_to: dir-content
+    capabilities:
+    - content_calendar
+    - post_copy
+    - hashtag_strategy
+    - reels_scripts
+    - community_management
+    - social_audit
+    - influencer_brief
+  worker-content:
+    type: worker
+    skill: dario-content
+    reports_to: dir-content
+    capabilities:
+    - editorial_calendar
+    - blog_writing
+    - content_brief
+    - repurposing
+    - copy_qa
+    - pillar_page
+    - content_cluster
+    watches:
+    - dario-kw-cluster
+  worker-support:
+    type: worker
+    skill: dario-support
+    reports_to: dir-support
+    capabilities:
+    - ticket_management
+    - sla_tracking
+    - client_health_score
+    - faq_generator
+    - handover_protocol
+    - churn_prevention
+    - post_sale_onboarding
+  worker-product:
+    type: worker
+    skill: dario-product
+    reports_to: dir-product
+    capabilities:
+    - prd_generator
+    - user_stories
+    - mvp_scoping
+    - sprint_planning
+    - rice_scoring
+    - technical_spec
+    - launch_checklist
+  worker-pr:
+    type: worker
+    skill: dario-pr
+    reports_to: dir-pr
+    capabilities:
+    - press_release
+    - media_outreach
+    - crisis_communication
+    - award_submission
+    - spokesperson_prep
+    - media_kit
+  worker-wp-audit:
+    type: worker
+    skill: dario-wp-audit
+    reports_to: dir-technical
+    capabilities:
+    - wordpress_audit
+    - theme_health
+    - plugin_bloat
+    - security_check
+    - pt_compliance
+  worker-woo-audit:
+    type: worker
+    skill: dario-woo-audit
+    reports_to: dir-technical
+    capabilities:
+    - woocommerce_audit
+    - checkout_flow
+    - payment_gateways
+    - mbway
+    - multibanco
+  worker-cwv-fix:
+    type: worker
+    skill: dario-cwv-fix
+    reports_to: dir-technical
+    capabilities:
+    - core_web_vitals
+    - lcp_fix
+    - inp_fix
+    - cls_fix
+    - lighthouse
+  worker-pentest:
+    type: worker
+    skill: dario-pentest-checklist
+    reports_to: dir-technical
+    capabilities:
+    - security_audit
+    - owasp_top10
+    - vulnerability_check
+    - reconnaissance
+  worker-make-blueprint:
+    type: worker
+    skill: dario-make-blueprint
+    reports_to: dir-technical
+    capabilities:
+    - make_automation
+    - scenario_design
+    - webhook_integration
+    - data_mapping
+  worker-ios-hig:
+    type: worker
+    skill: dario-ios-hig
+    reports_to: dir-technical
+    capabilities:
+    - ios_design
+    - hig_compliance
+    - swiftui
+    - accessibility
+  worker-sop:
+    type: worker
+    skill: dario-sop
+    reports_to: dir-technical
+    capabilities:
+    - process_documentation
+    - checklist_creation
+    - operational_procedures
+  worker-seo-audit:
+    type: worker
+    skill: seo-audit
+    reports_to: dir-seo
+    capabilities:
+    - full_seo_audit
+    - health_score
+    - parallel_delegation
+  worker-seo-technical:
+    type: worker
+    skill: seo-technical
+    reports_to: dir-seo
+    capabilities:
+    - crawlability
+    - indexability
+    - security_headers
+    - core_web_vitals
+    - js_rendering
+  worker-seo-content:
+    type: worker
+    skill: seo-content
+    reports_to: dir-seo
+    capabilities:
+    - content_quality
+    - eeat_analysis
+    - readability
+    - thin_content
+    - ai_citation
+  worker-seo-schema:
+    type: worker
+    skill: seo-schema
+    reports_to: dir-seo
+    capabilities:
+    - schema_markup
+    - json_ld
+    - rich_results
+    - structured_data
+    watches:
+    - seo-audit
+  worker-seo-local:
+    type: worker
+    skill: seo-local
+    reports_to: dir-seo
+    capabilities:
+    - local_seo
+    - gbp_optimization
+    - nap_consistency
+    - citations
+    - reviews
+  worker-seo-geo:
+    type: worker
+    skill: seo-geo
+    reports_to: dir-seo
+    capabilities:
+    - geo_optimization
+    - ai_overviews
+    - chatgpt_search
+    - perplexity
+    - llms_txt
+  worker-seo-plan:
+    type: worker
+    skill: seo-plan
+    reports_to: dir-seo
+    capabilities:
+    - seo_strategy
+    - content_strategy
+    - site_architecture
+    - seo_roadmap
+    watches:
+    - seo-audit
+    - seo-content
+    watch_condition: score >= 65
+  worker-seo-page:
+    type: worker
+    skill: seo-page
+    reports_to: dir-seo
+    capabilities:
+    - single_page_analysis
+    - on_page_seo
+    - meta_optimization
+  worker-seo-sitemap:
+    type: worker
+    skill: seo-sitemap
+    reports_to: dir-seo
+    capabilities:
+    - xml_sitemap
+    - sitemap_validation
+    - sitemap_generation
+  worker-seo-images:
+    type: worker
+    skill: seo-images
+    reports_to: dir-seo
+    capabilities:
+    - image_optimization
+    - alt_text
+    - lazy_loading
+    - cls_prevention
+  worker-seo-hreflang:
+    type: worker
+    skill: seo-hreflang
+    reports_to: dir-seo
+    capabilities:
+    - hreflang
+    - international_seo
+    - multi_language
+    - multi_region
+  worker-seo-programmatic:
+    type: worker
+    skill: seo-programmatic
+    reports_to: dir-seo
+    capabilities:
+    - programmatic_seo
+    - template_pages
+    - data_driven_seo
+    - index_bloat
+  worker-seo-competitor:
+    type: worker
+    skill: seo-competitor-pages
+    reports_to: dir-seo
+    capabilities:
+    - competitor_comparison
+    - vs_pages
+    - alternatives_pages
+    - feature_matrix
+  worker-seo-dataforseo:
+    type: worker
+    skill: seo-dataforseo
+    reports_to: dir-seo
+    capabilities:
+    - live_serp_data
+    - keyword_metrics
+    - backlink_profiles
+    - ai_visibility
+  worker-seo-image-gen:
+    type: worker
+    skill: seo-image-gen
+    reports_to: dir-seo
+    capabilities:
+    - og_images
+    - social_preview
+    - hero_images
+    - seo_visuals
+  worker-kw-cluster:
+    type: worker
+    skill: dario-kw-cluster
+    reports_to: dir-seo
+    capabilities:
+    - keyword_clustering
+    - topic_mapping
+    - content_clusters
+    - pillar_pages
+    watches:
+    - dario-brand
+  worker-financial-model:
+    type: worker
+    skill: dario-financial-model
+    reports_to: dir-agency-finance
+    capabilities:
+    - pl_forecast
+    - cash_flow
+    - break_even
+    - scenario_planning
+  worker-pricing-calculator:
+    type: worker
+    skill: dario-pricing-calculator
+    reports_to: dir-agency-finance
+    capabilities:
+    - service_pricing
+    - cost_per_hour
+    - utilization_rates
+    - margins
+  worker-saas-metrics:
+    type: worker
+    skill: dario-saas-metrics
+    reports_to: dir-agency-finance
+    capabilities:
+    - mrr
+    - arr
+    - churn
+    - ltv_cac
+    - nrr
+    - unit_economics
+  worker-cfo-agency-pnl:
+    type: worker
+    skill: cfo-agency-pnl
+    reports_to: dir-agency-finance
+    capabilities:
+    - client_margin
+    - project_pnl
+    - token_cost_allocation
+    - rework_cost
+    - delivery_cost
+    watches:
+    - lucas-quality
+    - lucas-finance
+    watch_condition: always
+  worker-cfo-token-roi:
+    type: worker
+    skill: cfo-token-roi
+    reports_to: dir-agency-finance
+    capabilities:
+    - roi_calculation
+    - model_cost_breakdown
+    - efficiency_scoring
+    - savings_recommendations
+    - forecast_90d
+    watches:
+    - lucas-finance
+  worker-cfo-tax-autopilot:
+    type: worker
+    skill: cfo-tax-autopilot
+    reports_to: dir-agency-finance
+    capabilities:
+    - tax_calendar_monitoring
+    - deadline_alerts
+    - preparation_checklists
+    - obligation_tracking
+    - penalty_prevention
+    engine: tax_calendar.py
+  worker-client-onboard:
+    type: worker
+    skill: dario-client-onboard
+    reports_to: dir-client-success
+    capabilities:
+    - client_onboarding
+    - context_gathering
+    - baseline_audit
+  worker-diagnose:
+    type: worker
+    skill: dario-diagnose
+    reports_to: dir-client-success
+    capabilities:
+    - holistic_diagnostic
+    - priority_triage
+    - roadmap_generation
+  worker-projeto:
+    type: worker
+    skill: dario-projeto
+    reports_to: dir-client-success
+    capabilities:
+    - project_switching
+    - context_loading
+    - history_recall
+  worker-diva-moodboard:
+    type: worker
+    skill: diva-moodboard
+    reports_to: dir-design
+    capabilities:
+    - moodboard
+    - color_palette
+    - style_direction
+    - pantone_ncs
+    watches:
+    - diva-briefing
+  worker-diva-materials:
+    type: worker
+    skill: diva-materials
+    reports_to: dir-design
+    capabilities:
+    - material_spec
+    - supplier_database
+    - price_tiers
+    - portuguese_suppliers
+    watches:
+    - diva-moodboard
+  worker-diva-floor-plan:
+    type: worker
+    skill: diva-floor-plan
+    reports_to: dir-design
+    capabilities:
+    - floor_plan_analysis
+    - layout_optimization
+    - circulation_flow
+    - rgeu_compliance
+    watches:
+    - diva-briefing
+  worker-diva-render:
+    type: worker
+    skill: diva-render
+    reports_to: dir-design
+    capabilities:
+    - ai_rendering
+    - midjourney_prompts
+    - interior_visualization
+  worker-diva-render-brief:
+    type: worker
+    skill: diva-render-brief
+    reports_to: dir-design
+    capabilities:
+    - render_specification
+    - camera_angles
+    - lighting_setup
+    - styling
+  worker-diva-vision:
+    type: worker
+    skill: diva-vision
+    reports_to: dir-design
+    capabilities:
+    - photo_analysis
+    - space_assessment
+    - patologia_detection
+    - progress_tracking
+  worker-diva-portfolio:
+    type: worker
+    skill: diva-portfolio
+    reports_to: dir-design
+    capabilities:
+    - case_study
+    - before_after
+    - project_showcase
+  worker-diva-smart-home:
+    type: worker
+    skill: diva-smart-home
+    reports_to: dir-design
+    capabilities:
+    - domotica
+    - knx
+    - zigbee
+    - matter
+    - home_assistant
+    - loxone
+  worker-diva-budget:
+    type: worker
+    skill: diva-budget
+    reports_to: dir-construction
+    capabilities:
+    - construction_budget
+    - pronic_prices
+    - iva_analysis
+    - cost_m2
+    watches:
+    - diva-floor-plan
+    watch_condition: score >= 65
+  worker-diva-calc:
+    type: worker
+    skill: diva-calc
+    reports_to: dir-construction
+    capabilities:
+    - budget_calculator
+    - three_scenarios
+    - interactive_estimation
+  worker-diva-timeline:
+    type: worker
+    skill: diva-timeline
+    reports_to: dir-construction
+    capabilities:
+    - gantt_chart
+    - construction_phases
+    - critical_path
+    - dependencies
+    watches:
+    - diva-budget
+  worker-diva-inspection:
+    type: worker
+    skill: diva-inspection
+    reports_to: dir-construction
+    capabilities:
+    - construction_inspection
+    - punch_list
+    - quality_control
+    - handover
+  worker-diva-contract:
+    type: worker
+    skill: diva-contract
+    reports_to: dir-construction
+    capabilities:
+    - construction_contract
+    - empreitada
+    - guarantees
+    - penalties
+    - payment_milestones
+  worker-diva-comparador:
+    type: worker
+    skill: diva-comparador
+    reports_to: dir-construction
+    capabilities:
+    - proposal_comparison
+    - contractor_evaluation
+    - value_analysis
+  worker-diva-planradar:
+    type: worker
+    skill: diva-planradar
+    reports_to: dir-construction
+    capabilities:
+    - planradar_integration
+    - inspection_export
+    - field_reports
+  worker-diva-bim:
+    type: worker
+    skill: diva-bim
+    reports_to: dir-construction
+    capabilities:
+    - bim_integration
+    - revit
+    - archicad
+    - ifc
+    - room_data_sheets
+  worker-diva-licensing:
+    type: worker
+    skill: diva-licensing
+    reports_to: dir-regulatory
+    capabilities:
+    - building_permits
+    - rjue
+    - rgeu
+    - comunicacao_previa
+    - reru
+    watches:
+    - diva-briefing
+  worker-diva-energy:
+    type: worker
+    skill: diva-energy
+    reports_to: dir-regulatory
+    capabilities:
+    - energy_certification
+    - sce
+    - reh
+    - recs
+    - nzeb
+    watches:
+    - diva-floor-plan
+  worker-lucas-budget-tracker:
+    type: worker
+    skill: lucas-finance
+    reports_to: dir-cost-control
+    capabilities:
+    - token_counting
+    - budget_tracking
+    - spend_reporting
+    - project_cost_allocation
+    engine: budget_tracker.py
+  worker-lucas-model-router:
+    type: worker
+    skill: lucas-analytics
+    reports_to: dir-cost-control
+    capabilities:
+    - model_selection
+    - haiku_sonnet_opus_routing
+    - cost_per_quality_optimization
+    engine: model_router.py
+  worker-lucas-cost-alerts:
+    type: worker
+    skill: lucas-finance
+    reports_to: dir-cost-control
+    capabilities:
+    - threshold_alerting
+    - budget_warning
+    - auto_pause
+    - spend_notification
+    engine: token_meter.py
+  worker-lucas-cost-optimizer:
+    type: worker
+    skill: lucas-analytics
+    reports_to: dir-cost-control
+    capabilities:
+    - token_efficiency_analysis
+    - waste_detection
+    - optimization_suggestions
+    engine: cost_optimization_engine.py
+  worker-lucas-quality-scorer:
+    type: worker
+    skill: lucas-quality
+    reports_to: dir-quality
+    capabilities:
+    - output_evaluation
+    - rubric_scoring
+    - quality_grading
+    - deliverable_review
+  worker-lucas-feedback-loop:
+    type: worker
+    skill: lucas-feedback-loop
+    reports_to: dir-quality
+    capabilities:
+    - feedback_collection
+    - prompt_improvement
+    - pattern_extraction
+    - learning_loop
+  worker-lucas-skill-evaluator:
+    type: worker
+    skill: lucas-skill-evaluation
+    reports_to: dir-quality
+    capabilities:
+    - skill_testing
+    - regression_detection
+    - gold_set_evaluation
+    - before_after_comparison
+  worker-lucas-revision-analyst:
+    type: worker
+    skill: lucas-revision-analysis
+    reports_to: dir-quality
+    capabilities:
+    - revision_pattern_analysis
+    - common_failure_modes
+    - improvement_suggestions
+  worker-lucas-heartbeat-engine:
+    type: worker
+    skill: lucas-heartbeat
+    reports_to: dir-monitoring
+    capabilities:
+    - heartbeat_scheduling
+    - task_scanning
+    - wave_execution
+    - auto_dispatch
+  worker-lucas-stale-detector:
+    type: worker
+    skill: lucas-stale-detection
+    reports_to: dir-monitoring
+    capabilities:
+    - stale_task_detection
+    - escalation
+    - age_tracking
+    - progress_monitoring
+  worker-lucas-health-monitor:
+    type: worker
+    skill: lucas-health-monitoring
+    reports_to: dir-monitoring
+    capabilities:
+    - rag_health_check
+    - obsidian_status
+    - service_monitoring
+    - uptime_tracking
+  worker-lucas-alert-dispatcher:
+    type: worker
+    skill: lucas-alert-dispatch
+    reports_to: dir-monitoring
+    capabilities:
+    - alert_routing
+    - webhook_notification
+    - email_alert
+    - urgency_classification
+  worker-lucas-cross-project:
+    type: worker
+    skill: lucas-cross-project-analysis
+    reports_to: dir-analytics
+    capabilities:
+    - cross_project_patterns
+    - domain_playbooks
+    - success_extraction
+    - failure_analysis
+  worker-lucas-skill-dashboard:
+    type: worker
+    skill: lucas-skill-dashboard
+    reports_to: dir-analytics
+    capabilities:
+    - skill_performance_metrics
+    - tier_classification
+    - trend_detection
+    - efficiency_ranking
+  worker-lucas-revenue-tracker:
+    type: worker
+    skill: lucas-revenue-tracking
+    reports_to: dir-analytics
+    capabilities:
+    - revenue_attribution
+    - roi_per_skill
+    - client_value_tracking
+    - profitability_analysis
+  worker-lucas-knowledge-graph:
+    type: worker
+    skill: lucas-knowledge-graph
+    reports_to: dir-analytics
+    capabilities:
+    - entity_linking
+    - relationship_mapping
+    - semantic_queries
+    - recommendation_engine
+  worker-a360-nicho-explorer:
+    type: worker
+    skill: a360-nicho
+    reports_to: dir-a360-research
+    capabilities:
+    - niche_discovery
+    - niche_validation
+    - tam_sam_som
+    - market_scoring
+  worker-a360-mapear-nicho:
+    type: worker
+    skill: a360-nicho
+    reports_to: dir-a360-research
+    capabilities:
+    - icp_mapping
+    - pain_points
+    - proprietary_mechanism
+    - offer_design
+    - trigger_events
+  worker-a360-cliente-radar:
+    type: worker
+    skill: a360-avatar
+    reports_to: dir-a360-research
+    capabilities:
+    - prospect_research
+    - competitor_analysis
+    - spin_questions
+    - meeting_hooks
+  worker-a360-lp-builder:
+    type: worker
+    skill: a360-validacao
+    reports_to: dir-a360-production
+    capabilities:
+    - landing_page
+    - cro_frameworks
+    - aida
+    - pas
+    - html_generation
+  worker-a360-pitch-deck:
+    type: worker
+    skill: a360-pitch
+    reports_to: dir-a360-production
+    capabilities:
+    - pitch_deck
+    - slide_generation
+    - html_reveal
+    - sales_narrative
+  worker-a360-gtm:
+    type: worker
+    skill: a360-growth
+    reports_to: dir-a360-production
+    capabilities:
+    - go_to_market
+    - outbound_sequence
+    - content_calendar
+    - cold_email
+  worker-a360-playbook-vendas:
+    type: worker
+    skill: a360-funil
+    reports_to: dir-a360-production
+    capabilities:
+    - sales_script
+    - deal_framework
+    - spin_selling
+    - objection_handling
+  worker-a360-meeting-prep:
+    type: worker
+    skill: a360-case-study
+    reports_to: dir-a360-production
+    capabilities:
+    - meeting_briefing
+    - spin_questions
+    - opening_hooks
+    - next_steps
+  worker-lucas-backend:
+    type: worker
+    skill: lucas-backend-dev
+    reports_to: dir-saas-engineering
+    capabilities:
+    - node_js
+    - api_design
+    - express
+    - fastify
+    - microservices
+    - testing
+  worker-lucas-frontend:
+    type: worker
+    skill: lucas-frontend-dev
+    reports_to: dir-saas-engineering
+    capabilities:
+    - react
+    - nextjs
+    - tailwind
+    - dashboard_ui
+    - data_visualization
+  worker-lucas-ai-agents:
+    type: worker
+    skill: lucas-ai-agents-dev
+    reports_to: dir-saas-engineering
+    capabilities:
+    - ai_agent_building
+    - claude_api
+    - multi_agent_systems
+    - prompt_engineering
+    - rag
+  worker-lucas-database:
+    type: worker
+    skill: lucas-database-admin
+    reports_to: dir-saas-engineering
+    capabilities:
+    - postgresql
+    - prisma
+    - drizzle
+    - migrations
+    - data_modeling
+    - pgvector
+  worker-lucas-agency-finance:
+    type: worker
+    skill: lucas-finance
+    reports_to: dir-accounting
+    capabilities:
+    - agency_invoicing
+    - monthly_pnl
+    - cash_flow_forecast
+    - freelancer_tracking
+    - client_profitability
+    - tax_calendar_alerts
+    - atcud_qr_saft
+  worker-conta-facturacao:
+    type: worker
+    skill: conta-facturacao
+    reports_to: dir-accounting
+    security_tier: 3
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
+    output_schema: conta-facturacao
+    validator: pt_validators.py
+    capabilities:
+    - efatura_at
+    - atcud_qr_code
+    - saf_t
+    - credit_notes
+    - series_management
+    - dl_28_2019
+  worker-conta-iva:
+    type: worker
+    skill: conta-iva
+    reports_to: dir-accounting
+    security_tier: 2
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
+    output_schema: conta-iva
+    validator: pt_validators.py
+    capabilities:
+    - iva_periodic_returns
+    - regime_normal
+    - regime_simplificado
+    - intra_eu_vies
+    - pro_rata
+    - regularizations
+  worker-conta-irc:
+    type: worker
+    skill: conta-irc
+    reports_to: dir-accounting
+    security_tier: 2
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
+    output_schema: conta-irc
+    validator: pt_validators.py
+    capabilities:
+    - modelo_22
+    - derrama
+    - pec
+    - tributacao_autonoma
+    - tax_planning
+    - deductions
+  worker-conta-irs:
+    type: worker
+    skill: conta-irs
+    reports_to: dir-accounting
+    security_tier: 2
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
+    validator: pt_validators.py
+    capabilities:
+    - withholding_categories
+    - cat_a_b_e_f_g
+    - freelancer_retention
+    - non_residents
+    - annual_obligations
+  worker-conta-ss:
+    type: worker
+    skill: conta-ss
+    reports_to: dir-accounting
+    security_tier: 2
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
+    capabilities:
+    - employer_contributions
+    - employee_contributions
+    - dri_declarations
+    - independent_workers
+    - special_regimes
+    - tsu_rates
+  worker-conta-payroll:
+    type: worker
+    skill: conta-payroll
+    reports_to: dir-accounting
+    security_tier: 2
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
+    output_schema: conta-payroll
+    validator: pt_validators.py
+    capabilities:
+    - salary_processing
+    - subsidio_alimentacao
+    - subsidio_ferias_natal
+    - overtime
+    - termination
+    - dmr
+  worker-conta-lancamentos:
+    type: worker
+    skill: conta-lancamentos
+    reports_to: dir-accounting
+    security_tier: 3
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
+    validator: pt_validators.py
+    capabilities:
+    - double_entry
+    - recurring_entries
+    - accruals
+    - adjustments
+    - reversals
+    - snc_compliance
+  worker-conta-conciliacao:
+    type: worker
+    skill: conta-conciliacao
+    reports_to: dir-accounting
+    security_tier: 1
+    allowed_tools:
+    - Read
+    - Grep
+    output_schema: conta-conciliacao
+    validator: pt_validators.py
+    capabilities:
+    - multi_bank
+    - auto_matching
+    - discrepancy_resolution
+    - periodic_close
+  worker-conta-plano:
+    type: worker
+    skill: conta-plano
+    reports_to: dir-accounting
+    security_tier: 3
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
+    validator: pt_validators.py
+    capabilities:
+    - snc_chart_of_accounts
+    - ncrf_mapping
+    - ifrs_alignment
+    - account_validation
+  worker-conta-ap:
+    type: worker
+    skill: conta-ap
+    reports_to: dir-accounting
+    security_tier: 1
+    allowed_tools:
+    - Read
+    - Grep
+    validator: pt_validators.py
+    capabilities:
+    - three_way_match
+    - payment_scheduling
+    - aging_analysis
+    - supplier_management
+  worker-conta-ativos:
+    type: worker
+    skill: conta-ativos
+    reports_to: dir-accounting
+    capabilities:
+    - depreciation_rates
+    - asset_register
+    - acquisition_disposal
+    - revaluation
+    - impairment
+    - dr_25_2009
+  worker-conta-custos:
+    type: worker
+    skill: conta-custos
+    reports_to: dir-accounting
+    capabilities:
+    - cost_centers
+    - abc_costing
+    - margins
+    - break_even
+    - profitability_analysis
+  worker-conta-orcamento:
+    type: worker
+    skill: conta-orcamento
+    reports_to: dir-accounting
+    capabilities:
+    - annual_budget
+    - variance_analysis
+    - rolling_forecasts
+    - departmental_budgets
+    - kpis
+  worker-conta-tesouraria:
+    type: worker
+    skill: conta-tesouraria
+    reports_to: dir-accounting
+    capabilities:
+    - cash_flow_forecast
+    - working_capital
+    - liquidity_ratios
+    - bank_relationships
+  worker-conta-relatorios:
+    type: worker
+    skill: conta-relatorios
+    reports_to: dir-accounting
+    security_tier: 3
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
+    output_schema: conta-relatorios
+    validator: pt_validators.py
+    capabilities:
+    - balancete
+    - demonstracao_resultados
+    - balanco
+    - fluxos_de_caixa
+    - anexo
+    - snc_statements
+  worker-conta-consolidacao:
+    type: worker
+    skill: conta-consolidacao
+    reports_to: dir-accounting
+    capabilities:
+    - intercompany_elimination
+    - currency_translation
+    - minorities
+    - equity_method
+  worker-conta-encerramento:
+    type: worker
+    skill: conta-encerramento
+    reports_to: dir-accounting
+    security_tier: 3
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
+    validator: pt_validators.py
+    capabilities:
+    - closing_checklist
+    - provisions
+    - adjustments
+    - statutory_filings
+    - modelo_22_ies
+    - assembleia_geral
+  worker-conta-auditoria:
+    type: worker
+    skill: conta-auditoria
+    reports_to: dir-accounting
+    security_tier: 1
+    allowed_tools:
+    - Read
+    - Grep
+    capabilities:
+    - dossier_fiscal
+    - working_papers
+    - management_letter
+    - roc_procedures
+    - internal_controls
+  worker-risco-rgpd:
+    type: worker
+    skill: risco-rgpd
+    reports_to: dir-risk
+    security_tier: 1
+    allowed_tools:
+    - Read
+    - Grep
+    capabilities:
+    - data_mapping
+    - dpia
+    - consent_management
+    - breach_notification_72h
+    - ropa
+    - dpo_obligations
+    - lei_58_2019
+  worker-risco-aml:
+    type: worker
+    skill: risco-aml
+    reports_to: dir-risk
+    security_tier: 1
+    allowed_tools:
+    - Read
+    - Grep
+    capabilities:
+    - customer_due_diligence
+    - pep_screening
+    - suspicious_transaction_reporting
+    - lei_83_2017
+  worker-risco-matrix:
+    type: worker
+    skill: risco-matrix
+    reports_to: dir-risk
+    security_tier: 2
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
+    capabilities:
+    - likelihood_impact_scoring
+    - heat_map
+    - mitigation_planning
+    - risk_register
+  worker-risco-bcp:
+    type: worker
+    skill: risco-bcp
+    reports_to: dir-risk
+    capabilities:
+    - business_impact_analysis
+    - recovery_strategies
+    - crisis_management
+    - bcm_testing
+    - iso_22301
+  worker-risco-esg:
+    type: worker
+    skill: risco-esg
+    reports_to: dir-risk
+    security_tier: 2
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
+    capabilities:
+    - csrd_compliance
+    - eu_taxonomy
+    - double_materiality
+    - carbon_footprint
+    - sustainability_metrics
+  worker-risco-iso27001:
+    type: worker
+    skill: risco-iso27001
+    reports_to: dir-risk
+    capabilities:
+    - isms_implementation
+    - annex_a_controls
+    - statement_of_applicability
+    - incident_management
+    - nis2_compliance
+  worker-risco-whistleblowing:
+    type: worker
+    skill: risco-whistleblowing
+    reports_to: dir-risk
+    security_tier: 3
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
+    capabilities:
+    - dl_93_2021
+    - internal_reporting_channel
+    - investigation_procedure
+    - retaliation_protection
+  worker-risco-regulatorio:
+    type: worker
+    skill: risco-regulatorio
+    reports_to: dir-risk
+    capabilities:
+    - legislative_change_tracking
+    - compliance_calendar
+    - regulatory_impact_assessment
+  worker-risco-etica:
+    type: worker
+    skill: risco-etica
+    reports_to: dir-risk
+    security_tier: 3
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
+    capabilities:
+    - code_of_conduct
+    - conflict_of_interest
+    - gifts_hospitality
+    - ethics_hotline
+  worker-risco-contractual:
+    type: worker
+    skill: risco-contractual
+    reports_to: dir-risk
+    capabilities:
+    - obligation_tracking
+    - sla_monitoring
+    - penalty_management
+    - contract_lifecycle
+  worker-risco-seguros:
+    type: worker
+    skill: risco-seguros
+    reports_to: dir-risk
+    capabilities:
+    - coverage_analysis
+    - renewal_calendar
+    - claims_management
+    - policy_gap_identification
+  worker-risco-terceiros:
+    type: worker
+    skill: risco-terceiros
+    reports_to: dir-risk
+    security_tier: 1
+    allowed_tools:
+    - Read
+    - Grep
+    capabilities:
+    - vendor_due_diligence
+    - supply_chain_risk
+    - onboarding_monitoring
+    - exit_management
+  worker-risco-reporting:
+    type: worker
+    skill: risco-reporting
+    reports_to: dir-risk
+    security_tier: 2
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
+    capabilities:
+    - kri_dashboards
+    - incident_log
+    - board_reports
+    - regulatory_filings
+    - compliance_metrics
+  worker-risco-audit:
+    type: worker
+    skill: risco-audit
+    reports_to: dir-risk
+    capabilities:
+    - internal_audit_planning
+    - fieldwork
+    - findings_documentation
+    - management_response
+    - follow_up_tracking
+  worker-builder-design-system:
+    type: worker
+    skill: builder-design-system
+    reports_to: dir-design-visual
+    capabilities:
+    - design_tokens
+    - color_palette
+    - typography_scale
+    - tailwind_config
+    - component_specs
+    - spacing_system
+  worker-builder-brand-identity:
+    type: worker
+    skill: builder-brand-identity
+    reports_to: dir-design-visual
+    capabilities:
+    - logo_brief
+    - brand_guidelines
+    - color_system
+    - visual_identity
+  worker-builder-wireframe:
+    type: worker
+    skill: builder-wireframe
+    reports_to: dir-design-visual
+    capabilities:
+    - wireframe_lowfi
+    - user_flow
+    - sitemap
+    - page_structure
+  worker-builder-landing-page:
+    type: worker
+    skill: builder-landing-page
+    reports_to: dir-frontend
+    capabilities:
+    - html_generation
+    - react_jsx
+    - tailwind_styling
+    - responsive
+    - hero_section
+    - pricing_table
+    - cta_design
+  worker-builder-nextjs-app:
+    type: worker
+    skill: builder-nextjs-app
+    reports_to: dir-frontend
+    capabilities:
+    - nextjs_app_router
+    - page_scaffold
+    - layout_system
+    - loading_states
+    - error_boundaries
+    - server_components
+  worker-builder-react-components:
+    type: worker
+    skill: builder-react-components
+    reports_to: dir-frontend
+    capabilities:
+    - typescript_components
+    - shadcn_ui
+    - compound_components
+    - variant_system
+    - storybook
+  worker-builder-api-design:
+    type: worker
+    skill: builder-api-design
+    reports_to: dir-backend-build
+    capabilities:
+    - rest_endpoints
+    - openapi_spec
+    - request_validation
+    - error_handling
+    - rate_limiting
+  worker-builder-database-schema:
+    type: worker
+    skill: builder-database-schema
+    reports_to: dir-backend-build
+    capabilities:
+    - postgresql_ddl
+    - sqlite_schema
+    - migrations
+    - indexes
+    - relationships
+  worker-builder-auth-system:
+    type: worker
+    skill: builder-auth-system
+    reports_to: dir-backend-build
+    capabilities:
+    - jwt
+    - session_management
+    - oauth
+    - role_based_access
+    - password_hashing
+  worker-builder-vercel-deploy:
+    type: worker
+    skill: builder-vercel-deploy
+    reports_to: dir-devops-build
+    capabilities:
+    - vercel_config
+    - env_vars
+    - domains
+    - preview_urls
+    - edge_functions
+  worker-builder-docker-compose:
+    type: worker
+    skill: builder-docker-compose
+    reports_to: dir-devops-build
+    capabilities:
+    - dockerfile
+    - compose_yaml
+    - multi_service
+    - volumes
+    - networking
+  worker-builder-ci-cd:
+    type: worker
+    skill: builder-ci-cd
+    reports_to: dir-devops-build
+    capabilities:
+    - github_actions
+    - build_test_deploy
+    - preview_deploys
+    - release_workflow
+  worker-diva-briefing:
+    type: worker
+    skill: diva-briefing
+    reports_to: dir-design
+    capabilities:
+    - client_briefing
+    - needs_capture
+    - project_scoping
+  worker-diva-diagnose:
+    type: worker
+    skill: diva-diagnose
+    reports_to: dir-construction
+    capabilities:
+    - space_diagnostic
+    - structural_assessment
+    - regulatory_check
+  worker-diva-roadmap:
+    type: worker
+    skill: diva-roadmap
+    reports_to: dir-construction
+    capabilities:
+    - project_roadmap
+    - milestone_planning
+    - visual_roadmap
+    watches:
+    - diva-timeline
+  worker-diva-client-onboard:
+    type: worker
+    skill: diva-client-onboard
+    reports_to: dir-design
+    capabilities:
+    - diva_onboarding
+    - architecture_client_setup
+  vp_events:
+    id: atlas-vp
+    name: A.T.L.A.S.
+    title: VP Events & Logistics
+    type: orchestrator
+    adapter: atlas-v1-events-logistics
+    reports_to: dario-ceo
+    capabilities:
+    - event_planning
+    - logistics_management
+    - venue_management
+    - vendor_coordination
+    - guest_experience
+    - production_management
+    - sponsorship
+    - compliance_permits
+    - sustainability
+    - hybrid_virtual_events
+    heartbeat:
+      enable_timer: true
+      interval_minutes: 45
+      enable_assignment_wakeup: true
+      enable_on_demand: true
+      cooldown_minutes: 10
+    context_mode: full
+    skill: atlas-vp-events
+  dir_event_planning:
+    id: dir-event-planning
+    name: Event Planning Director
+    title: Director of Event Planning
+    type: manager
+    reports_to: atlas-vp
+    manages:
+    - worker-atlas-briefing
+    - worker-atlas-venue
+    - worker-atlas-timeline
+    - worker-atlas-budget
+    - worker-atlas-checklist
+    - worker-atlas-post-event
+    capabilities:
+    - event_strategy
+    - venue_selection
+    - timeline_management
+    - budget_control
+    - post_event_analysis
+    squads:
+    - Event Masters Squad
+    skill: atlas-event-planning
+  dir_logistics:
+    id: dir-logistics
+    name: Logistics Director
+    title: Director of Logistics Operations
+    type: manager
+    reports_to: atlas-vp
+    manages:
+    - worker-atlas-vendor
+    - worker-atlas-catering
+    - worker-atlas-transport
+    - worker-atlas-accommodation
+    - worker-atlas-staff
+    - worker-atlas-warehouse
+    capabilities:
+    - vendor_management
+    - catering_operations
+    - transport_logistics
+    - accommodation_management
+    - staffing
+    - inventory_management
+    squads:
+    - Logistics Operations Squad
+    skill: atlas-event-logistics
+  dir_production:
+    id: dir-production
+    name: Production Director
+    title: Director of Creative Production
+    type: manager
+    reports_to: atlas-vp
+    manages:
+    - worker-atlas-av
+    - worker-atlas-staging
+    - worker-atlas-decor
+    - worker-atlas-entertainment
+    - worker-atlas-photo-video
+    capabilities:
+    - av_production
+    - stage_design
+    - decoration_theming
+    - entertainment_booking
+    - photo_video_coordination
+    squads:
+    - Creative Production Squad
+    skill: atlas-event-production
+  dir_guest_experience:
+    id: dir-guest-experience
+    name: Guest Experience Director
+    title: Director of Guest Experience
+    type: manager
+    reports_to: atlas-vp
+    manages:
+    - worker-atlas-guest
+    - worker-atlas-seating
+    - worker-atlas-protocol
+    - worker-atlas-tech
+    - worker-atlas-hybrid
+    capabilities:
+    - guest_management
+    - seating_planning
+    - protocol_etiquette
+    - event_technology
+    - hybrid_events
+    squads:
+    - Guest Experience Squad
+    skill: atlas-guest-experience
+  dir_event_business:
+    id: dir-event-business
+    name: Event Business Director
+    title: Director of Event Business
+    type: manager
+    reports_to: atlas-vp
+    manages:
+    - worker-atlas-marketing
+    - worker-atlas-sponsor
+    - worker-atlas-crm
+    - worker-atlas-risk
+    - worker-atlas-compliance
+    - worker-atlas-sustainability
+    capabilities:
+    - event_marketing
+    - sponsorship_management
+    - attendee_crm
+    - risk_management
+    - permits_licensing
+    - green_events
+    squads:
+    - Event Business Squad
+    - Risk & Compliance Squad
+    skill: atlas-event-business
+  worker-atlas-briefing:
+    type: worker
+    skill: atlas-briefing
+    reports_to: dir-event-planning
+    capabilities:
+    - event_briefing
+    - requirements_gathering
+    - stakeholder_mapping
+    - kpi_definition
+  worker-atlas-venue:
+    type: worker
+    skill: atlas-venue
+    reports_to: dir-event-planning
+    capabilities:
+    - venue_selection
+    - site_inspection
+    - venue_comparison
+    - contract_negotiation
+    - layout_optimization
+  worker-atlas-timeline:
+    type: worker
+    skill: atlas-timeline
+    reports_to: dir-event-planning
+    capabilities:
+    - event_timeline
+    - run_of_show
+    - gantt_chart
+    - critical_path
+    - milestone_tracking
+  worker-atlas-budget:
+    type: worker
+    skill: atlas-budget
+    reports_to: dir-event-planning
+    capabilities:
+    - event_budget
+    - cost_estimation
+    - revenue_planning
+    - variance_tracking
+    - roi_calculation
+  worker-atlas-checklist:
+    type: worker
+    skill: atlas-checklist
+    reports_to: dir-event-planning
+    capabilities:
+    - day_of_checklist
+    - run_sheets
+    - emergency_procedures
+    - go_no_go
+    - staff_assignment
+  worker-atlas-post-event:
+    type: worker
+    skill: atlas-post-event
+    reports_to: dir-event-planning
+    capabilities:
+    - debrief
+    - survey_design
+    - metrics_dashboard
+    - roi_report
+    - vendor_scorecard
+    - lessons_learned
+  worker-atlas-vendor:
+    type: worker
+    skill: atlas-vendor
+    reports_to: dir-logistics
+    capabilities:
+    - vendor_procurement
+    - rfp_management
+    - evaluation_matrix
+    - contract_management
+    - vendor_coordination
+  worker-atlas-catering:
+    type: worker
+    skill: atlas-catering
+    reports_to: dir-logistics
+    capabilities:
+    - menu_planning
+    - dietary_management
+    - beverage_planning
+    - haccp_compliance
+    - quantity_calculation
+  worker-atlas-transport:
+    type: worker
+    skill: atlas-transport
+    reports_to: dir-logistics
+    capabilities:
+    - guest_transport
+    - route_planning
+    - parking_management
+    - fleet_coordination
+    - load_in_logistics
+  worker-atlas-accommodation:
+    type: worker
+    skill: atlas-accommodation
+    reports_to: dir-logistics
+    capabilities:
+    - hotel_blocks
+    - room_management
+    - travel_coordination
+    - welcome_packages
+    - group_rates
+  worker-atlas-staff:
+    type: worker
+    skill: atlas-staff
+    reports_to: dir-logistics
+    capabilities:
+    - staffing_ratios
+    - role_definitions
+    - briefing
+    - communication_plan
+    - volunteer_management
+  worker-atlas-warehouse:
+    type: worker
+    skill: atlas-warehouse
+    reports_to: dir-logistics
+    capabilities:
+    - equipment_inventory
+    - asset_tracking
+    - pick_pack
+    - storage_management
+    - kit_standardization
+  worker-atlas-av:
+    type: worker
+    skill: atlas-av
+    reports_to: dir-production
+    capabilities:
+    - sound_design
+    - lighting_design
+    - video_projection
+    - streaming
+    - power_management
+    - stage_design
+  worker-atlas-staging:
+    type: worker
+    skill: atlas-staging
+    reports_to: dir-production
+    capabilities:
+    - stage_types
+    - set_design
+    - scenic_elements
+    - rigging
+    - technical_drawings
+    - build_schedule
+  worker-atlas-decor:
+    type: worker
+    skill: atlas-decor
+    reports_to: dir-production
+    capabilities:
+    - theme_development
+    - floral_design
+    - lighting_decor
+    - signage
+    - photo_opportunities
+    - props
+  worker-atlas-entertainment:
+    type: worker
+    skill: atlas-entertainment
+    reports_to: dir-production
+    capabilities:
+    - entertainment_booking
+    - programming_design
+    - artist_management
+    - mc_hosting
+    - spa_licensing
+  worker-atlas-photo-video:
+    type: worker
+    skill: atlas-photo-video
+    reports_to: dir-production
+    capabilities:
+    - photography
+    - videography
+    - drone
+    - live_streaming
+    - photo_booth
+    - social_media_content
+    - rgpd
+  worker-atlas-guest:
+    type: worker
+    skill: atlas-guest
+    reports_to: dir-guest-experience
+    capabilities:
+    - guest_list
+    - rsvp_workflow
+    - registration
+    - name_badges
+    - capacity_management
+    - accessibility
+  worker-atlas-seating:
+    type: worker
+    skill: atlas-seating
+    reports_to: dir-guest-experience
+    capabilities:
+    - seating_plan
+    - table_configuration
+    - vip_placement
+    - floor_plan_layout
+    - protocol_seating
+  worker-atlas-protocol:
+    type: worker
+    skill: atlas-protocol
+    reports_to: dir-guest-experience
+    capabilities:
+    - protocol_precedence
+    - vip_management
+    - diplomatic_protocol
+    - corporate_protocol
+    - gift_protocol
+    - dress_code
+  worker-atlas-tech:
+    type: worker
+    skill: atlas-tech
+    reports_to: dir-guest-experience
+    capabilities:
+    - registration_platforms
+    - check_in_technology
+    - event_app
+    - wifi_planning
+    - lead_capture
+    - analytics
+  worker-atlas-hybrid:
+    type: worker
+    skill: atlas-hybrid
+    reports_to: dir-guest-experience
+    capabilities:
+    - hybrid_models
+    - virtual_platform
+    - streaming_production
+    - engagement_equity
+    - timezone_management
+  worker-atlas-marketing:
+    type: worker
+    skill: atlas-marketing
+    reports_to: dir-event-business
+    capabilities:
+    - event_marketing
+    - channel_strategy
+    - email_sequences
+    - social_media
+    - pricing_strategy
+    - ticketing
+  worker-atlas-sponsor:
+    type: worker
+    skill: atlas-sponsor
+    reports_to: dir-event-business
+    capabilities:
+    - sponsorship_tiers
+    - sponsorship_deck
+    - valuation
+    - sponsor_activation
+    - roi_reporting
+    - fulfillment
+  worker-atlas-crm:
+    type: worker
+    skill: atlas-crm
+    reports_to: dir-event-business
+    capabilities:
+    - attendee_crm
+    - segmentation
+    - retention_strategy
+    - automation
+    - attendee_lifetime_value
+    - rgpd
+  worker-atlas-risk:
+    type: worker
+    skill: atlas-risk
+    reports_to: dir-event-business
+    capabilities:
+    - risk_assessment
+    - weather_contingency
+    - medical_health
+    - security_planning
+    - crowd_management
+    - crisis_communication
+    - insurance
+  worker-atlas-compliance:
+    type: worker
+    skill: atlas-compliance
+    reports_to: dir-event-business
+    capabilities:
+    - event_permits
+    - fire_safety_scie
+    - food_safety_haccp
+    - noise_regulations
+    - accessibility_dl163
+    - temporary_structures
+    - insurance
+  worker-atlas-sustainability:
+    type: worker
+    skill: atlas-sustainability
+    reports_to: dir-event-business
+    capabilities:
+    - iso_20121
+    - carbon_footprint
+    - waste_management
+    - sustainable_catering
+    - green_certification
+    - measurement_reporting

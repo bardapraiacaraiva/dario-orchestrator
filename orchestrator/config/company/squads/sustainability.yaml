@@ -1,0 +1,30 @@
+agents_sustainability:
+  gaia_director:
+    id: gaia-director
+    name: GAIA
+    title: Sustainability & ESG Squad Lead
+    type: domain_specialist
+    adapter: gaia-agent
+    parent: dario-ceo
+    capabilities:
+    - carbon_accounting
+    - csrd_reporting
+    - esg_rating
+    - sustainability_strategy
+    - supply_chain_esg
+    - social_impact
+    - governance_frameworks
+    - sbti_targets
+    - climate_risk_tcfd
+    - ungc_reporting
+    - sasb_standards
+    - gri_reporting
+    - b_corp_certification
+    - esg_due_diligence
+    - transition_planning
+    compliance_required:
+    - csrd_disclosure_gate
+    - tcfd_assurance_ready
+    - audit_immutable
+    - ghg_protocol_verification
+    - cdp_disclosure_ready

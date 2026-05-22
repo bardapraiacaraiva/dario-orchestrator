@@ -51,10 +51,9 @@ import time
 import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 TRACES_DIR = ORCH_DIR / "traces"
@@ -90,7 +89,7 @@ class Span:
     name: str
     kind: SpanKind = SpanKind.CUSTOM
     span_id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
-    parent_id: Optional[str] = None
+    parent_id: str | None = None
     trace_id: str = ""
     start_time: float = 0
     end_time: float = 0
@@ -141,7 +140,7 @@ class SpanTracer:
     def __init__(self, trace_id: str = ""):
         self.trace_id = trace_id or uuid.uuid4().hex[:16]
         self.spans: list[Span] = []
-        self._active_span: Optional[Span] = None
+        self._active_span: Span | None = None
 
     @contextmanager
     def span(self, name: str, kind: SpanKind = SpanKind.CUSTOM, parent: Span = None, **attrs):
@@ -194,7 +193,7 @@ class SpanTracer:
 
         data = {
             "trace_id": self.trace_id,
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
             "span_count": len(self.spans),
             "total_duration_ms": sum(s.duration_ms for s in self.spans if not s.parent_id),
             "spans": [s.to_dict() for s in self.spans],
@@ -333,7 +332,7 @@ def main():
 
         print("=== TRACE TREE ===")
         tracer.print_tree()
-        print(f"\n=== SUMMARY ===")
+        print("\n=== SUMMARY ===")
         print(json.dumps(tracer.summary(), indent=2))
 
         path = tracer.export_json()

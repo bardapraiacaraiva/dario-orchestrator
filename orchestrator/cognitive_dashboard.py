@@ -27,10 +27,9 @@ CLI:
 
 import argparse
 import json
-import sqlite3
 import sys
 import webbrowser
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -43,13 +42,13 @@ try:
     _yaml = YAML()
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
 
@@ -59,7 +58,7 @@ except ImportError:
 
 def collect_drift_status() -> dict:
     """Per-eval golden status — last known comparison result for each."""
-    from golden_eval import list_goldens, compare_against_golden, GOLDEN_DIR
+    from golden_eval import GOLDEN_DIR, compare_against_golden, list_goldens
     goldens = list_goldens()
     rows = []
     for g in goldens:
@@ -172,7 +171,8 @@ def collect_cron_history() -> dict:
 
 
 def collect_qvalue_top() -> dict:
-    from qvalue_memory_wire import stats as q_stats, top_strategies
+    from qvalue_memory_wire import stats as q_stats
+    from qvalue_memory_wire import top_strategies
     s = q_stats()
     top = top_strategies(5)
     return {
@@ -184,7 +184,7 @@ def collect_qvalue_top() -> dict:
 
 
 def collect_synaptic_health() -> dict:
-    from synaptic_update import stats, _load_weights
+    from synaptic_update import _load_weights, stats
     s = stats()
     weights = _load_weights()
     graph = weights.get("affinity_graph", {})
@@ -217,7 +217,7 @@ def collect_embeddings_status() -> dict:
 
 def collect_all() -> dict:
     return {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "drift": collect_drift_status(),
         "cot": collect_cot_health(),
         "semantic": collect_semantic_memory(),

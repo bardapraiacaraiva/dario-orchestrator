@@ -312,21 +312,42 @@ DEFAULT_CHECKLIST = {
 # =============================================================================
 
 def validate_task(task: dict) -> dict:
-    """Validate a task against TASK-FORMAT-SPEC-V1."""
-    errors = []
-    warnings = []
+    """Validate a task against TASK-FORMAT-SPEC-V1.
 
-    # Required fields
+    v12.1: Pydantic-backed via `schemas.TaskSpec` for the structural check,
+    plus domain rules (inputs/performance) layered on top. Return shape is
+    unchanged so all existing callers keep working.
+    """
+    from pydantic import ValidationError
+
+    from schemas import TaskSpec
+
+    errors: list[str] = []
+    warnings: list[str] = []
+
+    # Structural validation via Pydantic
+    try:
+        TaskSpec.model_validate(task)
+    except ValidationError as ve:
+        for err in ve.errors():
+            loc = ".".join(str(x) for x in err["loc"])
+            errors.append(f"{loc}: {err['msg']}")
+
+    # Required fields (kept as explicit messages — legacy callers rely on this wording)
     for field in ["id", "title", "skill"]:
         if not task.get(field):
-            errors.append(f"Missing required field: {field}")
+            msg = f"Missing required field: {field}"
+            if msg not in errors:
+                errors.append(msg)
 
     # Executor type
     etype = task.get("executor_type", "agente")
     if etype not in EXECUTOR_TYPES:
-        errors.append(f"Invalid executor_type: {etype}. Must be one of: {list(EXECUTOR_TYPES.keys())}")
+        errors.append(
+            f"Invalid executor_type: {etype}. Must be one of: {list(EXECUTOR_TYPES.keys())}"
+        )
 
-    # Inputs validation
+    # Domain-specific: inputs validation
     inputs = task.get("inputs")
     if inputs:
         if isinstance(inputs, str):
@@ -337,11 +358,11 @@ def validate_task(task: dict) -> dict:
                 inputs = []
         for inp in inputs:
             if not inp.get("campo"):
-                warnings.append(f"Input missing 'campo' field")
+                warnings.append("Input missing 'campo' field")
             if not inp.get("tipo"):
                 warnings.append(f"Input '{inp.get('campo', '?')}' missing 'tipo'")
 
-    # Performance
+    # Domain-specific: performance
     perf = task.get("performance")
     if perf:
         if isinstance(perf, str):
@@ -454,8 +475,9 @@ def check_preconditions(task_id: str) -> dict:
 
         elif tipo == "budget_check":
             try:
-                import yaml
                 from datetime import datetime
+
+                import yaml
                 budget_path = ORCH_DIR / "budgets" / f"{datetime.now().strftime('%Y-%m')}.yaml"
                 if budget_path.exists():
                     with open(budget_path) as f:

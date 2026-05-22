@@ -1,0 +1,85 @@
+workers_oraculo:
+  worker-oraculo-paper:
+    id: worker-oraculo-paper
+    skill: oraculo-paper-reading-extraction
+    reports_to: oraculo-director
+  worker-oraculo-replication:
+    id: worker-oraculo-replication
+    skill: oraculo-replication-studies
+    reports_to: oraculo-director
+  worker-oraculo-eval:
+    id: worker-oraculo-eval
+    skill: oraculo-model-evaluation
+    reports_to: oraculo-director
+  worker-oraculo-bench:
+    id: worker-oraculo-bench
+    skill: oraculo-benchmarking
+    reports_to: oraculo-director
+  worker-oraculo-align:
+    id: worker-oraculo-align
+    skill: oraculo-alignment-research
+    reports_to: oraculo-director
+  worker-oraculo-agent:
+    id: worker-oraculo-agent
+    skill: oraculo-agentic-research
+    reports_to: oraculo-director
+  worker-oraculo-multimodal:
+    id: worker-oraculo-multimodal
+    skill: oraculo-multimodal-research
+    reports_to: oraculo-director
+  worker-oraculo-ft:
+    id: worker-oraculo-ft
+    skill: oraculo-llm-fine-tuning
+    reports_to: oraculo-director
+  worker-oraculo-rag:
+    id: worker-oraculo-rag
+    skill: oraculo-rag-research
+    reports_to: oraculo-director
+  worker-oraculo-evalfx:
+    id: worker-oraculo-evalfx
+    skill: oraculo-evaluation-frameworks
+    reports_to: oraculo-director
+  worker-oraculo-writing:
+    id: worker-oraculo-writing
+    skill: oraculo-paper-writing
+    reports_to: oraculo-director
+  worker-oraculo-review:
+    id: worker-oraculo-review
+    skill: oraculo-peer-review
+    reports_to: oraculo-director
+  worker-oraculo-conf:
+    id: worker-oraculo-conf
+    skill: oraculo-conference-tracking
+    reports_to: oraculo-director
+  worker-oraculo-card:
+    id: worker-oraculo-card
+    skill: oraculo-model-card-generation
+    reports_to: oraculo-director
+  worker-oraculo-safety:
+    id: worker-oraculo-safety
+    skill: oraculo-ai-safety-research
+    reports_to: oraculo-director
+squads_oraculo:
+  research_to_paper:
+    workers:
+    - worker-oraculo-paper
+    - worker-oraculo-writing
+    - worker-oraculo-review
+    - worker-oraculo-conf
+  evaluation_benchmarks:
+    workers:
+    - worker-oraculo-eval
+    - worker-oraculo-bench
+    - worker-oraculo-evalfx
+    - worker-oraculo-replication
+  ml_engineering:
+    workers:
+    - worker-oraculo-ft
+    - worker-oraculo-rag
+    - worker-oraculo-multimodal
+    - worker-oraculo-agent
+  safety_alignment:
+    workers:
+    - worker-oraculo-align
+    - worker-oraculo-safety
+    - worker-oraculo-card

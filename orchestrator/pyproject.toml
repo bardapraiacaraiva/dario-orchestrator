@@ -1,0 +1,174 @@
+[project]
+name = "dario-orchestrator"
+version = "12.1.0"
+description = "DARIO Enterprise AI OS — multi-squad orchestrator with cognitive layer, compliance gates, and dream-based memory consolidation."
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "Proprietary" }
+authors = [
+    { name = "Bardapraiacaraiva", email = "bardapraiacaraiva@gmail.com" },
+]
+
+# Core runtime dependencies — verified via AST scan of all .py files (2026-05-22)
+dependencies = [
+    # LLM provider SDKs
+    "anthropic>=0.87,<1.0",
+    # Web framework + ASGI server
+    "fastapi>=0.135,<1.0",
+    "starlette>=0.52,<1.0",
+    "uvicorn[standard]>=0.38,<1.0",
+    # Data validation (the contract layer — Onda 1 #2)
+    "pydantic>=2.12,<3.0",
+    # YAML configs
+    "pyyaml>=6.0,<7.0",
+    # Eval framework (used by tests + golden_eval engine)
+    "deepeval>=3.9,<4.0",
+    # Agent observability (legacy; will be replaced by OTel in Onda 1 #4)
+    "agentops>=0.4,<1.0",
+    # LangGraph — installed but unused; activated by Onda 1 #3 for chain_executor refactor
+    "langgraph>=1.1,<2.0",
+    "langgraph-checkpoint>=3.0,<4.0",
+    "langgraph-checkpoint-sqlite>=2.0",
+]
+
+[project.optional-dependencies]
+# Test extras
+test = [
+    "pytest>=9.0,<10.0",
+    "pytest-asyncio>=1.3,<2.0",
+    "pytest-cov>=7.0,<8.0",
+    "pytest-xdist>=3.8,<4.0",
+    "pytest-rerunfailures>=16.0,<17.0",
+    "pytest-repeat>=0.9,<1.0",
+]
+
+# OTel + Langfuse stack — Onda 1 #4
+observability = [
+    "opentelemetry-api>=1.30",
+    "opentelemetry-sdk>=1.30",
+    "opentelemetry-exporter-otlp>=1.30",
+    "opentelemetry-instrumentation-fastapi>=0.50b0",
+    "langfuse>=2.50",
+]
+
+# Dev tooling
+dev = [
+    "ruff>=0.13",
+    "mypy>=1.13",
+]
+
+[project.scripts]
+dario-orchestrator = "runtime:main"
+dario-dispatch = "dispatch_engine:main"
+dario-executor = "executor:main"
+dario-dream = "dream.engine:main"
+dario-cognitive-dashboard = "cognitive_dashboard:main"
+dario-license = "license_manager:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+# Single-package layout; everything at the repo root.
+packages = ["memory", "dream", "tools"]
+include = [
+    "*.py",
+    "*.yaml",
+    "*.html",
+    "chains/*.yaml",
+    "bundles/*.yaml",
+    "quality/*.yaml",
+]
+
+[tool.uv]
+# uv resolver settings
+resolution = "highest"
+prerelease = "if-necessary-or-explicit"
+
+# pytest config lives in pytest.ini (single source of truth) to avoid
+# the "ignoring pyproject.toml" warning that pytest emits when both exist.
+
+[tool.ruff]
+line-length = 110
+target-version = "py313"
+extend-exclude = [
+    "**/__pycache__",
+    "**/.venv",
+    "agent-memory",
+    "backups",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+# Tolerated during the migration window (Onda 4 #2):
+#   E402  module-level imports below code — many engines do `sys.path.insert`
+#         before importing siblings; refactor in Onda 5.
+#   E701/E702  multiple statements per line — present in ~150 places, mass
+#         rewrite would inflate the diff without a real correctness win.
+#   E722  bare except — 11 sites; each needs case-by-case review.
+#   F841  unused local var — 20 sites, often intentional (re-bound below).
+#   B007  unused for-loop variable — present in 25 enumerate() patterns.
+#   B904  raise-without-from — 2 sites in error wrappers.
+#   B905  zip-without-explicit-strict — 5 sites; safe to ignore until
+#         Python 3.14 makes strict the default.
+#   UP042 replace-str-enum — 8 enum subclasses; cosmetic.
+ignore = [
+    "E501", "E402", "E701", "E702", "E722", "E731",
+    "F841",
+    "B007", "B904", "B905", "B006", "B010", "B011", "B024", "B033",
+    "UP042",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests can have minor smells the production code shouldn't:
+"tests/*" = ["E402", "F401"]
+# Migration scripts target old Python versions for compatibility checks:
+"scripts/upgrade_*.py" = ["UP036"]
+
+[tool.mypy]
+python_version = "3.13"
+strict_optional = true
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = false  # too aggressive for current codebase; lift gradually
+ignore_missing_imports = true
+# Onda 4 #2 — incremental strict checking. Start with the foundational
+# modules we wrote in Onda 1-3; expand the `files` list as legacy code
+# gets typed up. `follow_imports=skip` prevents mypy from cascading into
+# untyped dependencies (the legacy upgrade packs).
+files = [
+    # Foundational
+    "schemas",
+    "otel_setup.py",
+    "chain_graph.py",
+    "chain_schemas.py",
+    "config",
+    "optimization",
+    # Intelligence sub-modules (Onda 3-6)
+    "upgrades/intelligence_qvalue.py",
+    "upgrades/intelligence_tiered.py",
+    "upgrades/intelligence_kg.py",
+    "upgrades/intelligence_router.py",
+    "upgrades/intelligence_tools.py",
+    "upgrades/intelligence_benchmark.py",
+    "upgrades/intelligence_metrics.py",
+    # Core + Execution sub-modules (Onda 6-7)
+    "upgrades/core_handoff.py",
+    "upgrades/core_messagebus.py",
+    "upgrades/core_checkpoints.py",
+    "upgrades/core_engines.py",
+    "upgrades/execution_parallel.py",
+    # Durable execution piloto (Onda 5 #5)
+    "durable",
+    # Memory + Dream subsystems (Onda 7 #3)
+    "memory",
+    "dream",
+]
+follow_imports = "skip"
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+# Auto-generated / external interfaces — relax for these.
+module = ["fastapi", "langgraph.*", "opentelemetry.*", "yaml"]
+ignore_missing_imports = true

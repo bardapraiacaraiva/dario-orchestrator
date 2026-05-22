@@ -1,0 +1,80 @@
+workers_obsidian:
+  worker-obsidian-graph:
+    id: worker-obsidian-graph
+    skill: obsidian-knowledge-graph
+    reports_to: obsidian-director
+  worker-obsidian-basb:
+    id: worker-obsidian-basb
+    skill: obsidian-second-brain
+    reports_to: obsidian-director
+  worker-obsidian-atomic:
+    id: worker-obsidian-atomic
+    skill: obsidian-atomic-notes
+    reports_to: obsidian-director
+  worker-obsidian-moc:
+    id: worker-obsidian-moc
+    skill: obsidian-moc-design
+    reports_to: obsidian-director
+  worker-obsidian-para:
+    id: worker-obsidian-para
+    skill: obsidian-para-organization
+    reports_to: obsidian-director
+  worker-obsidian-zettel:
+    id: worker-obsidian-zettel
+    skill: obsidian-zettelkasten-method
+    reports_to: obsidian-director
+  worker-obsidian-rag:
+    id: worker-obsidian-rag
+    skill: obsidian-rag-corpus-engineering
+    reports_to: obsidian-director
+  worker-obsidian-tax:
+    id: worker-obsidian-tax
+    skill: obsidian-taxonomy-design
+    reports_to: obsidian-director
+  worker-obsidian-ont:
+    id: worker-obsidian-ont
+    skill: obsidian-ontology-modeling
+    reports_to: obsidian-director
+  worker-obsidian-rel:
+    id: worker-obsidian-rel
+    skill: obsidian-search-relevance
+    reports_to: obsidian-director
+  worker-obsidian-sem:
+    id: worker-obsidian-sem
+    skill: obsidian-semantic-search
+    reports_to: obsidian-director
+  worker-obsidian-emb:
+    id: worker-obsidian-emb
+    skill: obsidian-embedding-models
+    reports_to: obsidian-director
+  worker-obsidian-kbc:
+    id: worker-obsidian-kbc
+    skill: obsidian-knowledge-base-curation
+    reports_to: obsidian-director
+  worker-obsidian-cite:
+    id: worker-obsidian-cite
+    skill: obsidian-cross-referencing
+    reports_to: obsidian-director
+  worker-obsidian-comp:
+    id: worker-obsidian-comp
+    skill: obsidian-knowledge-compaction
+    reports_to: obsidian-director
+squads_obsidian:
+  pkm_setup:
+    workers:
+    - worker-obsidian-basb
+    - worker-obsidian-para
+    - worker-obsidian-atomic
+    - worker-obsidian-zettel
+  rag_engineering:
+    workers:
+    - worker-obsidian-rag
+    - worker-obsidian-sem
+    - worker-obsidian-emb
+    - worker-obsidian-rel
+  knowledge_graph_full:
+    workers:
+    - worker-obsidian-graph
+    - worker-obsidian-ont
+    - worker-obsidian-tax
+    - worker-obsidian-cite

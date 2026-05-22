@@ -149,6 +149,189 @@ affinity_graph:
     co_activations: 3
     notes: Local SEO needs LocalBusiness schema
     weight: 0.5
+  mercurius-prospecting + mercurius-discovery-call:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 86.5
+    notes: Prospecting feeds discovery — same persona target across both
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.6
+  mercurius-discovery-call + mercurius-objection-handling:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 87.5
+    notes: Discovery surfaces objections that handling addresses
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.6
+  mercurius-objection-handling + mercurius-negotiation-prep:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 89.0
+    notes: Objection patterns inform negotiation concession sequencing
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.6
+  mercurius-negotiation-prep + atlas-fin-pix-rules-bcb:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 88.5
+    notes: B2G negotiations require PSP compliance specifics — pricing depends on
+      settlement model
+    source: stress_test_synthetic
+    validated_by_client: false
+  atlas-fin-pix-rules-bcb + lex-administrativo:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 87.5
+    notes: PSP architecture must be reflected in contractual clauses (split, settlement,
+      MED)
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.55
+  mercurius-prospecting + lex-administrativo:
+    weight: 0.45
+    co_activations: 3
+    avg_combined_score: 87.0
+    notes: Contract template prepared in parallel with prospecting accelerates close
+      cycle
+    source: stress_test_synthetic
+    validated_by_client: false
+  aegis-iam-identity + aegis-secrets-management:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 89.0
+    notes: Identity tokens stored as secrets — coupled lifecycle
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.55
+  aegis-iam-identity + aegis-zero-trust-architecture:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 88.5
+    notes: Identity is the perimeter in zero-trust models
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.55
+  aegis-threat-modeling + aegis-vulnerability-management:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 90.0
+    notes: Proactive (modeling) + reactive (CVE) form complete posture
+    source: stress_test_synthetic
+    validated_by_client: false
+  aegis-secure-sdlc + aegis-vulnerability-management:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 88.7
+    notes: Dev process gates feed vuln detection pipeline
+    source: stress_test_synthetic
+    validated_by_client: false
+  aegis-secrets-management + aegis-zero-trust-architecture:
+    weight: 0.45
+    co_activations: 3
+    avg_combined_score: 89.5
+    notes: Secrets isolated per network zone
+    source: stress_test_synthetic
+    validated_by_client: false
+  aegis-secure-sdlc + aegis-threat-modeling:
+    weight: 0.45
+    co_activations: 3
+    avg_combined_score: 89.0
+    notes: Threat models inform CI/CD security gates
+    source: stress_test_synthetic
+    validated_by_client: false
+  nexus-cicd + nexus-cloud:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 88.0
+    notes: Pipelines target cloud — coupled config
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.55
+  nexus-cloud + nexus-database:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 88.5
+    notes: DB lives in cloud — provisioning shared
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.55
+  nexus-database + nexus-monitoring:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 88.7
+    notes: DB metrics core to monitoring
+    source: stress_test_synthetic
+    validated_by_client: false
+  nexus-monitoring + nexus-infra:
+    weight: 0.45
+    co_activations: 3
+    avg_combined_score: 87.0
+    notes: IaC provisions monitoring stack
+    source: stress_test_synthetic
+    validated_by_client: false
+  nexus-cicd + nexus-infra:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 86.0
+    notes: CI/CD deploys IaC changes
+    source: stress_test_synthetic
+    validated_by_client: false
+  nexus-cloud + nexus-infra:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 87.5
+    notes: IaC defines cloud topology
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.55
+  demeter-etl + demeter-warehouse:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 88.0
+    notes: ETL writes feed warehouse — sequential
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.6
+  demeter-warehouse + demeter-metrics-layer:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 88.5
+    notes: Metrics built on warehouse star schema
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.55
+  demeter-metrics-layer + demeter-bi-dashboard:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 88.7
+    notes: Dashboards consume semantic metrics
+    source: stress_test_synthetic
+    validated_by_client: false
+    weight_original: 0.55
+  demeter-etl + demeter-event-tracking:
+    weight: 0.45
+    co_activations: 3
+    avg_combined_score: 86.5
+    notes: Event ingestion is a special-case ETL
+    source: stress_test_synthetic
+    validated_by_client: false
+  demeter-warehouse + demeter-event-tracking:
+    weight: 0.5
+    co_activations: 3
+    avg_combined_score: 87.0
+    notes: Events land in warehouse fact tables
+    source: stress_test_synthetic
+    validated_by_client: false
+  demeter-bi-dashboard + demeter-event-tracking:
+    weight: 0.45
+    co_activations: 3
+    avg_combined_score: 86.5
+    notes: Funnel dashboards visualize events
+    source: stress_test_synthetic
+    validated_by_client: false
 reinforcement:
   failure_decrement: 0.05
   max_weight: 1.0

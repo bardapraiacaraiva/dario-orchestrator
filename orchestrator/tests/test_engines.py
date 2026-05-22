@@ -2,8 +2,11 @@
 import json
 import subprocess
 import sys
-import pytest
 from pathlib import Path
+
+import pytest
+
+pytestmark = pytest.mark.slow
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 PY = sys.executable
@@ -68,7 +71,7 @@ class TestAutodiag:
     def test_all_checks_run(self):
         r = run("autodiag_runner.py", ["--json"])
         data = json.loads(r.stdout)
-        assert data["total"] == 7
+        assert data["total"] == 8
         assert "passed" in data
 
     def test_single_check(self):
@@ -120,16 +123,25 @@ class TestTracer:
         assert isinstance(data, list)
 
 
-class TestChainExecutor:
-    def test_dry_run(self):
-        r = run("chain_executor.py", ["--chain", "brand_to_market", "--dry-run", "--json"])
-        data = json.loads(r.stdout)
-        assert data["total_steps"] == 5
-        assert data["total_waves"] == 5
+class TestChainGraph:
+    """Onda 5 #2: legacy subprocess tests for chain_executor.py replaced by
+    direct chain_graph API checks. Full graph behaviour covered in
+    tests/test_chain_graph.py (8 dedicated tests)."""
 
-    def test_list(self):
-        r = run("chain_executor.py", ["--list", "--json"])
-        assert r.returncode == 0
+    def test_chain_listing_via_chain_graph(self):
+        from chain_graph import list_chains
+        chains = list_chains()
+        assert "brand_to_market" in chains
+        assert chains["brand_to_market"]["total_steps"] >= 1
+
+    def test_build_execution_plan_via_chain_graph(self):
+        from chain_graph import build_execution_plan, load_chain_def
+        defn = load_chain_def("brand_to_market")
+        assert defn is not None
+        plan = build_execution_plan(defn)
+        assert len(plan) >= 1
+        assert "wave" in plan[0]
+        assert "steps" in plan[0]
 
 
 class TestContextInjector:

@@ -73,6 +73,5 @@ def is_privileged_type(output_type: str) -> bool:
 
 
 if __name__ == "__main__":
-    import sys
     sample = "Análise estratégica do caso XYZ: cliente tem 70% de chance de ganhar..."
     print(mark(sample, output_type="estrategia_processual"))

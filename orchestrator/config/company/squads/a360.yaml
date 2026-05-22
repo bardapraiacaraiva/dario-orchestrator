@@ -1,0 +1,131 @@
+workers_a360:
+  worker-a360-nicho:
+    id: worker-a360-nicho
+    skill: a360-nicho
+    reports_to: a360-director
+    phase: discovery
+  worker-a360-avatar:
+    id: worker-a360-avatar
+    skill: a360-avatar
+    reports_to: a360-director
+    phase: discovery
+  worker-a360-validacao:
+    id: worker-a360-validacao
+    skill: a360-validacao
+    reports_to: a360-director
+    phase: validation
+  worker-a360-modelo:
+    id: worker-a360-modelo
+    skill: a360-modelo
+    reports_to: a360-director
+    phase: validation
+  worker-a360-oferta:
+    id: worker-a360-oferta
+    skill: a360-oferta
+    reports_to: a360-director
+    phase: offer
+  worker-a360-funil:
+    id: worker-a360-funil
+    skill: a360-funil
+    reports_to: a360-director
+    phase: offer
+  worker-a360-lancamento:
+    id: worker-a360-lancamento
+    skill: a360-lancamento
+    reports_to: a360-director
+    phase: launch
+  worker-a360-pitch:
+    id: worker-a360-pitch
+    skill: a360-pitch
+    reports_to: a360-director
+    phase: launch
+  worker-a360-metricas:
+    id: worker-a360-metricas
+    skill: a360-metricas
+    reports_to: a360-director
+    phase: growth
+  worker-a360-growth:
+    id: worker-a360-growth
+    skill: a360-growth
+    reports_to: a360-director
+    phase: growth
+  worker-a360-scale:
+    id: worker-a360-scale
+    skill: a360-scale
+    reports_to: a360-director
+    phase: scale
+  worker-a360-case-study:
+    id: worker-a360-case-study
+    skill: a360-case-study
+    reports_to: a360-director
+    phase: scale
+squads_a360:
+  discovery:
+    workers:
+    - worker-a360-nicho
+    - worker-a360-avatar
+    description: Niche research + ICP definition
+  validation:
+    workers:
+    - worker-a360-validacao
+    - worker-a360-modelo
+    description: Smoke tests + business model design
+  offer:
+    workers:
+    - worker-a360-oferta
+    - worker-a360-funil
+    description: Grand Slam Offer + acquisition funnel
+  launch:
+    workers:
+    - worker-a360-lancamento
+    - worker-a360-pitch
+    - worker-a360-metricas
+    description: PLF sequence + pitch deck + baseline metrics
+  growth:
+    workers:
+    - worker-a360-metricas
+    - worker-a360-growth
+    - worker-a360-case-study
+    description: Growth engine + retention + portfolio proof
+  scale:
+    workers:
+    - worker-a360-scale
+    - worker-a360-growth
+    - worker-a360-metricas
+    description: 0-to-1M ARR roadmap
+dispatch_a360:
+  valida minha ideia:
+    chain: a360_pre_pmf
+    fallback: a360-validacao
+  tenho uma ideia:
+    chain: a360_pre_pmf
+  qual o mercado:
+    skill: a360-nicho
+  quem e meu cliente:
+    skill: a360-avatar
+  modelo de negocio:
+    skill: a360-modelo
+  grand slam offer:
+    skill: a360-oferta
+  constroi minha oferta:
+    chain: a360_offer_pack
+  funil de aquisicao:
+    skill: a360-funil
+  lancamento plf:
+    chain: a360_launch_pack
+  pitch deck:
+    skill: a360-pitch
+  dashboard metricas saas:
+    skill: a360-metricas
+  growth engine:
+    skill: a360-growth
+  escalar para 1m arr:
+    chain: a360_scale_pack
+  case study cliente:
+    skill: a360-case-study
+  a360 completo:
+    chain: a360_full_lifecycle
+  diagnostica meu negocio:
+    skill: a360-director
+  ajuda com o meu negocio:
+    skill: a360-director

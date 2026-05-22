@@ -33,7 +33,6 @@ sys.path.insert(0, str(ORCH_DIR))
 
 import golden_eval
 
-
 # Each entry: (eval_id, human_score, golden_output_text, notes)
 GOLDENS = [
     # =================================================================

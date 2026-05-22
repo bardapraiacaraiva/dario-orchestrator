@@ -36,7 +36,7 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 try:
@@ -46,7 +46,7 @@ try:
     yaml_engine.width = 200
 
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml_engine.load(f)
 
     def dump_yaml(data, path):
@@ -57,7 +57,7 @@ except ImportError:
     import yaml
 
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
 
     def dump_yaml(data, path):
@@ -132,7 +132,7 @@ def record_score(task_id: str, score: int, skill: str = None,
         task_data = load_yaml(str(task_file))
         if task_data:
             task_data["quality_score"] = score
-            task_data["scored_at"] = datetime.now(timezone.utc).isoformat()
+            task_data["scored_at"] = datetime.now(UTC).isoformat()
             if dimensions:
                 task_data["quality_dimensions"] = dimensions
             # Get skill from task if not provided
@@ -220,7 +220,7 @@ def update_skill_metrics(skill: str, score: int, project: str = None,
         metrics = load_yaml(str(QUALITY_FILE))
     else:
         metrics = {
-            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "last_updated": datetime.now(UTC).isoformat(),
             "total_tasks_scored": 0,
             "global_avg_quality": 0,
             "skills": {},
@@ -260,7 +260,7 @@ def update_skill_metrics(skill: str, score: int, project: str = None,
         sd["live_scores"].append(score)
         sd["live_scores"] = sd["live_scores"][-100:]
     sd["total_executions"] = (sd.get("total_executions") or 0) + 1
-    sd["last_scored_at"] = datetime.now(timezone.utc).isoformat()
+    sd["last_scored_at"] = datetime.now(UTC).isoformat()
 
     # Recalculate averages using RECENT scores only (fixed: was using all-time)
     recent_scores = sd["scores"][-20:]  # Last 20 = current performance
@@ -295,7 +295,7 @@ def update_skill_metrics(skill: str, score: int, project: str = None,
     # Update globals
     skills[skill] = sd
     metrics["skills"] = skills
-    metrics["last_updated"] = datetime.now(timezone.utc).isoformat()
+    metrics["last_updated"] = datetime.now(UTC).isoformat()
 
     # Recalculate global stats
     all_global_scores = []
@@ -387,7 +387,7 @@ def cmd_dashboard(args):
                 }
         print(json.dumps(result, indent=2))
     else:
-        print(f"=== QUALITY DASHBOARD ===")
+        print("=== QUALITY DASHBOARD ===")
         print(f"  Total scored: {metrics.get('total_tasks_scored', 0)}")
         print(f"  Global avg:   {metrics.get('global_avg_quality', 0)}")
         print(f"  Data note:    {metrics.get('data_note', 'live data')}\n")

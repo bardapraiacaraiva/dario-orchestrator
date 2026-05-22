@@ -18,6 +18,7 @@ Usage:
 import hashlib
 import logging
 from pathlib import Path
+
 from fastapi import HTTPException, Security
 from fastapi.security import APIKeyHeader
 
@@ -25,7 +26,7 @@ try:
     from ruamel.yaml import YAML
     yaml_engine = YAML()
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml_engine.load(f)
     def dump_yaml(data, path):
         with open(path, 'w', encoding='utf-8') as f:
@@ -33,7 +34,7 @@ try:
 except ImportError:
     import yaml
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
     def dump_yaml(data, path):
         with open(path, 'w', encoding='utf-8') as f:

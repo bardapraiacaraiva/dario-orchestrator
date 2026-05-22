@@ -10,10 +10,10 @@ Does:
 
 Outputs JSON to stdout (picked up by hook system).
 """
+import json
 import subprocess
 import sys
-import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -96,7 +96,7 @@ def main():
     # 5. Log boot event to unified audit trail
     run_engine("audit_logger.py", [
         "-a", "session-boot", "-A", "session_start",
-        "-e", "system", "-i", f"boot-{datetime.now(timezone.utc).strftime('%H%M')}",
+        "-e", "system", "-i", f"boot-{datetime.now(UTC).strftime('%H%M')}",
         "-d", summary
     ])
 

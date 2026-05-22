@@ -1,7 +1,4 @@
 """Tests for SQLite persistence layer."""
-import json
-import pytest
-from db import DB
 
 
 def _task(id, title="Test", **kwargs):

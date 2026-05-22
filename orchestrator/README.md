@@ -1,15 +1,15 @@
-# DARIO Orchestrator v11.0
+# DARIO Orchestrator v12.1
 
-> **The AI Enterprise Operating System** — 269 skills, 17 domains, from idea to deployed product.
+> **The AI Enterprise Operating System** — 536+ skills, 32 squads, 18 cognitive modules, from idea to deployed product.
 
-[![Skills](https://img.shields.io/badge/skills-269-blue)](#skills)
+[![Skills](https://img.shields.io/badge/skills-536%2B-blue)](#skills)
 [![Tests](https://img.shields.io/badge/tests-259%20pass-green)](#testing)
 [![License](https://img.shields.io/badge/license-proprietary-red)](#license)
 [![VPS](https://img.shields.io/badge/demo-LIVE-brightgreen)](http://31.97.53.231:8422)
 
 ## What is DARIO?
 
-DARIO is not a chatbot. It's a **complete virtual C-suite** — 269 AI specialists organized in 17 business domains, orchestrated by a self-evolving engine with 66 Python modules, 90+ API endpoints, and OWASP 10/10 security.
+DARIO is not a chatbot. It's a **complete virtual C-suite** — 536+ AI specialists organized in 32 squads, orchestrated by a self-evolving engine with 66+ Python modules, 90+ API endpoints, 18 cognitive modules (Memory & Dreaming + PROMETHEUS Meta-Evolution), and OWASP 10/10 security.
 
 **One system. Every department. From idea to deployed product.**
 

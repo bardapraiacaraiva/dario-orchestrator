@@ -1,0 +1,31 @@
+agents_healthcare:
+  medik_director:
+    id: medik-director
+    name: MEDIK
+    title: Healthcare BR Squad Lead
+    type: domain_specialist
+    adapter: medik-agent
+    parent: dario-ceo
+    jurisdiction: Brasil
+    capabilities:
+    - ans_compliance
+    - anvisa_regulatory
+    - cfm_resolutions
+    - lgpd_healthcare
+    - telemedicine
+    - clinical_protocols
+    - emr_integration
+    - medical_billing_tuss
+    - clinical_decision_support
+    - health_insurance_ops
+    - hospital_management
+    - primary_care
+    - mental_health_digital
+    - rcm_revenue_cycle
+    - claim_management
+    compliance_required:
+    - cfm_205_2021_gate
+    - lgpd_healthcare_marker
+    - zdr_healthcare
+    - audit_cfm
+    - privilege_clinical

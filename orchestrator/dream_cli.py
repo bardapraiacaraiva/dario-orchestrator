@@ -21,7 +21,7 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 from dream.engine import run_dream
-from memory import hooks, episodic, procedural
+from memory import episodic, hooks, procedural
 
 
 def cmd_dream(args) -> int:

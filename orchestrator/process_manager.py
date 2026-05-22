@@ -11,14 +11,13 @@ Usage:
 """
 
 import os
-import sys
-import json
 import signal
 import socket
 import subprocess
+import sys
 import time
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 HOME = Path.home()
 ORCH = HOME / ".claude" / "orchestrator"

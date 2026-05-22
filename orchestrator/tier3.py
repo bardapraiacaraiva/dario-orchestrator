@@ -22,12 +22,11 @@ Usage:
 """
 
 import argparse
+import hashlib
 import json
 import logging
 import sys
-import hashlib
-import time
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -119,7 +118,7 @@ class MultiTenancy:
                 INSERT OR IGNORE INTO budget (month, tokens_used, token_limit, updated_at)
                 VALUES (?, 0, ?, ?)
             """, (f"{datetime.now().strftime('%Y-%m')}_{tenant_id}", budget_limit,
-                  datetime.now(timezone.utc).isoformat()))
+                  datetime.now(UTC).isoformat()))
         return {"tenant_id": tenant_id, "name": name, "budget_limit": budget_limit}
 
     def get_tenant_tasks(self, tenant_id: str) -> list:
@@ -155,10 +154,10 @@ class DashboardEngine:
 
         # Task timeline (last 24h activity)
         recent = [t for t in tasks if t.get("updated_at") and
-                  t["updated_at"] > (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()]
+                  t["updated_at"] > (datetime.now(UTC) - timedelta(hours=24)).isoformat()]
 
         return {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "state": {"operational": "ACTIVE"},  # From state_machine
             "tasks": {
                 "counts": counts,
@@ -252,7 +251,7 @@ class PluginSystem:
             return {"error": f"Plugin '{plugin_name}' not found"}
         self.PLUGINS_DIR.mkdir(parents=True, exist_ok=True)
         plugin = {"name": plugin_name, **self.REGISTRY[plugin_name],
-                   "installed_at": datetime.now(timezone.utc).isoformat()}
+                   "installed_at": datetime.now(UTC).isoformat()}
         (self.PLUGINS_DIR / f"{plugin_name}.json").write_text(json.dumps(plugin, indent=2))
         return {"installed": True, **plugin}
 

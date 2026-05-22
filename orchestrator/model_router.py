@@ -323,7 +323,7 @@ def main():
         print(f"Complexity: {result['complexity']}")
         print(f"Cost est: ${result['estimated_cost_usd']:.4f}")
         print(f"Savings vs Opus: {result['savings_vs_opus_pct']}%")
-        print(f"Reasoning:")
+        print("Reasoning:")
         for r in result["reasoning"]:
             print(f"  - {r}")
 

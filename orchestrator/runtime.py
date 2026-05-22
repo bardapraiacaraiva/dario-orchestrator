@@ -40,15 +40,12 @@ import json
 import logging
 import subprocess
 import sys
-import threading
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-from fastapi import FastAPI, Query, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Optional
 
 # Add orchestrator dir to path for imports
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -91,7 +88,7 @@ class Scheduler:
             try:
                 await self._pulse()
                 self.pulse_count += 1
-                self.last_pulse = datetime.now(timezone.utc).isoformat()
+                self.last_pulse = datetime.now(UTC).isoformat()
             except Exception as e:
                 log.error(f"Pulse error: {e}")
             await asyncio.sleep(1800)  # 30 minutes
@@ -122,7 +119,7 @@ class Scheduler:
             from db import DB
             db = DB()
             tasks = db.get_tasks(status="in_progress")
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             reaped = 0
             for t in tasks:
                 checked_out = t.get("checked_out_at", "")
@@ -179,7 +176,7 @@ async def lifespan(app: FastAPI):
         lic = check_license()
         if not lic.get("valid"):
             log.error(f"[LICENSE] {lic.get('reason', 'Invalid')}. Runtime blocked.")
-            log.error(f"[LICENSE] Activate: python license_manager.py --activate DARIO-XXXX-XXXX-XXXX-PRO")
+            log.error("[LICENSE] Activate: python license_manager.py --activate DARIO-XXXX-XXXX-XXXX-PRO")
             # Don't sys.exit — allow health endpoint but block task execution
             app.state.license_valid = False
         else:
@@ -223,6 +220,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# OpenTelemetry tracing (v12.1 / Onda 1 #4 — real OTel, exports to Langfuse if env set)
+try:
+    from otel_setup import instrument_fastapi, setup_tracing
+    setup_tracing(service_name="dario-orchestrator-runtime")
+    instrument_fastapi(app)
+except Exception as e:
+    log.warning(f"[OTel] tracing setup failed: {e} — runtime running without tracing")
+
 # License middleware (v11.1+ hardening — 2026-05-19)
 # Guards ALL endpoints except whitelist (/health, /license/*, /docs, /openapi.json).
 # Returns 402 Payment Required when trial expired or no license.
@@ -236,9 +241,10 @@ except Exception as e:
 
 # Auth middleware (was ORPHAN — all endpoints were unauthenticated)
 try:
-    from auth import verify_key, check_permission
     from fastapi import Request
     from starlette.middleware.base import BaseHTTPMiddleware
+
+    from auth import verify_key  # check_permission imported elsewhere on demand
 
     class AuthMiddleware(BaseHTTPMiddleware):
         async def dispatch(self, request: Request, call_next):
@@ -267,27 +273,40 @@ except ImportError:
 
 
 # ─── Models ──────────────────────────────────────────────────────────────────
+# v12.1 — TaskCreate and TaskComplete now live in schemas.contracts (central
+# Pydantic layer). The two request-only models below stay here because they
+# are only used by this HTTP surface.
 
-class TaskCreate(BaseModel):
-    id: str
-    title: str
-    project: str = ""
-    skill: str = ""
-    priority: str = "medium"
-    description: str = ""
-    execution_policy: str = "default"
-    depends_on: list = []
-    estimated_tokens: int = 0
+from schemas import (  # noqa: E402  (kept after middleware setup)
+    AssignResponse,
+    AuditResponse,
+    BudgetResponse,
+    CheckoutResponse,
+    CompleteResponse,
+    DispatchResponse,
+    EventStatsResponse,
+    HealthResponse,
+    ParsedDocumentResponse,
+    PulseResponse,
+    RubricResponse,
+    ScoresResponse,
+    StateResponse,
+    TaskComplete,
+    TaskCreate,
+    TaskListResponse,
+    TaxAlertResponse,
+    TemplateInstantiateResponse,
+    TemplateListResponse,
+    ValidationCheckResponse,
+    WebhookListResponse,
+    WebhookTestResponse,
+)
 
-class TaskComplete(BaseModel):
-    score: int = 0
-    tokens: int = 0
-    output: str = ""
-    status: str = "done"
 
 class AssignRequest(BaseModel):
     worker_id: str
     reason: str = ""
+
 
 class TransitionRequest(BaseModel):
     target_state: str
@@ -295,26 +314,26 @@ class TransitionRequest(BaseModel):
 
 # ─── Endpoints ───────────────────────────────────────────────────────────────
 
-@app.get("/health")
+@app.get("/health", response_model=HealthResponse)
 async def health():
     state_result = _run_engine("state_machine.py", ["--json"])
-    return {
-        "status": "ok",
-        "state": state_result.get("state", "?"),
-        "autonomy": state_result.get("autonomy_level", "?"),
-        "health": state_result.get("system_health", 0),
-        "scheduler": {"running": scheduler.running, "pulses": scheduler.pulse_count},
-        "db": db.stats(),
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-    }
+    return HealthResponse(
+        status="ok",
+        state=state_result.get("state", "?"),
+        autonomy=state_result.get("autonomy_level", "?"),
+        health=state_result.get("system_health", 0),
+        timestamp=datetime.now(UTC).isoformat(),
+        scheduler={"running": scheduler.running, "pulses": scheduler.pulse_count},
+        db=db.stats(),
+    )
 
 
-@app.get("/tasks")
+@app.get("/tasks", response_model=TaskListResponse)
 async def list_tasks(status: str = None, project: str = None,
                      assignee: str = None, unassigned: bool = False):
     tasks = db.get_tasks(status=status, project=project,
                          assignee=assignee, unassigned=unassigned)
-    return {"count": len(tasks), "tasks": tasks}
+    return TaskListResponse(count=len(tasks), tasks=tasks)
 
 
 @app.post("/tasks")
@@ -328,23 +347,23 @@ async def create_task(task: TaskCreate):
     return result
 
 
-@app.post("/tasks/{task_id}/assign")
+@app.post("/tasks/{task_id}/assign", response_model=AssignResponse)
 async def assign_task(task_id: str, req: AssignRequest):
     success = db.assign_task(task_id, req.worker_id, req.reason)
     if not success:
         raise HTTPException(400, "Assignment failed (task not in todo state or already assigned)")
-    return {"assigned": True, "task_id": task_id, "worker": req.worker_id}
+    return AssignResponse(assigned=True, task_id=task_id, worker=req.worker_id)
 
 
-@app.post("/tasks/{task_id}/checkout")
+@app.post("/tasks/{task_id}/checkout", response_model=CheckoutResponse)
 async def checkout_task(task_id: str):
     success = db.checkout_task(task_id)
     if not success:
         raise HTTPException(400, "Checkout failed (not assigned or not in todo)")
-    return {"checked_out": True, "task_id": task_id}
+    return CheckoutResponse(checked_out=True, task_id=task_id)
 
 
-@app.post("/tasks/{task_id}/complete")
+@app.post("/tasks/{task_id}/complete", response_model=CompleteResponse)
 async def complete_task(task_id: str, req: TaskComplete):
     success = db.complete_task(task_id, req.score, req.tokens, req.output, req.status)
     if not success:
@@ -353,72 +372,114 @@ async def complete_task(task_id: str, req: TaskComplete):
         task = db.get_task(task_id)
         if task:
             db.record_score(task_id, task.get("skill", ""), req.score, task.get("project", ""))
-    return {"completed": True, "task_id": task_id, "score": req.score}
+    return CompleteResponse(completed=True, task_id=task_id, score=req.score)
 
 
-@app.get("/dispatch")
+@app.get("/dispatch", response_model=DispatchResponse)
 async def dispatch_dry_run():
     result = _run_engine("dispatch_engine.py", ["--dry-run", "--json"])
     return result
 
 
-@app.post("/dispatch")
+@app.post("/dispatch", response_model=DispatchResponse)
 async def dispatch_execute():
     result = _run_engine("dispatch_engine.py", ["--json"])
     return result
 
 
-@app.get("/state")
+@app.get("/state", response_model=StateResponse)
 async def get_state():
     return _run_engine("state_machine.py", ["--json"])
 
 
-@app.post("/state/transition")
+@app.post("/state/transition", response_model=StateResponse)
 async def force_transition(req: TransitionRequest):
     result = _run_engine("state_machine.py", ["--transition", req.target_state, "--json"])
     return result
 
 
-@app.get("/audit")
+@app.get("/audit", response_model=AuditResponse)
 async def get_audit(limit: int = 50, actor: str = None, task_id: str = None):
     entries = db.get_audit(limit=limit, actor=actor, task_id=task_id)
-    return {"count": len(entries), "entries": entries}
+    return AuditResponse(count=len(entries), entries=entries)
 
 
-@app.get("/budget")
+@app.get("/budget", response_model=BudgetResponse)
 async def get_budget(month: str = None):
     return db.get_budget(month)
 
 
-@app.get("/scores")
+@app.get("/scores", response_model=ScoresResponse)
 async def get_scores():
-    return {"skills": db.get_skill_stats()}
+    stats = db.get_skill_stats()
+    # Wrap into ScoresResponse — extra='allow' preserves the 'skills' dict.
+    return ScoresResponse(total_scored=len(stats), skills=stats)
 
 
-@app.post("/pulse")
+@app.post("/pulse", response_model=PulseResponse)
 async def trigger_pulse(request: Request = None):
     """Manually trigger a heartbeat pulse."""
     # License guard on execution (was ORPHAN — no enforcement)
     if hasattr(app.state, 'license_valid') and not app.state.license_valid:
-        return {"error": "License expired or invalid. Activate VIP key.", "status": "blocked"}
+        # Surfaced as a non-200 via HTTPException so the Pydantic envelope stays sane
+        raise HTTPException(402, "License expired or invalid. Activate VIP key.")
     await scheduler._pulse()
     scheduler.pulse_count += 1
-    scheduler.last_pulse = datetime.now(timezone.utc).isoformat()
-    return {"pulse": scheduler.pulse_count, "status": "executed"}
+    scheduler.last_pulse = datetime.now(UTC).isoformat()
+    return PulseResponse(pulse=scheduler.pulse_count, status="executed")
 
 
 @app.get("/chains")
 async def list_chains():
-    result = _run_engine("chain_executor.py", ["--list", "--json"])
-    return result
+    """List available chains — now via chain_graph directly (Onda 3 #3)."""
+    from chain_graph import list_chains as _list_chains
+    return _list_chains()
 
 
 @app.post("/chains/{chain_name}/start")
 async def start_chain(chain_name: str, project: str = "", context: str = ""):
-    result = _run_engine("chain_executor.py", [
-        "--chain", chain_name, "--project", project, "--context", context, "--json"
-    ])
-    return result
+    """Initialise a chain run via the chain_graph durable runtime (Onda 5 #2).
+
+    Each step is dispatched to an executor callable that records the
+    invocation but defers actual LLM execution to the caller (autopilot
+    receives the run_id and runs each skill via its existing path). The
+    chain_graph SqliteSaver persists state across crashes — same contract
+    that chain_executor.py provided, now backed by LangGraph primitives.
+    """
+    from datetime import datetime
+
+    from chain_graph import ChainGraph, load_chain_def
+
+    chain_def = load_chain_def(chain_name)
+    if chain_def is None:
+        raise HTTPException(404, f"Chain '{chain_name}' not found")
+
+    # Lightweight executor: records the step + returns a placeholder artifact.
+    # Real per-step LLM execution is dispatched separately by the autopilot
+    # (which already owns the model_router + budget enforcement path).
+    def deferred_executor(skill: str, step_def: dict, state) -> dict:
+        return {
+            "skill": skill,
+            "status": "queued",
+            "_score": 0,
+            "queued_at": datetime.now(UTC).isoformat(),
+        }
+
+    graph = ChainGraph(
+        chain_name=chain_name,
+        chain_def=chain_def,
+        executor=deferred_executor,
+    )
+    thread_id = f"chain_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
+    final = graph.invoke(project=project, context=context, thread_id=thread_id)
+    return {
+        "run_id": thread_id,
+        "chain": chain_name,
+        "status": final.get("status", "queued"),
+        "total_steps": final.get("total_steps", 0),
+        "current_step": final.get("current_step", 0),
+        "artifacts_queued": list(final.get("artifacts", {}).keys()),
+    }
 
 
 # ─── #15: Real-Time SSE Event Stream ─────────────────────────────────────────
@@ -455,11 +516,11 @@ async def sse_history(task_id: str, limit: int = 50):
     return _sse_bus.get_history(task_id, limit)
 
 
-@app.get("/events/stats")
+@app.get("/events/stats", response_model=EventStatsResponse)
 async def sse_stats():
     """SSE bus statistics (new endpoint)."""
     if not _sse_bus:
-        return {}
+        return EventStatsResponse()
     return _sse_bus.stats()
 
 
@@ -486,7 +547,10 @@ class ComposeRequest(BaseModel):
 @app.post("/chains/compose")
 async def compose_chain(req: ComposeRequest):
     """Dynamically compose a skill chain. Validates schemas and saves."""
-    from chain_executor import DEFAULT_SCHEMAS, build_execution_plan
+    # Onda 5 #2: DEFAULT_SCHEMAS now lives in chain_schemas.py (extracted).
+    # build_execution_plan lives in chain_graph (Onda 3 #3).
+    from chain_graph import build_execution_plan
+    from chain_schemas import DEFAULT_SCHEMAS
 
     # Validate all skills have schemas
     validated = []
@@ -582,7 +646,9 @@ def load_webhooks() -> dict:
     if not WEBHOOKS_FILE.exists():
         return {"hooks": []}
     try:
-        return load_yaml(str(WEBHOOKS_FILE)) or {"hooks": []}
+        import yaml as _yaml
+        with open(WEBHOOKS_FILE, encoding="utf-8") as f:
+            return _yaml.safe_load(f) or {"hooks": []}
     except Exception:
         return {"hooks": []}
 
@@ -603,21 +669,28 @@ async def fire_webhooks(event_type: str, payload: dict):
                 log.warning(f"Webhook failed ({url}): {e}")
 
 
-@app.get("/webhooks")
+@app.get("/webhooks", response_model=WebhookListResponse)
 async def list_webhooks():
-    return load_webhooks()
+    hooks = load_webhooks() or []
+    if isinstance(hooks, dict):
+        hooks = list(hooks.values())
+    return WebhookListResponse(count=len(hooks), webhooks=hooks)
 
 
-@app.post("/webhooks/test")
+@app.post("/webhooks/test", response_model=WebhookTestResponse)
 async def test_webhook(url: str, event: str = "test"):
     """Fire a test webhook."""
-    await fire_webhooks(event, {"test": True, "url": url})
-    return {"fired": True, "event": event}
+    try:
+        await fire_webhooks(event, {"test": True, "url": url})
+        return WebhookTestResponse(ok=True, url=url, status_code=200)
+    except Exception as e:
+        return WebhookTestResponse(ok=False, url=url, status_code=0, error=str(e)[:200])
 
 
 # ─── #20: Visual DAG Dashboard ──────────────────────────────────────────────
 
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse
+
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard():
@@ -651,18 +724,21 @@ async def dashboard_data():
         "audit": audit,
         "scores": scores,
         "budget": budget,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 
 # ─── Templates API ───────────────────────────────────────────────────────────
 
-@app.get("/templates")
+@app.get("/templates", response_model=TemplateListResponse)
 async def list_templates():
     result = _run_engine("task_templates.py", ["--list", "--json"])
+    if isinstance(result, list):
+        return TemplateListResponse(count=len(result), templates=result)
     return result
 
-@app.post("/templates/{name}/instantiate")
+
+@app.post("/templates/{name}/instantiate", response_model=TemplateInstantiateResponse)
 async def instantiate_template(name: str, variables: dict = {}, create: bool = False):
     args = ["--template", name, "--vars", json.dumps(variables)]
     if create:
@@ -674,65 +750,67 @@ async def instantiate_template(name: str, variables: dict = {}, create: bool = F
 
 # ─── Adaptive Rubric API ────────────────────────────────────────────────────
 
-@app.get("/rubric/{task_id}")
+@app.get("/rubric/{task_id}", response_model=RubricResponse)
 async def get_rubric(task_id: str):
     result = _run_engine("adaptive_rubric.py", ["--task", task_id, "--json"])
+    if "task_id" not in result:
+        result["task_id"] = task_id
     return result
 
 
 # ─── Core Upgrades v11.0 ────────────────────────────────────────────────────
 
 try:
-    from core_upgrades import init_core_upgrades
+    from upgrades.core import init_core_upgrades
     init_core_upgrades(app, db)
     log.info("Core Upgrades v11.0 loaded: TaskQueue + MessageBus + EngineRegistry + HandoffProtocol + CheckpointStore + DurableDecorators + SessionManager")
 except ImportError as e:
     log.warning(f"Core Upgrades not loaded: {e}")
 
 try:
-    from execution_upgrades import init_execution_upgrades
+    from upgrades.execution import init_execution_upgrades
     init_execution_upgrades(app)
     log.info("Execution Upgrades v11.0 loaded: ParallelAgent + AgentCards + DualOrchestrator + TeamCoordinator + Blackboard + AgentToolbox + RaceExecutor + WaveScheduler")
 except ImportError as e:
     log.warning(f"Execution Upgrades not loaded: {e}")
 
 try:
-    from intelligence_upgrades import init_intelligence_upgrades
+    from upgrades.intelligence import init_intelligence_upgrades
     init_intelligence_upgrades(app)
     log.info("Intelligence Upgrades v11.0 loaded: TieredMemory + QValueMemory + KnowledgeGraph + LearnedRouter + ToolMemory + BenchmarkEvolution + MetricsRegistry")
 except ImportError as e:
     log.warning(f"Intelligence Upgrades not loaded: {e}")
 
 try:
-    from quality_upgrades import init_quality_upgrades
+    from upgrades.quality import init_quality_upgrades
     init_quality_upgrades(app)
     log.info("Quality Upgrades v11.0 loaded")
 except ImportError as e:
     log.warning(f"Quality Upgrades not loaded: {e}")
 
 try:
-    from state_upgrades import init_state_upgrades
+    from upgrades.state import init_state_upgrades
     init_state_upgrades(app)
     log.info("State Upgrades v11.0 loaded")
 except ImportError as e:
     log.warning(f"State Upgrades not loaded: {e}")
 
 try:
-    from observability_upgrades import init_observability_upgrades
+    from upgrades.observability import init_observability_upgrades
     init_observability_upgrades(app)
     log.info("Observability Upgrades v11.0 loaded")
 except ImportError as e:
     log.warning(f"Observability Upgrades not loaded: {e}")
 
 try:
-    from security_upgrades import init_security_upgrades
+    from upgrades.security import init_security_upgrades
     init_security_upgrades(app)
     log.info("Security Upgrades v11.0 loaded")
 except ImportError as e:
     log.warning(f"Security Upgrades not loaded: {e}")
 
 try:
-    from financial_upgrades import init_financial_upgrades
+    from upgrades.financial import init_financial_upgrades
     init_financial_upgrades(app)
     log.info("Financial Upgrades v11.0 loaded")
 except ImportError as e:
@@ -741,35 +819,52 @@ except ImportError as e:
 
 # ─── Production Data Connectors ────────────────────────────────────────────
 
-@app.post("/prod/parse-bank-statement")
+@app.post("/prod/parse-bank-statement", response_model=ParsedDocumentResponse)
 async def parse_bank_statement(file_path: str, bank: str = None):
     """Parse a bank statement CSV and return structured transactions."""
     args = ["--file", file_path, "--output", "json"]
     if bank:
         args.extend(["--bank", bank])
     result = _run_engine("bank_parser.py", args)
+    if "parsed" not in result:
+        result["parsed"] = "error" not in result
+    result.setdefault("document_type", "bank_statement")
     return result
 
-@app.post("/prod/parse-saft")
+
+@app.post("/prod/parse-saft", response_model=ParsedDocumentResponse)
 async def parse_saft(file_path: str, update: bool = False):
     """Parse a SAF-T XML and return structured invoice/customer data."""
     args = ["--file", file_path, "--json"]
     if update:
         args.append("--update")
     result = _run_engine("saft_parser.py", args)
+    if "parsed" not in result:
+        result["parsed"] = "error" not in result
+    result.setdefault("document_type", "saft")
     return result
 
-@app.get("/prod/tax-alerts")
+
+@app.get("/prod/tax-alerts", response_model=TaxAlertResponse)
 async def tax_alerts():
     """Get current tax calendar alerts."""
     result = _run_engine("tax_calendar.py", ["--alerts", "--json"])
+    if isinstance(result, list):
+        return TaxAlertResponse(count=len(result), alerts=result)
+    result.setdefault("count", len(result.get("alerts", [])))
     return result
 
-@app.post("/prod/validate-pt")
+
+@app.post("/prod/validate-pt", response_model=ValidationCheckResponse)
 async def validate_pt(data: dict):
     """Validate Portuguese financial data (NIF, ATCUD, SNC, IVA, IBAN)."""
     result = _run_engine("pt_validators.py", ["--validate-all", json.dumps(data)])
-    return result
+    return ValidationCheckResponse(
+        valid=bool(result.get("valid", False)),
+        field=str(result.get("field", "")),
+        value=str(result.get("value", "")),
+        reason=result.get("reason"),
+    )
 
 @app.get("/prod/chain/onboarding")
 async def get_onboarding_chain():
@@ -833,6 +928,7 @@ except ImportError as e:
 
 if __name__ == "__main__":
     import argparse
+
     import uvicorn
 
     parser = argparse.ArgumentParser(description="DARIO Runtime Engine")

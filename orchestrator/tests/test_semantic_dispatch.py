@@ -7,8 +7,7 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-from dispatch_engine import infer_skill_from_task, SEMANTIC_DISPATCH_ENABLED
-
+from dispatch_engine import SEMANTIC_DISPATCH_ENABLED, infer_skill_from_task
 
 SCENARIOS = [
     # (label, task_dict, expected_skill_or_acceptable_set, expected_path)

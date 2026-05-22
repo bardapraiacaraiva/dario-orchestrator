@@ -11,7 +11,7 @@ relação para fins de auditoria + transparência.
 """
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 LEX_DIR = Path.home() / ".claude" / "orchestrator" / "lex-br"
@@ -54,7 +54,7 @@ def add_marker(output_text: str, escritorio: str = "Não informado",
     rodape = DEFAULT_RODAPE.format(
         escritorio=escritorio,
         dpo_contact=dpo_contact,
-        date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        date=datetime.now(UTC).strftime("%Y-%m-%d"),
         zdr_status="Activo" if zdr_active else "**INACTIVO — REVISAR**",
     )
 
@@ -77,7 +77,7 @@ def configure_for_office(escritorio: str, dpo_contact: str,
         "escritorio": escritorio,
         "dpo_contact": dpo_contact,
         "zdr_active": zdr_active,
-        "configured_at": datetime.now(timezone.utc).isoformat(),
+        "configured_at": datetime.now(UTC).isoformat(),
     }
     LEX_DIR.mkdir(parents=True, exist_ok=True)
     config_path.write_text(json.dumps(config, indent=2, ensure_ascii=False),
@@ -113,7 +113,6 @@ def add_marker_with_config(output_text: str, output_type: str = "draft_interno")
 
 
 if __name__ == "__main__":
-    import sys
     sample = "Parecer jurídico sobre cláusula contratual: a cláusula X é válida..."
     print(add_marker(sample, escritorio="Escritório XYZ Advocacia",
                      dpo_contact="dpo@xyz-adv.com.br"))

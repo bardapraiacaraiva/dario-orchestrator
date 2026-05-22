@@ -29,7 +29,7 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 try:
@@ -38,12 +38,12 @@ try:
     yaml_engine.preserve_quotes = True
     yaml_engine.width = 200
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml_engine.load(f)
 except ImportError:
     import yaml
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
 
 
@@ -152,7 +152,7 @@ def validate_task(task_id: str, strict: bool = False) -> dict:
     estimated = task.get("estimated_tokens", 0)
     budget_ok = True
     if estimated and int(estimated) > 0:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         budget_file = BUDGET_DIR / f"{now.strftime('%Y-%m')}.yaml"
         if budget_file.exists():
             budget = load_yaml(str(budget_file))
@@ -266,7 +266,7 @@ def validate_task(task_id: str, strict: bool = False) -> dict:
             result["checks"]["security_tier"] = True
             # Tier 1 workers should never have Write/Edit
             if tier == 1 and task.get("execution_policy") in ("critical",):
-                result["warnings"].append(f"Tier 1 (reader) worker executing critical task — extra caution")
+                result["warnings"].append("Tier 1 (reader) worker executing critical task — extra caution")
         else:
             result["checks"]["security_tier"] = True  # No tier defined = ok, just not enforced
     else:
@@ -308,11 +308,11 @@ def main():
             mark = "+" if passed else "!"
             print(f"  [{mark}] {check}")
         if result["errors"]:
-            print(f"\n  ERRORS:")
+            print("\n  ERRORS:")
             for e in result["errors"]:
                 print(f"    - {e}")
         if result["warnings"]:
-            print(f"\n  WARNINGS:")
+            print("\n  WARNINGS:")
             for w in result["warnings"]:
                 print(f"    - {w}")
 

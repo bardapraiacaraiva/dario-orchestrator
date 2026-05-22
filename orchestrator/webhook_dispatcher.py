@@ -34,7 +34,7 @@ import json
 import sys
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 try:
@@ -43,7 +43,7 @@ try:
     _yaml.preserve_quotes = True
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 
     def _dump_yaml(data, path):
@@ -53,7 +53,7 @@ except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
     def _dump_yaml(data, path):
@@ -149,7 +149,7 @@ def _was_sent_recently(event_key: str) -> bool:
     try:
         data = _load_yaml(str(WEBHOOK_LOG)) or {}
         sends = data.get("sends", [])
-        cutoff = datetime.now(timezone.utc) - timedelta(hours=DEDUP_WINDOW_HOURS)
+        cutoff = datetime.now(UTC) - timedelta(hours=DEDUP_WINDOW_HOURS)
         for entry in sends:
             if entry.get("event_key") != event_key:
                 continue
@@ -175,7 +175,7 @@ def _log_send(event_key: str, hook_name: str, status: str, severity: str,
         except Exception:
             pass
     entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "event_key": event_key,
         "hook": hook_name,
         "status": status,
@@ -316,7 +316,7 @@ def send(event: dict, dry_run: bool = False) -> dict:
         context: dict          extra structured data (optional)
     """
     if "timestamp" not in event:
-        event["timestamp"] = datetime.now(timezone.utc).isoformat()
+        event["timestamp"] = datetime.now(UTC).isoformat()
 
     config = load_config()
     if not config.get("enabled"):

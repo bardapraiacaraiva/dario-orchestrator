@@ -26,7 +26,7 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -44,7 +44,7 @@ def _load_pricing():
     if pricing_file.exists():
         try:
             import yaml
-            with open(pricing_file, "r") as f:
+            with open(pricing_file) as f:
                 data = yaml.safe_load(f)
             pricing = data.get("pricing", {})
             costs = {}
@@ -85,14 +85,14 @@ def record_usage(input_tokens: int, output_tokens: int, model: str = "sonnet",
             output_tokens / 1_000_000 * costs["output"])
 
     # Update budget via DB
-    month = datetime.now(timezone.utc).strftime("%Y-%m")
+    month = datetime.now(UTC).strftime("%Y-%m")
     with db._conn() as conn:
         conn.execute("""
             INSERT INTO budget (month, tokens_used) VALUES (?, ?)
             ON CONFLICT(month) DO UPDATE SET
                 tokens_used = tokens_used + ?,
                 updated_at = ?
-        """, (month, total, total, datetime.now(timezone.utc).isoformat()))
+        """, (month, total, total, datetime.now(UTC).isoformat()))
 
     # Record in audit with full breakdown
     db.log_event("token-meter", "usage_recorded",
@@ -183,11 +183,11 @@ def main():
             print(f"  Tokens: {report['total_tokens']:,} / {report['token_limit']:,} ({report['percentage']:.2f}%)")
             print(f"  Cost:   ${report['total_cost']:.4f}")
             if report["by_model"]:
-                print(f"\n  By Model:")
+                print("\n  By Model:")
                 for m, c in report["by_model"].items():
                     print(f"    {m:10s} ${c:.4f}")
             if report["by_skill"]:
-                print(f"\n  By Skill (top 10):")
+                print("\n  By Skill (top 10):")
                 for s, c in report["by_skill"].items():
                     print(f"    {s:30s} ${c:.4f}")
         return 0

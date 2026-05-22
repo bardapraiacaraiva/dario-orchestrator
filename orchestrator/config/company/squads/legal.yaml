@@ -1,0 +1,32 @@
+agents_legal:
+  lex_br_director:
+    id: lex-br-director
+    name: L.E.X.-BR
+    title: Legal Expert eXpert Brasil
+    type: domain_specialist
+    adapter: lex-br-agent
+    parent: dario-ceo
+    capabilities:
+    - direito_civil_br
+    - direito_empresarial_br
+    - direito_trabalhista_br
+    - direito_tributario_br
+    - direito_consumidor_br
+    - lgpd_compliance
+    - ai_governance_legal
+    - direito_administrativo_br
+    - direito_imobiliario_br
+    - direito_familia_br
+    - direito_criminal_br
+    - propriedade_intelectual_br
+    - direito_regulatorio_br
+    - litigation_strategy_br
+    - oab_205_compliance
+    - audit_trail_juridico
+    jurisdiction: Brasil
+    language: pt-br-formal
+    compliance_required:
+    - oab_provimento_205_2021
+    - lgpd_lei_13709_18
+    - zdr_zero_data_retention
+    - sigilo_profissional_eoab_36

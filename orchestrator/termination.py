@@ -25,11 +25,10 @@ Integration:
     multi-step executions, chain runs, and autonomous pulses.
 """
 
-import time
 import logging
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("termination")
@@ -351,7 +350,6 @@ def conservative_conditions() -> TerminationCondition:
 # =============================================================================
 
 if __name__ == "__main__":
-    import json
 
     print("=== Composable Termination Conditions ===\n")
 
@@ -376,7 +374,7 @@ if __name__ == "__main__":
         mark = "STOP" if r.should_stop else "CONTINUE"
         print(f"  [{mark:8s}] {t['name']:20s} → {r.reason or 'OK'}")
 
-    print(f"\n--- Presets ---")
+    print("\n--- Presets ---")
     print(f"  default_task:   {default_task_conditions()}")
     print(f"  chain:          {chain_conditions()}")
     print(f"  pulse:          {pulse_conditions()}")

@@ -7,11 +7,10 @@ Opens: dashboard.html with real data from orchestrator files.
 
 import os
 import sys
-import yaml
-import glob
-import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
+
+import yaml
 
 HOME = Path.home()
 ORCH = HOME / ".claude" / "orchestrator"
@@ -20,7 +19,7 @@ DASHBOARD = ORCH / "dashboard.html"
 
 def load_yaml_safe(path):
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
     except:
         return {}
@@ -117,7 +116,7 @@ def generate():
         if t.get("created_at"):
             try:
                 created = datetime.fromisoformat(t["created_at"].replace("Z", "+00:00"))
-                delta = datetime.now(timezone.utc) - created
+                delta = datetime.now(UTC) - created
                 age = f"{delta.days}d" if delta.days > 0 else f"{delta.seconds//3600}h"
             except:
                 age = "?"

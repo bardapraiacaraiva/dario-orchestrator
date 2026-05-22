@@ -7,9 +7,12 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
+import pytest
+
 import eval_drilldown as ed
 import golden_eval
 
+pytestmark = pytest.mark.slow
 
 SANDBOX_EVAL = "test-drilldown-sandbox-xyz"
 

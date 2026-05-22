@@ -34,12 +34,12 @@ try:
     yaml_engine = YAML()
     yaml_engine.preserve_quotes = True
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml_engine.load(f)
 except ImportError:
     import yaml
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
 
 

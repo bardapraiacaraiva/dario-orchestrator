@@ -1,0 +1,26 @@
+agents_energy:
+  helios_director:
+    id: helios-director
+    name: HELIOS
+    title: Energy & Utilities Squad Lead
+    parent: dario-ceo
+    capabilities:
+    - mercado_livre_br
+    - aneel_compliance
+    - ppa_power_purchase
+    - energy_storage
+    - grid_integration
+    - hydrogen_strategy
+    - carbon_credits_energy
+    - renewable_financing
+    - smart_meter_data
+    - demand_response
+    - ev_charging_strategy
+    - microgrid_design
+    - energy_efficiency_iso50001
+    - climate_pricing
+    - utility_rate_design
+    compliance_required:
+    - aneel_compliance_gate
+    - iso50001_certification_ready
+    - audit_immutable

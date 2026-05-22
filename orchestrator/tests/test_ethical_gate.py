@@ -7,8 +7,11 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
+import pytest
+
 from ethical_gate import evaluate
 
+pytestmark = pytest.mark.slow
 
 SCENARIOS = [
     # (label, task_dict, expected_verdict, must_have_reason_substring or None)

@@ -11,11 +11,10 @@ Usage:
   python3 skill_store.py verify               Verify all skills are valid
 """
 
-import os
-import sys
 import shutil
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 HOME = Path.home()
 SKILLS = HOME / ".claude" / "skills"
@@ -48,7 +47,7 @@ def list_skills(verbose=False):
         # Read description from frontmatter
         desc = ""
         try:
-            with open(skill_md, "r", encoding="utf-8") as f:
+            with open(skill_md, encoding="utf-8") as f:
                 in_frontmatter = False
                 for line in f:
                     if line.strip() == "---":
@@ -105,7 +104,7 @@ def info_skill(name):
     # Parse frontmatter
     frontmatter = {}
     try:
-        with open(skill_md, "r", encoding="utf-8") as f:
+        with open(skill_md, encoding="utf-8") as f:
             in_fm = False
             for line in f:
                 if line.strip() == "---":
@@ -198,10 +197,10 @@ license: MIT
     print(f"  Edit: {skill_md}")
     print(f"\n  {DIM}Next: register as worker in company.yaml:{RESET}")
     print(f"  {CYAN}worker-{name}:{RESET}")
-    print(f"    type: \"worker\"")
+    print("    type: \"worker\"")
     print(f"    skill: \"{name}\"")
-    print(f"    reports_to: \"dir-...\"")
-    print(f"    capabilities: [...]")
+    print("    reports_to: \"dir-...\"")
+    print("    capabilities: [...]")
     print()
 
 def remove_skill(name):

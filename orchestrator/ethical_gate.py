@@ -35,13 +35,13 @@ try:
     _yaml.preserve_quotes = True
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
 
@@ -59,7 +59,7 @@ ACTION_VERBS = {
     "lancar", "lançar", "deployar", "configurar", "integrar",
     "create", "build", "generate", "produce", "design",
     "audit", "analyze", "evaluate", "review", "diagnose",
-    "optimize", "improve", "fix", "implement", "develop",
+    "optimize", "improve", "implement", "develop",
     "write", "publish", "launch", "deploy", "configure", "integrate",
     "calcular", "calculate", "validar", "validate", "testar", "test",
     "documentar", "document", "planear", "plan", "definir", "define",

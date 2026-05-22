@@ -1,0 +1,85 @@
+workers_atlas_fin:
+  worker-atlas-fin-ob-br:
+    id: worker-atlas-fin-ob-br
+    skill: atlas-fin-open-banking-br
+    reports_to: atlas-fin-director
+  worker-atlas-fin-pix:
+    id: worker-atlas-fin-pix
+    skill: atlas-fin-pix-rules-bcb
+    reports_to: atlas-fin-director
+  worker-atlas-fin-psd2:
+    id: worker-atlas-fin-psd2
+    skill: atlas-fin-psd2-eu
+    reports_to: atlas-fin-director
+  worker-atlas-fin-orch:
+    id: worker-atlas-fin-orch
+    skill: atlas-fin-payment-orchestration
+    reports_to: atlas-fin-director
+  worker-atlas-fin-fraud:
+    id: worker-atlas-fin-fraud
+    skill: atlas-fin-fraud-prevention
+    reports_to: atlas-fin-director
+  worker-atlas-fin-cb:
+    id: worker-atlas-fin-cb
+    skill: atlas-fin-chargeback-management
+    reports_to: atlas-fin-director
+  worker-atlas-fin-kyc:
+    id: worker-atlas-fin-kyc
+    skill: atlas-fin-kyc-onboarding
+    reports_to: atlas-fin-director
+  worker-atlas-fin-aml:
+    id: worker-atlas-fin-aml
+    skill: atlas-fin-aml-monitoring
+    reports_to: atlas-fin-director
+  worker-atlas-fin-sanctions:
+    id: worker-atlas-fin-sanctions
+    skill: atlas-fin-sanctions-screening
+    reports_to: atlas-fin-director
+  worker-atlas-fin-fx:
+    id: worker-atlas-fin-fx
+    skill: atlas-fin-foreign-exchange
+    reports_to: atlas-fin-director
+  worker-atlas-fin-instant:
+    id: worker-atlas-fin-instant
+    skill: atlas-fin-instant-payments
+    reports_to: atlas-fin-director
+  worker-atlas-fin-baas:
+    id: worker-atlas-fin-baas
+    skill: atlas-fin-banking-as-a-service
+    reports_to: atlas-fin-director
+  worker-atlas-fin-embed:
+    id: worker-atlas-fin-embed
+    skill: atlas-fin-embedded-finance
+    reports_to: atlas-fin-director
+  worker-atlas-fin-bcb:
+    id: worker-atlas-fin-bcb
+    skill: atlas-fin-regulatory-reporting-bcb
+    reports_to: atlas-fin-director
+  worker-atlas-fin-lgpd:
+    id: worker-atlas-fin-lgpd
+    skill: atlas-fin-lgpd-financial
+    reports_to: atlas-fin-director
+squads_atlas_fin:
+  open_banking_full:
+    workers:
+    - worker-atlas-fin-ob-br
+    - worker-atlas-fin-psd2
+    - worker-atlas-fin-instant
+    - worker-atlas-fin-pix
+  payments_ops:
+    workers:
+    - worker-atlas-fin-orch
+    - worker-atlas-fin-fraud
+    - worker-atlas-fin-cb
+    - worker-atlas-fin-fx
+  kyc_aml_full:
+    workers:
+    - worker-atlas-fin-kyc
+    - worker-atlas-fin-aml
+    - worker-atlas-fin-sanctions
+    - worker-atlas-fin-lgpd
+  baas_embedded:
+    workers:
+    - worker-atlas-fin-baas
+    - worker-atlas-fin-embed
+    - worker-atlas-fin-bcb

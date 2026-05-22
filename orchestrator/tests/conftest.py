@@ -1,8 +1,38 @@
-"""Shared fixtures for DARIO orchestrator tests."""
+"""Shared fixtures for DARIO orchestrator tests.
+
+Onda 3 #1 — Mock Ollama embeddings by default.
+
+Why
+----
+`semantic_dispatch._embed()` does a 4-5s HTTP round-trip to a local Ollama
+server (`nomic-embed-text` model). Several test files call this indirectly
+via `golden_eval.compare_against_golden()`. The result was a test suite
+dominated by network latency rather than by what we're actually testing.
+
+Default behaviour
+-----------------
+Every test gets a fast deterministic mock automatically — `_embed(text)`
+returns a hash-derived 768-dim vector. Same text → same vector. Different
+text → different vector.
+
+Opt-out
+-------
+A test that NEEDS the real Ollama (smoke tests, integration with the live
+model) declares it:
+
+    @pytest.mark.real_embedding
+    def test_real_ollama_connection():
+        ...
+
+Side benefit: the mock also unblocks CI environments that don't have
+Ollama running. Today the suite implicitly required an Ollama daemon.
+"""
+
+from __future__ import annotations
+
+import hashlib
 import json
-import os
 import sys
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -10,6 +40,53 @@ import pytest
 # Add orchestrator to path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
+
+
+EMBED_DIM = 768  # nomic-embed-text dimension
+
+
+def _deterministic_embed(text: str, timeout: int = 30) -> list[float]:
+    """Hash-derived pseudo-embedding. Same text → same vector, no I/O."""
+    if not text:
+        return [0.0] * EMBED_DIM
+    digest = hashlib.sha256(text.encode("utf-8")).digest()
+    needed = (EMBED_DIM + 31) // 32
+    expanded = digest * needed
+    return [(b / 127.5) - 1.0 for b in expanded[:EMBED_DIM]]
+
+
+def pytest_configure(config):
+    """Register the real_embedding marker so pytest.ini doesn't reject it."""
+    config.addinivalue_line(
+        "markers",
+        "real_embedding: bypass the Ollama mock and call the real _embed() "
+        "(requires Ollama running on localhost:11434).",
+    )
+
+
+@pytest.fixture(autouse=True)
+def mock_ollama_embed(request, monkeypatch):
+    """Replace `semantic_dispatch._embed` with a deterministic mock by default."""
+    if request.node.get_closest_marker("real_embedding"):
+        # Test opted out — let it use the real Ollama HTTP client.
+        yield
+        return
+
+    import semantic_dispatch
+
+    monkeypatch.setattr(semantic_dispatch, "_embed", _deterministic_embed)
+
+    # Modules that did `from semantic_dispatch import _embed` at import time
+    # need their local binding patched too.
+    for mod_name in ("golden_eval",):
+        mod = sys.modules.get(mod_name)
+        if mod is not None and hasattr(mod, "_embed"):
+            monkeypatch.setattr(mod, "_embed", _deterministic_embed)
+
+    yield
+
+
+# ─── Pre-existing fixtures ───────────────────────────────────────────────────
 
 
 @pytest.fixture

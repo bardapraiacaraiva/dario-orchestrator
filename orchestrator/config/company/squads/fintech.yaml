@@ -1,0 +1,29 @@
+agents_fintech:
+  atlas_fin_director:
+    id: atlas-fin-director
+    name: ATLAS-FIN
+    title: Fintech Services Squad Lead
+    parent: dario-ceo
+    jurisdiction: Brasil + EU
+    capabilities:
+    - open_banking_br
+    - pix_rules_bcb
+    - psd2_eu
+    - payment_orchestration
+    - fraud_prevention
+    - chargeback_management
+    - kyc_onboarding
+    - aml_monitoring
+    - sanctions_screening
+    - foreign_exchange
+    - instant_payments
+    - banking_as_a_service
+    - embedded_finance
+    - regulatory_reporting_bcb
+    - lgpd_financial
+    compliance_required:
+    - bcb_compliance_gate
+    - ecb_compliance_gate
+    - audit_immutable
+    - pci_dss_scope
+    - sanctions_realtime

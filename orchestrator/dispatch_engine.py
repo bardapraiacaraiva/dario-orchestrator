@@ -23,10 +23,8 @@ import argparse
 import logging
 import os
 import sys
-import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Optional
 
 # --- YAML handling (try ruamel for round-trip, fallback to PyYAML) ---
 try:
@@ -36,7 +34,7 @@ try:
     yaml_engine.width = 200
 
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml_engine.load(f)
 
     def dump_yaml(data, path):
@@ -47,7 +45,7 @@ except ImportError:
     import yaml
 
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
 
     def dump_yaml(data, path):
@@ -118,10 +116,10 @@ class CompanyHierarchy:
             if isinstance(adata, dict) and "id" in adata:
                 self.agent_by_id[adata["id"]] = adata
 
-    def get_worker(self, worker_id: str) -> Optional[dict]:
+    def get_worker(self, worker_id: str) -> dict | None:
         return self.worker_by_id.get(worker_id)
 
-    def get_worker_for_skill(self, skill: str) -> Optional[str]:
+    def get_worker_for_skill(self, skill: str) -> str | None:
         return self.worker_by_skill.get(skill)
 
     def get_siblings(self, worker_id: str) -> list:
@@ -133,7 +131,7 @@ class CompanyHierarchy:
         siblings = self.director_workers.get(director, [])
         return [s for s in siblings if s != worker_id]
 
-    def get_director(self, worker_id: str) -> Optional[dict]:
+    def get_director(self, worker_id: str) -> dict | None:
         """Get the director that manages this worker."""
         worker = self.worker_by_id.get(worker_id)
         if not worker:
@@ -375,10 +373,11 @@ KEYWORD_SKILL_MAP = {
 # Semantic dispatch toggle (Upgrade 1 — cognitive audit Sprint 1)
 # Set ENV DARIO_DISABLE_SEMANTIC=1 to force legacy keyword-only matching
 import os as _os
+
 SEMANTIC_DISPATCH_ENABLED = _os.environ.get("DARIO_DISABLE_SEMANTIC") != "1"
 
 
-def _try_semantic_match(task: dict) -> Optional[str]:
+def _try_semantic_match(task: dict) -> str | None:
     """
     Attempt semantic skill inference via embeddings cache.
     Returns matched skill if score >= threshold, else None (caller falls back to keywords).
@@ -398,7 +397,7 @@ def _try_semantic_match(task: dict) -> Optional[str]:
         return None
 
 
-def _try_qvalue_match(task: dict) -> Optional[str]:
+def _try_qvalue_match(task: dict) -> str | None:
     """
     Q-value memory suggestion (Upgrade 5 — cognitive audit Sprint 2).
     Used as the last-resort signal when both semantic and keyword fail to
@@ -424,7 +423,7 @@ def _try_qvalue_match(task: dict) -> Optional[str]:
     return None
 
 
-def infer_skill_from_task(task: dict) -> Optional[str]:
+def infer_skill_from_task(task: dict) -> str | None:
     """Infer the best skill for a task using multiple signals.
 
     Priority order:
@@ -631,7 +630,7 @@ def assign_task(task: dict, worker_id: str, reasons: list) -> bool:
                 return False
 
             # Assign
-            now = datetime.now(timezone.utc).isoformat()
+            now = datetime.now(UTC).isoformat()
             data["assignee"] = worker_id
             data["assigned_at"] = now
             data["dispatch_reason"] = reasons[-1] if reasons else "direct_match"
@@ -649,7 +648,7 @@ def assign_task(task: dict, worker_id: str, reasons: list) -> bool:
         if not data or data.get("status") != "todo" or data.get("assignee"):
             return False
         data["assignee"] = worker_id
-        data["assigned_at"] = datetime.now(timezone.utc).isoformat()
+        data["assigned_at"] = datetime.now(UTC).isoformat()
         data["dispatch_reason"] = reasons[-1] if reasons else "direct_match"
         dump_yaml(data, task_file)
         log.info(f"DISPATCHED (no lock): {data.get('id')} → {worker_id}")
@@ -663,14 +662,14 @@ def assign_task(task: dict, worker_id: str, reasons: list) -> bool:
 # CORE: Audit Logging
 # =============================================================================
 
-def log_dispatch(task_id: str, worker_id: Optional[str], reasons: list, dry_run: bool = False):
+def log_dispatch(task_id: str, worker_id: str | None, reasons: list, dry_run: bool = False):
     """Append dispatch decision to audit log."""
     AUDIT_DIR.mkdir(parents=True, exist_ok=True)
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(UTC).strftime("%Y-%m-%d")
     log_file = AUDIT_DIR / f"dispatch_{today}.log"
 
     entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "task_id": task_id,
         "assigned_to": worker_id or "QUEUED",
         "dry_run": dry_run,
@@ -770,7 +769,7 @@ def cmd_dispatch(args):
 def cmd_status(args):
     """Show worker availability status."""
     if not COMPANY_FILE.exists():
-        log.error(f"company.yaml not found")
+        log.error("company.yaml not found")
         return 1
 
     company_data = load_yaml(str(COMPANY_FILE))
@@ -811,7 +810,7 @@ def cmd_status(args):
 def cmd_explain(args):
     """Explain routing decision for a specific task."""
     if not COMPANY_FILE.exists():
-        log.error(f"company.yaml not found")
+        log.error("company.yaml not found")
         return 1
 
     company_data = load_yaml(str(COMPANY_FILE))
@@ -840,7 +839,7 @@ def cmd_explain(args):
     worker_id, reasons = find_best_worker(task, hierarchy, workload, explain=True)
 
     print(f"\nRouting decision: {'→ ' + worker_id if worker_id else 'QUEUED (no available worker)'}")
-    print(f"\nReasoning chain:")
+    print("\nReasoning chain:")
     for i, r in enumerate(reasons, 1):
         print(f"  {i}. {r}")
 

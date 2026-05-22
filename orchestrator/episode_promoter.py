@@ -36,7 +36,7 @@ import json
 import re
 import sys
 from collections import defaultdict
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 try:
@@ -45,7 +45,7 @@ try:
     _yaml.preserve_quotes = True
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 
     def _dump_yaml(data, path):
@@ -55,7 +55,7 @@ except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
     def _dump_yaml(data, path):
@@ -79,14 +79,14 @@ def _load_episodes(days: int = DEFAULT_LOOKBACK_DAYS) -> list:
     """Walk episodes/ filesystem and return list of dicts (Pydantic-free for portability)."""
     if not EPISODES_DIR.exists():
         return []
-    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    cutoff = datetime.now(UTC) - timedelta(days=days)
     out = []
     for day_dir in sorted(EPISODES_DIR.iterdir()):
         if not day_dir.is_dir():
             continue
         # Parse day from dir name "YYYY-MM-DD"
         try:
-            d = datetime.fromisoformat(day_dir.name).replace(tzinfo=timezone.utc)
+            d = datetime.fromisoformat(day_dir.name).replace(tzinfo=UTC)
             if d < cutoff:
                 continue
         except Exception:
@@ -229,7 +229,7 @@ def _write_rule(slug: str, rule: dict) -> Path:
     """Write a YAML rule file under evolution/rules/."""
     RULES_DIR.mkdir(parents=True, exist_ok=True)
     path = RULES_DIR / f"auto-rule-{slug}.yaml"
-    rule["generated_at"] = datetime.now(timezone.utc).isoformat()
+    rule["generated_at"] = datetime.now(UTC).isoformat()
     rule["source"] = "episode_promoter"
     _dump_yaml(rule, str(path))
     return path

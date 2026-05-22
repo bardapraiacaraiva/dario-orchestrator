@@ -1,0 +1,85 @@
+workers_euterpe:
+  worker-euterpe-mmm:
+    id: worker-euterpe-mmm
+    skill: euterpe-mmm-modeling
+    reports_to: euterpe-director
+  worker-euterpe-mta:
+    id: worker-euterpe-mta
+    skill: euterpe-attribution-multi-touch
+    reports_to: euterpe-director
+  worker-euterpe-cro:
+    id: worker-euterpe-cro
+    skill: euterpe-cro-advanced
+    reports_to: euterpe-director
+  worker-euterpe-brand:
+    id: worker-euterpe-brand
+    skill: euterpe-brand-tracking
+    reports_to: euterpe-director
+  worker-euterpe-cdp:
+    id: worker-euterpe-cdp
+    skill: euterpe-customer-data-platform
+    reports_to: euterpe-director
+  worker-euterpe-email:
+    id: worker-euterpe-email
+    skill: euterpe-email-marketing-mass
+    reports_to: euterpe-director
+  worker-euterpe-sms:
+    id: worker-euterpe-sms
+    skill: euterpe-sms-marketing
+    reports_to: euterpe-director
+  worker-euterpe-push:
+    id: worker-euterpe-push
+    skill: euterpe-push-marketing
+    reports_to: euterpe-director
+  worker-euterpe-viral:
+    id: worker-euterpe-viral
+    skill: euterpe-viral-marketing
+    reports_to: euterpe-director
+  worker-euterpe-influencer:
+    id: worker-euterpe-influencer
+    skill: euterpe-influencer-marketing
+    reports_to: euterpe-director
+  worker-euterpe-content:
+    id: worker-euterpe-content
+    skill: euterpe-content-distribution
+    reports_to: euterpe-director
+  worker-euterpe-search:
+    id: worker-euterpe-search
+    skill: euterpe-paid-search
+    reports_to: euterpe-director
+  worker-euterpe-social:
+    id: worker-euterpe-social
+    skill: euterpe-paid-social
+    reports_to: euterpe-director
+  worker-euterpe-prog:
+    id: worker-euterpe-prog
+    skill: euterpe-programmatic
+    reports_to: euterpe-director
+  worker-euterpe-affiliate:
+    id: worker-euterpe-affiliate
+    skill: euterpe-affiliate-marketing
+    reports_to: euterpe-director
+squads_euterpe:
+  measurement_analytics:
+    workers:
+    - worker-euterpe-mmm
+    - worker-euterpe-mta
+    - worker-euterpe-cro
+    - worker-euterpe-cdp
+  paid_media:
+    workers:
+    - worker-euterpe-search
+    - worker-euterpe-social
+    - worker-euterpe-prog
+  owned_engagement:
+    workers:
+    - worker-euterpe-email
+    - worker-euterpe-sms
+    - worker-euterpe-push
+    - worker-euterpe-content
+  organic_partnerships:
+    workers:
+    - worker-euterpe-viral
+    - worker-euterpe-influencer
+    - worker-euterpe-affiliate
+    - worker-euterpe-brand

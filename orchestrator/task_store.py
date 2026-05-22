@@ -13,10 +13,8 @@ Usage:
     store.update("T-001", {"priority": "high"})
 """
 
-import json
 import logging
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -95,7 +93,7 @@ class TaskStore:
         for f in TASKS_DIR.glob("*.yaml"):
             try:
                 import yaml
-                with open(f, 'r', encoding='utf-8') as fh:
+                with open(f, encoding='utf-8') as fh:
                     data = yaml.safe_load(fh)
                 if data:
                     if status and data.get("status") != status:
@@ -113,7 +111,7 @@ class TaskStore:
             return None
         try:
             import yaml
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding='utf-8') as f:
                 return yaml.safe_load(f)
         except Exception:
             return None

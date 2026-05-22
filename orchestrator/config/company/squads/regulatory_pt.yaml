@@ -1,0 +1,32 @@
+agents_regulatory_pt:
+  nomos_director:
+    id: nomos-director
+    name: NOMOS
+    title: Compliance Regulatório PT Squad Lead
+    type: domain_specialist
+    adapter: nomos-agent
+    parent: dario-ceo
+    jurisdiction: Portugal + EU
+    capabilities:
+    - cmvm_compliance
+    - bdp_banking_pt
+    - asae_food_safety
+    - acss_healthcare_pt
+    - rgpd_pt_marker
+    - igac_events_pt
+    - anac_aviation_pt
+    - concorrencia_pt
+    - eu_ai_act_pt
+    - dora_resilience
+    - mifid_ii_pt
+    - psd2_open_banking_pt
+    - anti_fraude_pt
+    - kyc_aml_pt
+    - dl_79_2024_digital
+    compliance_required:
+    - cmvm_disclosure_gate
+    - bdp_regulatory_reporting_gate
+    - ai_act_risk_classification
+    - dora_testing_schedule
+    - cnpd_consultation_marker
+    - audit_immutable

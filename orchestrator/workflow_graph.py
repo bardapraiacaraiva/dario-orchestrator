@@ -44,7 +44,6 @@ import logging
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Optional, Union
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
@@ -62,7 +61,7 @@ class Step:
     depends_on: list[str] = field(default_factory=list)
     output_schema: dict = field(default_factory=dict)
     input_schema: dict = field(default_factory=dict)
-    condition: Optional[str] = None  # Condition expression
+    condition: str | None = None  # Condition expression
     foreach_key: str = ""  # If set, iterates over this key in context
     max_iterations: int = 0  # If > 0, this is a loop step
     loop_until: str = ""  # Condition to exit loop
@@ -123,7 +122,7 @@ class Workflow:
         self.steps.append(step)
         return self
 
-    def parallel(self, skills: list[Union[str, dict]], name: str = "") -> "Workflow":
+    def parallel(self, skills: list[str | dict], name: str = "") -> "Workflow":
         """Add parallel steps (all run simultaneously in same wave)."""
         self._wave_counter += 1
         prev_skill = self.steps[-1].skill if self.steps else ""

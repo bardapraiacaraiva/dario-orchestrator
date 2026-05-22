@@ -1,0 +1,25 @@
+agents_acceleration:
+  a360-director:
+    id: a360-director
+    name: A360 Director
+    title: Business Acceleration Squad Lead
+    parent: dario-ceo
+    capabilities:
+    - diagnostic_routing
+    - lifecycle_phase_detection
+    - niche_research
+    - avatar_research
+    - idea_validation
+    - business_modeling
+    - offer_construction
+    - funnel_design
+    - launch_sequencing
+    - pitch_deck
+    - metrics_dashboard
+    - growth_engineering
+    - scaling_roadmap
+    - case_study_generation
+    compliance_required:
+    - audit_immutable
+    bundle_anchor: founder
+    license_tier_min: starter

@@ -11,14 +11,13 @@ Usage:
   python budget_tracker.py --add-tokens 5000 --project mar-brasa --skill dario-brand
 """
 
-import os
-import sys
 import argparse
 import logging
-import yaml
-import glob
-from datetime import datetime, timezone
+import sys
+from datetime import UTC, datetime
 from pathlib import Path
+
+import yaml
 
 # === LOGGING ===
 logging.basicConfig(
@@ -45,7 +44,7 @@ def load_company_config():
     """Load company budget limits from company.yaml."""
     if not COMPANY_YAML.exists():
         return {"monthly_limit_tokens": 50_000_000}
-    with open(COMPANY_YAML, "r", encoding="utf-8") as f:
+    with open(COMPANY_YAML, encoding="utf-8") as f:
         data = yaml.safe_load(f)
     return data.get("company", {}).get("budget", {"monthly_limit_tokens": 50_000_000})
 
@@ -53,7 +52,7 @@ def load_budget(month=None):
     """Load or initialize the monthly budget file."""
     path = get_budget_path(month)
     if path.exists():
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
     # Initialize new budget
     company = load_company_config()
@@ -68,7 +67,7 @@ def load_budget(month=None):
         "by_model": {"opus": 0, "sonnet": 0, "haiku": 0},
         "alert_80_sent": False,
         "alert_95_sent": False,
-        "last_updated": datetime.now(timezone.utc).isoformat(),
+        "last_updated": datetime.now(UTC).isoformat(),
         "pulse_count": 0,
     }
 
@@ -76,7 +75,7 @@ def save_budget(budget, month=None):
     """Write budget to YAML file."""
     BUDGET_DIR.mkdir(parents=True, exist_ok=True)
     path = get_budget_path(month)
-    budget["last_updated"] = datetime.now(timezone.utc).isoformat()
+    budget["last_updated"] = datetime.now(UTC).isoformat()
     budget["percentage"] = round(
         (budget["total_tokens_used"] / budget["limit"]) * 100, 2
     ) if budget["limit"] > 0 else 0
@@ -96,7 +95,7 @@ def scan_tasks_for_tokens():
             continue
         for task_file in task_dir.glob("*.yaml"):
             try:
-                with open(task_file, "r", encoding="utf-8") as f:
+                with open(task_file, encoding="utf-8") as f:
                     task = yaml.safe_load(f)
                 if not task:
                     continue
@@ -107,7 +106,7 @@ def scan_tasks_for_tokens():
                     totals["total"] += tokens
                     totals["by_project"][project] = totals["by_project"].get(project, 0) + tokens
                     totals["by_skill"][skill] = totals["by_skill"].get(skill, 0) + tokens
-            except (yaml.YAMLError, IOError, TypeError) as e:
+            except (OSError, yaml.YAMLError, TypeError) as e:
                 print(f"Warning: skipping {task_file.name} — {e}", file=sys.stderr)
                 continue
     return totals
@@ -175,25 +174,25 @@ def print_report(budget):
 
     alerts = check_thresholds(budget)
     if alerts:
-        print(f"\n  ALERTS:")
+        print("\n  ALERTS:")
         for a in alerts:
             print(f"    [{a['level']}] {a['message']}")
     else:
-        print(f"\n  Status: OK")
+        print("\n  Status: OK")
 
     if budget.get("by_project"):
-        print(f"\n  BY PROJECT:")
+        print("\n  BY PROJECT:")
         for proj, tokens in sorted(budget["by_project"].items(), key=lambda x: -x[1]):
             print(f"    {proj:<25} {tokens:>10,}")
 
     if budget.get("by_skill"):
-        print(f"\n  BY SKILL (top 10):")
+        print("\n  BY SKILL (top 10):")
         sorted_skills = sorted(budget["by_skill"].items(), key=lambda x: -x[1])[:10]
         for skill, tokens in sorted_skills:
             print(f"    {skill:<25} {tokens:>10,}")
 
     if budget.get("by_model"):
-        print(f"\n  BY MODEL:")
+        print("\n  BY MODEL:")
         for model, tokens in budget["by_model"].items():
             print(f"    {model:<25} {tokens:>10,}")
 

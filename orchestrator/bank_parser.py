@@ -30,10 +30,9 @@ import logging
 import os
 import re
 import sys
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 ORCH_DIR = Path(os.path.expanduser("~/.claude/orchestrator"))
 FINANCE_DIR = ORCH_DIR / "finance"
@@ -239,10 +238,10 @@ def detect_bank(filepath: str) -> str:
     """Try to auto-detect bank format from file content."""
     try:
         # Try UTF-8 first
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             first_lines = [f.readline() for _ in range(5)]
     except UnicodeDecodeError:
-        with open(filepath, "r", encoding="latin-1") as f:
+        with open(filepath, encoding="latin-1") as f:
             first_lines = [f.readline() for _ in range(5)]
 
     content = "\n".join(first_lines).lower()
@@ -279,7 +278,7 @@ def parse_file(filepath: str, bank: str = None) -> list[Transaction]:
     encoding = fmt.get("encoding", "utf-8")
 
     try:
-        with open(filepath, "r", encoding=encoding) as f:
+        with open(filepath, encoding=encoding) as f:
             reader = csv.reader(f, delimiter=fmt["delimiter"])
 
             # Skip header rows
@@ -552,7 +551,7 @@ def main():
         print(json.dumps([asdict(t) for t in txns], indent=2, ensure_ascii=False))
     elif args.output == "summary":
         s = summarize(txns)
-        print(f"\n=== Bank Statement Summary ===")
+        print("\n=== Bank Statement Summary ===")
         print(f"  Bank: {s['bank']}")
         print(f"  Period: {s['period']['start']} → {s['period']['end']}")
         print(f"  Transactions: {s['count']}")
@@ -562,7 +561,7 @@ def main():
         if s.get("closing_balance"):
             print(f"  Closing balance: {s['closing_balance']:,.2f} EUR")
         if args.categorize or True:
-            print(f"\n  Categories:")
+            print("\n  Categories:")
             for cat, data in s["by_category"].items():
                 print(f"    {cat:25s} {data['count']:>3} txns  {data['total']:>10,.2f} EUR")
     elif args.output == "table":

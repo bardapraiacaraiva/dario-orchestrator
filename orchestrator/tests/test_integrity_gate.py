@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Tests for Upgrade 14 integrity gate."""
 
-import sqlite3
 import sys
 from pathlib import Path
 
@@ -10,7 +9,9 @@ sys.path.insert(0, str(ORCH_DIR))
 sys.path.insert(0, str(ORCH_DIR / "tools"))
 
 import integrity_gate
+import pytest
 
+pytestmark = pytest.mark.slow
 
 # Production should currently be clean — these tests verify both the
 # clean state AND that the checks correctly detect synthetic breakage.

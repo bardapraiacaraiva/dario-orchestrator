@@ -34,8 +34,8 @@ CLI:
 import argparse
 import json
 import sys
-from collections import Counter, defaultdict
-from datetime import datetime, timezone, timedelta
+from collections import Counter
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -54,13 +54,13 @@ try:
     _yaml = YAML()
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
 
@@ -74,9 +74,9 @@ def _week_bounds(week_iso: str = None) -> tuple:
     if week_iso:
         # Parse YYYY-Www
         year, w = week_iso.split("-W")
-        start = datetime.fromisocalendar(int(year), int(w), 1).replace(tzinfo=timezone.utc)
+        start = datetime.fromisocalendar(int(year), int(w), 1).replace(tzinfo=UTC)
     else:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         # Monday of current week
         start = (now - timedelta(days=now.weekday())).replace(
             hour=0, minute=0, second=0, microsecond=0
@@ -94,7 +94,7 @@ def collect_cron_days(start: datetime, end: datetime) -> list:
     for f in sorted(CRON_DIR.glob("daily-*.yaml")):
         try:
             date_str = f.stem.replace("daily-", "")
-            d = datetime.fromisoformat(date_str).replace(tzinfo=timezone.utc)
+            d = datetime.fromisoformat(date_str).replace(tzinfo=UTC)
             if d < start or d >= end:
                 continue
             data = _load_yaml(str(f))
@@ -278,7 +278,7 @@ def collect_all(week_iso: str = None) -> dict:
         "iso_week": label,
         "start": start.isoformat(),
         "end": end.isoformat(),
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "cron": {
             "days_run": len(cron_days),
             "days_ok": sum(1 for d in cron_days if d.get("status") == "ok"),

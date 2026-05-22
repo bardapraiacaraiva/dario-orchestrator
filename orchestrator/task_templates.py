@@ -23,7 +23,7 @@ import json
 import logging
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path.home() / ".claude" / "orchestrator"))
@@ -173,7 +173,7 @@ def instantiate_template(template_name: str, variables: dict,
 
     prefix = template.get("project_prefix", "T")
     # Generate unique prefix with timestamp
-    ts = datetime.now(timezone.utc).strftime("%m%d")
+    ts = datetime.now(UTC).strftime("%m%d")
     prefix = f"{prefix}{ts}"
 
     tasks = []

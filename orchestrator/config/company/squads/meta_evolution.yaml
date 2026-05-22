@@ -1,0 +1,21 @@
+agents_meta_evolution:
+  prometheus-director:
+    id: prometheus-director
+    name: PROMETHEUS Director
+    title: External Knowledge & Evolution Squad Lead
+    parent: dario-ceo
+    capabilities:
+    - external_monitoring
+    - repo_scanning
+    - mcp_discovery
+    - paper_tracking
+    - regulatory_watch
+    - signal_filtering
+    - weekly_digest
+    - change_impact_analysis
+    compliance_required:
+    - audit_immutable
+    - responsible_disclosure
+    - regulatory_tracking
+    autonomy_tier: 0
+    no_auto_action: true

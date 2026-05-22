@@ -24,7 +24,6 @@ import json
 import os
 import sys
 import urllib.request
-from typing import Optional
 
 DATAJUD_BASE = "https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal}/_search"
 # Token público compartilhado (vide datajud-wiki.cnj.jus.br)

@@ -17,13 +17,10 @@ Usage:
     python composite_memory_scoring.py --query "brand positioning" --scope mar-brasa --json
 """
 
-import json
 import logging
 import math
-import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("memory_scoring")
@@ -95,11 +92,11 @@ class MemoryScorer:
 
         try:
             if isinstance(timestamp, (int, float)):
-                created = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+                created = datetime.fromtimestamp(timestamp, tz=UTC)
             else:
                 created = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
 
-            age_days = (datetime.now(timezone.utc) - created).days
+            age_days = (datetime.now(UTC) - created).days
             # Exponential decay: half-life of 30 days
             score = math.exp(-0.693 * age_days / 30)
             return max(0.0, min(1.0, score))

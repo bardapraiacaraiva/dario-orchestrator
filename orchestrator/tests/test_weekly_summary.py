@@ -2,11 +2,12 @@
 """Tests for Upgrade 18 weekly cognitive summary."""
 
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
+
 
 import weekly_summary as ws
 
@@ -45,7 +46,7 @@ def test_collect_cron_days_filters_by_window():
     # All returned dates must be within window
     for d in days:
         try:
-            dt = datetime.fromisoformat(d["date"]).replace(tzinfo=timezone.utc)
+            dt = datetime.fromisoformat(d["date"]).replace(tzinfo=UTC)
             assert start <= dt < end
         except Exception:
             pass
@@ -151,7 +152,8 @@ def test_collect_integrity_events_only_fail_warn():
 
 
 def test_save_to_obsidian():
-    import tempfile, shutil
+    import shutil
+    import tempfile
     # Replace OBSIDIAN_OUTPUTS with temp dir
     orig = ws.OBSIDIAN_OUTPUTS
     tmp = Path(tempfile.mkdtemp())

@@ -26,7 +26,6 @@ Exit codes:
 import argparse
 import json
 import logging
-import subprocess
 import sys
 from pathlib import Path
 
@@ -35,12 +34,12 @@ try:
     yaml_engine = YAML()
     yaml_engine.preserve_quotes = True
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml_engine.load(f)
 except ImportError:
     import yaml
     def load_yaml(path):
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
 
 
@@ -181,8 +180,8 @@ def search_rag(keywords: list, task_description: str = "") -> list:
     # Strategy 1: Semantic search with task description (HyDE-enhanced if available)
     if task_description:
         try:
-            import urllib.request
             import urllib.parse
+            import urllib.request
             # Use the /search endpoint with the full description for better vector match
             query = task_description[:500]  # First 500 chars for semantic search
             payload = json.dumps({"query": query, "top_k": 5}).encode()
@@ -219,8 +218,8 @@ def search_rag(keywords: list, task_description: str = "") -> list:
     # Strategy 2: Keyword fallback (if semantic returned nothing)
     if not results and keywords:
         try:
-            import urllib.request
             import urllib.parse
+            import urllib.request
             query = " ".join(keywords[:4])
             url = f"{RAG_URL}/search?q={urllib.parse.quote(query)}&top_k=3"
             with urllib.request.urlopen(url, timeout=3) as resp:

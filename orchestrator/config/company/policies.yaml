@@ -1,0 +1,29 @@
+execution_policies:
+  default:
+    comment_required: true
+    review_required: false
+    approval_required: false
+    revision_max_loops: 3
+    sla_hours: 8
+    auto_approve_threshold: 75
+  critical:
+    comment_required: true
+    review_required: true
+    approval_required: true
+    revision_max_loops: 3
+    sla_hours: 1
+    auto_approve_threshold: null
+  client_facing:
+    comment_required: true
+    review_required: true
+    approval_required: false
+    revision_max_loops: 2
+    sla_hours: 4
+    auto_approve_threshold: 85
+  financial:
+    comment_required: true
+    review_required: true
+    approval_required: true
+    revision_max_loops: 2
+    sla_hours: 2
+    auto_approve_threshold: null

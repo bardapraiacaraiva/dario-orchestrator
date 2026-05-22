@@ -1,0 +1,883 @@
+agents:
+  ceo:
+    id: dario-ceo
+    name: D.A.R.I.O.
+    title: Chief Executive Officer
+    type: orchestrator
+    adapter: dario-v2-digital-ceo
+    reports_to: null
+    capabilities:
+    - strategic_planning
+    - task_decomposition
+    - agent_hiring
+    - budget_allocation
+    - cross_division_coordination
+    - client_communication
+    - quality_assurance
+    heartbeat:
+      enable_timer: true
+      interval_minutes: 30
+      enable_assignment_wakeup: true
+      enable_on_demand: true
+      cooldown_minutes: 5
+    context_mode: full
+    specializations:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 17
+    - 18
+    - 19
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 26
+    - 27
+    - 28
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+    - 35
+    - 36
+    - 37
+    - 38
+    - 39
+    - 40
+    - 41
+    - 42
+    - 43
+    - 44
+    - 45
+    - 46
+    - 47
+    - 48
+    - 49
+    - 50
+    - 51
+    - 52
+    - 53
+    - 54
+    - 55
+    - 56
+    - 57
+  vp_architecture:
+    id: diva-vp
+    name: D.I.V.A.
+    title: VP Architecture & Design
+    type: orchestrator
+    adapter: diva-v1-design-architect
+    reports_to: dario-ceo
+    capabilities:
+    - architecture_design
+    - interior_design
+    - construction_management
+    - portuguese_regulations
+    - materials_science
+    - mep_systems
+    - smart_home
+    - 3d_visualization
+    heartbeat:
+      enable_timer: true
+      interval_minutes: 60
+      enable_assignment_wakeup: true
+      enable_on_demand: true
+      cooldown_minutes: 10
+    context_mode: full
+  dir_marketing:
+    id: dir-marketing
+    name: Marketing Director
+    title: Director of Marketing & Growth
+    type: manager
+    reports_to: dario-ceo
+    manages:
+    - worker-brand
+    - worker-offer
+    - worker-sales-letter
+    - worker-ads
+    - worker-funnel
+    - worker-pipeline
+    - worker-email-seq
+    - worker-naming
+    - worker-story-circle
+    - worker-pitch
+    - worker-proposal
+    - worker-negotiation
+    capabilities:
+    - brand_strategy
+    - offer_creation
+    - copywriting
+    - paid_traffic
+    - funnel_design
+    - sales_pipeline
+    - email_marketing
+    - pitch_creation
+    squads:
+    - Copy Squad
+    - Brand Squad
+    - Traffic Masters
+    - Sales Squad
+    - Storytelling Squad
+    - Movement Squad
+    - Hormozi Squad
+  dir_technical:
+    id: dir-technical
+    name: Technical Director
+    title: Director of Technical Operations
+    type: manager
+    reports_to: dario-ceo
+    manages:
+    - worker-wp-audit
+    - worker-woo-audit
+    - worker-cwv-fix
+    - worker-pentest
+    - worker-make-blueprint
+    - worker-ios-hig
+    - worker-sop
+    capabilities:
+    - wordpress_engineering
+    - woocommerce_optimization
+    - performance_optimization
+    - security_auditing
+    - automation_design
+    - ios_design
+    - process_documentation
+    squads:
+    - Cybersecurity Squad
+    - Claude Code Mastery
+    - AI Engineering Squad
+  dir_seo:
+    id: dir-seo
+    name: SEO Director
+    title: Director of Search & Visibility
+    type: manager
+    reports_to: dario-ceo
+    manages:
+    - worker-seo-audit
+    - worker-seo-technical
+    - worker-seo-content
+    - worker-seo-schema
+    - worker-seo-local
+    - worker-seo-geo
+    - worker-seo-plan
+    - worker-seo-page
+    - worker-seo-sitemap
+    - worker-seo-images
+    - worker-seo-hreflang
+    - worker-seo-programmatic
+    - worker-seo-competitor
+    - worker-seo-dataforseo
+    - worker-seo-image-gen
+    - worker-kw-cluster
+    capabilities:
+    - technical_seo
+    - content_seo
+    - local_seo
+    - geo_optimization
+    - schema_markup
+    - seo_strategy
+    - keyword_research
+    - competitor_analysis
+    - ai_search_optimization
+    squads:
+    - Data Squad
+  vp_cfo:
+    id: dario-cfo
+    name: C.F.O.
+    title: VP Finance, Accounting & Risk
+    type: orchestrator
+    adapter: dario-v2-digital-ceo
+    reports_to: dario-ceo
+    manages_directors:
+    - dir-agency-finance
+    - dir-accounting
+    - dir-risk
+    - dir-cost-control
+    capabilities:
+    - financial_governance
+    - accounting_oversight
+    - risk_management
+    - compliance_governance
+    - tax_strategy_pt
+    - budget_enforcement
+    - cost_optimization
+    - treasury_management
+    - audit_coordination
+    - financial_reporting
+    - regulatory_compliance
+    - token_cost_roi
+    heartbeat:
+      enable_timer: true
+      interval_minutes: 30
+      enable_assignment_wakeup: true
+      enable_on_demand: true
+      cooldown_minutes: 10
+    context_mode: full
+    execution_policy: financial
+    squads:
+    - CFO Squad
+    - PT Tax Compliance Squad
+    - Risk & Governance Squad
+    engines:
+    - budget_tracker.py
+    - token_meter.py
+    - model_router.py
+    data_files:
+    - finance/receivables.yaml
+    - finance/freelancers.yaml
+    - finance/tax_calendar.yaml
+  dir_agency_finance:
+    id: dir-agency-finance
+    name: Agency Finance Director
+    title: Director of Agency Finance & Pricing
+    type: manager
+    reports_to: dario-cfo
+    manages:
+    - worker-financial-model
+    - worker-pricing-calculator
+    - worker-saas-metrics
+    - worker-cfo-agency-pnl
+    - worker-cfo-token-roi
+    - worker-cfo-tax-autopilot
+    capabilities:
+    - financial_modeling
+    - pricing_strategy
+    - saas_analytics
+    - budget_forecasting
+    - agency_pnl
+    - client_profitability
+    - token_roi
+    - tax_automation
+    squads:
+    - CFO Squad
+  vp_lucas:
+    id: lucas-vp
+    name: L.U.C.A.S.
+    title: VP Operations & Intelligence
+    type: orchestrator
+    adapter: dario-v2-digital-ceo
+    reports_to: dario-ceo
+    capabilities:
+    - heartbeat_management
+    - budget_enforcement
+    - quality_scoring
+    - performance_analytics
+    - cross_project_intelligence
+    - cost_optimization
+    - monitoring_alerting
+    - revenue_attribution
+    heartbeat:
+      enable_timer: true
+      interval_minutes: 15
+      enable_assignment_wakeup: true
+      enable_on_demand: true
+      cooldown_minutes: 3
+    context_mode: full
+  dir_cost_control:
+    id: dir-cost-control
+    name: Cost Control Director
+    title: Director of Cost Control & Model Routing
+    type: manager
+    reports_to: dario-cfo
+    manages:
+    - worker-lucas-budget-tracker
+    - worker-lucas-model-router
+    - worker-lucas-cost-alerts
+    - worker-lucas-cost-optimizer
+    capabilities:
+    - token_tracking
+    - budget_enforcement
+    - model_selection
+    - cost_alerting
+    - spend_optimization
+  dir_quality:
+    id: dir-quality
+    name: Quality Director
+    title: Director of Quality & Feedback
+    type: manager
+    reports_to: lucas-vp
+    manages:
+    - worker-lucas-quality-scorer
+    - worker-lucas-feedback-loop
+    - worker-lucas-skill-evaluator
+    - worker-lucas-revision-analyst
+    capabilities:
+    - output_evaluation
+    - quality_rubrics
+    - feedback_collection
+    - skill_testing
+    - revision_analysis
+  dir_monitoring:
+    id: dir-monitoring
+    name: Monitoring Director
+    title: Director of Monitoring & Heartbeat
+    type: manager
+    reports_to: lucas-vp
+    manages:
+    - worker-lucas-heartbeat-engine
+    - worker-lucas-stale-detector
+    - worker-lucas-health-monitor
+    - worker-lucas-alert-dispatcher
+    capabilities:
+    - heartbeat_scheduling
+    - stale_detection
+    - health_checks
+    - alert_dispatching
+  dir_analytics:
+    id: dir-analytics
+    name: Analytics Director
+    title: Director of Analytics & Intelligence
+    type: manager
+    reports_to: lucas-vp
+    manages:
+    - worker-lucas-cross-project
+    - worker-lucas-skill-dashboard
+    - worker-lucas-revenue-tracker
+    - worker-lucas-knowledge-graph
+    capabilities:
+    - cross_project_patterns
+    - skill_performance
+    - revenue_attribution
+    - entity_linking
+    - domain_playbooks
+  dir_saas_engineering:
+    id: dir-saas-engineering
+    name: SaaS Engineering Director
+    title: Director of SaaS Engineering
+    type: manager
+    reports_to: lucas-vp
+    manages:
+    - worker-lucas-backend
+    - worker-lucas-frontend
+    - worker-lucas-ai-agents
+    - worker-lucas-database
+    capabilities:
+    - fullstack_development
+    - api_design
+    - database_engineering
+    - ai_agent_building
+  dir_accounting:
+    id: dir-accounting
+    name: Accounting Director
+    title: Director of Accounting & Tax (PT)
+    type: manager
+    reports_to: dario-cfo
+    manages:
+    - worker-conta-facturacao
+    - worker-conta-iva
+    - worker-conta-irc
+    - worker-conta-irs
+    - worker-conta-ss
+    - worker-conta-payroll
+    - worker-conta-lancamentos
+    - worker-conta-conciliacao
+    - worker-conta-plano
+    - worker-conta-ap
+    - worker-conta-ativos
+    - worker-conta-custos
+    - worker-conta-orcamento
+    - worker-conta-tesouraria
+    - worker-conta-relatorios
+    - worker-conta-consolidacao
+    - worker-conta-encerramento
+    - worker-conta-auditoria
+    capabilities:
+    - pt_tax_law
+    - at_compliance
+    - financial_reporting
+    - saf_t
+    - snc_accounting
+    - iva_declarations
+    - irc_computation
+    - payroll_processing
+    - bank_reconciliation
+    - year_end_close
+    - audit_preparation
+    - budget_management
+    - treasury_management
+    - cost_accounting
+    squads:
+    - PT Accounting Squad
+    - Tax Compliance Squad
+  dir_risk:
+    id: dir-risk
+    name: Risk & Compliance Director
+    title: Director of Risk, Compliance & Governance
+    type: manager
+    reports_to: dario-cfo
+    manages:
+    - worker-risco-rgpd
+    - worker-risco-aml
+    - worker-risco-matrix
+    - worker-risco-bcp
+    - worker-risco-esg
+    - worker-risco-iso27001
+    - worker-risco-whistleblowing
+    - worker-risco-regulatorio
+    - worker-risco-etica
+    - worker-risco-contractual
+    - worker-risco-seguros
+    - worker-risco-terceiros
+    - worker-risco-reporting
+    - worker-risco-audit
+    capabilities:
+    - rgpd_gdpr_compliance
+    - aml_kyc
+    - risk_assessment
+    - business_continuity
+    - esg_reporting
+    - iso27001_nis2
+    - whistleblowing
+    - regulatory_monitoring
+    - ethics_governance
+    - contract_compliance
+    - insurance_management
+    - third_party_risk
+    - compliance_reporting
+    - internal_audit
+    squads:
+    - Risk & Compliance Squad
+    - Governance Squad
+  vp_builder:
+    id: builder-vp
+    name: B.U.I.L.D.E.R.
+    title: VP Product Building & Engineering
+    type: orchestrator
+    adapter: dario-v2-digital-ceo
+    reports_to: dario-ceo
+    manages_directors:
+    - dir-design-visual
+    - dir-frontend
+    - dir-backend
+    - dir-devops
+    capabilities:
+    - product_building
+    - design_systems
+    - frontend_development
+    - backend_development
+    - api_design
+    - database_design
+    - deployment
+    - ci_cd
+    - visual_identity
+    - landing_pages
+    - full_stack
+    - idea_to_product
+    heartbeat:
+      enable_timer: true
+      interval_minutes: 30
+      enable_assignment_wakeup: true
+      enable_on_demand: true
+      cooldown_minutes: 10
+    context_mode: full
+    squads:
+    - Design Squad
+    - Frontend Squad
+    - Full-Stack Squad
+    - DevOps Squad
+  dir_design_visual:
+    id: dir-design-visual
+    name: Design Visual Director
+    title: Director of Visual Design & Brand Systems
+    type: manager
+    reports_to: builder-vp
+    manages:
+    - worker-builder-design-system
+    - worker-builder-brand-identity
+    - worker-builder-wireframe
+    capabilities:
+    - design_tokens
+    - color_palettes
+    - typography_systems
+    - component_libraries
+    - wireframing
+    - brand_guidelines
+    - tailwind_config
+    squads:
+    - Design Squad
+  dir_frontend:
+    id: dir-frontend
+    name: Frontend Director
+    title: Director of Frontend Engineering
+    type: manager
+    reports_to: builder-vp
+    manages:
+    - worker-builder-landing-page
+    - worker-builder-nextjs-app
+    - worker-builder-react-components
+    capabilities:
+    - react
+    - nextjs
+    - tailwindcss
+    - shadcn_ui
+    - responsive_design
+    - landing_pages
+    - dashboards
+    squads:
+    - Frontend Squad
+  dir_backend_build:
+    id: dir-backend-build
+    name: Backend Director
+    title: Director of Backend & API Engineering
+    type: manager
+    reports_to: builder-vp
+    manages:
+    - worker-builder-api-design
+    - worker-builder-database-schema
+    - worker-builder-auth-system
+    capabilities:
+    - rest_api
+    - graphql
+    - postgresql
+    - sqlite
+    - jwt_auth
+    - oauth
+    - node_express
+    - fastapi_python
+    squads:
+    - Full-Stack Squad
+  dir_devops_build:
+    id: dir-devops-build
+    name: DevOps Director
+    title: Director of DevOps & Deployment
+    type: manager
+    reports_to: builder-vp
+    manages:
+    - worker-builder-vercel-deploy
+    - worker-builder-docker-compose
+    - worker-builder-ci-cd
+    capabilities:
+    - vercel
+    - docker
+    - github_actions
+    - nginx
+    - ssl_certbot
+    - monitoring
+    squads:
+    - DevOps Squad
+  vp_a360:
+    id: a360-vp
+    name: Accelera 360
+    title: VP Business Acceleration
+    type: orchestrator
+    adapter: dario-v2-digital-ceo
+    reports_to: dario-ceo
+    capabilities:
+    - niche_discovery
+    - niche_mapping
+    - prospect_research
+    - landing_page_generation
+    - go_to_market
+    - sales_playbook
+    - pitch_deck
+    - meeting_preparation
+    - business_acceleration
+    heartbeat:
+      enable_timer: false
+      enable_assignment_wakeup: true
+      enable_on_demand: true
+      cooldown_minutes: 10
+    context_mode: full
+    own_coordinator: a360-framework-lite
+    pipelines:
+    - prospect-meeting
+    - business-foundation
+    - client-deliverable
+    - niche-discovery
+    - quick-pitch-deck
+  dir_a360_research:
+    id: dir-a360-research
+    name: A360 Research Director
+    title: Director of Research & Discovery
+    type: manager
+    reports_to: a360-vp
+    manages:
+    - worker-a360-nicho-explorer
+    - worker-a360-mapear-nicho
+    - worker-a360-cliente-radar
+    capabilities:
+    - niche_discovery
+    - niche_validation
+    - niche_mapping
+    - prospect_research
+    - competitor_analysis
+  dir_a360_production:
+    id: dir-a360-production
+    name: A360 Production Director
+    title: Director of Deliverables & Production
+    type: manager
+    reports_to: a360-vp
+    manages:
+    - worker-a360-lp-builder
+    - worker-a360-pitch-deck
+    - worker-a360-gtm
+    - worker-a360-playbook-vendas
+    - worker-a360-meeting-prep
+    capabilities:
+    - landing_page_generation
+    - pitch_deck_creation
+    - go_to_market_strategy
+    - sales_scripting
+    - meeting_briefing
+  dir_legal:
+    id: dir-legal
+    name: Legal Director
+    title: Director of Legal & Compliance
+    type: manager
+    reports_to: dario-ceo
+    manages:
+    - worker-legal
+    capabilities:
+    - client_contracts
+    - rgpd_compliance
+    - nda_generation
+    - terms_of_service
+    - privacy_policy
+    - ip_protection
+    - dispute_resolution
+  dir_hr:
+    id: dir-hr
+    name: HR Director
+    title: Director of HR & Team Management
+    type: manager
+    reports_to: dario-ceo
+    manages:
+    - worker-hr
+    capabilities:
+    - job_descriptions
+    - capacity_planning
+    - onboarding
+    - performance_review
+    - freelancer_management
+    - training_plans
+  dir_content:
+    id: dir-content
+    name: Content & Social Director
+    title: Director of Content & Social Media
+    type: manager
+    reports_to: dario-ceo
+    manages:
+    - worker-social
+    - worker-content
+    capabilities:
+    - content_calendars
+    - social_media
+    - blog_writing
+    - content_repurposing
+    - community_management
+    - editorial_planning
+    squads:
+    - Copy Squad
+    - Storytelling Squad
+  dir_support:
+    id: dir-support
+    name: Support Director
+    title: Director of Customer Support & Success
+    type: manager
+    reports_to: dario-ceo
+    manages:
+    - worker-support
+    capabilities:
+    - ticket_management
+    - sla_tracking
+    - client_health_score
+    - handover_protocols
+    - churn_prevention
+    - faq_generation
+  dir_product:
+    id: dir-product
+    name: Product Director
+    title: Director of Product Development
+    type: manager
+    reports_to: dario-ceo
+    manages:
+    - worker-product
+    capabilities:
+    - prd_generation
+    - user_stories
+    - mvp_scoping
+    - sprint_planning
+    - feature_prioritization
+    - technical_specs
+    - launch_checklists
+    squads:
+    - Product Management Squad
+  dir_pr:
+    id: dir-pr
+    name: PR Director
+    title: Director of PR & Communications
+    type: manager
+    reports_to: dario-ceo
+    manages:
+    - worker-pr
+    capabilities:
+    - press_releases
+    - media_outreach
+    - crisis_communication
+    - award_submissions
+    - spokesperson_prep
+    - media_kits
+  dir_client_success:
+    id: dir-client-success
+    name: Client Success Director
+    title: Director of Client Success
+    type: manager
+    reports_to: dario-ceo
+    manages:
+    - worker-client-onboard
+    - worker-diagnose
+    - worker-projeto
+    capabilities:
+    - client_onboarding
+    - diagnostic_analysis
+    - project_management
+    - context_switching
+    squads:
+    - Advisory Board
+    - C-Level Squad
+  dir_design:
+    id: dir-design
+    name: Design Director
+    title: Director of Design
+    type: manager
+    reports_to: diva-vp
+    manages:
+    - worker-diva-moodboard
+    - worker-diva-materials
+    - worker-diva-floor-plan
+    - worker-diva-render
+    - worker-diva-render-brief
+    - worker-diva-vision
+    - worker-diva-portfolio
+    - worker-diva-smart-home
+    capabilities:
+    - interior_design
+    - moodboard_creation
+    - material_specification
+    - spatial_planning
+    - 3d_visualization
+    - photo_analysis
+    - smart_home_design
+    squads:
+    - Architecture Masters Squad
+    - Interior Design Squad
+  dir_construction:
+    id: dir-construction
+    name: Construction Director
+    title: Director of Construction Management
+    type: manager
+    reports_to: diva-vp
+    manages:
+    - worker-diva-budget
+    - worker-diva-calc
+    - worker-diva-timeline
+    - worker-diva-inspection
+    - worker-diva-contract
+    - worker-diva-comparador
+    - worker-diva-planradar
+    - worker-diva-bim
+    capabilities:
+    - budget_estimation
+    - timeline_planning
+    - inspection_management
+    - contract_generation
+    - proposal_comparison
+    - bim_coordination
+    squads:
+    - Construction Management Squad
+    - Budget & Estimation Squad
+  dir_regulatory:
+    id: dir-regulatory
+    name: Regulatory Director
+    title: Director of Regulatory & Compliance
+    type: manager
+    reports_to: diva-vp
+    manages:
+    - worker-diva-licensing
+    - worker-diva-energy
+    capabilities:
+    - portuguese_building_regulations
+    - rjue_rgeu_compliance
+    - energy_certification
+    - municipal_permits
+    squads:
+    - Regulation Squad
+  shared_rag:
+    id: shared-rag
+    name: RAG Engine
+    title: Knowledge Base Service
+    type: service
+    reports_to: dario-ceo
+    capabilities:
+    - semantic_search
+    - content_ingestion
+    - knowledge_retrieval
+    endpoint: http://localhost:8420
+    tools:
+    - mcp__dario-rag__search_kb
+    - mcp__dario-rag__ingest_text
+    - mcp__dario-rag__ingest_url
+    - mcp__dario-rag__list_sources
+    - mcp__dario-rag__kb_stats
+    - mcp__dario-rag__kb_health
+  shared_memory:
+    id: shared-memory
+    name: Agent Memory
+    title: Persistent Memory Service
+    type: service
+    reports_to: dario-ceo
+    capabilities:
+    - session_persistence
+    - project_context
+    - user_preferences
+    - feedback_tracking
+    paths:
+      dario: C:\Users\barda\.claude\agent-memory\dario-v2-digital-ceo
+      global: C:\Users\barda\.claude\projects\C--Users-barda\memory
+  shared_obsidian:
+    id: shared-obsidian
+    name: Obsidian Integration
+    title: Second Brain Service
+    type: service
+    reports_to: dario-ceo
+    capabilities:
+    - output_persistence
+    - decision_logging
+    - context_storage
+    vaults:
+      dario: C:\Users\barda\OneDrive\Documents\D.A.R.I.O
+      diva: C:\Users\barda\OneDrive\Documents\D.I.V.A
+  shared_orchestrator:
+    id: shared-orchestrator
+    name: Orchestrator Engine
+    title: Task & Workflow Service
+    type: service
+    reports_to: dario-ceo
+    capabilities:
+    - task_management
+    - heartbeat_scheduling
+    - execution_policy_enforcement
+    - audit_logging
+    - budget_tracking
+    paths:
+      tasks: C:\Users\barda\.claude\orchestrator\tasks
+      audit: C:\Users\barda\.claude\orchestrator\audit
+      budgets: C:\Users\barda\.claude\orchestrator\budgets

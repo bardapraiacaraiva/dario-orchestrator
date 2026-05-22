@@ -20,7 +20,6 @@ CLI:
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 LEX_DIR = Path.home() / ".claude" / "orchestrator" / "lex-br"
@@ -155,7 +154,7 @@ def main():
     if args.task_file:
         try:
             import yaml
-            with open(args.task_file, "r", encoding="utf-8") as f:
+            with open(args.task_file, encoding="utf-8") as f:
                 task = yaml.safe_load(f)
         except Exception as e:
             print(f"Erro lendo task: {e}", file=sys.stderr)

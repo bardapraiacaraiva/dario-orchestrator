@@ -34,7 +34,6 @@ CLI:
 import argparse
 import json
 import sys
-from collections import defaultdict
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -46,13 +45,13 @@ try:
     _yaml = YAML()
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _yaml.load(f)
 except ImportError:
     import yaml as _pyaml
 
     def _load_yaml(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return _pyaml.safe_load(f)
 
 
@@ -140,8 +139,9 @@ def check_skill_frontmatter_valid() -> dict:
 def check_embeddings_coverage() -> dict:
     """Check 3: Embeddings cache has entries for skills used by evals + chains."""
     try:
-        from semantic_dispatch import extract_skill_corpus
         import sqlite3
+
+        from semantic_dispatch import extract_skill_corpus
         corpus = extract_skill_corpus()
         conn = sqlite3.connect(str(ORCH_DIR / "orchestrator.db"))
         rows = conn.execute("SELECT skill_name FROM skill_embeddings").fetchall()
@@ -180,10 +180,9 @@ def check_embeddings_coverage() -> dict:
 def check_embeddings_freshness() -> dict:
     """Check 4: Cached description hash matches current SKILL.md content."""
     try:
-        from semantic_dispatch import (
-            extract_skill_corpus, _hash, _load_keyword_index, _augment_description
-        )
         import sqlite3
+
+        from semantic_dispatch import _augment_description, _hash, _load_keyword_index, extract_skill_corpus
         corpus = extract_skill_corpus()
         keyword_index = _load_keyword_index()
         conn = sqlite3.connect(str(ORCH_DIR / "orchestrator.db"))
@@ -218,11 +217,20 @@ def check_embeddings_freshness() -> dict:
     }
 
 
+def _is_dspy_pilot_golden(eval_id: str) -> bool:
+    """Onda 7 #4 — DSPy-pilot goldens are intentionally outside EVAL_CASES.
+
+    They exist only to seed `optimization.optimize_skill dario-brand` and
+    have a `brand-<vertical>-<n>` naming pattern (no `eval-` prefix).
+    """
+    return eval_id.startswith("brand-") and not eval_id.startswith("eval-")
+
+
 def check_golden_skills_alive() -> dict:
     """Check 5: Each captured golden's eval references a still-existing skill."""
     try:
-        from golden_eval import list_goldens
         from eval_suite import EVAL_CASES
+        from golden_eval import list_goldens
     except Exception as e:
         return {"status": "ERROR", "message": str(e)[:200]}
 
@@ -230,6 +238,9 @@ def check_golden_skills_alive() -> dict:
     orphaned = []
     for g in list_goldens():
         eid = g["eval_id"]
+        if _is_dspy_pilot_golden(eid):
+            # DSPy pilot goldens deliberately have no eval_case.
+            continue
         skill = case_lookup.get(eid)
         if not skill:
             orphaned.append({"eval_id": eid, "reason": "no matching eval_case"})

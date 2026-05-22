@@ -28,7 +28,7 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -59,7 +59,7 @@ def interrupt_task(task_id: str, reason: str = "", checkpoint_data: dict = None,
     # Build checkpoint
     checkpoint = {
         "task_id": task_id,
-        "interrupted_at": datetime.now(timezone.utc).isoformat(),
+        "interrupted_at": datetime.now(UTC).isoformat(),
         "reason": reason,
         "previous_status": status,
         "checkpoint_data": checkpoint_data or {},
@@ -117,7 +117,7 @@ def resume_task(task_id: str, human_input: dict = None) -> dict:
 
     # Merge human input into checkpoint
     checkpoint["human_input"] = human_input or {}
-    checkpoint["resumed_at"] = datetime.now(timezone.utc).isoformat()
+    checkpoint["resumed_at"] = datetime.now(UTC).isoformat()
 
     # Move back to in_progress
     with db._conn() as conn:
@@ -206,7 +206,7 @@ def get_checkpoint(task_id: str) -> dict:
 
 # Unified with approval_gates.py (fixed: was divergent duplicate list)
 try:
-    from approval_gates import SKILL_APPROVAL, POLICY_APPROVAL
+    from approval_gates import POLICY_APPROVAL, SKILL_APPROVAL
     APPROVAL_REQUIRED_SKILLS = {s for s, level in SKILL_APPROVAL.items() if level in ("approve", "dual")}
     APPROVAL_REQUIRED_POLICIES = {p for p, level in POLICY_APPROVAL.items() if level in ("approve", "dual")}
 except ImportError:

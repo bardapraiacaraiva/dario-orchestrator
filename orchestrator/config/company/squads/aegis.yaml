@@ -1,0 +1,101 @@
+workers_aegis:
+  worker-aegis-tm:
+    id: worker-aegis-tm
+    skill: aegis-threat-modeling
+    reports_to: aegis-director
+  worker-aegis-pt:
+    id: worker-aegis-pt
+    skill: aegis-pentest-methodology
+    reports_to: aegis-director
+  worker-aegis-vm:
+    id: worker-aegis-vm
+    skill: aegis-vulnerability-management
+    reports_to: aegis-director
+  worker-aegis-soc:
+    id: worker-aegis-soc
+    skill: aegis-soc-operations
+    reports_to: aegis-director
+  worker-aegis-siem:
+    id: worker-aegis-siem
+    skill: aegis-siem-integration
+    reports_to: aegis-director
+  worker-aegis-edr:
+    id: worker-aegis-edr
+    skill: aegis-edr-management
+    reports_to: aegis-director
+  worker-aegis-zt:
+    id: worker-aegis-zt
+    skill: aegis-zero-trust-architecture
+    reports_to: aegis-director
+  worker-aegis-iam:
+    id: worker-aegis-iam
+    skill: aegis-iam-identity
+    reports_to: aegis-director
+  worker-aegis-secrets:
+    id: worker-aegis-secrets
+    skill: aegis-secrets-management
+    reports_to: aegis-director
+  worker-aegis-ir:
+    id: worker-aegis-ir
+    skill: aegis-incident-response
+    reports_to: aegis-director
+  worker-aegis-fo:
+    id: worker-aegis-fo
+    skill: aegis-digital-forensics
+    reports_to: aegis-director
+  worker-aegis-comp:
+    id: worker-aegis-comp
+    skill: aegis-compliance-frameworks
+    reports_to: aegis-director
+  worker-aegis-aware:
+    id: worker-aegis-aware
+    skill: aegis-security-awareness
+    reports_to: aegis-director
+  worker-aegis-sdlc:
+    id: worker-aegis-sdlc
+    skill: aegis-secure-sdlc
+    reports_to: aegis-director
+  worker-aegis-cloud:
+    id: worker-aegis-cloud
+    skill: aegis-cloud-security
+    reports_to: aegis-director
+  worker-aegis-tpr:
+    id: worker-aegis-tpr
+    skill: aegis-third-party-risk
+    reports_to: aegis-director
+  worker-aegis-supply:
+    id: worker-aegis-supply
+    skill: aegis-supply-chain-security
+    reports_to: aegis-director
+  worker-aegis-bas:
+    id: worker-aegis-bas
+    skill: aegis-breach-simulation
+    reports_to: aegis-director
+squads_aegis:
+  pentest_full:
+    workers:
+    - worker-aegis-tm
+    - worker-aegis-pt
+    - worker-aegis-vm
+    - worker-aegis-sdlc
+    - worker-aegis-bas
+  soc_24x7:
+    workers:
+    - worker-aegis-soc
+    - worker-aegis-siem
+    - worker-aegis-edr
+    - worker-aegis-ir
+    - worker-aegis-fo
+  ciso_office:
+    workers:
+    - worker-aegis-zt
+    - worker-aegis-iam
+    - worker-aegis-comp
+    - worker-aegis-aware
+    - worker-aegis-cloud
+  trust_compliance:
+    workers:
+    - worker-aegis-tpr
+    - worker-aegis-supply
+    - worker-aegis-comp
+    - worker-aegis-bas

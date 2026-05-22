@@ -17,7 +17,7 @@ Storage: ~/.claude/orchestrator/lex-br/memory/compliance_log/YYYY-MM-DD.yaml
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 LEX_DIR = Path.home() / ".claude" / "orchestrator" / "lex-br"
@@ -63,11 +63,11 @@ def log(skill: str, task_id: str, output: str = "",
     Returns the persisted entry dict.
     """
     AUDIT_DIR.mkdir(parents=True, exist_ok=True)
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(UTC).strftime("%Y-%m-%d")
     log_file = AUDIT_DIR / f"{today}.yaml"
 
     entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "skill": skill,
         "task_id": task_id,
         "client_hash": _hash_client(client_id) if client_id else None,
@@ -86,20 +86,20 @@ def log(skill: str, task_id: str, output: str = "",
 
 def count_today() -> int:
     """Quantos eventos hoje."""
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(UTC).strftime("%Y-%m-%d")
     log_file = AUDIT_DIR / f"{today}.yaml"
     if not log_file.exists():
         return 0
     try:
         from ruamel.yaml import YAML
         _y = YAML()
-        with open(log_file, "r", encoding="utf-8") as f:
+        with open(log_file, encoding="utf-8") as f:
             data = _y.load(f) or []
         return len(data) if isinstance(data, list) else 0
     except Exception:
         try:
             import yaml as _pyaml
-            with open(log_file, "r", encoding="utf-8") as f:
+            with open(log_file, encoding="utf-8") as f:
                 data = _pyaml.safe_load(f) or []
             return len(data) if isinstance(data, list) else 0
         except Exception:
@@ -115,7 +115,7 @@ def summary(days: int = 7) -> dict:
     out = []
     total = 0
     for i in range(days):
-        d = (datetime.now(timezone.utc) - timedelta(days=i)).strftime("%Y-%m-%d")
+        d = (datetime.now(UTC) - timedelta(days=i)).strftime("%Y-%m-%d")
         log_file = AUDIT_DIR / f"{d}.yaml"
         if log_file.exists():
             try:
