@@ -607,6 +607,42 @@ def validate_key(key: str) -> dict:
 # LICENSE FILE
 # =============================================================================
 
+def tier_caps_diff(from_tier: str = "trial", to_tier: str = "pro") -> dict:
+    """Report which features the user loses when moving from `from_tier` → `to_tier`.
+
+    Designed for the showcase-mode UX: callers can warn a trial user
+    BEFORE they activate PRO if PRO removes capabilities they were
+    relying on (e.g. multi_tenancy).
+
+    Returns:
+        {
+            "from": "trial",
+            "to": "pro",
+            "removed_features": ["multi_tenancy", "federation"],
+            "added_features": [],
+            "parallel_delta": 0,           # 3 → 3
+            "engines_delta": "no change",  # all → all
+        }
+    """
+    src = TIERS.get(from_tier, {})
+    dst = TIERS.get(to_tier, {})
+    src_features = {k for k, v in (src.get("features") or {}).items() if v}
+    dst_features = {k for k, v in (dst.get("features") or {}).items() if v}
+    return {
+        "from": from_tier,
+        "to": to_tier,
+        "removed_features": sorted(src_features - dst_features),
+        "added_features": sorted(dst_features - src_features),
+        "parallel_delta": (dst.get("max_parallel", 0) or 0)
+                          - (src.get("max_parallel", 0) or 0),
+        "engines_delta": (
+            "no change"
+            if src.get("engines_allowed") == dst.get("engines_allowed")
+            else f"{src.get('engines_allowed')} → {dst.get('engines_allowed')}"
+        ),
+    }
+
+
 def load_license() -> dict:
     """Load current license."""
     if LICENSE_FILE.exists():
@@ -866,6 +902,19 @@ def init_trial(force: bool = False) -> dict:
            server is the source of truth. Server says "machine_id already
            activated 5 days ago" → refused even if all local layers were
            wiped (e.g. fresh OS install on the same hardware).
+
+    Trial scope (showcase mode — important):
+        The trial deliberately unlocks ALL features, including the two
+        flags that are normally Enterprise-only (`multi_tenancy` and
+        `federation`). This lets a prospect prove the *ceiling* of the
+        platform before choosing a plan, but it has a UX trap: a user
+        who relies on those flags during the trial and then activates
+        PRO will discover they are gone.
+
+        The CLI banner (printed by --init-trial) makes this explicit so
+        the buyer is not surprised. Programmatic callers reading this
+        function's return value can inspect `lic["features"]` and the
+        `tier_caps_diff()` helper to detect the showcase-vs-PRO delta.
 
     Use `force=True` only with the dev bypass active.
     """
@@ -1194,18 +1243,32 @@ def main():
 
             expires = lic["expires_at"][:10]
             print(f"""
-╔══════════════════════════════════════════╗
-║  DARIO ORCHESTRATOR — 7-DAY TRIAL       ║
-║                                          ║
-║  Status:   ACTIVE                        ║
-║  Expires:  {expires}                    ║
-║  Parallel: 1 (max)                       ║
-║  Engines:  6 of 26                       ║
-║                                          ║
-║  To unlock full access:                  ║
-║  python license_manager.py --activate    ║
-║    DARIO-XXXX-XXXX-XXXX-PRO             ║
-╚══════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════╗
+║  DARIO ORCHESTRATOR — 7-DAY TRIAL (SHOWCASE MODE)               ║
+║                                                                  ║
+║  Status:   ACTIVE                                                ║
+║  Expires:  {expires}                                            ║
+║  Parallel: 3 (max)                                               ║
+║  Engines:  ALL                                                   ║
+║  Features: ALL (incl. Enterprise-grade multi_tenancy + federation)║
+║                                                                  ║
+║  IMPORTANT — what the trial includes vs paid tiers:              ║
+║                                                                  ║
+║  Trial  : showcases EVERYTHING, including features only sold     ║
+║           in Enterprise (multi_tenancy + federation + LEX-BR).   ║
+║  PRO    : R$ 297/mo. all engines, 3 parallel, NO multi_tenancy / ║
+║           federation / LEX-BR. Single-user / single-tenant.      ║
+║  ENT    : R$ 997+/mo. PRO + multi_tenancy + federation.          ║
+║                                                                  ║
+║  If you use multi_tenancy or federation during the trial, you    ║
+║  WILL need Enterprise — they are NOT in PRO.                     ║
+║                                                                  ║
+║  Activate paid:                                                  ║
+║    python license_manager.py --activate DARIO-XXXX-XXXX-XXXX-PRO ║
+║    python license_manager.py --activate DARIO-XXXX-XXXX-XXXX-ENT ║
+║                                                                  ║
+║  Purchase: barda@automationsolutionai.com                        ║
+╚══════════════════════════════════════════════════════════════════╝
 """)
         return 0
 
