@@ -1243,32 +1243,69 @@ def main():
 
             expires = lic["expires_at"][:10]
             print(f"""
-╔══════════════════════════════════════════════════════════════════╗
-║  DARIO ORCHESTRATOR — 7-DAY TRIAL (SHOWCASE MODE)               ║
-║                                                                  ║
-║  Status:   ACTIVE                                                ║
-║  Expires:  {expires}                                            ║
-║  Parallel: 3 (max)                                               ║
-║  Engines:  ALL                                                   ║
-║  Features: ALL (incl. Enterprise-grade multi_tenancy + federation)║
-║                                                                  ║
-║  IMPORTANT — what the trial includes vs paid tiers:              ║
-║                                                                  ║
-║  Trial  : showcases EVERYTHING, including features only sold     ║
-║           in Enterprise (multi_tenancy + federation + LEX-BR).   ║
-║  PRO    : R$ 297/mo. all engines, 3 parallel, NO multi_tenancy / ║
-║           federation / LEX-BR. Single-user / single-tenant.      ║
-║  ENT    : R$ 997+/mo. PRO + multi_tenancy + federation.          ║
-║                                                                  ║
-║  If you use multi_tenancy or federation during the trial, you    ║
-║  WILL need Enterprise — they are NOT in PRO.                     ║
-║                                                                  ║
-║  Activate paid:                                                  ║
-║    python license_manager.py --activate DARIO-XXXX-XXXX-XXXX-PRO ║
-║    python license_manager.py --activate DARIO-XXXX-XXXX-XXXX-ENT ║
-║                                                                  ║
-║  Purchase: barda@automationsolutionai.com                        ║
-╚══════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════╗
+║  DARIO ORCHESTRATOR — 7-DAY TRIAL (SHOWCASE MODE)                   ║
+║                                                                      ║
+║  Status:   ACTIVE                                                    ║
+║  Expires:  {expires}                                                ║
+║  Parallel: 3 max                                                     ║
+║  Engines:  ALL (32 squads, 559 skills)                               ║
+║  Features: ALL (incl. enterprise + every vertical squad)             ║
+║                                                                      ║
+║  ─── HORIZONTAL CORE (general-purpose orchestrator) ───              ║
+║                                                                      ║
+║    PRO         R$    297/mo  all engines, 3 parallel,                ║
+║                              NO multi_tenancy / federation           ║
+║    Enterprise  R$    997+/mo PRO + multi_tenancy + federation        ║
+║                                                                      ║
+║  ─── VERTICAL SQUADS (not bundled in PRO/ENT — add-on) ───           ║
+║                                                                      ║
+║    LEX-BR (legal BR, 15 skills + JusBrasil/CNJ/STF MCPs)             ║
+║        Solo   R$    297/mo   Office  R$    997/mo   Enterprise  TBD  ║
+║                                                                      ║
+║    GAIA (ESG/CSRD/B-Corp)                                            ║
+║        Solo   R$    297/mo   Team    R$    997/mo   ENT R$ 4.000+/mo ║
+║                                                                      ║
+║    NOMOS (compliance PT — CMVM/BdP/AI Act/DORA)                      ║
+║        Solo   R$    297/mo   Team    R$    997/mo                    ║
+║                                                                      ║
+║    ATLAS-FIN (fintech BR — PIX/BCB/AML)                              ║
+║        Solo   R$    997/mo   Team    R$  2.997/mo   ENT R$ 9.997+/mo ║
+║                                                                      ║
+║    AEGIS (cybersec — SOC/IR/Pentest)                                 ║
+║        Solo   R$  1.497/mo   Team    R$  2.997/mo   ENT R$ 4.997+/mo ║
+║                                                                      ║
+║    HELIOS (energia/utilities)                                        ║
+║        Solo   R$  1.997/mo   Team    R$  4.997/mo   ENT R$ 14.997+/mo║
+║                                                                      ║
+║    KIRION (real estate — REIT/FII/valuation)  Solo R$ 997/mo         ║
+║    DEMETER (data eng — dbt/warehouse/ML)      Solo R$ 297/mo         ║
+║    MEDIK (saúde BR — ANS/CFM/TUSS)            preço sob consulta     ║
+║                                                                      ║
+║  ─── KEY POINT — what disappears when you leave the trial ───        ║
+║                                                                      ║
+║  These features are PRESENT in the trial but require a SPECIFIC      ║
+║  paid tier (not auto-included in PRO or Enterprise):                 ║
+║                                                                      ║
+║    • multi_tenancy + federation       → require Enterprise           ║
+║    • lex_br_agent (15 LEX-BR skills)  → require LEX-BR Solo/Office   ║
+║    • oab_205_gate, lgpd_marker,                                      ║
+║      audit_oab, lex_memory,                                          ║
+║      dms_integration                  → all require LEX-BR add-on    ║
+║    • ESG/Fintech/Energy/etc. skills   → require matching vertical    ║
+║                                                                      ║
+║  Use the 7 days to identify which verticals matter to you, then      ║
+║  buy ONLY those (à-la-carte saves vs Enterprise+everything).         ║
+║                                                                      ║
+║  ─── ACTIVATE ───                                                    ║
+║                                                                      ║
+║    python license_manager.py --activate DARIO-XXXX-XXXX-XXXX-PRO     ║
+║    python license_manager.py --activate DARIO-XXXX-XXXX-XXXX-ENT     ║
+║    python license_manager.py --activate DARIO-XXXX-XXXX-XXXX-LEX_SOLO║
+║    (etc. — one key per tier purchased)                               ║
+║                                                                      ║
+║  Purchase / questions: barda@automationsolutionai.com                ║
+╚══════════════════════════════════════════════════════════════════════╝
 """)
         return 0
 
