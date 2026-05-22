@@ -141,6 +141,7 @@ TIERS = {
     "pro": {
         "name": "Professional",
         "duration_days": None,  # Permanent
+        "price_brl_month": 297,  # Onda 12 — cravado no dict (era só no banner)
         "max_parallel": 3,
         "engines_allowed": "all",
         "features": {
@@ -160,6 +161,7 @@ TIERS = {
     "enterprise": {
         "name": "Enterprise",
         "duration_days": None,
+        "price_brl_month": 997,  # Onda 12 — base price (banner já mostrava "R$ 997+")
         "max_parallel": 5,
         "engines_allowed": "all",
         "features": {
@@ -496,6 +498,129 @@ TIERS = {
             "regulator_simulator": True, "audit_trail_immutable": True,
             "multi_regulator_coordination": True, "dedicated_compliance_advisor": True,
             "sla_2h_support": True, "dpa_anthropic": True}},
+
+    # =========================================================================
+    # ENTERPRISE BUNDLES (Onda 12 — horizontal core + verticais com desconto)
+    # =========================================================================
+    # Os bundles existem para clientes que querem o orchestrator general-purpose
+    # (Enterprise) MAIS verticais especializados, sem pagar o somatório integral.
+    # Desconto cresce com o número de verticais incluídos (mais squads → maior
+    # margem para o operator + maior willingness-to-pay do cliente).
+    #
+    # Cada bundle herda max_parallel + all features do Enterprise + as features
+    # dos verticais incluídos. `bundle_components` documenta o que está dentro
+    # para que `tier_caps_diff()` saiba comparar correctamente.
+    "enterprise_legal": {
+        "name": "Enterprise Legal (ENT + LEX-BR Office, 10% off)",
+        "price_brl_month": 1795,   # R$ 1.795 vs R$ 1.994 sumed (10% off, savings R$ 199/mo)
+        "duration_days": None,
+        "max_parallel": 5,
+        "engines_allowed": "all",
+        "bundle_components": ["enterprise", "lex_office"],
+        "bundle_discount_pct": 10,
+        "lex_br_skills_count": 15,
+        "lex_br_mcp_servers": ["jusbrasil", "cnj_datajud", "stf", "anpd", "receita_federal"],
+        "lex_br_pieces_month": 200,
+        "features": {
+            "api_execution": True, "evolution_engine": True, "llm_judge": True,
+            "predictive_dispatch": True, "chain_executor": True,
+            "multi_tenancy": True, "federation": True,
+            "plugins": True, "adaptive_rubrics": True, "dashboard": True,
+            "task_templates": True,
+            "lex_br_agent": True, "oab_205_gate": True, "lgpd_marker": True,
+            "audit_oab": True, "lex_memory_multi_client": True,
+            "dms_integration": True,
+        },
+    },
+    "enterprise_compliance": {
+        "name": "Enterprise Compliance (ENT + NOMOS + GAIA Team, 17% off)",
+        "price_brl_month": 6633,   # R$ 6.633 vs R$ 7.991 sumed (17% off, savings R$ 1.358/mo)
+        "duration_days": None,
+        "max_parallel": 5,
+        "engines_allowed": "all",
+        "bundle_components": ["enterprise", "nomos_team", "gaia_team"],
+        "bundle_discount_pct": 17,
+        "features": {
+            "api_execution": True, "evolution_engine": True, "llm_judge": True,
+            "predictive_dispatch": True, "chain_executor": True,
+            "multi_tenancy": True, "federation": True,
+            "plugins": True, "adaptive_rubrics": True, "dashboard": True,
+            "task_templates": True,
+            "nomos_agent": True, "all_15_skills_nomos": True,
+            "gaia_agent": True, "csrd_reporting": True, "esg_due_diligence": True,
+            "audit_trail_immutable": True,
+        },
+    },
+    "enterprise_security": {
+        "name": "Enterprise Security (ENT + AEGIS Team, 15% off)",
+        "price_brl_month": 3395,   # R$ 3.395 vs R$ 3.994 sumed (15% off, savings R$ 599/mo)
+        "duration_days": None,
+        "max_parallel": 5,
+        "engines_allowed": "all",
+        "bundle_components": ["enterprise", "aegis_team"],
+        "bundle_discount_pct": 15,
+        "features": {
+            "api_execution": True, "evolution_engine": True, "llm_judge": True,
+            "predictive_dispatch": True, "chain_executor": True,
+            "multi_tenancy": True, "federation": True,
+            "plugins": True, "adaptive_rubrics": True, "dashboard": True,
+            "task_templates": True,
+            "aegis_agent": True, "soc_operations": True, "incident_response_full": True,
+            "vulnerability_management": True, "iam_identity": True,
+            "edr_management": True, "siem_integration": True,
+            "threat_modeling": True, "iso27001_soc2_prep": True,
+        },
+    },
+    "enterprise_finance": {
+        "name": "Enterprise Finance (ENT + ATLAS-FIN Team + DEMETER Team, 20% off)",
+        "price_brl_month": 3993,   # R$ 3.993 vs R$ 4.991 sumed (20% off, savings R$ 998/mo)
+        "duration_days": None,
+        "max_parallel": 5,
+        "engines_allowed": "all",
+        "bundle_components": ["enterprise", "atlas_fin_team", "demeter_team"],
+        "bundle_discount_pct": 20,
+        "features": {
+            "api_execution": True, "evolution_engine": True, "llm_judge": True,
+            "predictive_dispatch": True, "chain_executor": True,
+            "multi_tenancy": True, "federation": True,
+            "plugins": True, "adaptive_rubrics": True, "dashboard": True,
+            "task_templates": True,
+            "atlas_fin_agent": True, "pix_rules_bcb": True, "aml_monitoring": True,
+            "kyc_onboarding": True, "fraud_prevention": True,
+            "demeter_agent": True, "warehouse": True, "ml_pipelines": True,
+            "realtime_streaming": True,
+        },
+    },
+    "enterprise_full": {
+        "name": "Enterprise Full (ENT + 5 most-requested verticals, 25% off)",
+        "price_brl_month": 9736,   # R$ 9.736 vs R$ 12.982 sumed (25% off, savings R$ 3.246/mo)
+        "duration_days": None,
+        "max_parallel": 5,
+        "engines_allowed": "all",
+        "bundle_components": [
+            "enterprise", "lex_office", "gaia_team",
+            "nomos_team", "aegis_team", "demeter_team",
+        ],
+        "bundle_discount_pct": 25,
+        "lex_br_skills_count": 15,
+        "lex_br_mcp_servers": ["jusbrasil", "cnj_datajud", "stf", "anpd", "receita_federal"],
+        "lex_br_pieces_month": 200,
+        "features": {
+            "api_execution": True, "evolution_engine": True, "llm_judge": True,
+            "predictive_dispatch": True, "chain_executor": True,
+            "multi_tenancy": True, "federation": True,
+            "plugins": True, "adaptive_rubrics": True, "dashboard": True,
+            "task_templates": True,
+            "lex_br_agent": True, "oab_205_gate": True, "lgpd_marker": True,
+            "audit_oab": True, "lex_memory_multi_client": True, "dms_integration": True,
+            "nomos_agent": True, "gaia_agent": True,
+            "csrd_reporting": True, "esg_due_diligence": True,
+            "aegis_agent": True, "soc_operations": True, "incident_response_full": True,
+            "vulnerability_management": True, "iam_identity": True,
+            "demeter_agent": True, "warehouse": True, "ml_pipelines": True,
+            "audit_trail_immutable": True, "sla_4h_support": True,
+        },
+    },
 }
 
 
@@ -536,6 +661,12 @@ TIER_SUFFIXES = {
     "sphinx_solo": "SPS", "sphinx_team": "SPT", "sphinx_enterprise": "SPE",
     "euterpe_solo": "EUS", "euterpe_team": "EUT", "euterpe_enterprise": "EUE",
     "oraculo_solo": "OCS", "oraculo_team": "OCT", "oraculo_enterprise": "OCE",
+    # Enterprise bundles (Onda 12) — horizontal core + verticais com desconto
+    "enterprise_legal": "ELG",          # ENT + LEX-BR Office (10% off)
+    "enterprise_compliance": "ECP",     # ENT + NOMOS + GAIA Team (17% off)
+    "enterprise_security": "ESC",       # ENT + AEGIS Team (15% off)
+    "enterprise_finance": "EFN",        # ENT + ATLAS-FIN + DEMETER Team (20% off)
+    "enterprise_full": "EFL",           # ENT + 5 verticais (25% off)
 }
 TIER_MAP = {v: k for k, v in TIER_SUFFIXES.items()}
 
@@ -1297,6 +1428,27 @@ def main():
 ║  Use the 7 days to identify which verticals matter to you, then      ║
 ║  buy ONLY those (à-la-carte saves vs Enterprise+everything).         ║
 ║                                                                      ║
+║  ─── ENTERPRISE BUNDLES (ENT + vertical(s), Onda 12) ───             ║
+║                                                                      ║
+║  Bundles existem para quem leva o orchestrator + 1+ verticais — em   ║
+║  vez de comprar tudo separado, paga menos com a fórmula:             ║
+║       bundle = (Σ componentes) × (1 - discount%)                     ║
+║                                                                      ║
+║    Enterprise Legal       R$  1.795/mo   ENT + LEX-BR Office  10% off║
+║       saves R$ 199/mo vs comprar separado                            ║
+║                                                                      ║
+║    Enterprise Security    R$  3.395/mo   ENT + AEGIS Team     15% off║
+║       saves R$ 599/mo                                                ║
+║                                                                      ║
+║    Enterprise Compliance  R$  6.633/mo   ENT + NOMOS + GAIA   17% off║
+║       saves R$ 1.358/mo                                              ║
+║                                                                      ║
+║    Enterprise Finance     R$  3.993/mo   ENT + ATLAS + DEMETER 20%off║
+║       saves R$ 998/mo                                                ║
+║                                                                      ║
+║    Enterprise Full        R$  9.736/mo   ENT + 5 verticais    25% off║
+║       saves R$ 3.246/mo — equivalente a R$ 38.952/ano                ║
+║                                                                      ║
 ║  ─── ACTIVATE ───                                                    ║
 ║                                                                      ║
 ║    python license_manager.py --activate DARIO-XXXX-XXXX-XXXX-PRO     ║
@@ -1368,7 +1520,11 @@ def main():
                        "kirion_solo", "kirion_team", "kirion_enterprise",
                        "sphinx_solo", "sphinx_team", "sphinx_enterprise",
                        "euterpe_solo", "euterpe_team", "euterpe_enterprise",
-                       "oraculo_solo", "oraculo_team", "oraculo_enterprise")
+                       "oraculo_solo", "oraculo_team", "oraculo_enterprise",
+                       # Onda 12 — Enterprise bundles
+                       "enterprise_legal", "enterprise_compliance",
+                       "enterprise_security", "enterprise_finance",
+                       "enterprise_full")
         if tier not in valid_tiers:
             print(f"Tier must be one of: {', '.join(valid_tiers)}")
             return 1

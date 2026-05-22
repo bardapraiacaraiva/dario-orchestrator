@@ -81,16 +81,19 @@ def test_company_yaml_has_7_sections():
     return True
 
 
-def test_total_tiers_54():
+def test_total_tiers_59():
+    # 54 single tiers + 5 Enterprise bundles (Onda 12)
     from license_manager import TIERS
-    assert len(TIERS) == 54, f"expected 54 tiers, got {len(TIERS)}"
+    assert len(TIERS) == 59, f"expected 59 tiers (54 + 5 bundles), got {len(TIERS)}"
+    bundles = [k for k, v in TIERS.items() if "bundle_components" in v]
+    assert len(bundles) == 5, f"expected 5 bundles, got {len(bundles)}"
     return True
 
 
 def run_all():
     tests = [test_all_manifestos_exist, test_all_skills_exist_105,
              test_license_tiers_21_new, test_hmac_roundtrip_all_21,
-             test_company_yaml_has_7_sections, test_total_tiers_54]
+             test_company_yaml_has_7_sections, test_total_tiers_59]
     passed = 0
     for t in tests:
         try:
