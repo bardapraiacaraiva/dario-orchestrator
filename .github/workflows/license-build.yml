@@ -143,3 +143,62 @@ jobs:
             orchestrator/license_server/app*.pyd
             orchestrator/dist/dario-license.exe
           retention-days: 30
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # Fix 2 (2026-05-23) — publish artefacts as a GitHub Release asset on
+  # release/license-v* tag pushes, so the npx installer's `--obfuscated`
+  # mode can download them directly without GH auth.
+  # ───────────────────────────────────────────────────────────────────────────
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/release/license-v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download Linux artefacts
+        uses: actions/download-artifact@v4
+        with:
+          name: license-binaries-linux
+          path: ./linux
+
+      - name: Download Windows artefacts
+        uses: actions/download-artifact@v4
+        with:
+          name: license-binaries-windows
+          path: ./windows
+
+      - name: Bundle per-platform tarballs
+        run: |
+          set -eux
+          tar -czf license-binaries-linux-x64.tar.gz -C linux .
+          (cd windows && zip -r ../license-binaries-windows-x64.zip .)
+          ls -lh license-binaries-*.tar.gz license-binaries-*.zip
+          sha256sum license-binaries-*.tar.gz license-binaries-*.zip > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Create GitHub Release with binaries
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: License binaries — ${{ github.ref_name }}
+          body: |
+            Cython-compiled license artefacts for ${{ github.ref_name }}.
+
+            Includes:
+              • license_manager.{pyd,so} — Cython-compiled, symbol-stripped
+              • license_client.{pyd,so}
+              • license_server/app.{pyd,so}
+              • dario-license.exe — PyInstaller bundle (signed with self-signed cert)
+
+            See SHA256SUMS.txt for integrity verification.
+
+            Triggered by tag: `${{ github.ref_name }}`
+            Commit: `${{ github.sha }}`
+          files: |
+            license-binaries-linux-x64.tar.gz
+            license-binaries-windows-x64.zip
+            SHA256SUMS.txt
+          draft: false
+          prerelease: false
