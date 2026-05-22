@@ -66,19 +66,26 @@ jobs:
           # What we DO check: secret-bearing strings should not appear in
           # clear text. Specifically: MASTER_SECRET value, raw key prefixes,
           # and the "DARIO-" license prefix.
-          echo "=== Verifying secret-bearing strings absent ==="
+          echo "=== Verifying secret VALUES (not names) absent ==="
+          # Naming conventions like "MASTER_SECRET" (env var) and ".master_secret"
+          # (file path) appear in docstrings as documentation — that's not a leak.
+          # What MUST NOT appear: actual secret values (hex HMAC keys).
           FAIL=0
-          for forbidden in "MASTER_SECRET" ".master_secret" "DARIO-PROD-"; do
-            if grep -a "$forbidden" license_manager*.so 2>/dev/null; then
-              echo "FAIL: '$forbidden' literal present in compiled binary"
-              FAIL=1
-            fi
-          done
+          # 64-char hex strings = SHA256/HMAC output (the actual secret)
+          if grep -aoE "[a-f0-9]{64}" license_manager*.so 2>/dev/null | grep -v "^0000\+$" | head -3; then
+            echo "FAIL: 64-char hex sequence found — possible embedded HMAC secret"
+            FAIL=1
+          fi
+          # Production license key prefix (sample value)
+          if grep -a "DARIO-PROD-" license_manager*.so 2>/dev/null; then
+            echo "FAIL: 'DARIO-PROD-' literal present (would be hardcoded prod key)"
+            FAIL=1
+          fi
           if [ $FAIL -eq 1 ]; then
             echo "Above strings should never appear in distribution binary."
             exit 1
           fi
-          echo "OK — no secret-bearing strings in compiled binary"
+          echo "OK — no secret VALUES in compiled binary"
           echo
           echo "=== Informational: function name count (expected non-zero) ==="
           grep -ao "license_manager\.[a-zA-Z_]*" license_manager*.so | sort -u | wc -l
@@ -126,16 +133,18 @@ jobs:
         run: |
           set +e
           # Same honest check as the Linux job — see comment there for rationale.
-          echo "=== Verifying secret-bearing strings absent ==="
+          echo "=== Verifying secret VALUES absent ==="
           FAIL=0
-          for forbidden in "MASTER_SECRET" ".master_secret" "DARIO-PROD-"; do
-            if grep -a "$forbidden" license_manager*.pyd 2>/dev/null; then
-              echo "FAIL: '$forbidden' literal present in compiled .pyd"
-              FAIL=1
-            fi
-          done
+          if grep -aoE "[a-f0-9]{64}" license_manager*.pyd 2>/dev/null | grep -v "^0000\+$" | head -3; then
+            echo "FAIL: 64-char hex sequence found in .pyd — possible embedded HMAC secret"
+            FAIL=1
+          fi
+          if grep -a "DARIO-PROD-" license_manager*.pyd 2>/dev/null; then
+            echo "FAIL: 'DARIO-PROD-' literal present in .pyd"
+            FAIL=1
+          fi
           if [ $FAIL -eq 1 ]; then exit 1; fi
-          echo "OK — no secret-bearing strings in compiled .pyd"
+          echo "OK — no secret VALUES in compiled .pyd"
 
       - name: Generate self-signed code-signing cert for CI demonstration
         shell: pwsh
