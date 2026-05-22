@@ -609,9 +609,93 @@ def _machine_id() -> str:
         return "unknown"
 
 
+# ─── Onda 7 anti-bypass hardening ────────────────────────────────────────────
+# 3-layer trial fingerprint:
+#   1. `~/.claude/orchestrator/.trial_fingerprint` (original, visible)
+#   2. `~/.dario-trial-{obfuscated-hash}.bin` (home dir, hidden, obfuscated)
+#   3. Windows registry `HKCU\Software\DARIO\TrialState` (Windows only)
+#
+# `_check_fingerprint()` returns `used=True` if ANY of the three is present
+# and valid. To bypass, a user has to discover and remove all three —
+# substantially harder than just `rm .trial_fingerprint`.
+
+
+def _home_marker_path() -> Path:
+    """Hidden home-dir marker. Filename obfuscated by SHA256(machine_id+SECRET).
+
+    The user cannot guess this filename without `MASTER_SECRET`. Even if they
+    inspect ~/, the file looks like a generic dotfile blob.
+    """
+    machine = _machine_id()
+    digest = hashlib.sha256(f"{MASTER_SECRET}:home:{machine}".encode()).hexdigest()
+    return Path.home() / f".dario-trial-{digest[:16]}.bin"
+
+
+def _registry_state() -> dict | None:
+    """Read trial state from Windows registry HKCU\\Software\\DARIO\\TrialState.
+
+    Returns the stored dict if present, None otherwise. Always returns None
+    on non-Windows.
+    """
+    if os.name != "nt":
+        return None
+    try:
+        import winreg
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\DARIO\TrialState",
+                             0, winreg.KEY_READ)
+        try:
+            raw, _ = winreg.QueryValueEx(key, "fingerprint")
+            return json.loads(raw)
+        finally:
+            winreg.CloseKey(key)
+    except FileNotFoundError:
+        return None
+    except Exception:
+        return None
+
+
+def _registry_write(fp_data: dict) -> bool:
+    """Write trial state to Windows registry. Returns True on success."""
+    if os.name != "nt":
+        return False
+    try:
+        import winreg
+        key = winreg.CreateKeyEx(winreg.HKEY_CURRENT_USER,
+                                  r"Software\DARIO\TrialState", 0, winreg.KEY_WRITE)
+        try:
+            winreg.SetValueEx(key, "fingerprint", 0, winreg.REG_SZ,
+                              json.dumps(fp_data))
+            return True
+        finally:
+            winreg.CloseKey(key)
+    except Exception:
+        return False
+
+
+def _validate_fingerprint(fp: dict) -> dict:
+    """Check signature of a fingerprint dict. Returns dict with `valid` + `tampered`."""
+    if not isinstance(fp, dict):
+        return {"valid": False, "tampered": True}
+    sig_payload = f"{MASTER_SECRET}:{fp.get('machine_id')}:{fp.get('first_init_at')}"
+    expected_sig = hashlib.sha256(sig_payload.encode()).hexdigest()
+    if fp.get("signature") != expected_sig:
+        return {"valid": False, "tampered": True,
+                "first_init_at": fp.get("first_init_at")}
+    return {"valid": True, "tampered": False,
+            "first_init_at": fp.get("first_init_at"),
+            "machine_id": fp.get("machine_id")}
+
+
 def _write_fingerprint() -> dict:
     """Persistent trial-used marker. Survives license.json deletion.
-    Contains: machine_id + first_init_timestamp + signature."""
+
+    Onda 7 hardening — writes to 3 locations:
+        1. `.trial_fingerprint` in orchestrator dir (legacy compat)
+        2. `~/.dario-trial-{hash}.bin` in home dir (obfuscated)
+        3. Windows Registry `HKCU\\Software\\DARIO\\TrialState` (Windows only)
+
+    Contains: machine_id + first_init_timestamp + signature.
+    """
     now = datetime.now(UTC).isoformat()
     machine = _machine_id()
     sig_payload = f"{MASTER_SECRET}:{machine}:{now}"
@@ -622,27 +706,110 @@ def _write_fingerprint() -> dict:
         "signature": signature,
         "note": "Trial activation marker. Do not edit — deletion does NOT grant a new trial.",
     }
+    payload = json.dumps(fp, indent=2)
+
+    # Layer 1: orchestrator dir
     ORCH_DIR.mkdir(parents=True, exist_ok=True)
-    TRIAL_FINGERPRINT.write_text(json.dumps(fp, indent=2), encoding="utf-8")
+    try:
+        TRIAL_FINGERPRINT.write_text(payload, encoding="utf-8")
+    except Exception:
+        pass
+
+    # Layer 2: home dir (obfuscated)
+    try:
+        _home_marker_path().write_text(payload, encoding="utf-8")
+    except Exception:
+        pass
+
+    # Layer 3: Windows registry
+    _registry_write(fp)
+
     return fp
 
 
 def _check_fingerprint() -> dict:
-    """Detect if a trial was already initialized on this machine."""
-    if not TRIAL_FINGERPRINT.exists():
+    """Detect if a trial was already initialized on this machine.
+
+    Onda 7 hardening — checks 3 locations. Returns `used=True` if ANY of
+    them has a valid (or tampered) fingerprint. To regain a fresh trial,
+    a user would need to delete all three AND not be on a fingerprinted
+    machine the registry remembers.
+    """
+    found_in: list[str] = []
+    candidates: list[dict] = []
+
+    # Layer 1: orchestrator dir
+    if TRIAL_FINGERPRINT.exists():
+        try:
+            fp = json.loads(TRIAL_FINGERPRINT.read_text(encoding="utf-8"))
+            candidates.append({"source": "orchestrator_dir", "fp": fp})
+            found_in.append("orchestrator_dir")
+        except Exception:
+            # Corrupted — fail-closed (count as used)
+            return {"used": True, "corrupted": True, "found_in": ["orchestrator_dir"]}
+
+    # Layer 2: home dir (obfuscated)
+    home_marker = _home_marker_path()
+    if home_marker.exists():
+        try:
+            fp = json.loads(home_marker.read_text(encoding="utf-8"))
+            candidates.append({"source": "home_dir", "fp": fp})
+            found_in.append("home_dir")
+        except Exception:
+            return {"used": True, "corrupted": True, "found_in": ["home_dir"]}
+
+    # Layer 3: Windows registry
+    reg_fp = _registry_state()
+    if reg_fp is not None:
+        candidates.append({"source": "registry", "fp": reg_fp})
+        found_in.append("registry")
+
+    if not candidates:
         return {"used": False}
-    try:
-        fp = json.loads(TRIAL_FINGERPRINT.read_text(encoding="utf-8"))
-        # Verify signature wasn't tampered with
-        sig_payload = f"{MASTER_SECRET}:{fp.get('machine_id')}:{fp.get('first_init_at')}"
-        expected_sig = hashlib.sha256(sig_payload.encode()).hexdigest()
-        if fp.get("signature") != expected_sig:
-            return {"used": True, "tampered": True, "first_init_at": fp.get("first_init_at")}
-        return {"used": True, "tampered": False, "first_init_at": fp.get("first_init_at"),
-                "machine_id": fp.get("machine_id")}
-    except Exception:
-        # Corrupted fingerprint — treat as used (fail-closed)
-        return {"used": True, "corrupted": True}
+
+    # Validate signatures across all found copies. Any tamper flags the whole.
+    tampered = False
+    first_init = None
+    machine_id = None
+    for c in candidates:
+        v = _validate_fingerprint(c["fp"])
+        if v.get("tampered"):
+            tampered = True
+        if first_init is None:
+            first_init = v.get("first_init_at")
+            machine_id = v.get("machine_id")
+
+    # Self-heal: if one layer is missing but another has a valid fp,
+    # rewrite missing layers so future bypasses are harder.
+    if not tampered and len(found_in) < 3:
+        valid_fp = next(
+            (c["fp"] for c in candidates
+             if _validate_fingerprint(c["fp"]).get("valid")),
+            None,
+        )
+        if valid_fp is not None:
+            payload = json.dumps(valid_fp, indent=2)
+            if "orchestrator_dir" not in found_in:
+                try:
+                    ORCH_DIR.mkdir(parents=True, exist_ok=True)
+                    TRIAL_FINGERPRINT.write_text(payload, encoding="utf-8")
+                except Exception:
+                    pass
+            if "home_dir" not in found_in:
+                try:
+                    home_marker.write_text(payload, encoding="utf-8")
+                except Exception:
+                    pass
+            if "registry" not in found_in:
+                _registry_write(valid_fp)
+
+    return {
+        "used": True,
+        "tampered": tampered,
+        "first_init_at": first_init,
+        "machine_id": machine_id,
+        "found_in": found_in,
+    }
 
 
 def init_trial(force: bool = False) -> dict:
