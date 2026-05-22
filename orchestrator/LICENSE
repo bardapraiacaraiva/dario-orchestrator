@@ -1,0 +1,150 @@
+DARIO Orchestrator — Commercial Software License
+Copyright (c) 2026 Barda / Automation Solution AI (Marco Barda, marco@automationsolutionai.com)
+
+ALL RIGHTS RESERVED.
+
+This software, including its source code, binary artifacts, configuration
+files, prompt templates, skill definitions, embedded data, documentation,
+and all derivative materials (collectively, the "Software"), is proprietary
+and confidential. Possession of a copy of this Software does not grant any
+rights to its use beyond what is explicitly stated below.
+
+================================================================================
+1. EVALUATION LICENSE (TRIAL — 7 DAYS)
+================================================================================
+
+A 7-day evaluation license is granted to any natural person who installs
+the Software on a single machine for the express purpose of evaluating it
+prior to purchase. Under this license, the Evaluator may:
+
+  (a) Install one (1) copy on one (1) device they personally control;
+  (b) Execute the Software for the purpose of evaluating its functionality;
+  (c) Read the source code to understand the Software's behavior.
+
+The Evaluation License automatically TERMINATES after 7 calendar days from
+the moment of first activation (`--init-trial`), at which point continued
+use requires a Commercial License.
+
+================================================================================
+2. COMMERCIAL LICENSE
+================================================================================
+
+A Commercial License is granted upon purchase of a valid license key
+(format: DARIO-XXXX-XXXX-XXXX-SUF) from the Copyright Holder. The scope
+of the Commercial License (tier, parallel workers, vertical squads, term)
+is determined by the tier suffix and is defined in the file
+`orchestrator/license_manager.py` (TIERS dictionary, lines 130-630).
+
+Commercial License grants the Licensee:
+
+  (a) The right to use the Software in production on the machines
+      authorized by their tier's `max_parallel` value;
+  (b) The right to receive software updates published to the same
+      repository for the duration of their paid subscription;
+  (c) Email support at the response level specified in their tier.
+
+================================================================================
+3. PROHIBITIONS (APPLY UNDER BOTH LICENSES)
+================================================================================
+
+Under no circumstances may any party (Evaluator OR Licensee):
+
+  (a) Redistribute the Software, in whole or in part, by any means
+      including but not limited to: public repositories, mirrors, forks,
+      Gists, package registries, peer-to-peer networks, or torrents;
+
+  (b) Create derivative works including: ports to other programming
+      languages, "clean room" reimplementations following the same
+      architecture, white-label rebranding, or unauthorized vertical
+      squad extensions;
+
+  (c) Reverse engineer, decompile, deobfuscate, or otherwise attempt
+      to bypass the license enforcement mechanisms in:
+        - `license_manager.py` (HMAC-SHA256 signing, 3-layer fingerprint)
+        - `license_guard.py` (CLI + FastAPI middleware enforcement)
+        - `license_client.py` (TLS cert pinning, server revalidation)
+        - The Cython-compiled `.pyd` / `.so` binary artifacts
+        - The PKCS#12 code-signed PyInstaller bundle
+
+  (d) Share, transfer, sublicense, lease, or sell access to the Software
+      to any third party without prior written authorization from the
+      Copyright Holder;
+
+  (e) Use the Software for the purpose of building a competing product,
+      whether commercial or open-source, that incorporates any of the
+      Software's distinctive architectural elements, skill catalog
+      organization, license enforcement design, or pricing tier model;
+
+  (f) Use the Software in violation of any applicable law, including
+      but not limited to data protection regulations (GDPR, LGPD) and
+      financial regulations (PIX/BCB for ATLAS-FIN, OAB 205 for LEX-BR,
+      AI Act for NOMOS).
+
+================================================================================
+4. INTELLECTUAL PROPERTY
+================================================================================
+
+The Software embodies trade secrets and proprietary methodologies including
+but not limited to:
+
+  - The 32-squad organizational topology
+  - The 559+ skill catalog and their interaction graph
+  - The Evolution Engine algorithm (intelligence_upgrades.py)
+  - The compiled DSPy prompt artifacts and golden evaluation datasets
+  - The hierarchical license tier matrix (59 tiers including 5 bundles)
+
+All such trade secrets and the associated intellectual property remain the
+exclusive property of the Copyright Holder. Nothing in this license grants
+the Evaluator or Licensee any ownership, copyright, patent, trademark, or
+other intellectual property rights in the Software.
+
+================================================================================
+5. NO WARRANTY
+================================================================================
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF,
+OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+The Software performs compliance-relevant actions (LGPD, GDPR, OAB 205,
+CFM 205, AI Act, DORA). The Licensee remains solely responsible for
+verifying compliance with all applicable laws in their jurisdiction. The
+gates implemented in the Software (`ethical_gate.py`, `revisao_humana_*`)
+are best-effort safeguards, not legal advice.
+
+================================================================================
+6. TERMINATION
+================================================================================
+
+This license terminates automatically upon:
+
+  (a) Expiration of the 7-day Evaluation period (for Evaluators);
+  (b) Non-payment or cancellation of the Commercial subscription
+      (for Licensees);
+  (c) Any breach of the prohibitions in Section 3;
+  (d) Detection of license tampering (3-layer fingerprint mismatch,
+      rollback attempts caught by the License Server's anti-snapshot
+      protection).
+
+Upon termination, the licensee must:
+  - Cease all use of the Software within 30 days;
+  - Delete all local copies, including the cloned repository;
+  - Confirm deletion in writing if requested by the Copyright Holder.
+
+================================================================================
+7. CONTACT
+================================================================================
+
+Commercial inquiries, license purchases, partnership opportunities, and
+authorization requests:
+
+    Email: barda@automationsolutionai.com
+    Web:   https://github.com/bardapraiacaraiva/dario-orchestrator
+
+================================================================================
+
+End of license.

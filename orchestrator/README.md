@@ -99,9 +99,16 @@ dario-ceo (CEO)
 
 ## License
 
-Proprietary. Trial access for evaluation. Full license available for purchase.
+**Proprietary — All Rights Reserved.** See [LICENSE](LICENSE) for full terms.
 
-Contact: barda@automationsolutionai.com
+Summary:
+  - **7-day Evaluation License** is automatically granted on first `--init-trial`.
+  - **Commercial License** is granted upon purchase of a valid key (see `license_manager.py` TIERS dict for the 59 tiers + 5 Onda 12 bundles).
+  - **Prohibited under both licenses:** redistribution, derivative works, white-label rebranding, reverse engineering of license enforcement, sublicensing, building competing products that reuse the architecture, skill catalog, or pricing model.
+
+Possession of this code does NOT grant any rights beyond the explicit terms in `LICENSE`. Reading the source for evaluation is allowed; copying it into another project is not.
+
+For commercial licensing, partnerships, or authorization to redistribute: **barda@automationsolutionai.com**
 
 ---
 
