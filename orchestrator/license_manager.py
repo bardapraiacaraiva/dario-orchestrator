@@ -32,6 +32,51 @@ import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+
+def _detect_debugger() -> bool:
+    """Anti-debug check (Onda 10 #3).
+
+    Returns True if the current process appears to be running under a
+    debugger or instrumentation tool. Used to add friction for adversaries
+    who try to step through license validation in pdb / ghidra / WinDbg.
+
+    Detection signals:
+      • sys.gettrace() != None  → pdb / coverage / sys.settrace user
+      • sys.monitoring tools active (Python 3.12+)
+      • PYTHONBREAKPOINT/PYTHONINSPECT env vars
+      • Windows: kernel32.IsDebuggerPresent (when ctypes available)
+
+    The check is best-effort — sophisticated attackers bypass it. Its job
+    is to make casual single-step debugging visibly noisy, not to be
+    cryptographic.
+    """
+    try:
+        if sys.gettrace() is not None:
+            return True
+    except Exception:
+        pass
+    if os.getenv("PYTHONBREAKPOINT"):
+        return True
+    if os.getenv("PYTHONINSPECT"):
+        return True
+    # Python 3.12+ sys.monitoring API — any tool registered = inspected
+    try:
+        monitoring = sys.monitoring  # type: ignore[attr-defined]
+        for tool_id in range(6):
+            if monitoring.get_tool(tool_id):
+                return True
+    except (AttributeError, Exception):
+        pass
+    # Windows IsDebuggerPresent — only if ctypes available and no exception
+    if os.name == "nt":
+        try:
+            import ctypes
+            if ctypes.windll.kernel32.IsDebuggerPresent():
+                return True
+        except Exception:
+            pass
+    return False
+
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 LICENSE_FILE = ORCH_DIR / "license.json"
 

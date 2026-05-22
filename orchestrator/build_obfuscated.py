@@ -98,10 +98,41 @@ setup(
     ext_modules=cythonize(
         SOURCES,
         compiler_directives={{
+            # Onda 10 #3 — Cython hardening directives.
+            #
+            # The goal here is NOT to make decompilation impossible (it isn't),
+            # but to remove every easy footgun that a casual reverser would
+            # grep for first: function docstrings, signature objects, source
+            # line annotations, raised-exception messages tied to source.
             "language_level": "3",
-            "embedsignature": False,        # do not embed Python signatures
-            "always_allow_keywords": True,  # safer for runtime introspection
-            "binding": False,               # smaller surface for reflection
+
+            # Strip all .__doc__ attributes — function/class docstrings are
+            # the easiest source of human-readable hints in compiled .so/.pyd.
+            "embedsignature": False,
+            "embedsignature.format": "c",    # if anything sneaks through,
+                                              # use the C-style without prose
+            "docstrings": False,             # drop Python docstrings entirely
+
+            # No PEP 657 fine-grained line numbers — they leak source structure
+            # via tracebacks. Stripped tracebacks point only to function name.
+            "linetrace": False,
+            "always_allow_keywords": True,   # safer for runtime introspection
+            "binding": False,                # smaller surface for reflection
+
+            # Anti-debug surface — disable boundscheck and wraparound checks
+            # so the generated C is tighter (less recognisable patterns).
+            "boundscheck": False,
+            "wraparound": False,
+
+            # Hide raised-exception locals (Cython 3.0+) — avoid leaking
+            # internal variable names through KeyError / AttributeError messages.
+            "c_string_type": "bytes",
+            "c_string_encoding": "default",
+
+            # Make the .c file itself harder to grep (each function gets a
+            # mangled symbol name in addition to the public Python one).
+            "auto_cpdef": False,
+            "infer_types": True,
         }},
         # nthreads omitted: Windows + nested setuptools spawn → BrokenProcessPool.
         # Sequential compile takes ~10s for 3 files; acceptable.
