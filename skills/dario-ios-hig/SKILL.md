@@ -348,3 +348,197 @@ Audit any iOS interface design:
 - Never use Android/Material Design patterns on iOS (hamburger menus, FABs, top tab bars) — cross-platform shortcuts confuse iOS users and signal that the app was not designed for their platform
 - Never hardcode font sizes or disable Dynamic Type — this breaks accessibility scaling and excludes users with visual impairments from using the app
 - Always support Dark Mode with semantic system colors — shipping a light-only app in 2026 is a broken experience for the majority of iOS users who have Dark Mode enabled
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Layout & Safe Areas estão especificados com valores reais
+- [ ] Todas as dimensões usam pt (não px) e coincidem com valores HIG: 44pt touch target, 16-20pt margins, 49pt tab bar
+- [ ] Safe area insets referenciados correctamente para o dispositivo alvo (Dynamic Island vs notch vs SE)
+- [ ] Nenhum elemento interactivo colocado sob home indicator (34pt inset)
+- ❌ NOT delivery-ready: "adicionar padding no topo para a barra de status"
+- ✅ Delivery-ready: "aplicar `.safeAreaInset(edge: .top)` — iPhone 15 Pro tem Dynamic Island com 59pt de status bar; os botões de acção da Cuidai ficam a 16pt abaixo desse inset"
+
+### Gate 2 — Typography usa semantic styles com Dynamic Type verificado
+- [ ] Zero font sizes hardcoded — apenas `.largeTitle`, `.title`, `.body`, `.caption` etc.
+- [ ] Output menciona teste ao largest accessibility size (AX5) e prova que layout não quebra
+- [ ] Contraste verificado: ≥4.5:1 para body text, ≥3:1 para UI components
+- [ ] `@ScaledMetric` usado para qualquer spacing custom que deva escalar
+- ❌ NOT delivery-ready: "fonte de 17pt no corpo de texto"
+- ✅ Delivery-ready: "`.font(.body)` (17pt Regular por omissão) — testado em AX5 (28pt): label 'Adicionar Pet' na tab bar da Pupli não trunca porque usa `minimumScaleFactor(0.8)` + `lineLimit(2)`"
+
+### Gate 3 — Color system usa semantic colors com Dark Mode validado
+- [ ] Nenhuma cor hardcoded (#RRGGBB ou UIColor fixo) em elementos de UI — apenas cores semânticas do sistema ou Color Set com variantes light/dark
+- [ ] Backgrounds usam `.systemBackground`, `.secondarySystemBackground` conforme hierarquia
+- [ ] Modo escuro explicitamente testado ou mockup incluído
+- ❌ NOT delivery-ready: "fundo branco (#FFFFFF) com texto cinzento (#666666)"
+- ✅ Delivery-ready: "fundo `.secondarySystemBackground` (branco em light, cinzento #1C1C1E em dark) — cartões de agendamento da LUSOconta mantêm contraste AA em ambos os modos verificado com Xcode Accessibility Inspector"
+
+### Gate 4 — Navegação e controlos seguem padrões HIG nativos
+- [ ] Navigation stack usa `NavigationStack` (iOS 16+) ou `NavigationView` com `.navigationViewStyle(.stack)` — sem navegação custom que quebre gestos do sistema
+- [ ] Tab bar tem 2-5 items com SF Symbols + label ≤12 caracteres
+- [ ] Botões destrutivos confirmados com `.destructive` role e apresentados em `.confirmationDialog` ou Alert
+- [ ] Swipe-back (pop gesture) nunca desactivado sem alternativa equivalente
+- ❌ NOT delivery-ready: "botão 'Eliminar conta' vermelho na lista de definições"
+- ✅ Delivery-ready: "botão 'Eliminar conta' com `.buttonStyle(.bordered)` + `.tint(.red)` abre `.confirmationDialog('Eliminar conta da ARRECADA.GOV?', role: .destructive)` — swipe-to-delete também usa `.destructive` tint"
+
+### Gate 5 — SF Symbols usados correctamente com acessibilidade
+- [ ] Todos os ícones são SF Symbols (versão mínima compatível com iOS target declarada) ou assets com `.accessibilityLabel` definido
+- [ ] Símbolos com significado semântico têm `.symbolRenderingMode` e `.imageScale` adequados ao contexto
+- [ ] Nenhum SF Symbol usado como único indicador de estado sem label de texto ou accessibility label
+- ❌ NOT delivery-ready: "ícone de sino para notificações"
+- ✅ Delivery-ready: "`Image(systemName: \"bell.badge\").symbolRenderingMode(.palette).foregroundStyle(.red, .primary).accessibilityLabel(\"3 notificações não lidas\")` — Atrium Clinic app, barra de navegação superior"
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+- [ ] Nenhum `<AppName>`, `<color>`, `<screen>`, `<action>` ou equivalente no output final
+- [ ] Device target explícito (ex: iPhone 15 Pro, iOS 17.4, não "dispositivo moderno")
+- [ ] SwiftUI/UIKit code snippets compilam sem substituições — variáveis e view names referem o projecto real
+- ❌ NOT delivery-ready: "o `<PrimaryButton>` deve ter padding de `<value>`pt"
+- ✅ Delivery-ready: "`BookingCTAButton` da Cuidai usa `.padding(.horizontal, 20).padding(.vertical, 14)` — touch target resultante: 48×52pt, acima do mínimo HIG de 44×44pt"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# HIG Review — Pupli App (iOS 17, iPhone)
+**Score actual: 6/10 → Score alvo: 10/10**
+
+---
+
+## Problemas identificados + correcções
+
+### 1. Layout — Safe Areas violadas (impacto: alto)
+**Problema:** `PetProfileView` coloca o botão "Agendar Consulta" a y=812pt
+fixo — desaparece sob o home indicator no iPhone SE 3ª geração (667pt).
+
+**Correcção:**
+```swift
+// ❌ Antes
+VStack {
+    Spacer()
+    Button("Agendar Consulta") { ... }
+        .padding(.bottom, 20)
+}
+
+// ✅ Depois
+VStack {
+    Spacer()
+    Button("Agendar Consulta") { ... }
+}
+.safeAreaInset(edge: .bottom) {
+    Color.clear.frame(height: 0)
+}
+.padding(.bottom, 16)
+```
+Touch target resultante: 44×48pt em todos os dispositivos.
+
+---
+
+### 2. Typography — Sizes hardcoded bloqueiam Dynamic Type (impacto: alto)
+**Problema:** `PetCardView` usa `.font(.system(size: 17))` em 6 locations —
+utilizadores com AX3+ vêem texto idêntico ao padrão, sem escala.
+
+**Correcção:**
+```swift
+// ❌ Antes
+Text(pet.name).font(.system(size: 20, weight: .semibold))
+Text(pet.breed).font(.system(size: 14))
+
+// ✅ Depois
+Text(pet.name).font(.headline)       // 17pt semibold, escala até 28pt em AX5
+Text(pet.breed).font(.subheadline)   // 15pt regular, escala até 25pt em AX5
+```
+Testado em Simulator iPhone 15 Pro, Accessibility → Larger Text → AX5:
+layout mantém hierarquia, sem truncagem.
+
+---
+
+### 3. Color — Dark Mode não implementado (impacto: médio)
+**Problema:** `HomeView` usa `Color(hex: "#F5F5F5")` no background e
+`Color(hex: "#333333")` no texto — em Dark Mode ambas as cores ficam
+ilegíveis (fundo quase preto sobre texto preto).
+
+**Correcção:**
+```swift
+// ❌ Antes
+.background(Color(hex: "#F5F5F5"))
+Text(pet.owner).foregroundColor(Color(hex: "#333333"))
+
+// ✅ Depois
+.background(Color(.secondarySystemBackground))  // branco/dark gray automático
+Text(pet.owner).foregroundColor(.primary)        // preto/branco automático
+```
+Contraste verificado: 7.2:1 light, 8.1:1 dark (supera WCAG AA 4.5:1).
+
+---
+
+### 4. Navegação — Swipe-back desactivado indevidamente (impacto: médio)
+**Problema:** `BookingFlowView` define
+`.navigationBarBackButtonHidden(true)` sem alternativa — utilizadores
+não conseguem retroceder com gesto swipe.
+
+**Correcção:**
+```swift
+// ❌ Antes
+.navigationBarBackButtonHidden(true)
+
+// ✅ Depois
+.navigationBarBackButtonHidden(true)
+.toolbar {
+    ToolbarItem(placement: .navigationBarLeading) {
+        Button {
+            dismiss()
+        } label: {
+            Label("Voltar", systemImage: "chevron.left")
+        }
+    }
+}
+// + reactivar pop gesture:
+.gesture(DragGesture().onEnded { value in
+    if value.translation.width > 100 { dismiss() }
+})
+```
+
+---
+
+### 5. SF Symbols — Ícones sem accessibility labels (impacto: médio)
+**Problema:** Tab bar da Pupli usa 4 ícones SF Symbols sem
+`.accessibilityLabel` — VoiceOver lê "bell, house, person, plus".
+
+**Correcção:**
+```swift
+TabView {
+    HomeView()
+        .tabItem {
+            Label("Início", systemImage: "house.fill")
+        }
+        .accessibilityLabel("Início — lista de pets")
+    NotificationsView()
+        .tabItem {
+            Label("Alertas", systemImage: "bell.badge.fill")
+        }
+        .accessibilityLabel("Alertas — 3 não lidos")
+}
+```
+
+---
+
+## Score final após correcções: 10/10
+Todos os issues resolvidos. Pronto para submissão App Store Review.
+```
+
+---
+
+## Output anti-patterns
+
+- Usar `<AppName>`, `<primaryColor>`, `<screenName>` ou qualquer placeholder entre angle-brackets no output entregue ao cliente
+- Hardcodar font sizes (`.system(size: 17)`) em vez de semantic text styles (`.body`, `.headline`) — bloqueia Dynamic Type
+- Recomendar Safe Area sem especificar qual dispositivo/inset está em causa (Dynamic Island ≠ notch ≠ SE)
+- Dar score HIG sem listar os gaps concretos que justificam a pontuação — "7/10" sem razões não tem valor
+- Usar cores hex ou RGB em elementos de UI em vez de semantic system colors — garante falha em Dark Mode
+- Desactivar swipe-back (`navigationBarBackButtonHidden`) sem implementar alternativa de navegação acessível
+- Recomendar SF Symbols sem verificar a versão mínima de iOS suportada pelo projecto (ex: `bell.badge` requer iOS 15+)
+- Ignorar o teste em iPhone SE (375×667pt) — o layout mais restritivo do catálogo activo Apple
+- Apresentar code snippets com erros de compilação ou com view names genéricos (`ContentView`, `MyButton`) que não correspondem ao projecto real

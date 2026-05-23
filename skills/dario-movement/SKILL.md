@@ -483,3 +483,258 @@ Overall Movement Health Score (0-100):
 - Always define the enemy as a system or practice, never a specific person or competitor -- personal attacks create legal risk and moral weakness
 - Always create governance before you need it -- writing community rules during a crisis is reactive and perceived as authoritarian
 - Always track network topology, not just member count -- a hub-spoke network of 10,000 is more fragile than a mesh network of 1,000
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Phenomenon analysis tem tensão cultural real e pontuada
+
+- [ ] Identifica tensão específica (não vaga) entre status quo e ideal
+- [ ] Preenche tabela de viabilidade com scores 1-10 e evidência concreta (fonte, quote, dado)
+- [ ] Viability score calculado e interpretado (acima/abaixo de 0.7)
+- [ ] Menciona pelo menos um movimento vizinho que falhou e o motivo do colapso
+
+❌ NOT delivery-ready: "Existe uma tensão no mercado em torno da saúde mental e as pessoas querem mudança."
+
+✅ Delivery-ready: "Tensão: profissionais de saúde em Portugal pagam €800–1.200/mês em software de faturação que não fala com o SNS — Fenomenologo score: Tension intensity 9/10 (Reddit r/medicina_pt, 340 posts em 6 meses), Population density 7/10 (~12 000 clínicos privados), viability score = 0.78 → base sólida."
+
+---
+
+### Gate 2 — Tribal identity é específica, não cosmética
+
+- [ ] Vocabulário tribal próprio definido (mínimo 5 termos que o in-group usa e o out-group não usa)
+- [ ] Linha us/them articulada com clareza — quem é o "velho caminho" ou adversário
+- [ ] Pelo menos 1 ritual de entrada e 1 ritual de celebração descritos com mecânica concreta
+- [ ] Símbolo ou marcador visual/linguístico de pertença identificado
+
+❌ NOT delivery-ready: "A comunidade valoriza autenticidade e partilha. Os membros sentem-se parte de algo maior."
+
+✅ Delivery-ready: "Vocabulário Cuidai: 'cuidadores invisíveis' (in-group), 'sistema de costas voltadas' (adversário), 'check-in semanal' (ritual de entrada toda 2ª feira às 20h no Discord #sala-de-apoio), 'Cuidador do Mês' (celebração com post fixado + badge no perfil)."
+
+---
+
+### Gate 3 — Community flywheel tem mecanismos operacionais por fase
+
+- [ ] Cada fase (Attract / Engage / Empower / Celebrate) tem mecanismo nomeado + canal ou plataforma específica
+- [ ] Loop de retorno (Celebrate → Attract) tem pelo menos 1 exemplo concreto de como um membro traz outro
+- [ ] Métricas de ativação definidas para pelo menos 2 fases (ex.: % membros que agem na 1ª semana)
+- [ ] Identifica o gargalo mais provável do flywheel e propõe mitigação
+
+❌ NOT delivery-ready: "A fase Engage envolve conteúdo relevante e discussões significativas na comunidade."
+
+✅ Delivery-ready: "Engage — SAQUEI: desafio mensal 'Liquida um Objetivo' (membros partilham screenshot do objetivo quitado no #wins, meta: 30% dos membros novos postam na semana 1). Gargalo previsto: lurkers — mitigação: DM automático no dia 3 com prompt 'qual é o teu próximo objetivo?'."
+
+---
+
+### Gate 4 — Manifesto tem anatomia completa e voz própria
+
+- [ ] Declara uma crença central em 1 frase inesquecível (não um tagline genérico)
+- [ ] Contém pelo menos 1 "Acreditamos que..." e 1 "Recusamos..." (estrutura binária de identidade)
+- [ ] Tom é inconfundível — não poderia ser atribuído a outra marca sem edição
+- [ ] Extensão adequada ao contexto (fundacional: 300-600 palavras; post/social: 80-150 palavras)
+- [ ] Tem um call-to-action de adesão claro, não só de consumo
+
+❌ NOT delivery-ready: "Acreditamos num mundo melhor para todos. Juntos somos mais fortes. Junte-se a nós."
+
+✅ Delivery-ready: "Manifesto Tributario.AI — crença central: 'O fisco não é o inimigo — a opacidade é.' Recusamos: 'a ideia de que entender impostos é privilégio de quem pode pagar um TOC.' CTA: 'Assina a declaração. Não de rendimentos — de princípios.' (412 palavras, tom jurídico subvertido, assinatura digital simbólica na landing page)."
+
+---
+
+### Gate 5 — Lifecycle strategy previne diluição ao escalar
+
+- [ ] Fase actual do movimento identificada (Spark / Early Tribe / Growth / Institution) com critérios de transição
+- [ ] Risco de diluição de identidade ao escalar endereçado com pelo menos 1 mecanismo de defesa
+- [ ] Governance mínima definida: quem decide o quê, com que frequência, com que mecanismo (Ostrom aplicado)
+- [ ] Horizonte temporal realista para a próxima fase (semanas/meses, não "eventualmente")
+
+❌ NOT delivery-ready: "A comunidade crescerá organicamente à medida que mais pessoas se juntarem ao movimento."
+
+✅ Delivery-ready: "Atrium está em Early Tribe (180 membros, Março 2025). Transição para Growth quando: NPS ≥ 60 + 3 membros a moderar autonomamente. Risco de diluição: onboarding inconsistente — defesa: 'Carta de Fundadores' que todo novo membro lê e assina digitalmente. Governance: decisões de conteúdo → moderadores semanalmente; decisões de platform → fundador + top-5 contribuidores, votação mensal via Loomio."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, zero angle-brackets
+
+- [ ] Nome do cliente aparece no título, manifesto e pelo menos 2 secções de análise
+- [ ] Nenhum placeholder do tipo `[NOME DA MARCA]`, `<TARGET AUDIENCE>`, `[INSERIR AQUI]` sobreviveu
+- [ ] Métricas de impacto referem números reais ou estimativas fundamentadas (não "X membros" ou "Y% engajamento")
+- [ ] Datas, plataformas e canais são específicos ao cliente (não genéricos)
+
+❌ NOT delivery-ready: "A [MARCA] deve criar um manifesto que ressoe com [PÚBLICO-ALVO] nas plataformas relevantes."
+
+✅ Delivery-ready: "Lisbon Dog Care — manifesto lançado no Instagram @lisbondogcare a 1 de Abril 2025, reforçado no grupo Facebook 'Tutores LDC' (2.340 membros), KPI mês 1: 15 partilhas orgânicas do post de manifesto + 50 comentários com #SomosMatilha."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Movement Building Report — Cuidai
+**Data:** 15 Maio 2025 | **Squad lead:** Movement Chief | **Fase actual:** Spark → Early Tribe
+
+---
+
+## 1. Phenomenon Analysis (Fenomenologo)
+
+**Tensão central:** Em Portugal, ~800 000 cuidadores informais tratam de familiares com dependência
+sem reconhecimento legal, apoio psicológico sistemático, ou comunidade de pares — enquanto o
+discurso público fala de "família que cuida" como virtude, silenciando o esgotamento.
+
+**Vocabulário orgânico encontrado** (fóruns, grupos FB, Reddit pt):
+- "Estou invisível" — expressão recorrente em 67% dos posts analisados (grupo FB "Cuidadores PT", Jan–Abr 2025)
+- "Sistema de costas voltadas"
+- "Cuido e desapareço"
+- "Quem cuida de mim?"
+- "Burnout de cuidador" (vs. burnout profissional — distinção que o sistema de saúde não faz)
+
+**Tabela de viabilidade:**
+
+| Factor | Score | Evidência |
+|---|---|---|
+| Tension intensity | 9/10 | 74% cuidadores reportam burnout severo (DGS 2024) |
+| Population density | 8/10 | 800 000 cuidadores informais registados + subregistados |
+| Articulation gap | 6/10 | Sentem mas não nomeiam — oportunidade de dar linguagem |
+| Existing gathering | 7/10 | 12 grupos FB ativos, total ~45 000 membros dispersos |
+| Enemy clarity | 8/10 | "Sistema que vê mas não age" — adversário claro, não pessoal |
+| Transformation promise | 9/10 | De "invisível" para "cuidador reconhecido" — identidade poderosa |
+
+**Viability score:** 47/60 = **0.78 → Base sólida para movimento**
+
+**Movimento vizinho que colapsou:** "Rede Cuidar Portugal" (2019) — morreu por falta de ritual
+de entrada e ausência de enemy clarity (tentou ser "para todos", perdeu identidade).
+
+---
+
+## 2. Tribal Identity (Identitario)
+
+**Nome do in-group:** Cuidadores Visíveis
+
+**Us/Them:**
+- **Nós:** Cuidadores que recusam o silêncio, que nomeiam o esgotamento, que pedem ajuda sem culpa
+- **Eles (velho caminho):** Narrativa de que cuidar é "dever natural" que não precisa de suporte
+
+**Vocabulário tribal (5 termos próprios):**
+1. **"Check-in"** — acto semanal de dizer como estás (não pedir ajuda, declarar estado)
+2. **"Cuidador visível"** — identidade de membro activo
+3. **"Pausa com propósito"** — descanso que a Cuidai valida como necessário, não como falha
+4. **"A minha rede"** — os 3-5 pares de suporte de cada membro
+5. **"Semana de escuta"** — ritual mensal de partilha sem conselhos, só presença
+
+**Ritual de entrada:** Novo membro escreve 1 frase no canal #cheguei-aqui: "Cuido de [pessoa]
+desde [data]. O que mais preciso agora é [X]." — torna a entrada pública, ritualizada e concreta.
+
+**Ritual de celebração:** "Cuidador Visível do Mês" — post fixado no Instagram com foto (com
+consentimento), quote real do membro, e donativo simbólico de €20 para causa escolhida por ele.
+
+**Símbolo:** Mão aberta com coração — já usado pela Cuidai; reforçar como emoji de marca: 🤲
+
+---
+
+## 3. Community Flywheel (Movement Architect)
+
+**Plataforma principal:** Discord "Cuidai — A Nossa Rede" + Instagram @cuidai.pt
+
+```
+ATTRACT → Manifesto partilhado no Instagram (3x/semana) + parcerias com
+          psicólogos PT que referenciam a comunidade nas consultas
+    ↓
+ENGAGE  → Check-in semanal às 2ªs 20h no canal #sala-de-apoio (Discord)
+          Desafio mensal "Pausa com Propósito" (foto de 1 momento de descanso real)
+    ↓
+EMPOWER → Membros com 3+ meses → convite para "Âncora de Rede"
+          (moderam 1 canal, apoiam novos membros na 1ª semana)
+    ↓
+CELEBRATE → Spotlight mensal Instagram + badge Discord "Visível" 
+            Encontro presencial semestral Lisboa/Porto
+    ↓
+ATTRACT ← Âncoras trazem média de 2,3 novos membros (benchmark: Mãe Coruja
+           community, estrutura similar, dados 2023)
+```
+
+**Métricas de ativação:**
+- Semana 1: 40% dos novos membros postam no #cheguei-aqui
+- Mês 1: 25% participam em pelo menos 1 check-in ao vivo
+- Mês 3: 10% tornam-se Âncoras de Rede
+
+**Gargalo previsto:** Transição Engage → Empower (membros não se sentem "prontos para liderar")
+**Mitigação:** Convite pessoal do fundador por DM, não candidatura aberta. Tom: "Precisamos de ti,
+não de um especialista."
+
+---
+
+## 4. Manifesto Cuidai
+
+> **Acreditamos que cuidar de alguém que amamos é um dos actos mais corajosos da vida humana.**
+>
+> Recusamos a ideia de que esse amor obriga ao silêncio.
+>
+> Recusamos o sistema que vê o cuidador como recurso e não como pessoa.
+>
+> Recusamos a culpa que sentimos quando precisamos de parar.
+>
+> **Somos cuidadores. E hoje, tornamo-nos visíveis.**
+>
+> Não pedimos pena. Pedimos reconhecimento, rede, e o direito de dizer
+> "hoje estou a afogar-me" — e ser ouvidos.
+>
+> A Cuidai não é uma aplicação. É o lugar onde os cuidadores chegam a cuidadores.
+>
+> Se cuidas de alguém, este é o teu lugar.
+> Se já cuidaste, sabes o que isto significa.
+> Se vais cuidar — e muitos de nós vamos — bem-vindo antes de precisares.
+>
+> **Assina. Não um formulário. Uma declaração de que já não és invisível.**
+
+*(328 palavras | Tom: íntimo, directo, sem jargão clínico | CTA: botão "Torno-me Visível" na landing)*
+
+---
+
+## 5. Lifecycle & Governance (Estrategista de Ciclo + Movement Architect)
+
+**Fase actual:** Spark (comunidade Discord com 94 membros, Maio 2025)
+
+**Critérios de transição para Early Tribe (meta: Setembro 2025):**
+- 300 membros Discord activos (postaram nos últimos 30 dias)
+- 5 Âncoras de Rede nomeadas
+- NPS interno ≥ 55
+
+**Governance (Ostrom adaptado):**
+- Regras do espaço: definidas pelos primeiros 20 membros em workshop assíncrono (Jun 2025)
+- Decisões de conteúdo: Âncoras votam semanalmente (Loomio, maioria simples)
+- Decisões de platform/parcerias: Fundadora decide, com consulta mensal às Âncoras
+- Conflitos: moderação em 48h por 2 Âncoras + fundadora se escalado
+
+**Anti-diluição:** Toda parceria externa aprovada por voto de Âncoras — protege que a Cuidai
+não vire "marca de produto de saúde" disfarçada de comunidade.
+
+---
+
+## 6. Impact Metrics (Analista de Impacto)
+
+| Métrica | Baseline (Maio 2025) | Meta 90 dias | Ferramenta |
+|---|---|---|---|
+| Membros Discord activos | 94 | 300 | Discord Analytics |
+| Taxa de check-in semanal | 18% | 35% | Contagem manual |
+| NPS comunidade | n/a | ≥55 | Typeform mensal |
+| Partilhas orgânicas manifesto | 0 | 80 | Instagram Insights |
+| Âncoras de Rede activas | 0 | 5 | Discord roles |
+| Referenciações por psicólogos | 2 | 15 | UTM tracking |
+```
+
+---
+
+## Output anti-patterns
+
+- **Manifesto genérico:** usa "juntos somos mais fortes" ou "acreditamos num futuro melhor" sem declaração binária (acreditamos X / recusamos Y)
+- **Flywheel sem métricas de transição:** descreve as 4 fases mas não define quando uma fase activa a próxima
+- **Identidade tribal decorativa:** lista valores da marca (inovação, autenticidade) em vez de vocabulário in-group real e linha us/them operacional
+- **Viability score sem evidência:** preenche tabela com scores mas sem fonte, quote ou dado que justifique cada número
+- **Governance vaga:** diz "a comunidade decide em conjunto" sem especificar quem, com que frequência, por que mecanismo
+- **Lifecycle sem critérios de transição:** nomeia as fases (Spark, Early Tribe, Growth) mas não diz o que precisa acontecer para passar de uma para outra
+- **Manifesto sem CTA de adesão:** termina com inspiração mas sem acto concreto que o leitor faz para entrar no movimento
+- **Análise de fenómeno sem movimento vizinho:** diagnostica a tensão mas não aprende com comunidades que tentaram o mesmo espaço e falharam
+- **Métricas de impacto abstractas:** define "engajamento" e "crescimento" sem baseline, meta numérica e ferramenta de medição
+- **Placeholder sobrevivente:** entrega com `[NOME DA COMUNIDADE]` ou `<TARGET>` ainda visíveis no output final

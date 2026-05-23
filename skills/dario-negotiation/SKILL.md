@@ -225,3 +225,223 @@ Stop the negotiation and reassess if any of these appear:
 - Aggressive negotiation on every line item — signals a transactional mindset incompatible with partnership
 - They want guaranteed results tied to payment — shifts all risk to you with zero shared commitment
 - Multiple reschedules or no-shows — their behavior now predicts their behavior as a client
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Contexto de negociação completo e específico
+
+- [ ] Contraparte identificada com nome/cargo/empresa (não "o prospect" ou "o cliente")
+- [ ] O que DARIO quer obter está definido com número/data/condição concreta
+- [ ] BATNA do cliente está declarado explicitamente (não omitido)
+- [ ] Trigger event da negociação identificado (o que causou esta reunião agora)
+
+❌ NOT delivery-ready: `"Reunião com potencial cliente para falar de marketing"`  
+✅ Delivery-ready: `"Reunião com Ana Ferreira (CMO, Cuidai) — quer fechar retainer €2.800/mês a partir de março; BATNA: freelancer atual a €900/mês por projeto"`
+
+---
+
+### Gate 2 — Accusation Audit com 5-7 itens calibrados ao contexto real
+
+- [ ] Cada acusação antecipa uma preocupação ESPECÍFICA desta contraparte (não genérica)
+- [ ] Inclui instrução de entrega (quando dizer, tom, pausa)
+- [ ] Pelo menos 1 acusação referencia histórico conhecido da contraparte (ex: agência anterior, budget, setor)
+- [ ] Nenhuma acusação começa com "I think you feel" ou equivalente
+
+❌ NOT delivery-ready: `"Podem achar que somos caros"` (flutuante, sem contexto)  
+✅ Delivery-ready: `"Provavelmente estão a pensar que, tal como a agência anterior, vamos demorar 3 meses a entregar a primeira campanha." [dizer no minuto 0, após handshake, tom neutro descendente]`
+
+---
+
+### Gate 3 — Calibrated Questions Bank distribuídas pelas 3 fases
+
+- [ ] Mínimo 3 perguntas de discovery (começam com "Como" ou "O que")
+- [ ] Mínimo 2 perguntas de objection handling adequadas às objeções esperadas desta reunião
+- [ ] Mínimo 2 perguntas de closing presentes
+- [ ] Zero perguntas com "Porquê" / "Por que" (dispara defensividade — Voss rule)
+
+❌ NOT delivery-ready: `"Por que é que estão hesitantes em avançar?"`  
+✅ Delivery-ready: `"O que precisariam de ver esta semana para terem confiança de que €3.500/mês faz sentido para a Cuidai?"`
+
+---
+
+### Gate 4 — Labeling Statements com emoção nomeada e gatilho de uso
+
+- [ ] 5 labels presentes, cada um começando com "Parece que…", "Soa como…" ou "Parece-me que…"
+- [ ] Cada label tem indicação concreta de QUANDO usar (não genérico)
+- [ ] Nenhum label começa com "Eu acho que você sente…" ou variante
+- [ ] Pelo menos 1 label endereça a emoção de pressão interna (justificar ao chefe/board)
+
+❌ NOT delivery-ready: `"Parece que há alguma preocupação"` (vago, sem gatilho)  
+✅ Delivery-ready: `"Parece que precisam de resultados visíveis no Q1 para justificar o investimento ao conselho da Cuidai." [usar quando Ana mencionar reporte trimestral]`
+
+---
+
+### Gate 5 — Objection Playbook com resposta estruturada por objeção
+
+- [ ] Tabela Objeção → Resposta com mínimo 4 objeções prováveis desta contraparte
+- [ ] Cada resposta usa calibrated question OU labeling (não argumento direto)
+- [ ] Walk-away point definido com número concreto (preço mínimo, prazo máximo, condição dealbreaker)
+- [ ] Cenários Best/Likely/Worst com valores/resultados específicos
+
+❌ NOT delivery-ready:
+
+| Objeção | Resposta |
+|---|---|
+| "É caro" | "Explicar o valor" |
+
+✅ Delivery-ready:
+
+| Objeção | Resposta |
+|---|---|
+| "€3.500/mês está acima do nosso budget" | `"Como é que este investimento se compara com o custo de continuar sem pipeline previsível nos próximos 6 meses?"` |
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, zero placeholders entre `< >`
+
+- [ ] Nome da empresa/pessoa aparece em pelo menos 3 secções distintas
+- [ ] Nenhum `<nome>`, `<empresa>`, `<valor>`, `<data>` visível no output final
+- [ ] Números concretos presentes: preço proposto, prazo, métrica de sucesso, BATNA value
+- [ ] Frame control / Klaff angle definido se reunião for pitch competitivo
+
+❌ NOT delivery-ready: `"Reunião com <cliente> para fechar <serviço> a <preço>"`  
+✅ Delivery-ready: `"Reunião com Pedro Lopes (CEO, SAQUEI) para fechar onboarding €4.200 + retainer €1.800/mês, início abril 2025"`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Negotiation Prep — Cuidai × DARIO
+**Reunião:** 14 março 2025, 10h00 | Ana Ferreira (CMO) + Rui Santos (CFO)
+**Objetivo DARIO:** Fechar retainer mensal €2.800 (mín. aceitável: €2.200) + 6 meses
+**BATNA deles:** Freelancer atual a €900/mês por projeto, sem estratégia
+**BATNA nosso:** Projeto pontual €4.500 ou aguardar Q2
+
+---
+
+## Pre-meeting checklist
+- [ ] Rever case study Pupli (setor cuidados, ROI 3.1x em 4 meses)
+- [ ] Confirmar que Ana reporta ao board em abril — timing de pressão real
+- [ ] LinkedIn Rui Santos: background financeiro, vai perguntar por payback period
+- [ ] Levar proposta em duas versões: €2.800 full / €2.200 entry com upsell em mês 3
+
+---
+
+## Accusation Audit (entregar nos primeiros 60 segundos)
+
+> Tom: neutro, inflexão descendente. Pausa de 3 segundos após cada uma.
+
+1. "Provavelmente já trabalharam com agências que prometeram resultados e desapareceram
+   após o primeiro mês." 
+   *(Cuidai despediu agência anterior em nov/24 — Ana mencionou isto em cold call)*
+
+2. "Podem estar a pensar que €2.800/mês é muito para um mercado onde ainda estão
+   a validar o modelo de franchising."
+   *(CFO presente = budget vai ser questionado)*
+
+3. "Se calhar estão preocupados que vamos precisar de 2-3 meses antes de qualquer
+   resultado visível — e o vosso reporte ao board é em abril."
+   *(Timeline crítico identificado)*
+
+4. "Devem estar a pensar que, sendo uma equipa pequena, não temos capacidade para
+   suportar o crescimento de franchisados que estão a planear."
+   *(Cuidai quer expandir para 12 franchisados em 2025)*
+
+5. "É possível que achem que já ouviram estas promessas antes — e desta vez
+   não podem errar a escolha."
+   *(Pitch competitivo: também estão a falar com Atelier AI)*
+
+---
+
+## Calibrated Questions
+
+### Discovery
+1. "O que mudou na Cuidai nos últimos 3 meses que tornou este investimento urgente agora?"
+2. "Como é que estão a gerar leads para novos franchisados hoje em dia?"
+3. "O que tentaram antes em marketing que não gerou o retorno que esperavam?"
+4. "Como é que medem o sucesso — custo por lead qualificado, ou revenue por franchisado?"
+
+### Objection Handling
+5. "Como é que eu posso tornar a proposta mais fácil de defender internamente ao board?"
+6. "O que precisariam de ver no primeiro mês para saberem que a parceria está a funcionar?"
+7. "Como é que €2.800/mês se compara com o custo de perder mais 3 meses sem pipeline?"
+8. "O que falta para a Ana e o Rui ficarem confortáveis em avançar hoje?"
+
+### Closing
+9. "Como é que preferem estruturar os primeiros 30 dias — por fases ou full onboarding?"
+10. "O que precisam de mim esta semana para tomarem a decisão antes do reporte de abril?"
+
+---
+
+## Labeling Statements
+
+1. "Parece que a experiência com a agência anterior criou um nível de ceticismo que
+   é completamente justificado." 
+   *(usar se Ana cruzar os braços ou hesitar na introdução)*
+
+2. "Parece que o timing do reporte de abril está mesmo a criar pressão real,
+   não é só uma questão de calendário."
+   *(usar quando Rui mencionar board ou Q1)*
+
+3. "Parece que o budget não é o problema principal — é a confiança de que
+   desta vez vai funcionar."
+   *(usar se objeção de preço soar mais emocional que racional)*
+
+4. "Parece que precisam de um parceiro que entenda o modelo de franchising,
+   não só marketing genérico."
+   *(usar se questionarem a nossa experiência no setor)*
+
+5. "Parece que a Ana precisa de chegar ao board em abril com dados concretos,
+   não só uma aposta."
+   *(usar para fechar — cria urgência interna sem pressão externa)*
+
+---
+
+## Objection Playbook
+
+| Objeção provável | Resposta (Voss) |
+|---|---|
+| "€2.800 está acima do nosso budget" | "Como é que este investimento se compara com o custo de perder mais um trimestre sem pipeline de franchisados?" |
+| "Precisamos de pensar" | "Como é que eu posso tornar esta decisão mais fácil para vocês esta semana?" |
+| "Não conhecem bem o setor de cuidados" | "O que precisariam de ver para terem confiança de que entendemos o vosso mercado?" |
+| "Já trabalhamos com outra agência antes e correu mal" | "Parece que essa experiência criou um nível de cautela completamente justificado. O que foi o principal problema?" |
+| "Não somos nós que decidimos, é o board" | "Como é que posso ajudar a Ana a apresentar isto ao board de forma que faça sentido para eles?" |
+
+---
+
+## Walk-away Point
+- **Mínimo absoluto:** €2.200/mês + 4 meses (abaixo: propor projeto pontual €4.500)
+- **Dealbreaker:** Contrato sem cláusula de revisão aos 90 dias
+
+## Cenários
+| Cenário | Resultado | Probabilidade |
+|---|---|---|
+| **Best** | €2.800/mês × 6 meses + upsell paid media mês 3 | 35% |
+| **Likely** | €2.400/mês × 6 meses, início abril | 45% |
+| **Worst** | "Vamos pensar" → follow-up em 2 semanas | 20% |
+
+## Frame Control (Klaff)
+Abrir com: "Antes de falar da proposta, quero perceber se somos mesmo a escolha
+certa para a Cuidai — porque se não formos, prefiro dizer-vos já."  
+*(Prize frame: vocês escolhem-nos a nós, não o contrário)*
+```
+
+---
+
+## Output anti-patterns
+
+- Accusation audit com frases genéricas que servem para qualquer cliente ("podem achar que somos caros") — sem ancoragem ao histórico real da contraparte
+- Calibrated questions com "Porquê" / "Por quê" — dispara defensividade, viola regra Voss fundamental
+- Labels que começam com "Eu acho que vocês sentem…" ou "Acredito que estão a sentir…" — tornam o label sobre DARIO, não sobre a contraparte
+- Walk-away point omitido ou vago ("depende da situação") — sem número concreto não é BATNA, é ansiedade
+- Objection playbook com respostas argumentativas diretas em vez de calibrated questions ou labels
+- Cenários Best/Likely/Worst sem valores numéricos associados — inúteis para preparação real
+- Output entregue sem nome da empresa do cliente visível em nenhuma secção
+- Placeholders `<nome>`, `<empresa>`, `<valor>` sobrevivendo no output final
+- Accusation audit entregue SEM instrução de timing (quando dizer, em que momento da reunião)
+- Frame control ignorado em pitches competitivos onde há mais do que uma agência em consideração

@@ -493,3 +493,226 @@ Overall Visual Design Score (0-100):
 - Always test the grid at every breakpoint, including tablet landscape and small desktop -- the 1024px zone is where most grid systems break
 - Never apply the 60-30-10 color rule by counting CSS declarations -- it refers to visual surface area as perceived by the user
 - Always define a dark mode strategy at system design time, not as an afterthought -- retrofitting dark mode onto an existing color system requires rebuilding the entire palette
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Typography system completo
+
+- [ ] Tipo primário + secundário nomeados com fornecedor (Google Fonts, Adobe Fonts, etc.)
+- [ ] Modular scale com ratio explícito e mínimo 6 steps calculados em px + rem
+- [ ] Baseline grid definida (valor em px) e line-heights por nível documentados
+- [ ] Measure (caracteres/linha) especificada para body copy
+- ❌ NOT delivery-ready: "Use uma fonte serif para títulos e uma sans-serif para corpo"
+- ✅ Delivery-ready: "Fraunces (Google Fonts, weights 400/700) para headings + Inter (weights 400/500/600) para body; escala 1.250 com base 16px; baseline 24px; measure 62ch para body"
+
+---
+
+### Gate 2 — Grid system especificado para todos os breakpoints
+
+- [ ] Número de colunas definido por breakpoint (mobile / tablet / desktop)
+- [ ] Gutter width e margin/padding externos especificados em px ou rem por breakpoint
+- [ ] Max-width do container declarado
+- [ ] Spatial system (8pt ou outro) documentado com lista de tokens de espaçamento
+- ❌ NOT delivery-ready: "Grid responsivo com colunas para mobile e desktop"
+- ✅ Delivery-ready: "4 col / 16px gutter @ <640px — 8 col / 24px gutter @ 640-1024px — 12 col / 32px gutter @ >1024px; max-width 1280px; spatial tokens: 8/16/24/32/48/64/96px"
+
+---
+
+### Gate 3 — Color system com tokens e validação WCAG
+
+- [ ] Paleta nomeada com valores HEX + OKLCH para todos os tokens
+- [ ] Pares de contraste críticos testados (texto/fundo, CTA/fundo) com ratio declarado
+- [ ] Status WCAG AA/AAA confirmado para cada par
+- [ ] Dark mode ou modo alternativo indicado (mesmo que "fora de scope")
+- ❌ NOT delivery-ready: "Azul primário com bom contraste no fundo branco"
+- ✅ Delivery-ready: "`--color-brand-primary: #1A4FD6` (oklch(45% 0.22 264)); sobre `#FFFFFF`: ratio 7.3:1 → WCAG AAA ✓; CTA hover `#1340B0` sobre branco: 9.1:1 ✓"
+
+---
+
+### Gate 4 — Hierarchy map e composição documentados
+
+- [ ] Hierarquia visual mapeada para cada template/página (H1→H2→body→caption)
+- [ ] Padrão de leitura identificado (F-pattern / Z-pattern / leitura centrada) e justificado
+- [ ] Pelo menos 2 princípios Gestalt aplicados com exemplo concreto na página
+- [ ] CRAP checklist (Contrast / Repetition / Alignment / Proximity) passada explicitamente
+- ❌ NOT delivery-ready: "Hierarquia clara com bom contraste entre secções"
+- ✅ Delivery-ready: "Hero → Z-pattern; CTA alinhado ao ponto de saída do olho (bottom-right); Proximidade: form fields agrupados com gap 8px vs 32px entre grupos; Repetição: mesmo border-radius 6px em todos os cards"
+
+---
+
+### Gate 5 — CSS tokens e implementação prontos para handoff
+
+- [ ] Todas as variáveis CSS declaradas com `--nome-token: valor`
+- [ ] `clamp()` fluid typography com min/preferred/max para H1, H2, body mínimo
+- [ ] Layout principal especificado em CSS Grid ou Flexbox com código ou pseudocódigo
+- [ ] Container queries indicados onde relevante (componentes reutilizáveis)
+- ❌ NOT delivery-ready: "Tipografia fluida que escala entre mobile e desktop"
+- ✅ Delivery-ready: `` `--font-size-h1: clamp(2rem, 1rem + 3vw, 3.5rem)` `` com breakpoints min 320px / max 1280px documentados; grid: `grid-template-columns: repeat(12, 1fr)` com named areas para hero, aside, main
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets
+
+- [ ] Nenhum placeholder do tipo `[CLIENT_NAME]`, `<cor_da_marca>`, `[inserir fonte aqui]`
+- [ ] Nomes de fontes, cores, e breakpoints são os reais do projeto, não exemplos genéricos
+- [ ] Referências competitivas mencionadas são as do briefing do cliente, não exemplos de template
+- [ ] Todas as medidas (px, rem, vw) são valores numéricos concretos, não "X" ou "Y"
+- ❌ NOT delivery-ready: "Usar `[PRIMARY_COLOR]` com contraste adequado sobre fundo claro"
+- ✅ Delivery-ready: "Cuidai usa `#2D6A4F` (verde floresta) sobre `#F8FAF9`; ratio 5.8:1 → WCAG AA ✓ para texto ≥18px"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Design Spec — Cuidai Landing Page v1.0
+*Gerado por dario-layout-visual | 2025-01-15*
+
+---
+
+## Typography System
+
+**Primary:** Fraunces (Google Fonts) — Display / Hero / H1-H2
+Weights carregados: 400 (Regular), 600 (SemiBold), 700 (Bold)
+
+**Secondary:** Plus Jakarta Sans (Google Fonts) — H3-H6, Body, UI
+Weights carregados: 400 (Regular), 500 (Medium), 600 (SemiBold)
+
+**Ratio:** 1.250 (Major Third) | **Base:** 16px | **Baseline grid:** 24px
+
+| Token              | px  | rem    | Uso                        |
+|--------------------|-----|--------|----------------------------|
+| `--text-caption`   | 10  | 0.625  | Fine print, disclaimers    |
+| `--text-small`     | 13  | 0.8125 | Metadata, timestamps       |
+| `--text-body`      | 16  | 1      | Corpo principal            |
+| `--text-lead`      | 20  | 1.25   | Intro paragraphs           |
+| `--text-h4`        | 25  | 1.5625 | Card headings              |
+| `--text-h3`        | 31  | 1.9375 | Secção headings            |
+| `--text-h2`        | 39  | 2.4375 | Page sections              |
+| `--text-h1`        | 49  | 3.0625 | Hero headline              |
+| `--text-display`   | 61  | 3.8125 | Acima do fold (desktop)    |
+
+**Fluid typography (clamp):**
+```css
+--font-size-body:    clamp(1rem, 0.875rem + 0.25vw, 1.125rem);
+--font-size-h2:      clamp(1.5625rem, 1rem + 2vw, 2.4375rem);
+--font-size-h1:      clamp(2.4375rem, 1.5rem + 3vw, 3.8125rem);
+```
+
+**Measure:** 62ch máximo em body copy; 44ch em colunas laterais
+**Line-heights:** Display 1.1 · H1-H2 1.2 · H3-H4 1.3 · Body 1.55 · Caption 1.4
+
+---
+
+## Grid System
+
+| Breakpoint     | Colunas | Gutter | Margin | Max-width  |
+|----------------|---------|--------|--------|------------|
+| Mobile <640px  | 4       | 16px   | 20px   | 100%       |
+| Tablet 640-1024px | 8    | 24px   | 32px   | 100%       |
+| Desktop >1024px | 12     | 32px   | 48px   | 1280px     |
+
+**Spatial tokens (8pt system):**
+```css
+--space-2:   4px;   /* micro — icon padding interno */
+--space-4:   8px;   /* xs — gap entre form fields */
+--space-8:  16px;   /* s  — padding de card */
+--space-12: 24px;   /* m  — gap entre cards */
+--space-16: 32px;   /* l  — secção padding vertical */
+--space-24: 48px;   /* xl — entre secções major */
+--space-32: 64px;   /* 2xl — hero padding */
+--space-48: 96px;   /* 3xl — between page sections */
+```
+
+---
+
+## Color System
+
+```css
+/* Brand */
+--color-brand-primary:   #2D6A4F;  /* oklch(42% 0.12 158) */
+--color-brand-light:     #74C69D;  /* oklch(73% 0.10 158) */
+--color-brand-dark:      #1B4332;  /* oklch(28% 0.09 158) */
+
+/* Neutrals */
+--color-surface:         #F8FAF9;
+--color-surface-raised:  #FFFFFF;
+--color-border:          #D8E5E0;
+--color-text-primary:    #1A2E25;
+--color-text-secondary:  #4A6358;
+--color-text-muted:      #7A9A8A;
+
+/* Feedback */
+--color-success:         #40916C;
+--color-warning:         #E9C46A;
+--color-error:           #C1121F;
+```
+
+**Contraste WCAG 2.2 (pares críticos):**
+| Par                                     | Ratio | Status  |
+|-----------------------------------------|-------|---------|
+| `--text-primary` (#1A2E25) / `--surface` (#F8FAF9) | 14.2:1 | AAA ✓ |
+| `--brand-primary` (#2D6A4F) / `#FFFFFF` | 5.8:1  | AA ✓ (texto ≥18px) |
+| CTA texto branco / `--brand-primary`    | 5.8:1  | AA ✓   |
+| `--text-muted` / `--surface`            | 3.9:1  | AA ✓ (texto ≥18px) |
+
+---
+
+## Visual Hierarchy — Landing Page
+
+**Padrão de leitura:** Z-pattern (landing de conversão; conteúdo escasso acima do fold)
+
+**Gestalt aplicado:**
+- **Proximidade:** Testemunhos agrupados em cards com gap interno 16px vs gap entre cards 32px
+- **Similaridade:** Todos os CTAs com `border-radius: 8px`, `font-weight: 600`, cor `--brand-primary`
+- **Continuidade:** Linha-guia vertical alinhada ao canto esquerdo das colunas de texto cria fluxo entre secções
+
+**CRAP checklist — Hero section:**
+- ✅ Contrast: H1 (61px Fraunces 700 #1A2E25) vs body (16px Jakarta 400 #4A6358) — diferença óbvia
+- ✅ Repetition: espaçamento 48px consistente entre todas as secções major
+- ✅ Alignment: todos os elementos alinhados a grid column 1 (left-edge) ou centrados em 12 cols
+- ✅ Proximity: CTA button a ≤16px do headline benefício imediato
+
+---
+
+## CSS Layout (Hero section)
+
+```css
+.hero {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: auto;
+  gap: var(--space-8);
+  padding-block: var(--space-32);
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+.hero__copy    { grid-column: 1 / 7; }
+.hero__visual  { grid-column: 7 / 13; }
+
+@media (max-width: 1024px) {
+  .hero__copy,
+  .hero__visual { grid-column: 1 / -1; }
+}
+```
+```
+
+---
+
+## Output anti-patterns
+
+- Fontes mencionadas sem peso, fornecedor ou fallback stack ("usar uma sans-serif moderna")
+- Paleta com nomes de cor subjetivos sem valores HEX/OKLCH ("verde natural da marca")
+- Modular scale listada só em px sem tokens CSS `--` prontos para implementação
+- Contraste afirmado como "bom" sem ratio numérico e status WCAG explícito
+- Grid descrito em prosa ("layout de 3 colunas") sem colunas/gutter/margin por breakpoint
+- Spacing arbitrário fora do spatial system documentado (ex: margin-top: 37px)
+- Hierarquia descrita sem padrão de leitura identificado (F/Z/centrado) ou Gestalt nomeado
+- `clamp()` com valores placeholder sem min/max de viewport declarados
+- Spec gerada para "um cliente de wellness" em vez do cliente real do briefing
+- Design tokens misturados com valores hardcoded no mesmo spec (inconsistência de handoff)

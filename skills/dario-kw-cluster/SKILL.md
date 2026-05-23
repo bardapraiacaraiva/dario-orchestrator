@@ -106,3 +106,142 @@ Before finalizing clusters, check for keyword cannibalization:
 - Always validate SERP overlap before merging keywords into a cluster
 - Always check existing content first to avoid creating duplicates
 - Minimum 3 supporting articles per pillar page for internal linking effectiveness
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Cobertura mínima de clusters
+- [ ] Cada cluster tem **mínimo 1 pillar + 3 supporting keywords** (nunca 1 kw isolada)
+- [ ] Número de clusters cobre todos os tópicos core do negócio do cliente (sem lacunas óbvias)
+- [ ] Nenhum cluster tem >15 keywords sem sub-divisão temática justificada
+- ❌ NOT delivery-ready: "Cluster: dog care (3 keywords)"
+- ✅ Delivery-ready: "Pillar: 'creche para cães lisboa' (480/mo) + 5 supporting: 'hotel cães lisboa' (320/mo), 'babysitting cães' (140/mo)..."
+
+### Gate 2 — Intent classification completa
+- [ ] **Cada keyword** tem intent atribuído (Informational / Commercial / Transactional / Navigational)
+- [ ] Keywords transacionais e informacionais com o mesmo tema estão em **clusters separados** (ex: "como treinar cão" ≠ "contratar treino cão lisboa")
+- [ ] Nenhuma linha com célula Intent vazia na tabela
+- ❌ NOT delivery-ready: "design interiores | 800 | 35 | — | /design"
+- ✅ Delivery-ready: "design de interiores lisboa | 800 | 38 | Transactional | /servicos/design-interiores-lisboa"
+
+### Gate 3 — Cannibalization check documentado
+- [ ] Coluna "Existing URL" presente e preenchida (ou explicitamente "—" = nova página)
+- [ ] Qualquer página existente do cliente com solapamento identificada e acção recomendada (merge / 301 / expand)
+- [ ] Confirmação explícita `site:domain.com` foi executado para os primary KWs dos pillar pages
+- ❌ NOT delivery-ready: Tabela sem coluna Existing URL, sem menção a conteúdo já publicado
+- ✅ Delivery-ready: "Existing URL: /blog/quanto-custa-design-interiores — MERGE com Cluster 3 (301 recomendado)"
+
+### Gate 4 — Volumes e dificuldade reais (não estimados a olho)
+- [ ] Volumes têm fonte indicada: DataForSEO, GSC, Ahrefs, ou "estimativa manual" com aviso
+- [ ] Difficulty score presente (0-100) para cada primary KW dos pillars
+- [ ] Nenhum volume com formato vago como "médio" ou "alto" — números reais ou range (ex: 200-400/mo)
+- ❌ NOT delivery-ready: "remodelação apartamento | alto volume | difícil | ..."
+- ✅ Delivery-ready: "remodelação apartamento lisboa | 390/mo (DataForSEO) | KD 42 | Commercial | /remodelacao-apartamentos-lisboa"
+
+### Gate 5 — Content brief accionável por cluster
+- [ ] Cada cluster tem: Primary KW + Secondary KWs (2-5) + URL proposta + H1 sugerido + Content type + Word count target
+- [ ] URL proposta segue slug limpo, lowercase, hifens, sem acentos
+- [ ] Word count baseado em SERP benchmark (não inventado) — ou justificado ("top 3 avg: 1.800 palavras")
+- ❌ NOT delivery-ready: "Brief: escrever sobre design de interiores moderno, SEO, fotos"
+- ✅ Delivery-ready: "URL: /blog/design-interiores-moderno-apartamento | H1: Design de Interiores Moderno para Apartamentos: Guia 2025 | Type: Informational guide | Target: 1.600 words (SERP avg top-5)"
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, zero placeholders com angle-brackets
+- [ ] Zero instâncias de `<Client>`, `<Topic>`, `<URL>`, `<keyword>` no output final
+- [ ] Nome do cliente aparece no título do documento e no save path
+- [ ] Datas, domínios, URLs são reais e verificáveis (não "seusite.com" ou "exemplo.pt")
+- ❌ NOT delivery-ready: `# Keyword Cluster Map — <Client / Topic>`
+- ✅ Delivery-ready: `# Keyword Cluster Map — Lisbon Dog Care | Maio 2025`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Keyword Cluster Map — Lisbon Dog Care | Maio 2025
+**Domínio:** lisbondogcare.pt | **Fonte volumes:** DataForSEO PT-PT | **Data:** 2025-05-14
+
+---
+
+## Cluster 1 (Pillar): creche para cães lisboa (480/mo)
+
+| Keyword | Volume | KD | Intent | Target URL | Existing URL |
+|---|---|---|---|---|---|
+| creche para cães lisboa | 480 | 28 | Transactional | /creche-caes-lisboa | — (nova) |
+| creche cães preços lisboa | 210 | 24 | Transactional | /creche-caes-lisboa | — |
+| jardim infantil cães lisboa | 140 | 18 | Transactional | /creche-caes-lisboa | — |
+| creche canina alfama | 90 | 15 | Navigational | /creche-caes-lisboa | — |
+| deixar cão durante dia lisboa | 170 | 22 | Transactional | /creche-caes-lisboa | — |
+
+**Content brief:**
+- **Primary KW:** creche para cães lisboa (480/mo, KD 28)
+- **Secondary KWs:** creche cães preços, jardim infantil cães, deixar cão durante dia lisboa
+- **Intent:** Transactional (service page)
+- **URL:** /creche-caes-lisboa
+- **H1:** Creche para Cães em Lisboa — Cuidados Diários com Amor e Segurança
+- **Content type:** Service page
+- **Word count target:** 900 palavras (SERP top-5 avg)
+- **Internal links:** → /hotel-caes-lisboa (sibling), → /sobre-nos (navigational), ← /index (homepage)
+
+---
+
+## Cluster 2 (Pillar): hotel cães lisboa (320/mo)
+
+| Keyword | Volume | KD | Intent | Target URL | Existing URL |
+|---|---|---|---|---|---|
+| hotel cães lisboa | 320 | 31 | Transactional | /hotel-caes-lisboa | /servicos (MERGE recomendado) |
+| hotel canino lisboa preços | 190 | 27 | Transactional | /hotel-caes-lisboa | — |
+| hospedar cão férias lisboa | 150 | 22 | Transactional | /hotel-caes-lisboa | — |
+| pensão cães lisboa | 110 | 19 | Transactional | /hotel-caes-lisboa | — |
+
+**Content brief:**
+- **Primary KW:** hotel cães lisboa (320/mo, KD 31)
+- **Secondary KWs:** hotel canino preços, hospedar cão férias, pensão cães
+- **Intent:** Transactional (service page)
+- **URL:** /hotel-caes-lisboa
+- **H1:** Hotel para Cães em Lisboa — Hospedagem Segura Durante as Suas Férias
+- **Content type:** Service page
+- **Word count target:** 850 palavras (SERP top-5 avg)
+- **⚠️ Cannibalization:** /servicos ranka para "hotel cães" (posição 14) — consolidar conteúdo aqui + 301 de /servicos para /hotel-caes-lisboa
+- **Internal links:** → /creche-caes-lisboa (sibling), → /treino-caes-lisboa (cross-cluster), ← /index
+
+---
+
+## Cluster 3 (Blog Pillar): como escolher creche para cão (260/mo)
+
+| Keyword | Volume | KD | Intent | Target URL | Existing URL |
+|---|---|---|---|---|---|
+| como escolher creche para cão | 260 | 21 | Informational | /blog/como-escolher-creche-caes | — |
+| o que perguntar creche cães | 90 | 14 | Informational | /blog/como-escolher-creche-caes | — |
+| creche cães segura checklist | 70 | 16 | Informational | /blog/como-escolher-creche-caes | — |
+| sinais mau comportamento creche canina | 50 | 12 | Informational | /blog/como-escolher-creche-caes | — |
+
+**Content brief:**
+- **Primary KW:** como escolher creche para cão (260/mo, KD 21)
+- **Secondary KWs:** o que perguntar creche cães, checklist creche segura
+- **Intent:** Informational (blog guide)
+- **URL:** /blog/como-escolher-creche-caes
+- **H1:** Como Escolher a Melhor Creche para o Seu Cão: 7 Critérios Essenciais
+- **Content type:** Informational guide + checklist
+- **Word count target:** 1.400 palavras (SERP top-3 avg)
+- **Internal links:** → /creche-caes-lisboa (CTA transactional), → /hotel-caes-lisboa, ← /blog (index)
+
+---
+
+**Save:** `05 - Claude - IA/Outputs/2025-05-14 - Lisbon Dog Care - Keyword Cluster Map.md`
+```
+
+---
+
+## Output anti-patterns
+
+- Criar cluster com 1 única keyword — isso é uma página, não um cluster; nunca entrega sem mínimo 4 kws agrupadas
+- Omitir coluna "Existing URL" — cannibalization não detectada = trabalho duplicado para o cliente
+- Usar "volume alto/médio/baixo" em vez de números — sem dados verificáveis o cliente não consegue priorizar
+- Misturar intent informacional e transactional no mesmo cluster — cria cannibalization estrutural desde o início
+- Propor URLs com acentos, maiúsculas ou espaços — `/Design-Interiores-Lisboa` quebra em produção
+- Deixar H1 idêntico ao Primary KW — demonstra zero value-add; o H1 deve expandir e contextualizar
+- Cluster map sem internal linking map — a arquitectura fica desconectada e perde equity de PageRank
+- Entregar sem cannibalization check documentado para os pillar pages — erro crítico que o cliente vai descobrir em auditoria
+- Gerar clusters genéricos sem adaptar ao sector do cliente — "como fazer X" para um cliente B2B SaaS é desperdício de crawl budget
+- Usar o template com angle-brackets por preencher (`<Client>`, `<URL>`) — entrega não-profissional que invalida credibilidade do trabalho

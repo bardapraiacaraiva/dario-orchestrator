@@ -124,3 +124,182 @@ mcp__dario-rag__ingest_text(
 - Always verify the vault path exists before writing — writing to a non-existent directory silently fails or creates orphaned files outside the vault structure
 - Never save content containing secrets, credentials, or API keys to the vault — Obsidian vaults sync via OneDrive and persisted secrets are a permanent security exposure
 - Always check for duplicate content before saving — re-saving identical deliverables clutters the vault and creates confusion about which version is current
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Filename segue convenção canónica
+
+- [ ] Formato exato `YYYY-MM-DD - Tema - Titulo.md` (dois espaços-travessão-espaços)
+- [ ] Data é a data de hoje em ISO 8601 (10 chars, sem prefixo)
+- [ ] Título sem acentos, sem caracteres non-ASCII, max 120 chars
+- [ ] Tema identifica claramente o client ou projeto (não "output" ou "file")
+
+❌ NOT delivery-ready: `audit_atrium_v2_final.md` / `2026-4-5 - Atrium - Audit.md`
+✅ Delivery-ready: `2026-04-15 - Atrium Golden Visa - DARIO Pre-Publish Audit.md`
+
+---
+
+### Gate 2 — Pasta correta para o tipo de conteúdo
+
+- [ ] Audit / Plan / Strategy / Benchmark → `05 - Claude - IA/Outputs/`
+- [ ] Decisão técnica ou de negócio → `05 - Claude - IA/Decisoes/`
+- [ ] Brief canónico / contexto de projeto → `05 - Claude - IA/Contextos/`
+- [ ] Nota rápida não estruturada → `00 - Inbox/`
+- [ ] Caminho completo escrito e verificável antes de escrever (diretório existe)
+
+❌ NOT delivery-ready: ficheiro guardado em `01 - Projetos/` porque "parece um projeto"
+✅ Delivery-ready: `C:\Users\barda\OneDrive\Documents\VCHOME segundo cerebro\05 - Claude - IA\Outputs\2026-04-15 - LUSOconta - Benchmark Contabilidade Online.md`
+
+---
+
+### Gate 3 — Frontmatter completo e válido
+
+- [ ] Bloco `---` abre e fecha corretamente (YAML válido)
+- [ ] Campos obrigatórios presentes: `project`, `date`, `type`, `status`, `tags`
+- [ ] `type` é um dos valores canónicos: `audit|plan|decision|context|benchmark|strategy`
+- [ ] Campos opcionais do tipo preenchidos (`score_global` em audits, `decision_by` em decisions, etc.)
+- [ ] `tags` é lista YAML (não string inline)
+
+❌ NOT delivery-ready: `tags: audit, wordpress, cuidai` (string) ou frontmatter sem `status`
+✅ Delivery-ready:
+```yaml
+---
+project: Cuidai
+date: 2026-04-15
+type: audit
+status: delivered
+tags: [cuidai, wordpress, seo, tier0]
+score_global: 61
+tier0_count: 3
+tier1_count: 7
+---
+```
+
+---
+
+### Gate 4 — Conteúdo passa os limites de save
+
+- [ ] Ficheiro tem ≥ 20 linhas de conteúdo substantivo
+- [ ] Não é cópia de ficheiro já existente no vault (verificado antes de escrever)
+- [ ] Não contém secrets, credenciais, API keys, PII persistível
+- [ ] Não é rascunho intermédio — é o output final desta sessão
+
+❌ NOT delivery-ready: guardar um `plan` de 8 linhas "para não perder" / re-salvar a mesma estratégia da semana passada com data nova
+✅ Delivery-ready: audit completo de 140 linhas sem credenciais, confirmado que `2026-04-14 - Cuidai - Audit.md` não existe no vault
+
+---
+
+### Gate 5 — RAG ingest acionado (quando aplicável)
+
+- [ ] Se o ficheiro é substantivo e deve ser pesquisável imediatamente, `mcp__dario-rag__ingest_text` foi chamado
+- [ ] `name` no ingest usa o path relativo: `obsidian/05 - Claude - IA/Outputs/<filename sem .md>`
+- [ ] `collection` definido como `"obsidian"`, `tags` alinhadas com frontmatter
+- [ ] Se ingest não foi feito, utilizador foi informado que "ficará disponível no próximo ciclo do watcher"
+
+❌ NOT delivery-ready: ingest feito com `name: "audit"` (genérico, colide com outros docs)
+✅ Delivery-ready: `name: "obsidian/05 - Claude - IA/Outputs/2026-04-15 - Cuidai - DARIO Pre-Publish Audit"`
+
+---
+
+### Gate 6 — Confirmação ao utilizador usa CLIENT NAME + REAL data, sem placeholders
+
+- [ ] Confirmação inclui path completo real (não `<vault_path>/...`)
+- [ ] Inclui nome do client/tema real, data real, contagem de linhas real
+- [ ] Indica se RAG ingest foi feito ou se aguarda watcher
+- [ ] Zero angle-brackets `< >` visíveis ao utilizador
+
+❌ NOT delivery-ready: "Ficheiro guardado em `<path>/<filename>.md`. Indexado com tags `<tags>`."
+✅ Delivery-ready: "Guardado em `05 - Claude - IA/Outputs/2026-04-15 - Vivenda Creative Home - Plano Remodelacao WordPress.md` (87 linhas). Indexado na RAG — pesquisável via DARIO search_kb com tag `vivenda`."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+**[Internal DARIO action — Obsidian Save]**
+
+Tipo detectado: **plan** (output de dario-wp-audit para Vivenda Creative Home)
+Pasta: `05 - Claude - IA/Outputs/`
+Filename: `2026-04-15 - Vivenda Creative Home - Plano Remodelacao WordPress.md`
+
+---
+
+Conteúdo a escrever:
+
+---
+project: Vivenda Creative Home
+date: 2026-04-15
+type: plan
+status: draft
+tags: [vivenda, wordpress, remodelacao, woocommerce, performance]
+milestones: [auditoria-tecnica, migracao-tema, otimizacao-wc, go-live]
+timeline_weeks: 8
+---
+
+# Plano de Remodelação WordPress — Vivenda Creative Home
+
+**Data:** 2026-04-15
+**Gerado por:** DARIO / dario-wp-audit
+**Status:** Draft — aguarda aprovação cliente
+
+## Resumo executivo
+
+O site atual da Vivenda (vivenda.pt) opera em WordPress 6.3 com tema Flatsome 3.14
+e WooCommerce 8.2. A auditoria identificou 3 bloqueadores Tier-0 e 11 issues Tier-1.
+Este plano define o caminho de remodelação em 8 semanas.
+
+## Bloqueadores Tier-0 (resolução imediata)
+
+1. **Core Web Vitals reprovados** — LCP 6.2s (target < 2.5s); origem: imagens sem lazy-load
+2. **SSL misto** — 14 assets servidos via HTTP em páginas HTTPS → alerta browser ativo
+3. **WooCommerce 8.2 → 8.9 pending** — 3 CVEs críticos não patchados (CVE-2024-XXXX)
+
+## Roadmap (8 semanas)
+
+| Semana | Milestone | Owner |
+|--------|-----------|-------|
+| 1-2 | Auditoria técnica completa + staging clone | DARIO + Dev |
+| 3-4 | Migração tema → GeneratePress + ACF | Dev |
+| 5-6 | Otimização WooCommerce + Stripe checkout | Dev |
+| 7 | QA + testes de regressão | DARIO |
+| 8 | Go-live + monitorização 72h | Dev + Cliente |
+
+## Próximos passos imediatos
+
+- [ ] Cliente aprova orçamento até 2026-04-18
+- [ ] Dev configura staging em staging.vivenda.pt
+- [ ] DARIO agenda check-in semanal às sextas
+
+---
+
+**[Write tool executado]**
+Path: `C:\Users\barda\OneDrive\Documents\VCHOME segundo cerebro\05 - Claude - IA\Outputs\2026-04-15 - Vivenda Creative Home - Plano Remodelacao WordPress.md`
+
+**[RAG ingest executado]**
+`mcp__dario-rag__ingest_text` → name: `obsidian/05 - Claude - IA/Outputs/2026-04-15 - Vivenda Creative Home - Plano Remodelacao WordPress`, collection: `obsidian`, tags: `[vivenda, wordpress, remodelacao]`
+
+---
+
+✅ **Guardado com sucesso.**
+📄 `05 - Claude - IA/Outputs/2026-04-15 - Vivenda Creative Home - Plano Remodelacao WordPress.md` (52 linhas)
+🔍 Indexado na RAG — pesquisável via DARIO search_kb com tags `vivenda`, `wordpress`, `remodelacao`.
+```
+
+---
+
+## Output anti-patterns
+
+- Usar `<client_name>`, `<date>`, `<path>` na confirmação final — o utilizador vê placeholders e perde confiança no sistema
+- Guardar sem frontmatter completo — ficheiros sem `project`/`type`/`status` são invisíveis ao Dataview e ao RAG tagging
+- Nomear com acentos ou caracteres especiais no filename (`Remodelação.md`) — quebra plugins Obsidian e sort alfabético
+- Usar `-v2`, `-v3` em vez de nova data — contradiz o modelo de versioning por data e cria ambiguidade sobre qual é o "current"
+- Escrever para diretório sem verificar que existe — falha silenciosa cria ficheiros órfãos fora do vault
+- Fazer RAG ingest com `name` genérico (`"audit"`, `"plano"`) — colisões de namespace tornam docs irrecuperáveis por search
+- Guardar rascunhos intermédios ou outputs < 20 linhas — polui o vault e dilui o sinal de pesquisa
+- Persistir secrets, API keys ou PII no vault — vault sincroniza via OneDrive, exposição permanente e irrecuperável
+- Ignorar o passo de verificação de duplicados — re-salvar o mesmo deliverable com data nova cria confusão sobre versão vigente
+- Confirmar "guardado" sem fornecer path completo e contagem de linhas — utilizador não consegue verificar nem navegar para o ficheiro
