@@ -147,6 +147,28 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via fetch/read da página real nesta sessão
+- 🟡 **assumed** — plausível com base em padrões do sector, mas precisa confirmação do cliente antes de entrega
+- 🟢 **projection** — estimativa de impacto por design (não verificável sem dados externos)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs o que precisa verify antes de publicar ou apresentar.  **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready: `Overall Score: 68/100 — meta description em falta, imagens sem alt text, schema ausente.` — reader não sabe se os scores foram calculados da página real ou estimados; dados de tráfego e impacto surgem sem origem.
+
+✅ Delivery-ready:
+- 🔵 **verified** — `<title>` tem 81 caracteres (extraído do HTML via fetch); H1 ausente confirmado no DOM
+- 🟡 **assumed** — página assume público PT; hreflang não implementado — cliente deve confirmar se existe versão EN planeada
+- 🟢 **projection** — corrigir meta description de 38→155 chars estima +8-12% CTR orgânico (benchmark sector e-commerce; não garantido)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed (ex: intenção de internacionalização, autor/bio para E-E-A-T, canonical intencional ou erro)
+- [ ] All 🔵 citations referem elemento HTML exato + valor encontrado (ex: `og:image` URL real, tamanho ficheiro em KB)
+- [ ] All 🟢 projections de impacto (score lifts, CTR, ranking) labeled como estimativa ao cliente — clear expectations
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

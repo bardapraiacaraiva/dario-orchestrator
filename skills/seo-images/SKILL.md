@@ -234,6 +234,32 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via análise directa do HTML/source da página auditada
+- 🟡 **assumed** — plausível com base em padrões típicos, mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa de impacto/melhoria por design (não verificável sem re-teste)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+> "23 imagens sem alt text, hero image a 450KB, WebP adoption em 12% — recomendamos migração imediata."
+> *(sem labels: reader assume que tudo foi verificado via fetch real — pode ser inspecção parcial ou amostra)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — 23 `<img>` sem `alt` attribute detectados via Grep no HTML fonte
+> - 🔵 **verified** — `hero-banner.jpg` = 447KB confirmado via Bash/curl response headers
+> - 🟡 **assumed** — imagens de produto categorizadas como "content images" (threshold 100KB); confirmar se alguma serve como hero/LCP
+> - 🟡 **assumed** — CDN não detectado nos headers amostrados; confirmar se existe CDN configurado fora do domínio principal
+> - 🟢 **projection** — migração para WebP estimada em -60% file size médio e melhoria de LCP ~0.4s (baseado em benchmarks industry; validar com PageSpeed pós-deploy)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — categorias de imagens validadas, CDN status confirmado, substituir assumptions com actuals
+- [ ] All citations added per 🔵 sources — URLs auditadas, timestamps de fetch, tool outputs anexados
+- [ ] All 🟢 projections labeled as such ao cliente — expectativas de LCP/CLS improvement comunicadas como estimativas, não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

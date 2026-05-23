@@ -246,6 +246,35 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — forecast por design (não verificável no momento)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. o que precisa de verificação. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "O site tem 4.200 páginas programáticas, 38% de conteúdo único, e risco de penalização por Scaled Content Abuse."
+> *(reader assume que tudo é verified — mas de onde vêm estes números?)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — URL pattern `/[city]/[service]` confirmado via Glob no repositório do cliente
+> - 🟡 **assumed** — 4.200 páginas estimadas com base no CSV fornecido (linha count: 4.198); confirmar se há registos excluídos por lógica de negócio
+> - 🟡 **assumed** — 38% unique content calculado por amostra de 50 páginas; amostra completa de 5-10% ainda não executada
+> - 🟢 **projection** — redução estimada de index bloat em ~30% após aplicar quality gates; baseada em padrões do sector, não em dados históricos do domínio
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir row counts, unique content %, e batch sizes com actuals do dataset final
+- [ ] All 🔵 citations added — incluir output de Grep/Glob/WebFetch como evidência linkada ou anexada
+- [ ] All 🟢 projections labeled as such ao cliente — deixar claro que forecasts de indexação e ranking são estimativas, não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

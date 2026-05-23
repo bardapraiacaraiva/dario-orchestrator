@@ -230,6 +230,38 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via session/memory/preset do cliente ou dados reais do projecto
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de delivery
+- 🟢 **projection** — forecast/estimativa por design (não verificável até publicação)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+OG image gerada: 1200x630, keywords "eco packaging london", alt text escrito,
+ficheiro renomeado eco-packaging-london-1200x630.webp, <100KB, schema markup sugerido.
+```
+*(reader assume que tudo foi verified — mas brand preset, target keywords e file size são assumptions não confirmadas)*
+
+✅ Delivery-ready:
+```
+- 🔵 verified   — Aspect ratio 16:9 / resolução 1K aplicados (banana MCP confirmou set_aspect_ratio)
+- 🔵 verified   — gemini_generate_image executou sem erro; ficheiro output.png gerado em sessão
+- 🟡 assumed    — Keywords "eco packaging london" usadas no alt text e file name (aguarda confirmação SEO strategy do cliente)
+- 🟡 assumed    — Brand preset não encontrado; domain mode "Product" aplicado por default (cliente deve confirmar se existe preset activo)
+- 🟢 projection — WebP <100KB estimado após conversão com `magick -quality 85` (tamanho real depende do conteúdo da imagem gerada)
+- 🟢 projection — CTR/engagement do OG image no social preview (verificável só pós-publicação via Search Console / analytics)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — keywords SEO validadas, preset correcto carregado (ou criado)
+- [ ] Todos os 🔵 sources citados — path do ficheiro gerado, tool calls MCP logged
+- [ ] Todos os 🟢 projections comunicados ao cliente como estimativas (expectativas claras sobre file size real e impacto SEO)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

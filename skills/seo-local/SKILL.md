@@ -397,6 +397,31 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via fonte citada (Whitespark, BrightLocal, Sterling Sky, etc.)
+- 🟡 **assumed** — plausível mas requer confirmação do cliente antes de entrega
+- 🟢 **projection** — forecast/estimate por design (não verificável no momento)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. precisa verificar. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+> "O seu perfil GBP tem categoria errada, 23 reviews, e o NAP está inconsistente em 4 directories."
+> *(reader assume tudo verificado — mas categoria e NAP foram inferidos da página, não auditados ao vivo)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — GBP signals weight: 32% do local pack (Whitespark 2026)
+> - 🟡 **assumed** — Primary GBP category inferida como "Electricista" com base no conteúdo da página; confirmar category real no GBP dashboard
+> - 🟡 **assumed** — NAP consistency: endereço detectado no footer; não auditado em Yelp/Apple Maps/citations externas
+> - 🟢 **projection** — Estimated uplift de 15–25% em map pack visibility se reviews atingirem threshold de 10 com rating ≥ 4.5
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir categoria assumida, contagem de reviews e NAP com actuals do GBP dashboard + citation audit
+- [ ] All 🔵 citations linked — Whitespark 2026, BrightLocal LCRS 2026, Sterling Sky sources anexadas ao report
+- [ ] All 🟢 projections labeled como tal ao cliente — expectativas de uplift apresentadas como forecast, não garantia
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

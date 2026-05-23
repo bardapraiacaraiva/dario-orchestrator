@@ -186,6 +186,28 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmed from prior session/memory/cliente data
+- 🟡 **assumed** — plausible but needs cliente confirm pre-delivery
+- 🟢 **projection** — forecast by design (not verifiable)
+
+Output checklist upfront mostra reader exactly o que é trust-as-is vs precisa verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready: KPI table com "Organic Traffic: 0 → 5.000/mês em 3 meses", competitor DA como "DA ~40", keyword volumes como "~2.000/mês" — sem labels, reader assume tudo verified quando maioria é assumed ou projection.
+
+✅ Delivery-ready:
+- 🔵 **verified** — Concorrente `clinicaxyz.pt` identificado; usa author bios com nº de ordem profissional e 6 case studies publicados
+- 🟡 **assumed** — Domain Authority estimado em DA 38 via Moz Open Explorer (snapshot de hoje; pode variar ±5 pts — confirmar com cliente se têm acesso Ahrefs/Semrush)
+- 🟢 **projection** — Organic traffic target: 0 → 4.200 sessões/mês aos 6 meses (modelo baseado em keyword universe × CTR médio do sector; não garantido)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir DA estimados, volumes de keywords e business details com actuals do cliente (acesso Ahrefs/Semrush/GSC se disponível)
+- [ ] All 🔵 citations added — cada concorrente listado com domínio real + fonte da análise (DataForSEO, Moz, screenshot data)
+- [ ] All 🟢 projections labeled as such ao cliente — KPI table entregue com nota explícita: "valores são projeções por design, não garantias; revisão recomendada ao fim de cada fase"
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown
