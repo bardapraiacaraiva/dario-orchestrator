@@ -333,6 +333,41 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no render brief deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via floor plan, moodboard, material specs, ou RAG KB do cliente
+- 🟡 **assumed** — plausível dado o estilo/tipologia, mas requer confirmação antes de briefar o estúdio
+- 🟢 **projection** — escolha criativa/técnica por design (não verificável até ao render final)
+
+Output checklist upfront mostra ao visualization team exatamente o que é trust-as-is vs. o que bloqueia produção.  **Honest transparency > brief enviado com gaps escondidos.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Sala — Golden hour, carvalho mel, 4K, câmara da entrada.
+```
+*(Leitor assume que tudo foi confirmado — estúdio produz em cima de dados errados ou incompletos.)*
+
+✅ Delivery-ready:
+```
+- 🔵 Piso: Carvalho europeu, veio natural, mate acetinado — confirmado via material spec sheet (Sessão 3)
+- 🟡 Direção solar: Sul assumido (orientação do lote não confirmada — verificar planta de implantação)
+- 🟡 Resolução: 4K assumido para apresentação cliente — confirmar se necessita versão social (1:1 / 9:16)
+- 🟢 Lighting mood: Golden hour + tom quente 2700K — escolha criativa, resultado só validável no preview render
+- 🟢 Composição hero shot: 2-point perspective da entrada — sugerido por design, cliente pode pedir ajuste pós-preview
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir orientação solar assumida com dados reais da planta de implantação
+- [ ] All 🟡 resoluções e formatos de entrega confirmados (still / 360 / animation; plataforma de destino)
+- [ ] All 🔵 sources citadas no brief enviado ao estúdio (spec sheet, moodboard ref, floor plan pg. nº)
+- [ ] All 🟢 projections comunicadas ao cliente como *choices sujeitas a ajuste no preview round* — não como resultado garantido
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

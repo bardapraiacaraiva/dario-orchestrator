@@ -288,6 +288,37 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via dados do projeto/sessão/cliente DIVA
+- 🟡 **assumed** — plausível para obra-tipo mas precisa confirm do cliente pré-entrega
+- 🟢 **projection** — forecast de prazo/custo por design (não verificável até execução)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. precisa verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+"Infiltracao terraco" → custo_estimado_correccao: 800 | due_date: 2026-05-05 | assignee: impermeabilizador
+```
+*(sem labels — reader assume tudo verified; custo e prazo são estimativas, assignee pode não estar confirmado no PlanRadar)*
+
+✅ Delivery-ready:
+```
+🔵 verified   — categoria: Impermeabilizacao | severidade_diva: CRITICO | norma: Sistema Sika
+🟡 assumed    — assignee: "impermeabilizador" (subcontratado registado no projeto?)
+🟢 projection — custo_estimado_correccao: 800€ (estimativa campo, não orçamento formal)
+🟢 projection — due_date: 2026-05-05 (prazo proposto; depende de disponibilidade equipa)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — assignees validados no roster PlanRadar do projeto
+- [ ] All 🟡 items confirmed — fases de obra (ex: `06_acabamentos`) correspondem às fases configuradas na conta PlanRadar
+- [ ] All 🔵 sources citadas — normas de referência (NP EN, caderno encargos) anexadas ao ticket
+- [ ] All 🟢 projections comunicadas ao cliente — custos e prazos marcados como estimativa, não compromisso contratual
+- [ ] CSV/JSON validado contra API PlanRadar v1 antes de import (campos obrigatórios preenchidos)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

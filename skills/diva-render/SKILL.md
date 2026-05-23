@@ -270,6 +270,37 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de render deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmed from prior session/memory/cliente data
+- 🟡 **assumed** — plausible but needs cliente confirm pre-delivery
+- 🟢 **projection** — forecast by design (not verifiable)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs o que precisa validar antes de usar o visual em apresentação.  **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Render gerado: sala de estar, pavimento carvalho, paredes branco gesso, sofá linho bege, iluminação tarde, estilo Warm Minimalism."
+> *(reader assume que tudo foi confirmado — materiais, estilo, hora do dia — quando pode ser tudo assumption do modelo)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Estilo Warm Minimalism (confirmado em sessão de briefing)
+> - 🔵 **verified** — Pavimento: carvalho em espinha (especificado pelo cliente, ref. board V2)
+> - 🟡 **assumed** — Sofá em linho bege (inferido da paleta; cliente não confirmou tecido/cor exactos)
+> - 🟡 **assumed** — Iluminação de tarde/natural (escolhida para atmosfera; hora não especificada pelo cliente)
+> - 🟢 **projection** — Qualidade fotorrealista do render final em Midjourney (resultado depende de seed/versão externa; não previsível)
+> - 🟢 **projection** — Custo estimado ~$0.04/imagem via Gemini Imagen 3 (baseado em pricing actual; sujeito a alteração)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — materiais, acabamentos e atmosfera validados pelo cliente antes de gerar render final
+- [ ] All 🔵 citations added — referencias a briefing, mood board ou sessão anterior documentadas no projecto
+- [ ] All 🟢 projections labeled as such ao cliente — expectativas de output externo (Midjourney/DALL-E) e custos comunicados como estimativa, não garantia
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

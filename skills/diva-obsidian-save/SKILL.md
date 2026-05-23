@@ -264,6 +264,47 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa por design (não verificável no momento do save)
+
+Output checklist upfront mostra ao leitor exatamente o que é trust-as-is vs. o que precisa de verify antes de guardar no vault.  **Honest transparency > inflated delivery.**
+
+---
+
+❌ **NOT delivery-ready:**
+```
+Filename: 2026-04-21 - Vila Cascais - Especificacao Domotica Premium.md
+project: Vila Cascais
+specializations: [domotica, mep]
+status: delivered
+```
+*Sem labels — leitor assume que project name, specializations e status estão todos verified. Podem estar errados.*
+
+---
+
+✅ **Delivery-ready:**
+```
+Filename gerado: 2026-04-21 - Vila Cascais - Especificacao Domotica Premium.md
+  🔵 verified   — data confirmada na sessão; "Vila Cascais" vem do brief do cliente
+  🟡 assumed    — folder destino "05 - Claude - IA/Outputs/" (confirmar se projeto
+                   já tem pasta própria em 01 - Projetos/)
+  🟡 assumed    — status: "draft" (cliente ainda não validou entrega formal)
+  🟢 projection — specializations: [domotica, mep] (inferido do conteúdo gerado;
+                   confirmar squads envolvidos com coordenador de projeto)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — folder de destino validado; status (`draft` / `delivered` / `approved`) confirmado com cliente
+- [ ] All 🔵 sources cited — project name, date e brief origin documentados no frontmatter ou body
+- [ ] All 🟢 projections labeled como tal ao cliente — specializations e squads marcados como "a confirmar" até validação técnica
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

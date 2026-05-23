@@ -251,6 +251,44 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de ingest deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via kb_health, ingest endpoint response, ou session anterior
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente/projeto antes de delivery
+- 🟢 **projection** — estimativa por design (não verificável sem execução real)
+
+Output checklist upfront mostra ao leitor exatamente o que é trust-as-is vs. o que precisa verify antes de usar em produção DIVA.
+**Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Ingerido: Caderno de Encargos — Projeto Habitação Cascais
+Tags: construction, spec, portugal
+Collection: diva | Engine: healthy
+```
+*(reader assume que engine estava live, tags são correctas, e o ficheiro foi parseado sem erros — nada confirmado)*
+
+✅ Delivery-ready:
+```
+Ingerido: Caderno de Encargos — Projeto Habitação Cascais
+- 🔵 verified   — engine respondeu kb_health OK (esta sessão)
+- 🔵 verified   — collection "diva" confirmada no response payload
+- 🟡 assumed    — tags ["construction", "spec", "cascais"] derivadas por análise de conteúdo; aguarda validação do cliente para tags de projeto
+- 🟡 assumed    — nome do projeto "Habitação Cascais" inferido do filename; confirmar slug definitivo
+- 🟢 projection — retrieval quality estimada boa (doc >500 chars, estrutura clara); só validável após query real
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — slug do projeto e tags de domínio validados com o cliente antes de indexar em produção
+- [ ] All 🔵 sources citadas — endpoint response (status 200, chunk count) registado no log de sessão
+- [ ] All 🟢 projections comunicadas ao cliente — retrieval quality não garantida até teste de query real sobre a coleção `diva`
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

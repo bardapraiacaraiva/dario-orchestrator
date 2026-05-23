@@ -301,6 +301,39 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do moodboard deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via briefing do cliente, sessão anterior, ou RAG KB
+- 🟡 **assumed** — plausível dado o contexto, mas requer confirmação antes da entrega
+- 🟢 **projection** — escolha de design por critério técnico/estético (não verificável, é proposta)
+
+Output checklist upfront mostra ao cliente e ao designer exactamente o que é confiável vs. o que precisa de sync.  
+**Honest transparency > moodboard com ar de certeza total.**
+
+---
+
+❌ **NOT delivery-ready:**
+> "Paleta: Pantone 7527 C nas paredes, calcário Moleanos na bancada, carvalho europeu no pavimento, orçamento médio-premium."
+> — Reader assume que tudo foi confirmado. Nenhum item está labelled. Cliente aprova algo que pode não corresponder ao que quer ou pode pagar.
+
+✅ **Delivery-ready:**
+> - 🔵 **verified** — Cliente confirmou: "não quero nada rústico", espaço é apartamento em Lisboa, budget premium
+> - 🟡 **assumed** — Estilo Minimalista Quente como direcção principal (cliente não escolheu mood words; inferido das referências partilhadas)
+> - 🟡 **assumed** — Pantone 7527 C como cor base (plausível para o perfil, mas NCS S 1505-Y20R não confirmado com cliente nem com pintor)
+> - 🟢 **projection** — Calcário Moleanos na bancada (recomendação técnica para budget premium; alternativas existem — Pietra di Vicenza, Limestone Azul Valverde)
+> - 🟢 **projection** — Prompt Midjourney gerado para conceito visual; imagens são interpretações, não renders finais
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — mood words escolhidos, direcção de estilo validada pelo cliente
+- [ ] All 🟡 referências de cor confirmadas com amostra física ou NCS/Pantone fan deck
+- [ ] All 🔵 constraints (anti-preferências, elementos fixos, budget) documentados no briefing
+- [ ] All 🟢 propostas de materiais apresentadas como opções de design, não como decisões finais
+- [ ] All 🟢 AI prompts labelled ao cliente como "conceito visual" — não substitui render técnico
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

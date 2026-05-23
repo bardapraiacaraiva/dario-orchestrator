@@ -258,6 +258,42 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas necessita confirmação do cliente antes de publicar
+- 🟢 **projection** — previsão por design (não verificável à data de publicação)
+
+Output checklist upfront mostra ao leitor exactamente o que é trust-as-is vs. precisa verificar. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+Área intervencionada: 142 m2 | Duração da obra: 8 meses | Valorização estimada: +18%
+Empreiteiro: Construções Silva Lda | Testemunho cliente: "Adorámos o resultado."
+```
+*(sem labels — o reader assume que tudo é verified; orçamento ou testemunho podem nunca ter sido aprovados)*
+
+✅ Delivery-ready:
+```
+- 🔵 Área intervencionada: 142 m2 (confirmado planta final assinada)
+- 🔵 Equipa — Arquitecto: Diva Studio; Fotógrafo: João Matos (@jmfoto)
+- 🟡 Duração da obra: 8 meses (indicado pelo cliente verbalmente — aguarda confirmação escrita)
+- 🟡 Orçamento final: EUR 95.000 (cliente ainda não aprovou divulgação)
+- 🟡 Testemunho: "Adorámos o resultado." (WhatsApp informal — aguarda versão aprovada para publicação)
+- 🟢 Valorização estimada: +18% (projecção de mercado; não auditada por perito)
+- 🟢 Retorno sobre investimento ao fim de 5 anos: indicativo, baseado em benchmark local
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados (substituir assumptions com dados reais aprovados)
+- [ ] Todas as fontes 🔵 referenciadas no output (planta, contrato, ficheiro de sessão)
+- [ ] Todas as projecções 🟢 comunicadas ao cliente como estimativas, não garantias
+- [ ] Testemunho recebido por escrito e aprovado para publicação
+- [ ] Orçamento: cliente assinou autorização de divulgação (ou campo removido do output)
+- [ ] Fotografias: créditos verificados e fotógrafo autorizado uso no canal de destino
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

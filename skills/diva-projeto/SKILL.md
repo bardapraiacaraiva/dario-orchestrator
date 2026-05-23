@@ -310,6 +310,30 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via agent-memory, RAG, ou Obsidian vault (fonte localizável)
+- 🟡 **assumed** — plausível com base no histórico do projeto, mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — previsão por design (custos estimados, datas de fase futura, métricas regulatórias pendentes)
+
+Output checklist upfront mostra ao leitor exatamente o que é trust-as-is vs. o que precisa de verify antes de avançar com decisões de obra ou licenciamento.
+
+❌ NOT delivery-ready:
+> "Orçamento restante: EUR 42.000 | Fase actual: Projeto de Execução | Alvará previsto: Março 2025"
+> *(reader assume tudo verified — mas restante pode estar desatualizado, fase pode ter avançado, alvará é estimativa não confirmada)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Orçamento aprovado EUR 180.000 (lido de `project_vila_cascais.md`, sessão 2024-11-03)
+> - 🟡 **assumed** — Orçamento gasto EUR 138.000 (último registo em Obsidian; confirmar com empreiteiro se houve auto de medição recente)
+> - 🟢 **projection** — Alvará de construção previsto Q1 2025 (estimativa baseada em prazo médio municipal; sujeito a resposta da CM)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: auto de medição actualizado, fase real da obra)
+- [ ] All 🔵 citations added — indicar ficheiro-fonte e data de última actualização para cada dado de orçamento e equipa
+- [ ] All 🟢 projections labeled as such ao cliente — datas de licenciamento, estimativas de custo de especialidades, e prazos de conclusão apresentados como previsão, não como compromisso
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown
