@@ -182,3 +182,158 @@ Stop and reassess the pipeline strategy if any of these appear:
 - Same objection appearing 3+ times → systemic messaging gap, address in templates
 - Prospect ghosting after proposal → follow-up cadence missing or proposal too complex
 - Outbound feels "spammy" → over-automation, not enough personalization per touch
+
+## Delivery-ready self-check (run BEFORE delivering pipeline strategy ao cliente)
+
+Pipeline output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### 1. ICP completo com NÚMEROS específicos (não ranges genéricos)
+- [ ] Industry + sub-vertical específico
+- [ ] Company size com employee count CONCRETO (não "small business")
+- [ ] Revenue range com bracket exato (não "small budget")
+- [ ] Decision maker title named (não "decision makers")
+- [ ] Pain points 5+ com cliente quote ou case anchor
+- [ ] Trigger events 3+ events específicos detectáveis
+- [ ] Disqualifiers 3+ items com hard line
+
+❌ NOT delivery-ready: "Target small businesses with marketing needs"
+✅ Delivery-ready: "ICP: SaaS PT B2B 50-250 empregados, receita anual €2-15M, decision maker é Head of Marketing ou CEO directo. Pain: outbound team de 2 SDRs sem escala, CAC €4.5K acima do benchmark €2.8K, response rate <2%. Triggers: founding new sales role, deteccao competidor PT a crescer, ARR plateau >12 meses."
+
+### 2. Cadence com touches EXACTOS + scripts + channels
+- [ ] 8-12 touches mapeados em calendar days específicos
+- [ ] Channel definido por touch (email/LinkedIn/phone/video)
+- [ ] Script ou angle por touch (não "follow-up email")
+- [ ] Personalização variables marcados ({first_name}, {pain_anchor}, {recent_event})
+
+### 3. Pipeline math com CONVERSION RATES citadas (fonte ou industry benchmark)
+- [ ] N contas → emails sent (volume target)
+- [ ] Open rate target + benchmark fonte
+- [ ] Reply rate target + benchmark
+- [ ] Meeting book rate
+- [ ] Proposal-to-deal rate
+- [ ] Bottom-line: X dollars in N months
+
+❌ NOT delivery-ready: "Aproximadamente 1-2 deals por mês"
+✅ Delivery-ready: "30 target accounts × 80% emailed (24) × 25% open (6) × 15% reply (1) × 60% meeting (0.6) × 40% proposal (0.24) × 35% close = 0.084 deals/account. 30 accounts = ~2.5 deals em 90d. AVG deal €8K = €20K/quarter pipeline value (fontes: HubSpot 2026 B2B benchmarks + agência stats próprias)."
+
+### 4. Target Account List TEMPLATE com 5+ critérios + scoring
+- [ ] Selection criteria explícito (ICP fit, signal strength, accessibility)
+- [ ] Lead scoring formula (não "high/medium/low" subjective)
+- [ ] Source channels (Apollo, ZoomInfo, manual research, etc.)
+- [ ] Cadence assignment rules (A-tier accounts = full cadence, B = lighter)
+
+### 5. CRM + tracking setup EXPLICIT
+- [ ] HubSpot/Pipedrive/Outreach options + recommendation
+- [ ] Stages definition (não "qualified leads")
+- [ ] Activity targets per SDR/week
+- [ ] Reporting dashboard fields
+
+### 6. Output uses CLIENT NAME + REAL data throughout
+- [ ] Client name em cada section title
+- [ ] Industry/vertical-specific (não generic B2B)
+- [ ] Templates referencem actual case studies + names
+- [ ] Sem placeholder angle-brackets
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+Pipeline 92+/100 para SaaS PT B2B:
+
+```markdown
+---
+project: Tributario.AI (sales pipeline launch)
+date: 2026-05-23
+type: sales-pipeline
+target_revenue_quarter: €60K pipeline value
+---
+
+# Sales Pipeline — Tributario.AI
+
+## ICP
+
+| Field | Definition |
+|---|---|
+| Industry | Empresas brasileiras com faturação >R$ 100M/ano sujeitas Reforma Tributária CBS+IBS |
+| Sub-vertical | Indústria + varejo + serviços com complexidade fiscal alta (multi-estado) |
+| Employee count | 200-2000 colaboradores |
+| Revenue | R$ 100M - R$ 1B ARR |
+| Decision Maker | CFO + Tax Director (parallel) |
+| Pain points | 1. Reforma 2026 obriga rebuilder modelos fiscais com prazo Set 2026 |
+| | 2. Big4 consultor cobra R$ 250-500K, planning ciclo 12 meses |
+| | 3. Excel-based fiscal forecast: 1 senior controller 50% do tempo |
+| | 4. Audit BR receita federal: 6 cases/ano (industry avg) |
+| | 5. Sem simulador "what-if" para changes regulatórios |
+| Triggers | Reforma aprovação Lei Complementar (Jul 2026), nova hire CFO/Tax (LinkedIn signal), audit BR receita (news scraping), pos-IPO TG transition |
+| Disqualifiers | Faturação <R$ 50M, decision maker inacessível 3 attempts, Big4 contracted (12mo lock), "só ferramenta sem advisory" |
+
+## Pipeline Math (90-day projection)
+
+Target accounts: **30 contas** Tier-1 (full cadence)
+
+| Stage | Conversion | Volume | Source benchmark |
+|---|---|---|---|
+| Accounts emailed | 90% (after research) | 27 | n/a |
+| Emails opened | 32% (CFO B2B SaaS PT/BR 2026) | 8.6 | HubSpot 2026 + RD Station |
+| Replied | 18% of opens | 1.5 | Outreach.io 2026 |
+| Meeting booked | 65% of replies | 1.0 | (account-specific, low N variance) |
+| Proposal sent | 80% of meetings | 0.8 | (qualification rate) |
+| Closed-won | 35% of proposals | 0.28 | (B2B SaaS BR enterprise) |
+| **Deals expected** | | **~0.28/account** | |
+| **Total 30 accounts** | | **~8.4 deals/90d** | |
+| AVG deal value | R$ 12K/mo × 24mo = R$ 288K | | |
+| **Pipeline value 90d** | | **R$ 2.4M ARR** | |
+
+## Outbound Cadence (10 touches over 21 days)
+
+[full table aqui]
+
+## Target Account List (30 contas Tier-1)
+
+Selection score per account:
+- ICP fit (1-5): industry + size + revenue + trigger event
+- Accessibility (1-5): contact found via Apollo/LinkedIn + email validated
+- Signal strength (1-5): recent funding / news / hires / org changes
+- **Total score >12/15 → Tier-1 cadence**, 8-12 = Tier-2 (light), <8 = drop
+
+Source mix:
+- Apollo.io: 15 (filtros revenue + employees + role)
+- LinkedIn Sales Navigator: 10 (industry + hires last 90d)
+- Manual research: 5 (referrals, conference attendance)
+
+[full account list aqui com nome empresa + CFO + nota signal]
+
+## CRM Setup (HubSpot Pro)
+
+- Pipeline name: "Tributario.AI BR Enterprise Q3 2026"
+- Stages: New Lead → Researched → Engaged → Meeting Booked → Proposal Sent → Negotiation → Closed-Won / Closed-Lost
+- Properties custom: ICP_score, Trigger_event, Reform_compliance_priority (1-5), Big4_competitor (Y/N)
+- Activity targets/SDR/week: 100 emails + 50 LinkedIn + 25 calls
+- Reporting: weekly review template (replies, meetings, proposals, blockers)
+
+## Weekly Pipeline Review
+
+Every Friday 16h00:
+1. Stage transitions (last 7d)
+2. Stuck accounts >14d → escalation criteria
+3. Objections seen → messaging gap analysis
+4. Net new accounts to add Tier-1 (target +5/week)
+5. SDR ratio: actual vs target activity
+
+## Next 14 Days
+
+- Day 1-3: Apollo extract + LinkedIn enrichment (30 accounts)
+- Day 4-7: Email templates A/B (2 variants × 3 cohorts)
+- Day 8-10: HubSpot setup + pipeline configuration
+- Day 11-14: Cadence launch + first 10 accounts triggered
+
+Owner: João (SDR Lead). Slack channel #pipeline-tributario.
+```
+
+## Output anti-patterns
+
+- ICP "small businesses" sem employee count + revenue range exato
+- Pipeline math "aproximadamente N deals" sem conversion rates + source benchmark
+- Cadence "follow-up email" sem script ou angle específico
+- Target account list "20-30 accounts" sem scoring criteria
+- CRM stages "qualified leads" sem definition
+- Output sem frontmatter (tracking impossível)
+- Placeholder <Client>/<Industry> em vez de nome real
