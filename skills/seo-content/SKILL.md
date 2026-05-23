@@ -229,6 +229,39 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via crawl direto da URL / session data / QRG citada
+- 🟡 **assumed** — plausível com base em padrões do sector, mas precisa de confirmação do cliente antes de entrega
+- 🟢 **projection** — estimativa de impacto por design (não verificável sem testes)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "O artigo tem 1.200 palavras, Flesch de 58, densidade de keyword a 2.1%, sem autor visível — recomendamos expandir para 1.500 palavras."
+
+*Problema: o reader não sabe se estes números foram crawlados, estimados ou copiados de um brief. Tudo parece verificado. Nada está labelled.*
+
+---
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Word count: 1.247 palavras (WebFetch da URL entregue em sessão)
+> - 🔵 **verified** — Sem atributo de autor visível no DOM (Grep `<author>` / byline: 0 matches)
+> - 🟡 **assumed** — Flesch Reading Ease estimado ~58 (baseado em sentence length médio observado; sem cálculo formal executado)
+> - 🟡 **assumed** — Página classificada como "Blog post" → floor mínimo 1.500 palavras (tipo de página inferido pelo URL pattern `/blog/`, não confirmado pelo cliente)
+> - 🟢 **projection** — Adição de author bio + E-E-A-T signals projecta melhoria de qualidade rater score; impacto em ranking não garantido sem dados de impressões pré/pós
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — tipo de página validado pelo cliente; Flesch recalculado com texto final
+- [ ] All 🔵 citations added — URL crawlada + timestamp de sessão documentados
+- [ ] All 🟢 projections labeled como tal ao cliente (expectativas de impacto GEO/ranking comunicadas como estimativas, não garantias)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

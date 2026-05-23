@@ -297,6 +297,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via WebFetch/fonte pública no momento da geração
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa por design (keyword trends, CTR forecasts, datas futuras)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+| Pricing (from) | $29/mo | $49/mo | $19/mo |
+| G2 Rating      | 4.8    | 4.5    | 4.2    |
+| Free Tier      | ✅     | ❌     | ✅     |
+```
+*(reader assume todos os preços, ratings e features são actuais — sem labels, sem datas, sem fontes)*
+
+✅ Delivery-ready:
+- 🔵 **verified** — HubSpot Starter pricing $20/mo (WebFetch: hubspot.com/pricing, 2025-06-12)
+- 🟡 **assumed** — Salesforce free tier = ❌ (baseado em pricing page pública; confirmar se trial conta como "free")
+- 🟡 **assumed** — G2 rating 4.4/5 para Pipedrive (último fetch há >30 dias; pode ter mudado)
+- 🟢 **projection** — "best CRM tools 2026" search volume estimado High (baseado em padrão histórico — não ferramenta live)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — preços, ratings e feature flags substituídos com actuals (re-fetch se >2 semanas)
+- [ ] All 🔵 citations adicionadas inline ou em footnote ("as of [date], source: [url]")
+- [ ] All 🟢 projections explicitamente marcadas ao cliente como estimativas ("volume signal, not guaranteed")
+- [ ] Comparison table revista para qualquer competitor que lançou major update desde o fetch inicial
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

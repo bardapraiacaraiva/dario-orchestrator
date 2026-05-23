@@ -463,6 +463,40 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via DataForSEO live call nesta sessão
+- 🟡 **assumed** — plausível mas precisa de cliente confirmar antes de entregar
+- 🟢 **projection** — forecast por design (não verificável via API)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs precisa verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+"keyword volume: 18.100 | difficulty: 67 | top competitor: hubspot.com | 
+projected traffic gain: +34% em 3 meses"
+→ Reader assume tudo verified. Mas volume pode estar stale, difficulty 
+  varia por location, e o traffic gain não vem da API.
+```
+
+✅ Delivery-ready:
+```
+- 🔵 keyword volume "crm software": 18.100/mês (DataForSEO live call, US/EN, 2840)
+- 🔵 difficulty score: 67/100 (dataforseo_labs, desktop, confirmado esta sessão)
+- 🟡 target location: assumido US — confirmar se cliente quer PT/BR ou outro mercado
+- 🟡 competitor set: ["hubspot.com", "salesforce.com"] — assumido por SERP top-10; 
+     cliente deve validar se são concorrentes reais do negócio
+- 🟢 projected organic traffic gain +34% em 90 dias — estimativa editorial, 
+     não calculada pela API
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — location_code, language_code e competitor set validados com cliente antes de re-fetch
+- [ ] All 🔵 citations incluem timestamp do live call (API data expira; SERP muda diariamente)
+- [ ] All 🟢 projections (traffic forecasts, ranking timelines, ROI estimates) marcados como tal ao cliente — não passam por DataForSEO output
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

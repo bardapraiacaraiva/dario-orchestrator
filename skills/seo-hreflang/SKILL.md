@@ -247,6 +247,33 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via fetch da página / sitemap / HTTP headers analisados nesta sessão
+- 🟡 **assumed** — plausível com base nos padrões ISO/Google, mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — impacto estimado por design (não verificável sem dados reais de Search Console)
+
+Output checklist upfront mostra ao leitor exactamente o que é trust-as-is vs o que precisa de verificação. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+en-GB implementado em example.co.uk — return tags presentes — impacto esperado: +30% impressões UK
+```
+*(reader assume que tudo foi verificado ao vivo; impacto não tem label; return tags nunca foram confirmadas no domínio remoto)*
+
+✅ Delivery-ready:
+- 🔵 **verified** — `hreflang="en-US"` com self-referencing tag presente em `https://example.com/page` (fetched via WebFetch desta sessão)
+- 🟡 **assumed** — return tags em `https://example.co.uk/page` apontam de volta para `en-US`; não foi possível fazer fetch ao domínio `.co.uk` — cliente deve confirmar antes de publicar
+- 🟡 **assumed** — `x-default` aponta para `/en/` com base na estrutura de URLs observada; confirmar se é o language selector pretendido
+- 🟢 **projection** — corrigir missing return tags deverá resolver invalidação do hreflang set e melhorar cobertura indexada (estimativa baseada em padrões Google — validar via GSC após deploy)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — return tags verificadas em todos os domínios alternativos (fetch directo ou cliente confirma via GSC / screaming frog)
+- [ ] All 🔵 citations added — URLs fetched e códigos ISO validados referenciados no relatório final
+- [ ] All 🟢 projections labeled as such ao cliente — impactos de indexação apresentados como estimativas, não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

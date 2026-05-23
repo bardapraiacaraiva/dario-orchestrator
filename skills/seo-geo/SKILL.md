@@ -329,6 +329,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output GEO deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via crawl/fetch do URL analisado ou fonte citada no SKILL.md
+- 🟡 **assumed** — plausível dado o domínio/industria, mas requer confirmação do cliente pré-entrega
+- 🟢 **projection** — forecast de impacto por design (não verificável sem dados históricos)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs precisa verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "O teu site tem boa cobertura de brand mentions e deves ver crescimento de AI citations em breve."
+*(sem labels — reader assume que tudo está verified quando na verdade são assumptions e projecções)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — `robots.txt` permite GPTBot e PerplexityBot (confirmado via fetch `/robots.txt`)
+> - 🔵 **verified** — Citability score: 0 passagens entre 134-167 palavras nas top 5 páginas crawladas
+> - 🟡 **assumed** — Brand mentions em Reddit estimados como "baixos" baseado em ausência de resultados públicos; cliente deve confirmar via ferramenta de monitoring
+> - 🟡 **assumed** — Autor com credenciais presente em 3 páginas; não foi possível verificar se byline é indexável por AI crawlers sem acesso ao HTML renderizado
+> - 🟢 **projection** — Implementar llms.txt + SSR deverá incrementar AI citation rate em ~15-25% nos 60-90 dias seguintes (baseado em benchmarks de industria, não em dados históricos do domínio)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: brand mention counts reais, confirmação de SSR vs CSR)
+- [ ] All 🔵 citations linked — cada stat do relatório (ex: "527% growth", "134-167 words") referencia a fonte original do SKILL.md
+- [ ] All 🟢 projections comunicadas ao cliente como forecasts, não garantias — expectativas alinhadas pré-entrega
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown
