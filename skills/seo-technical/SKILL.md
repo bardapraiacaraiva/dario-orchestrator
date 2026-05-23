@@ -224,6 +224,42 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de auditoria técnica SEO deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via crawl directo, ferramenta (PageSpeed, CrUX, robots.txt fetch) ou sessão anterior
+- 🟡 **assumed** — plausível dado o stack/sector, mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa de impacto ou forecast por design (não verificável sem implementação)
+
+Output checklist upfront mostra ao leitor exactamente o que é trust-as-is vs. o que precisa verify. **Honest transparency > inflated audit delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+- LCP está em 3.8s — recomendo optimizar imagens hero
+- robots.txt bloqueia GPTBot e ChatGPT-User
+- Implementar SSR vai reduzir crawl delay em 40%
+```
+*(reader assume que tudo foi medido — mas LCP pode ser lab data, bloqueio AI pode ser inferido, e os 40% são opinião)*
+
+✅ Delivery-ready:
+```
+- 🔵 verified  — robots.txt bloqueia `GPTBot` e `Google-Extended` (fetched directo via WebFetch, 2025-01-15)
+- 🟡 assumed   — LCP estimado em ~3.8s baseado em Lighthouse lab data; CrUX (field data real) não disponível sem acesso Search Console
+- 🟡 assumed   — Canonical tags auto-geradas pelo CMS assumidas como self-referencing; não validadas página a página
+- 🟢 projection — Migração para SSR deverá reduzir crawl delay em 35-50% (benchmark sector e-commerce; resultado real depende de implementação)
+- 🔵 verified  — INP < 200ms (CrUX p75 confirmado via PageSpeed Insights API; FID não referenciado — removido em Set 2024)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir lab data por CrUX/field data real; validar canonicals via crawl completo
+- [ ] All 🔵 citations added — URL da fonte + timestamp do fetch (robots.txt, PSI API, CrUX endpoint)
+- [ ] All 🟢 projections labeled como tal ao cliente — expectativas claras antes de aprovar roadmap de implementação
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

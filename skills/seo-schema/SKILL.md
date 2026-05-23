@@ -223,6 +223,41 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de schema markup deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via page source scan / prior session / cliente data
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente antes de delivery
+- 🟢 **projection** — gerado por design como placeholder (não verificável automaticamente)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+"telephone": "+351 21 000 0000"
+"datePublished": "2024-03-15"
+"aggregateRating": { "ratingValue": "4.8", "reviewCount": "312" }
+```
+*(reader assume que todos os valores foram extraídos da página — podem ser placeholders ou dados desactualizados)*
+
+✅ Delivery-ready:
+```
+"name": "Clínica XYZ"              🔵 verified — extraído do <title> e H1 da página
+"telephone": "[Phone]"             🟡 assumed — não encontrado no source; confirmar com cliente
+"aggregateRating.ratingValue": "4.8" 🟡 assumed — valor visível na UI mas não em markup existente; validar fonte
+"dateModified": "2026-02-10"       🔵 verified — Last-Modified header da página
+"openingHours": "Mo-Fr 09:00-17:00" 🟡 assumed — padrão do template; confirmar horário real
+"geo.latitude / longitude"         🟢 projection — placeholder para cliente preencher; não inferido
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed (substituir assumptions com actuals: telefone, ratings, horários, URLs de logo/imagem)
+- [ ] All 🔵 sources citadas no `SCHEMA-REPORT.md` (e.g., "extraído de JSON-LD existente linha 14", "HTTP header")
+- [ ] All 🟢 projections/placeholders comunicados ao cliente com instrução explícita de preenchimento antes de deploy
+- [ ] Nenhum schema deprecated (HowTo, SpecialAnnouncement, ClaimReview, etc.) incluído no output final
+- [ ] JSON-LD para markup time-sensitive (Product, Offer) confirmado como server-rendered, não JS-injected
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

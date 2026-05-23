@@ -180,6 +180,31 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/URL/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via WebFetch/HTTP check/parse real do ficheiro
+- 🟡 **assumed** — plausível com base na estrutura detectada, mas precisa de confirmação do cliente antes da entrega
+- 🟢 **projection** — estimativa por design (ex: contagens após geração, datas sugeridas)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+- "847 URLs válidas no sitemap" — sem indicar se foram fetchadas (🔵) ou contadas pelo parser sem verificar HTTP status (🟡)
+- "`<lastmod>` actualizado" — sem indicar se as datas vieram do servidor (🔵) ou foram assumidas como data de hoje (🟡)
+- "Sitemap referenciado no robots.txt" — sem ter feito WebFetch ao `/robots.txt` real
+
+✅ Delivery-ready:
+- 🔵 **verified** — 312 URLs retornam HTTP 200 (confirmado via Bash/curl batch)
+- 🟡 **assumed** — 28 URLs de `/blog/*` assumidas como indexáveis; cliente deve confirmar ausência de `noindex` em templates de categoria
+- 🟢 **projection** — sitemap index com 3 ficheiros gerado para ~74.000 URLs estimadas após crawl completo; split real depende do volume final
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions com actuals (ex: status HTTP real, meta robots verificados)
+- [ ] Todos os itens 🔵 com fonte citada — URL do ficheiro analisado, timestamp do fetch, comando HTTP usado
+- [ ] Todos os itens 🟢 labeled explicitamente ao cliente como projecção — nunca apresentados como factos verificados
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown
