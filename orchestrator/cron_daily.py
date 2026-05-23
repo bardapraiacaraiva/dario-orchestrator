@@ -236,6 +236,49 @@ def job_integrity_gate() -> dict:
     }
 
 
+def job_auto_capture_obsidian() -> dict:
+    """Auto-capture new Obsidian outputs into the scoring pipeline.
+
+    Scans `~/OneDrive/.../05 - Claude - IA/Outputs/` for new .md files,
+    infers skill, runs score_real_output.py for each. Idempotent —
+    uses `.captured_outputs.yaml` registry to avoid double-processing.
+
+    Cap at 5 new captures per daily run (max ~$0.05/day API spend).
+    Operator can run manually with `--limit N` for larger batches.
+    """
+    try:
+        import subprocess
+        script = ORCH_DIR / "scripts" / "auto_capture_obsidian.py"
+        if not script.exists():
+            return {"error": "auto_capture_obsidian.py not found"}
+
+        proc = subprocess.run(
+            [sys.executable, str(script), "--limit", "5"],
+            capture_output=True, text=True, timeout=600,
+            cwd=str(ORCH_DIR),
+        )
+        # Parse the summary line
+        lines = proc.stdout.strip().split("\n")
+        result = {
+            "stdout_tail": "\n".join(lines[-10:]),
+            "returncode": proc.returncode,
+        }
+        # Quick metrics from output
+        import re as _re
+        for line in lines:
+            m = _re.search(r"Captured:\s*(\d+)", line)
+            if m:
+                result["captured"] = int(m.group(1))
+            m = _re.search(r"Skipped \(errors\):\s*(\d+)", line)
+            if m:
+                result["skipped"] = int(m.group(1))
+        return result
+    except subprocess.TimeoutExpired:
+        return {"error": "timeout (>10min)"}
+    except Exception as e:
+        return {"error": str(e)[:300]}
+
+
 def job_delivery_rate_recompute() -> dict:
     """Recompute delivery_ready_rate from current production scores.
 
@@ -425,6 +468,7 @@ def run_all(dry_run: bool = False) -> dict:
     report["jobs"].append(_run_job("integrity_gate", job_integrity_gate))
     report["jobs"].append(_run_job("prompt_hints_promote", job_prompt_hints_promote))
     report["jobs"].append(_run_job("delivery_rate_recompute", job_delivery_rate_recompute))
+    report["jobs"].append(_run_job("auto_capture_obsidian", job_auto_capture_obsidian))
 
     report["duration_seconds"] = (_now() - start).total_seconds()
 
