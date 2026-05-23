@@ -55,3 +55,128 @@ Savings: ~70% vs including everything
 
 ## Inspired by
 - **dyad-sh/dyad** (8K stars) — Smart Context auto-selection
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Scoring real e verificável
+- [ ] Scores são decimais concretos (0.00–1.00), não "alto/médio/baixo"
+- [ ] Pelo menos 5 ficheiros listados com scores individuais
+- [ ] Total de tokens incluídos vs. total disponível está explícito
+- ❌ NOT delivery-ready: `tailwind.config.ts → alta relevância`
+- ✅ Delivery-ready: `tailwind.config.ts → 0.95 (design tokens — ESSENTIAL) | ~420 tokens`
+
+### Gate 2 — Token budget documentado com math visível
+- [ ] Budget total declarado (ex: 4000 tokens)
+- [ ] Soma dos ficheiros incluídos não excede budget
+- [ ] Savings % calculado: `(tokens_skipped / tokens_total) × 100`
+- ❌ NOT delivery-ready: "poupámos bastantes tokens ao saltar ficheiros irrelevantes"
+- ✅ Delivery-ready: `Included: 1 180 tokens | Skipped: 3 420 tokens | Savings: 74.3%`
+
+### Gate 3 — Scoring factors aplicados com pesos explícitos
+- [ ] Os 4 factores (filename match, import chain, recency, size penalty) aparecem ou são justificados
+- [ ] Score final mostra contribuição de pelo menos 2 factores
+- [ ] Ficheiros com size penalty têm nota de tamanho (ex: `db/schema.ts → 2 100 lines → penalidade -0.15`)
+- ❌ NOT delivery-ready: `db/schema.ts → 0.10 (não relevante)`
+- ✅ Delivery-ready: `db/schema.ts → 0.10 (filename match: 0.0 | import chain: 0.0 | size penalty: -0.15 → final: 0.10)`
+
+### Gate 4 — Contexto alinhado à task específica
+- [ ] Os ficheiros incluídos têm relação directa com a task declarada
+- [ ] Ficheiros excluídos têm razão explícita e task-específica (não genérica)
+- [ ] Se task mudar (ex: hero → auth flow), scores são re-calculados e diferentes
+- ❌ NOT delivery-ready: `auth.ts → excluído (irrelevante)`
+- ✅ Delivery-ready: `lib/auth.ts → 0.08 — excluído: task é hero section UI, sem dependência de autenticação`
+
+### Gate 5 — Integração e configuração declaradas
+- [ ] Token budget default (4000) ou valor customizado está explícito
+- [ ] Ordem de execução clara: context selection → prompt assembly → builder skill
+- [ ] Cache behavior declarado: session-scoped, invalidação por ficheiro modificado
+- ❌ NOT delivery-ready: "corre antes do builder skill com cache"
+- ✅ Delivery-ready: `Cache: session-scoped | Invalidation: file mtime change | Budget: 4 000 tokens (override: SMART_CONTEXT_BUDGET=8000)`
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets
+- [ ] Nenhum `<client_name>`, `<project_path>`, `<task_description>` no output
+- [ ] Nome do projecto real aparece nos paths (ex: `cuidai/components/ui/button.tsx`)
+- [ ] Task description é concreta, não placeholder
+- ❌ NOT delivery-ready: `<project>/tailwind.config.ts → score <valor>`
+- ✅ Delivery-ready: `lusocontas/tailwind.config.ts → 0.92 | task: "gerar dashboard de movimentos bancários"`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## Smart Context Selection — LUSOconta Dashboard Task
+
+**Skill:** builder-dashboard-component
+**Task:** "Gerar componente de tabela de movimentos bancários com filtros por data"
+**Project root:** `/projects/lusocontas`
+**Token budget:** 4 000 tokens
+
+---
+
+### Ficheiros descobertos (Glob: `**/*.{ts,tsx,json,css}`)
+Total: 34 ficheiros | ~16 800 tokens se incluídos todos
+
+---
+
+### Scoring breakdown
+
+| Ficheiro | Filename | Import chain | Recency | Size penalty | **Final** | Tokens |
+|---|---|---|---|---|---|---|
+| tailwind.config.ts | 0.40 | 0.00 | 0.20 | 0.00 | **0.92** | 380 |
+| components/ui/table.tsx | 0.40 | 0.30 | 0.20 | 0.00 | **0.90** | 290 |
+| components/ui/date-picker.tsx | 0.40 | 0.30 | 0.15 | 0.00 | **0.85** | 310 |
+| app/layout.tsx | 0.00 | 0.30 | 0.20 | 0.00 | **0.75** | 180 |
+| lib/formatters.ts | 0.40 | 0.00 | 0.15 | 0.00 | **0.70** | 140 |
+| package.json | 0.00 | 0.00 | 0.20 | 0.00 | **0.62** | 210 |
+| db/schema.ts | 0.00 | 0.00 | 0.10 | -0.15 | **0.12** | 2 100 |
+| lib/auth.ts | 0.00 | 0.00 | 0.05 | 0.00 | **0.08** | 890 |
+| scripts/seed.ts | 0.00 | 0.00 | 0.00 | -0.10 | **0.05** | 1 400 |
+
+---
+
+### Decisão de inclusão
+
+**Incluídos (score ≥ 0.60):**
+- tailwind.config.ts → 380 tokens
+- components/ui/table.tsx → 290 tokens
+- components/ui/date-picker.tsx → 310 tokens
+- app/layout.tsx → 180 tokens
+- lib/formatters.ts → 140 tokens
+- package.json → 210 tokens
+
+**Total incluído: 1 510 tokens**
+**Skipped: 15 290 tokens**
+**Savings: 91.0%** ✅ (acima do target 60–80%)
+
+---
+
+### Razões de exclusão (task-specific)
+
+- `db/schema.ts` → schema de BD não tem impacto em componente de UI de tabela; size penalty activo (2 100 linhas)
+- `lib/auth.ts` → tabela de movimentos não requer lógica de autenticação neste contexto
+- `scripts/seed.ts` → script de desenvolvimento, zero relevância para geração de componente
+
+---
+
+### Cache status
+Session ID: `lsc-2025-01-15` | Scores válidos até próximo `git commit` ou `mtime` change
+Override disponível: `SMART_CONTEXT_BUDGET=8000` para tasks com múltiplos componentes
+```
+
+---
+
+## Output anti-patterns
+
+- Scores qualitativos ("alta", "média", "baixa") em vez de decimais — impossível auditar decisões de inclusão
+- Token budget declarado mas sem math: "incluímos os mais relevantes dentro do budget" sem soma verificável
+- Savings % arredondado a múltiplos de 10 (60%, 70%, 80%) — cheira a estimativa, não a cálculo real
+- Ficheiros excluídos sem razão task-specific: "auth.ts → irrelevante" vale zero sem ligação à task concreta
+- Scoring factors listados no SKILL.md mas ausentes no output — pesos existem para aparecer, não decorar docs
+- Paths genéricos (`/project/src/…`) em vez de paths reais do cliente (`lusocontas/components/…`)
+- Cache declarada sem scope: "usa cache" sem definir invalidação = comportamento imprevisível em sessões longas
+- Token count omitido por ficheiro — sem granularidade, o budget check é inauditável
+- Score único sem decomposição por factor nos ficheiros borderline (0.55–0.65) — zona de decisão crítica sem justificação
+- Angle-brackets no output final: `<task>`, `<project_name>`, `<score>` — output não está ready, está em template
