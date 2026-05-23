@@ -75,3 +75,210 @@ router.delete('/projects/:id', requireRole('admin'), deleteProject)
 - Sem rate limiting no login — brute force vulnerability
 - Secrets em codigo — SEMPRE usar env vars
 - CORS com * em producao — qualquer site pode chamar a API
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Password hashing é seguro e verificável
+- [ ] Usa bcrypt (cost ≥ 12) ou argon2id — nunca MD5, SHA-1, SHA-256 bare
+- [ ] Hash gerado é visível no output (ex: `$2b$12$...` ou `$argon2id$...`)
+- [ ] Função `compare` usa timing-safe comparison (não `===` direto)
+- [ ] Salt é gerado automaticamente pela lib (nunca hardcoded)
+- ❌ NOT delivery-ready: `const hash = sha256(password)` ou `bcrypt.hash(password, 8)`
+- ✅ Delivery-ready: `const hash = await bcrypt.hash(password, 12)` com import `bcryptjs@^2.4.3` em `package.json`
+
+### Gate 2 — JWT configurado para produção (não tutorial)
+- [ ] Access token expiry: ≤ 15 min (`expiresIn: '15m'`)
+- [ ] Algoritmo: RS256 (assimétrico) ou HS256 com secret ≥ 32 chars em env var
+- [ ] Refresh token: expiry 7 dias, stored na DB com campo `revoked_at`
+- [ ] Refresh rotation: ao usar refresh, o antigo é invalidado e novo é emitido
+- [ ] Payload do JWT contém apenas `sub`, `role`, `iat`, `exp` — não inclui password hash ou dados sensíveis
+- ❌ NOT delivery-ready: `jwt.sign({ user }, 'secret')` sem expiry, secret hardcoded
+- ✅ Delivery-ready: `jwt.sign({ sub: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '15m', algorithm: 'HS256' })`
+
+### Gate 3 — Rate limiting e proteção brute-force implementados
+- [ ] Rate limiter no endpoint `/auth/login`: máx 5 tentativas / 15 min / IP
+- [ ] Rate limiter no `/auth/register`: máx 3 requests / hora / IP
+- [ ] Resposta 429 inclui header `Retry-After` com segundos restantes
+- [ ] Implementação usa `express-rate-limit` + `rate-limit-redis` (ou `memory` em dev com aviso)
+- ❌ NOT delivery-ready: sem rate limiter, ou `windowMs: 60000, max: 100` (muito permissivo)
+- ✅ Delivery-ready: `rateLimit({ windowMs: 15 * 60 * 1000, max: 5, message: { error: 'Too many attempts. Try again in 15 minutes.' } })`
+
+### Gate 4 — RBAC implementado com roles reais do cliente
+- [ ] Roles definidas correspondem ao domínio do cliente (ex: Cuidai: `caregiver/family/admin`; Tributario.AI: `accountant/client/admin`)
+- [ ] Middleware `requireRole` rejeita com 403 (não 401) quando role insuficiente
+- [ ] Permissões são granulares e listadas explicitamente (não só `true/false`)
+- [ ] Pelo menos um exemplo de rota protegida por role está incluído no output
+- ❌ NOT delivery-ready: `roles: ['admin', 'user']` genérico sem ligação ao domínio do cliente
+- ✅ Delivery-ready: `const roles = { admin: ['read','write','delete','manage_users','manage_billing'], accountant: ['read','write','export'], client: ['read'] }` (Tributario.AI)
+
+### Gate 5 — CORS e variáveis de ambiente production-safe
+- [ ] CORS whitelist contém apenas origins reais do cliente (nunca `*` em prod)
+- [ ] Todos os secrets referenciados via `process.env.NOME_VAR` com nome explícito
+- [ ] Ficheiro `.env.example` gerado com todas as vars necessárias (valores placeholder, não secrets reais)
+- [ ] `credentials: true` nas CORS options se usar cookies
+- ❌ NOT delivery-ready: `cors({ origin: '*' })` ou `JWT_SECRET=mysecret` hardcoded no código
+- ✅ Delivery-ready: `cors({ origin: ['https://app.cuidai.pt', 'https://admin.cuidai.pt'], credentials: true })` + `.env.example` com `JWT_SECRET=`, `REFRESH_SECRET=`, `DATABASE_URL=`
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets
+- [ ] Sem `<your-app>`, `<client>`, `<domain>`, `<secret>` no output final
+- [ ] Nome da app/projeto aparece em comments, prefixos de env var, e origem CORS
+- [ ] Stack tecnológica corresponde ao projeto real do cliente (Node/Express, Next.js, FastAPI, etc.)
+- [ ] Endpoints seguem convenção de nomenclatura já existente no projeto (se aplicável)
+- ❌ NOT delivery-ready: `origin: 'https://<your-domain>.com'` ou `APP_NAME=<your-app>`
+- ✅ Delivery-ready: `origin: 'https://app.tributario.ai'`, `TRIBUTARIO_JWT_SECRET=`, comentários com `// Tributario.AI — Auth System v1`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+// Tributario.AI — Authentication System
+// Stack: Node.js + Express + Prisma + PostgreSQL
+// Generated: 2024-01
+
+// === .env.example ===
+DATABASE_URL=postgresql://user:pass@localhost:5432/tributario
+JWT_SECRET=                        # min 32 chars, openssl rand -hex 32
+REFRESH_SECRET=                    # diferente do JWT_SECRET
+JWT_EXPIRES_IN=15m
+REFRESH_EXPIRES_IN=7d
+ALLOWED_ORIGINS=https://app.tributario.ai,https://admin.tributario.ai
+
+// === src/config/cors.ts ===
+import cors from 'cors'
+
+export const corsConfig = cors({
+  origin: process.env.ALLOWED_ORIGINS?.split(',') ?? [],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+})
+
+// === src/lib/password.ts ===
+import bcrypt from 'bcryptjs' // ^2.4.3
+
+const BCRYPT_ROUNDS = 12
+
+export async function hashPassword(plain: string): Promise<string> {
+  return bcrypt.hash(plain, BCRYPT_ROUNDS)
+}
+
+export async function verifyPassword(plain: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(plain, hash) // timing-safe internamente
+}
+
+// === src/lib/jwt.ts ===
+import jwt from 'jsonwebtoken'
+
+type TokenPayload = { sub: string; role: TributarioRole }
+
+export function signAccessToken(payload: TokenPayload): string {
+  return jwt.sign(payload, process.env.JWT_SECRET!, {
+    expiresIn: process.env.JWT_EXPIRES_IN ?? '15m',
+    algorithm: 'HS256',
+  })
+}
+
+export function signRefreshToken(payload: { sub: string }): string {
+  return jwt.sign(payload, process.env.REFRESH_SECRET!, {
+    expiresIn: process.env.REFRESH_EXPIRES_IN ?? '7d',
+    algorithm: 'HS256',
+  })
+}
+
+export function verifyAccessToken(token: string): TokenPayload {
+  return jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload
+}
+
+// === src/lib/rbac.ts ===
+export type TributarioRole = 'admin' | 'accountant' | 'client'
+
+const PERMISSIONS = {
+  admin:      ['read', 'write', 'delete', 'manage_users', 'manage_billing', 'export'],
+  accountant: ['read', 'write', 'export'],
+  client:     ['read'],
+} as const
+
+export function requireRole(...roles: TributarioRole[]) {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Forbidden: insufficient role' })
+    }
+    next()
+  }
+}
+
+// === src/middleware/rateLimiter.ts ===
+import rateLimit from 'express-rate-limit'
+
+export const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many login attempts. Try again in 15 minutes.' },
+  keyGenerator: (req) => req.ip ?? 'unknown',
+})
+
+export const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hora
+  max: 3,
+  message: { error: 'Too many registrations from this IP.' },
+})
+
+// === src/routes/auth.ts ===
+router.post('/auth/register', registerLimiter, async (req, res) => {
+  const { email, password, role = 'client' } = req.body
+  const hash = await hashPassword(password)
+  const user = await prisma.user.create({ data: { email, passwordHash: hash, role } })
+  const accessToken  = signAccessToken({ sub: user.id, role: user.role })
+  const refreshToken = signRefreshToken({ sub: user.id })
+  await prisma.refreshToken.create({ data: { token: refreshToken, userId: user.id } })
+  res.status(201).json({ accessToken, refreshToken })
+})
+
+router.post('/auth/login', loginLimiter, async (req, res) => {
+  const { email, password } = req.body
+  const user = await prisma.user.findUnique({ where: { email } })
+  if (!user || !(await verifyPassword(password, user.passwordHash))) {
+    return res.status(401).json({ error: 'Invalid credentials' })
+  }
+  const accessToken  = signAccessToken({ sub: user.id, role: user.role })
+  const refreshToken = signRefreshToken({ sub: user.id })
+  await prisma.refreshToken.create({ data: { token: refreshToken, userId: user.id } })
+  res.json({ accessToken, refreshToken })
+})
+
+router.post('/auth/refresh', async (req, res) => {
+  const { refreshToken } = req.body
+  const stored = await prisma.refreshToken.findUnique({ where: { token: refreshToken } })
+  if (!stored || stored.revokedAt) return res.status(401).json({ error: 'Invalid refresh token' })
+  const payload = jwt.verify(refreshToken, process.env.REFRESH_SECRET!) as { sub: string }
+  const user = await prisma.user.findUnique({ where: { id: payload.sub } })
+  // Rotate: revogar antigo, emitir novo par
+  await prisma.refreshToken.update({ where: { token: refreshToken }, data: { revokedAt: new Date() } })
+  const newAccess  = signAccessToken({ sub: user!.id, role: user!.role })
+  const newRefresh = signRefreshToken({ sub: user!.id })
+  await prisma.refreshToken.create({ data: { token: newRefresh, userId: user!.id } })
+  res.json({ accessToken: newAccess, refreshToken: newRefresh })
+})
+
+// Rota protegida — exemplo Tributario.AI
+router.delete('/declarations/:id', requireAuth, requireRole('admin', 'accountant'), deleteDeclaration)
+```
+
+---
+
+## Output anti-patterns
+
+- `jwt.sign({ user }, 'secret')` — secret hardcoded, sem expiry, payload com objeto inteiro do user (expõe dados)
+- `bcrypt.hash(password, 8)` — cost factor 8 é insuficiente em 2024; mínimo 12
+- `cors({ origin: '*' })` em produção — qualquer domínio pode chamar a API com credenciais
+- Refresh token sem campo `revoked_at` na DB — impossível invalidar tokens comprometidos
+- Rate limiter em memória sem aviso — não sobrevive a restart ou multi-instance (usar Redis em prod)
+- Roles genéricas `['admin', 'user']` sem ligação ao domínio real do cliente — não reflete permissões reais do negócio
+- `.env` com secrets reais committed — deve existir apenas `.env.example` no output
+- `return res.status(401)` quando role é insuficiente — deve ser 403 Forbidden, não 401 Unauthorized
+- `if (user.password === password)` — comparação plaintext, sem hash, crítico
+- Refresh token com `expiresIn: '30d'` ou sem expiry — janela de ataque desnecessariamente longa

@@ -65,3 +65,187 @@ npx shadcn@latest add "https://magicui.design/r/animated-gradient-text"
 ## Inspired by
 - **magicuidesign/magicui** (19K stars) — 150+ animated shadcn components
 - **framer/motion** (26K stars) — React animation library
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Componentes instaláveis e funcionais
+- [ ] Cada componente tem o comando `npx shadcn` exato e correto (não inventado)
+- [ ] Import path corresponde ao ficheiro gerado pelo CLI (`@/components/magicui/...`)
+- [ ] Dependências peer (framer-motion, clsx, tailwind-merge) mencionadas se necessário
+- ❌ NOT delivery-ready: `import { Meteors } from "magic-ui"` — package name errado, não instala
+- ✅ Delivery-ready: `npx shadcn@latest add "https://magicui.design/r/meteors"` → `import { Meteors } from "@/components/magicui/meteors"`
+
+### Gate 2 — Máximo 3 animações por página respeitado
+- [ ] Output lista explicitamente quais 3 animações foram escolhidas e porquê
+- [ ] Justificação de cada animação: "guia atenção para X" não "fica bonito"
+- [ ] Animações restantes da lista são explicitamente descartadas com razão
+- ❌ NOT delivery-ready: Hero com Particles + MorphingText + Meteors + SparklesText + AnimatedBeam numa página só
+- ✅ Delivery-ready: "Escolhido: AnimatedGradientText (headline), NumberTicker (social proof), ShimmerButton (CTA) — RestroGrid descartado: conflitaria com Meteors no z-index"
+
+### Gate 3 — `prefers-reduced-motion` implementado
+- [ ] Cada componente personalizado tem guard `useReducedMotion()` ou CSS `@media (prefers-reduced-motion: reduce)`
+- [ ] Componentes Magic UI nativos: confirmar que a versão instalada já inclui o guard
+- [ ] Animações críticas (ex: loading states) têm fallback estático funcional
+- ❌ NOT delivery-ready: `animate={{ x: [0, 10, 0] }}` sem qualquer reduced-motion check
+- ✅ Delivery-ready: `const shouldReduceMotion = useReducedMotion(); <motion.div animate={shouldReduceMotion ? {} : { x: [0,10,0] }}>`
+
+### Gate 4 — Mobile safety verificada
+- [ ] Animações com `Particles` ou `GlowEffect` desactivadas em viewport < 768px
+- [ ] `BentoGrid` tem layout fallback (grid-cols-1) sem hover effects em touch devices
+- [ ] Performance: componentes com `will-change` não aplicado a mais de 3 elementos simultâneos
+- ❌ NOT delivery-ready: `<Particles quantity={150} />` sem `className="hidden md:block"`
+- ✅ Delivery-ready: `<Particles quantity={80} className="hidden md:block" />` + static background em mobile
+
+### Gate 5 — Props e customização com dados reais do cliente
+- [ ] Cores do gradiente correspondem à palette do cliente (não os defaults roxo/azul Magic UI)
+- [ ] `NumberTicker` mostra números reais do cliente (não "500+", "1000+", "99%")
+- [ ] `MorphingText` usa palavras do domínio do cliente (não "Hello", "World", "Motion")
+- ❌ NOT delivery-ready: `<AnimatedGradientText>Welcome to our platform</AnimatedGradientText>`
+- ✅ Delivery-ready: `<AnimatedGradientText className="from-[#0EA5E9] to-[#6366F1]">Recupera o teu dinheiro em 48h</AnimatedGradientText>` (SAQUEI, cores brand)
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+- [ ] Zero ocorrências de `<ClientName>`, `<color>`, `<your-text>`, `<NUMBER>` no output final
+- [ ] Ficheiros têm nomes reais: `hero-cuidai.tsx` não `hero-component.tsx`
+- [ ] Tailwind config snippet usa as cores hex reais do cliente se custom theme necessário
+- ❌ NOT delivery-ready: `text="<insira slogan aqui>"` ou `from-<primary-color> to-<secondary-color>`
+- ✅ Delivery-ready: `text="Cuidar começa aqui."` com `from-[#22C55E] to-[#15803D]` (Cuidai green palette)
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# SAQUEI — Hero Section Animada
+
+## Componentes selecionados (3/3 budget)
+1. **AnimatedGradientText** — headline principal (guia leitura imediata)
+2. **NumberTicker** — social proof (ancora credibilidade)
+3. **ShimmerButton** — CTA único (maximiza click-through)
+
+*Descartados: Meteors (distrai do formulário), Particles (pesado em mobile), MorphingText (reduz clareza da proposta de valor)*
+
+## Install
+```bash
+npx shadcn@latest add "https://magicui.design/r/animated-gradient-text"
+npx shadcn@latest add "https://magicui.design/r/number-ticker"
+npx shadcn@latest add "https://magicui.design/r/shimmer-button"
+```
+
+## `/components/saquei/hero-animated.tsx`
+
+```tsx
+"use client";
+
+import { useReducedMotion } from "framer-motion";
+import { AnimatedGradientText } from "@/components/magicui/animated-gradient-text";
+import { NumberTicker } from "@/components/magicui/number-ticker";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
+import { cn } from "@/lib/utils";
+
+export function SaqueiHeroAnimated() {
+  const shouldReduce = useReducedMotion();
+
+  return (
+    <section className="relative flex min-h-[600px] flex-col items-center justify-center gap-8 px-4 py-24">
+      {/* Badge */}
+      <div className="flex items-center gap-2 rounded-full border border-[#F59E0B]/30 bg-[#F59E0B]/10 px-4 py-1.5">
+        <span className="text-xs font-medium text-[#F59E0B]">
+          Processo 100% digital
+        </span>
+      </div>
+
+      {/* Headline com gradiente SAQUEI brand */}
+      <AnimatedGradientText
+        className={cn(
+          "text-center text-5xl font-bold leading-tight md:text-7xl",
+          "from-[#F59E0B] via-[#EF4444] to-[#F59E0B]",
+          shouldReduce && "animate-none"
+        )}
+      >
+        Recupera o que é teu.
+      </AnimatedGradientText>
+
+      <p className="max-w-xl text-center text-lg text-muted-foreground">
+        Reclamações de consumo resolvidas sem advogados, sem filas,
+        sem stress. Só resultados.
+      </p>
+
+      {/* Social proof com números reais */}
+      <div className="flex gap-12">
+        <div className="flex flex-col items-center">
+          <div className="flex items-baseline gap-1">
+            <NumberTicker
+              value={2340}
+              className="text-4xl font-bold text-[#F59E0B]"
+            />
+            <span className="text-2xl font-bold text-[#F59E0B]">+</span>
+          </div>
+          <span className="text-sm text-muted-foreground">casos resolvidos</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="flex items-baseline gap-1">
+            <NumberTicker
+              value={94}
+              className="text-4xl font-bold text-[#F59E0B]"
+            />
+            <span className="text-2xl font-bold text-[#F59E0B]">%</span>
+          </div>
+          <span className="text-sm text-muted-foreground">taxa de sucesso</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="flex items-baseline gap-1">
+            <NumberTicker
+              value={48}
+              className="text-4xl font-bold text-[#F59E0B]"
+            />
+            <span className="text-2xl font-bold text-[#F59E0B]">h</span>
+          </div>
+          <span className="text-sm text-muted-foreground">resposta média</span>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <ShimmerButton
+        shimmerColor="#F59E0B"
+        background="#EF4444"
+        className="px-10 py-4 text-lg font-semibold"
+        onClick={() => window.location.href = "/reclamar"}
+      >
+        Iniciar reclamação grátis
+      </ShimmerButton>
+
+      <p className="text-xs text-muted-foreground">
+        Sem cartão de crédito · Resultado em 48h · Cancelamento gratuito
+      </p>
+    </section>
+  );
+}
+```
+
+## Mobile behaviour
+- `NumberTicker` ativo em todos os viewports (CPU leve)
+- `AnimatedGradientText` reduz para `text-5xl` em mobile (já via responsive)
+- `ShimmerButton` full-width em `< 640px`: adicionar `className="w-full sm:w-auto"`
+
+## Performance checklist
+- [x] `will-change: transform` apenas no ShimmerButton shimmer layer
+- [x] `prefers-reduced-motion` via `useReducedMotion()` — desactiva gradient animation
+- [x] Sem Particles: hero mantém < 50ms interaction latency em low-end Android
+```
+
+---
+
+## Output anti-patterns
+
+- Instalar componente via `import from "magic-ui"` ou `"@magic-ui/react"` — package não existe; sempre usar CLI `npx shadcn@latest add "https://magicui.design/r/[component]"`
+- Usar mais de 3 animações distintas na mesma página sem justificação explícita de hierarquia visual
+- Omitir `prefers-reduced-motion` guard em qualquer animação custom com Framer Motion
+- Deixar cores dos componentes como defaults Magic UI (roxo `#8B5CF6` / azul `#3B82F6`) quando o cliente tem brand palette definida
+- Gerar `NumberTicker` com valores inventados (`value={500}`, `value={99}`) sem confirmar dados reais do produto
+- Aplicar `Particles` ou `GlowEffect` sem `className="hidden md:block"` — destrói performance em mobile mid-range
+- Usar `MorphingText` em headlines com proposta de valor — o morfing atrasa leitura e reduz conversão
+- Esquecer `"use client"` directive em ficheiros com hooks Framer Motion — quebra em Next.js App Router
+- Entregar componente isolado sem mostrar onde encaixa na página (`page.tsx` ou layout pai)
+- Placeholder copy nos exemplos: `"Your Amazing Product"`, `"Click here"`, `<slogan>` — sempre substituir por copy real do cliente
