@@ -144,6 +144,28 @@ def generate():
             production_validated_count += 1
     delivery_rate_pct = (100.0 * delivery_yes / delivery_total) if delivery_total else 0.0
 
+    # Human review queue stats (added 2026-05-23)
+    queue_pending = 0
+    queue_resolved = 0
+    queue_avg_ttr_min = 0
+    queue_dir = ORCH / "human_review_queue"
+    if queue_dir.exists():
+        ttrs = []
+        for meta_file in queue_dir.glob("*.meta.yaml"):
+            try:
+                m = load_yaml_safe(meta_file)
+                state = m.get("state", "pending")
+                if state == "pending":
+                    queue_pending += 1
+                elif state == "resolved":
+                    queue_resolved += 1
+                    if m.get("time_to_resolution_minutes"):
+                        ttrs.append(float(m["time_to_resolution_minutes"]))
+            except Exception:
+                continue
+        if ttrs:
+            queue_avg_ttr_min = sum(ttrs) / len(ttrs)
+
     # Task rows
     task_rows = ""
     for t in tasks[:10]:
@@ -305,6 +327,7 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
     <div class="health-row"><span class="dot dot-green"></span> Skills — {total_skills} totais (DARIO {skills['dario']}, DIVA {skills['diva']}, LUCAS {skills['lucas']}, SEO {skills['seo']}, A360 {skills['a360']})</div>
     <div class="health-row"><span class="dot dot-green"></span> Budget Tracker — {budget.get('month','?')}, {pct:.1f}% usado</div>
     <div class="health-row"><span class="dot dot-green"></span> Quality — {len(q_skills)} skills scored, avg {avg_quality:.1f}, delivery-ready {delivery_rate_pct:.0f}% ({delivery_yes}/{delivery_total})</div>
+    <div class="health-row"><span class="dot {'dot-amber' if queue_pending > 0 else 'dot-green'}"></span> Review Queue — {queue_pending} pending, {queue_resolved} resolved {'(avg TTR ' + f'{queue_avg_ttr_min:.0f}min)' if queue_resolved else ''}</div>
     <div class="health-row"><span class="dot dot-green"></span> Tasks — {len(tasks)} activas, {done_count} done</div>
     <div class="health-row"><span class="dot {'dot-green' if pulse_time != 'nunca' else 'dot-red'}"></span> Last Pulse — {pulse_time}</div>
   </div>
