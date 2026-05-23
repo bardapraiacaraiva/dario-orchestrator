@@ -257,3 +257,178 @@ After funnel design:
 - Feed to `dario-funnel` for detailed funnel implementation
 - Feed email sequences to `dario-email-seq` for copy writing
 - Save output to Obsidian: `05 - Claude - IA/Outputs/YYYY-MM-DD - A360 - Funnel - [BusinessName].md`
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Value Ladder está completa e com preços reais do cliente
+
+- [ ] Todos os 4-5 rungs preenchidos (Lead Magnet → Tripwire → Core Offer → Profit Maximizer → Continuity)
+- [ ] Cada rung tem nome específico do produto, preço em € (não "$X"), e formato de entrega concreto
+- [ ] A progressão de preços faz sentido (sem saltos inexplicáveis, ex: LM grátis → Tripwire €19 → Core €497)
+- [ ] Coluna "Purpose" descreve a transformação real, não genérica
+- ❌ NOT delivery-ready: `| Core Offer | [name] | $X | Primary revenue | [format] |`
+- ✅ Delivery-ready: `| Core Offer | Kit Gestão de Heranças | €297 | Família navega processo sem advogado em <60 dias | Portal privado + 3 sessões Zoom |`
+
+---
+
+### Gate 2 — Lead Magnet tem nome, formato e critérios de qualidade verificados
+
+- [ ] Nome segue a fórmula ou equivalente PT com resultado específico e timeframe
+- [ ] Tipo de lead magnet justificado (porquê checklist e não ferramenta/calculadora para este avatar)
+- [ ] Todos os 5 critérios de qualidade do Hormozi assinalados com evidência concreta
+- [ ] Estimativa de tempo de consumo indicada (ex: "leitura 7 min")
+- ❌ NOT delivery-ready: `Lead Magnet: guia sobre gestão financeira para PMEs`
+- ✅ Delivery-ready: `"O Checklist de 12 Pontos para Identificar Fugas de Tesouraria em 10 Minutos" — PDF 8 páginas, leitura 6 min, leva naturalmente ao diagnóstico gratuito (Core Offer da LUSOconta)`
+
+---
+
+### Gate 3 — Tipo de funil selecionado com justificação e sequência de páginas definida
+
+- [ ] Funil escolhido entre os 8 tipos com razão explícita (preço, avatar, tipo de tráfego)
+- [ ] Sequência de páginas listada por ordem com título de cada página
+- [ ] Blueprint da página principal preenchido (headline real, bullets reais, CTA real)
+- [ ] Se funil tem OTO/upsell, produto e preço do OTO estão definidos
+- ❌ NOT delivery-ready: `Vamos usar um Application Funnel para serviço high-ticket`
+- ✅ Delivery-ready: `Application Funnel (Atrium): Opt-in → Vídeo "3 Erros que Custam €50K em Due Diligence" → Formulário 7 perguntas → Call 45min com Pedro → Proposta €4.800. OTO não aplicável nesta fase.`
+
+---
+
+### Gate 4 — Estratégia de tráfego com canais, budget e tempo-para-resultados definidos
+
+- [ ] Mínimo 2 dos 4 métodos Hormozi selecionados e justificados para o avatar do cliente
+- [ ] Canal específico indicado (não "redes sociais" — "LinkedIn orgânico, posts 3x/semana")
+- [ ] Budget mensal em € atribuído a cada canal pago (ou "€0 orgânico" explícito)
+- [ ] Timeline realista para primeiros leads (semanas, não "em breve")
+- ❌ NOT delivery-ready: `Usar paid ads e content marketing para atrair leads`
+- ✅ Delivery-ready: `Cuidai — Semana 1-4: warm outreach a 40 clínicas parceiras (€0, responsável: Ana). A partir Mês 2: Meta Ads €300/mês targeting cuidadores 40-65 Lisboa/Porto. Orgânico: 2 posts/semana LinkedIn sobre burnout do cuidador.`
+
+---
+
+### Gate 5 — Benchmarks de conversão definidos por etapa do funil
+
+- [ ] Taxa de opt-in estimada para a página de lead magnet (sector e tipo de tráfego considerados)
+- [ ] Taxa de conversão do tripwire e/ou core offer indicada com fonte ou benchmark de referência
+- [ ] CAC estimado calculado com base no budget e taxas de conversão
+- [ ] LTV básico calculado (core offer + continuity × meses médios de retenção)
+- ❌ NOT delivery-ready: `As taxas de conversão variam muito, depende do mercado`
+- ✅ Delivery-ready: `SAQUEI — Opt-in page: 35% (benchmark Hormozi B2C fintech). Tripwire €27: 8% dos leads. Core €197: 12% dos compradores tripwire. CAC estimado: €43 com €300/mês Meta Ads a 700 cliques. LTV 12 meses: €197 + €29×8 = €429.`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+
+- [ ] Nome do cliente aparece no título e em pelo menos 3 contextos específicos do output
+- [ ] Zero instâncias de `[name]`, `[format]`, `$X`, `[avatar]`, `[outcome]` no output final
+- [ ] Todos os preços em € (ou moeda local do cliente confirmada), não em $
+- [ ] Produto/serviço real do cliente referenciado nos blueprints das páginas
+- ❌ NOT delivery-ready: `Headline: "[Specific promise + timeframe] para [avatar]"`
+- ✅ Delivery-ready: `Headline: "Encontra o espaço de armazém certo em Lisboa em menos de 48 horas — sem visitas desnecessárias" (ARRECADA.GOV, Opt-in page)`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Acquisition Funnel — Tributario.AI
+
+**Avatar:** Contabilista certificado, 35-55 anos, carteira 80-200 clientes,
+perde 6h/semana em pesquisa fiscal manual, teme erros que geram coimas.
+
+---
+
+## Value Ladder
+
+| Rung | Produto | Preço | Transformação | Formato |
+|------|---------|-------|---------------|---------|
+| **Lead Magnet** | Guia IRS 2025: 11 Deduções que 90% dos TOCs Esquecem | €0 | Primeiro quick-win de poupança para cliente | PDF 14 págs, leitura 9 min |
+| **Tripwire** | Pack de Prompts Fiscais para ChatGPT | €27 | Responde a dúvidas de clientes em <2 min | ZIP com 47 prompts + guia PDF |
+| **Core Offer** | Tributario.AI Pro — Acesso Anual | €497/ano | Elimina pesquisa fiscal manual, 0 erros normativos | SaaS + atualizações AT em tempo real |
+| **Profit Maximizer** | Onboarding Assistido (3 sessões) | €197 (add-on) | Migração do fluxo de trabalho atual em 2 semanas | 3× Zoom 60 min com especialista |
+| **Continuity** | (incluído no Pro) | — | Atualizações automáticas legislação AT | SaaS subscription |
+
+---
+
+## Lead Magnet
+
+**Nome:** "Os 11 Benefícios Fiscais IRS 2025 que 90% dos TOCs Não Aplicam
+(e que Custam em Média €340 por Cliente)"
+
+**Tipo:** Checklist/Cheat sheet — escolhido porque TOCs precisam
+de referência rápida consultável durante atendimento, não vídeo.
+
+**Critérios Hormozi:**
+- ✅ Problema único: deduções IRS ignoradas (não "tudo sobre IRS")
+- ✅ Quick win: verificável em <10 min por cliente
+- ✅ Leva ao Core: checklist mostra O QUÊ, Tributario.AI garante o COMO automaticamente
+- ✅ Nome com benefício + número concreto (€340 média)
+- ✅ PDF 14 páginas — leitura 9 min
+
+---
+
+## Funil Selecionado: Tripwire Funnel
+
+**Justificação:** Core Offer a €497 requer micro-commitment primeiro.
+Pack de Prompts a €27 converte leads em compradores e financia ads.
+
+**Sequência de páginas:**
+1. **Opt-in Page** — "Descarrega o Guia IRS 2025 gratuito"
+2. **Thank You / Tripwire Page** — Oferta imediata Pack Prompts €27
+3. **OTO Page** — Tributario.AI Pro €497 com desconto 30 dias (€397)
+4. **Confirmation Page** — Acesso + próximos passos
+
+**Blueprint Opt-in Page:**
+- **Headline:** "Os 11 Benefícios Fiscais IRS 2025 que Estão a Custar
+  €340 por Cliente aos TOCs que Não os Conhecem"
+- **Sub-headline:** "Para contabilistas com carteira activa que querem
+  entregar mais poupança sem mais horas de pesquisa"
+- **Bullets:**
+  - O benefício do Art.º 78.º-E que se aplica a 1 em cada 3 clientes
+  - A dedução de reabilitação urbana que 94% dos TOCs não pede
+  - Como validar os 11 pontos em <10 min por declaração
+- **CTA:** "Enviar o Guia Gratuitamente"
+- **Social proof:** "Já usado por 1.200+ contabilistas em Portugal"
+
+---
+
+## Estratégia de Tráfego
+
+| Canal | Método | Budget/mês | Timeline | Responsável |
+|-------|--------|------------|----------|-------------|
+| LinkedIn Orgânico | Content (posts casos práticos) | €0 | Leads em 30-45 dias | Miguel (founder) |
+| Warm Outreach | Email para 200 TOCs da beta list | €0 | Leads semana 1 | Miguel |
+| Meta Ads | TOCs 35-55, interesses: contabilidade, AT | €400 | Leads dia 3-5 | Agência |
+| Parceria OCC | Co-marketing newsletter OCC | €150/mês | Leads mês 2 | BD team |
+
+---
+
+## Benchmarks de Conversão
+
+| Etapa | Taxa Estimada | Base |
+|-------|---------------|------|
+| Opt-in page (tráfego frio Meta) | 28% | Benchmark B2B SaaS PT |
+| Opt-in page (LinkedIn orgânico) | 45% | Hormozi warm traffic |
+| Tripwire €27 (% dos opt-ins) | 11% | DigitalMarketer B2B |
+| Core Offer €497 (% dos tripwire buyers) | 18% | Brunson ascension |
+| **CAC estimado (Meta €400/mês)** | **€51** | 400÷(700cliques×28%×11%) |
+| **LTV 24 meses** | **€994** | €497×2 renovações |
+| **Payback period** | **~5 semanas** | CAC÷LTV mensal |
+```
+
+---
+
+## Output anti-patterns
+
+- Entregar Value Ladder com `[name]`, `[format]` ou `$X` — é um template, não um funnel
+- Escolher o tipo de funil sem justificação (dizer "usamos webinar funnel" sem explicar porquê para este cliente e preço)
+- Benchmarks de conversão vagos ("à volta de 20-30%") sem contextualizar canal, temperatura do tráfego ou sector
+- Preços em dólares para clientes portugueses/brasileiros sem confirmação explícita da moeda
+- Lead magnet com nome genérico ("Guia de Marketing Digital") sem resultado específico, número ou timeframe
+- Blueprint de página com placeholders como "Headline: [problema do cliente]" em vez de copy real
+- Estratégia de tráfego que lista canais sem budget, timeline ou responsável atribuído
+- Value Ladder com apenas 2 rungs (Lead Magnet + Core Offer) ignorando tripwire e continuity
+- LTV calculado sem incluir continuity/recorrência quando o modelo do cliente a tem
+- Funil desenhado sem verificar awareness level do avatar (Schwartz) — enviar cold traffic para página de Core Offer direto

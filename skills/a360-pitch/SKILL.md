@@ -303,3 +303,206 @@ After pitch preparation:
 - Feed to `dario-pitch` for advanced deck design and speaker notes
 - Feed financials to `dario-financial-model` for detailed projections
 - Save output to Obsidian: `05 - Claude - IA/Outputs/YYYY-MM-DD - A360 - Pitch - [CompanyName].md`
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Problem Slide passa o "feel it" test
+
+- [ ] Dor quantificada com número real (€/$, horas, % falha)
+- [ ] Avatar específico nomeado (não "empresas" — "fundadores de SaaS B2B em Portugal com <€500k ARR")
+- [ ] Tendência que agrava o problema citada com fonte ou dado observável
+- [ ] Consequência emocional presente (não só racional)
+
+❌ NOT delivery-ready: "As empresas perdem dinheiro com processos ineficientes."
+✅ Delivery-ready: "Fundadores de healthtech em Portugal gastam em média 14h/semana em compliance regulatório (dados APIFARMA 2023) — tempo que devia ir para produto. Com o novo quadro MDR, esse número vai duplicar até 2026."
+
+---
+
+### Gate 2 — Market Size tem TAM/SAM/SOM com fonte verificável
+
+- [ ] TAM tem fonte (Statista, IBISWorld, relatório sectorial, cálculo bottom-up explícito)
+- [ ] SAM está segmentado geograficamente ou por vertical real
+- [ ] SOM é defensável: derivado de nº clientes alvo × ARPU, não tirado do ar
+- [ ] Stage-appropriateness: SOM > €10M pre-seed, > €50M seed
+
+❌ NOT delivery-ready: "O mercado é enorme, estimado em biliões globalmente."
+✅ Delivery-ready: "TAM: €2.1B (mercado europeu de gestão documental para contabilistas, Mordor Intelligence 2024). SAM: €180M (Portugal + PALOP, ~42.000 TOC registados × €4.300 gasto anual médio em software). SOM: €9M nos primeiros 3 anos (2.100 clientes × €358 MRR)."
+
+---
+
+### Gate 3 — Traction Slide é honesta E apresenta os dados no melhor enquadramento verdadeiro
+
+- [ ] Métrica principal destacada (MRR, ARR, utilizadores ativos, LOIs assinadas)
+- [ ] Taxa de crescimento MoM incluída se positiva (ex: "+23% MoM nos últimos 4 meses")
+- [ ] Nenhum dado fabricado ou extrapolado sem base explícita
+- [ ] Se pré-receita: waitlist, pilotos assinados, ou LOIs com nomes (anonimizados OK)
+- [ ] "Melhor versão verdadeira" — não esconde churn nem runway curto sem mencionar plano
+
+❌ NOT delivery-ready: "Temos muita tração e crescimento forte com vários clientes interessados."
+✅ Delivery-ready: "€8.400 MRR (Outubro 2024), +31% MoM desde Julho. 23 clientes pagantes, NRR 112%. 4 LOIs de clientes enterprise assinadas (Randstad PT, Multipessoal, NOS, Grupo Pestana). Churn: 4.3% — plano de retenção em curso com onboarding revisto."
+
+---
+
+### Gate 4 — Financial Projections têm assumptions explícitas e são internamente consistentes
+
+- [ ] Cada linha de receita tem assumption: nº clientes × ARPU × churn rate
+- [ ] Burn rate e runway calculados a partir do ask (não flutua sem explicação)
+- [ ] Year 1 é conservador e defensável com dados actuais de tração
+- [ ] Year 2-3 growth rate justificado (ex: "baseado em expansão para Espanha em Q3 Y2")
+- [ ] EBITDA negativo em Y1/Y2 é explicado — não apologético, estratégico
+
+❌ NOT delivery-ready: Tabela com receitas a crescer 10× por ano sem uma única assumption.
+✅ Delivery-ready: "Y1: €210k receita (23 clientes actuais + 77 novos @ €350 MRR médio, 8% churn mensal). Y2: €890k (expansão Espanha Q3, 3 AEs contratados @ €45k CAC). Y3: €2.4M (Series A fuel, 4 verticais). EBITDA Y1: –€380k (produto + GTM). Breakeven Q2 Y3."
+
+---
+
+### Gate 5 — The Ask é específico: montante + uso de capital + milestones + valuation rationale
+
+- [ ] Montante exacto pedido (não "entre €X e €Y")
+- [ ] Uso de capital detalhado em 3-5 linhas com % ou €
+- [ ] 3 milestones que o capital vai atingir (com prazo)
+- [ ] Valuation ou valuation range com método explícito (múltiplo de receita, comparáveis, DCF simplificado)
+- [ ] Tipo de instrumento mencionado (equity, SAFE, convertible note, revenue share)
+
+❌ NOT delivery-ready: "Procuramos €500k para crescer o negócio e contratar equipa."
+✅ Delivery-ready: "Ask: €500k (SAFE, cap €4M, 20% discount). Uso: 45% produto (2 engenheiros sénior), 35% GTM (1 AE + paid acquisition), 20% operações + legal. Milestones: (1) €25k MRR até Q2 2025, (2) expansão Espanha Q3 2025, (3) Series A €2M em Q1 2026. Valuation cap baseado em 8× ARR run-rate comparáveis SaaS B2B early-stage PT/ES (Sherpany, Factorial seed rounds 2022-23)."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+
+- [ ] Zero instâncias de `[COMPANY NAME]`, `[INSERT METRIC]`, `[YOUR AVATAR]` no output final
+- [ ] Nome do fundador/empresa aparece no slide de cover e team
+- [ ] Todos os números são reais ou claramente marcados como projecção com data
+- [ ] Tagline é específica ao produto real, não genérica
+
+❌ NOT delivery-ready: "A [EMPRESA] resolve o problema de [DOR] para [AVATAR] com [SOLUÇÃO]."
+✅ Delivery-ready: "A Tributario.AI elimina 11h/semana de trabalho manual de compliance para contabilistas portugueses — automatizando a leitura e classificação de decisões arbitrais do CAAD."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# TRIBUTARIO.AI — Seed Pitch Deck
+## Investor Brief · Novembro 2024 · Ricardo Fonseca, CEO
+
+---
+
+### SLIDE 2 — PROBLEMA
+
+**"O contabilista português passa 14h/semana a ler jurisprudência que uma máquina podia ler em 4 segundos."**
+
+Existem 42.000 TOC registados em Portugal. Cada um gere em média 180 processos fiscais activos.
+Com a digitalização forçada da AT e o crescimento do CAAD (+340% decisões arbitrais desde 2019),
+manter-se actualizado é impossível manualmente.
+
+Consequências reais:
+- €2.300 de risco médio por processo mal enquadrado (dados OCC 2023)
+- 67% dos TOC admitem ter perdado pelo menos um prazo crítico por excesso de informação
+- Solução actual: PDF search manual + newsletters pagas (€900/ano) que ainda chegam tarde
+
+O problema está a piorar: AT vai migrar 100% para e-fatura obrigatória em 2025 → volume documental +60%.
+
+---
+
+### SLIDE 3 — SOLUÇÃO
+
+**Tributario.AI é um co-piloto de compliance fiscal** que lê, classifica e alerta o contabilista
+sobre jurisprudência relevante para cada cliente — em tempo real.
+
+Como funciona:
+1. Integração com portal AT e base CAAD via API
+2. LLM fine-tuned em 180.000 decisões arbitrais portuguesas (dataset proprietário)
+3. Dashboard por cliente: alertas de risco, precedentes aplicáveis, sugestões de argumento
+
+Demo ao vivo: app.tributario.ai/demo (senha: pitch2024)
+
+Unique mechanism: "Fiscal Memory Engine" — cada decisão nova é automaticamente
+cruzada com a carteira do contabilista. Não é busca. É vigilância contínua.
+
+---
+
+### SLIDE 5 — MERCADO
+
+TAM: €2.1B — mercado europeu de legaltech/taxtech para contabilistas (Mordor Intelligence 2024)
+SAM: €180M — Portugal + PALOP (42.000 TOC × €4.300 gasto anual médio em software fiscal)
+SOM: €9.2M — 3 anos (2.150 clientes × €358 MRR médio, baseado em cohort actual)
+
+Timing: Reforma IRS 2024 + obrigatoriedade e-fatura 2025 = janela de adopção excepcional.
+Comparável: Klarity (US, taxtech B2B) atingiu $8M ARR em 18 meses com modelo similar.
+
+---
+
+### SLIDE 7 — TRAÇÃO
+
+| Métrica | Valor | Tendência |
+|---|---|---|
+| MRR | €8.400 | +31% MoM (Jul–Out 2024) |
+| Clientes pagantes | 23 TOC | — |
+| NRR | 112% | expansão planos |
+| Churn mensal | 4.3% | ↓ (era 7.1% em Jun) |
+| LOIs enterprise | 4 assinadas | Randstad PT, NOS, Grupo Pestana, Multipessoal |
+| Waitlist | 340 TOC | lista aberta desde Set 2024 |
+
+Milestone recente: Parceria de distribuição com a OCC (Ordem dos Contabilistas Certificados)
+aprovada em Outubro — acesso preferencial a 42.000 membros a partir de Janeiro 2025.
+
+---
+
+### SLIDE 10 — PROJECÇÕES FINANCEIRAS
+
+| | Ano 1 (2025) | Ano 2 (2026) | Ano 3 (2027) |
+|---|---|---|---|
+| Receita | €210k | €890k | €2.4M |
+| COGS (infra + suporte) | €42k | €133k | €312k |
+| Gross Profit | €168k (80%) | €757k (85%) | €2.09M (87%) |
+| OpEx | €548k | €920k | €1.1M |
+| EBITDA | –€380k | –€163k | +€990k |
+| Clientes | 100 | 380 | 950 |
+| ARPU/mês | €175 | €195 | €210 |
+| Burn rate | €31.6k/mês | €13.6k/mês | Positivo Q2 |
+| Equipa | 6 | 11 | 18 |
+
+Assumptions Y1: conversão de 30% da waitlist (340→100) + 8% churn mensal → líquido +8/mês.
+Y2: 1 AE contratado Q1, expansão Espanha Q3 (mercado 2× Portugal). Y3: Series A €2M em Q1 2026.
+
+---
+
+### SLIDE 11 — THE ASK
+
+**€500.000 · SAFE · Cap €4M · 20% discount**
+
+Uso do capital:
+- 45% — Produto: 2 engenheiros sénior (fine-tuning modelo + integrações AT/CAAD)
+- 35% — GTM: 1 Account Executive + €45k paid acquisition (Google + OCC newsletter)
+- 20% — Operações: jurídico, infra cloud escalável, onboarding enterprise
+
+Milestones com este capital:
+1. **€25k MRR** → Q2 2025 (breakeven unit economics)
+2. **Expansão Espanha** → Q3 2025 (parceria REAF-Consejo General)
+3. **Series A €2M** → Q1 2026 (ARR €500k+ como trigger)
+
+Runway: 15 meses a €31.6k/mês burn actual.
+Valuation rationale: 8× ARR run-rate (€100k × 12 = €1.2M ARR equivalente projectado Y1).
+Comparáveis seed PT/ES: Factorial (€8M cap, 2021), Sherpany (€6M cap, 2022).
+```
+
+---
+
+## Output anti-patterns
+
+- **Traction fabricada ou arredondada magicamente**: "€10k MRR" quando são €8.400 — investidores fazem due diligence, a inconsistência destrói credibilidade
+- **TAM tirado de press releases sem metodologia**: citar "mercado de $500B" sem SAM/SOM segmentados é sinal imediato de falta de rigor
+- **Financial projections sem assumptions**: tabela com receitas a crescer 8× por ano com zero explicação de como (qual canal, qual ARPU, qual equipa)
+- **Problema abstracto sem quantificação**: "empresas perdem produtividade" não move ninguém — dor tem de ter número e nome
+- **The Ask com range em vez de número**: "entre €300k e €600k" sinaliza falta de decisão estratégica — escolhe um número e defende-o
+- **Competition slide que ignora incumbentes**: dizer "não temos competição" é instant credibility kill — qualquer Excel e qualquer advogado é competição
+- **Solution slide feature-first**: listar funcionalidades antes do benefício ("temos OCR + NLP + dashboard") em vez de "o contabilista recebe um alerta antes do prazo, não depois"
+- **Placeholders não substituídos no output final**: entregar slide com `[INSERT YOUR METRIC HERE]` ao cliente é falha básica de execução
+- **Valuation sem método explícito**: dizer "a empresa vale €5M" sem múltiplo, sem comparáveis, sem DCF — é wishful thinking apresentado como facto
+- **Vision slide vaga como fechamento**: terminar com "queremos mudar o mundo da contabilidade" sem métrica concreta de onde o negócio está em 2030 desperdiça os últimos 30 segundos de atenção máxima do investidor

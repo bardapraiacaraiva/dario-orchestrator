@@ -225,3 +225,162 @@ After launch:
 - Route to `a360-case-study` to document launch results
 - Feed testimonials to `dario-sales-letter` for updated copy
 - Save output to Obsidian: `05 - Claude - IA/Outputs/YYYY-MM-DD - A360 - Launch Plan - [OfferName].md`
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Launch Type Match
+- [ ] O tipo de lançamento (Seed/Internal/JV/Challenge/Webinar/Evergreen) foi escolhido com base nos dados reais do cliente (tamanho da lista, budget, maturidade do produto)
+- [ ] A decisão de launch type está justificada explicitamente ("escolhemos Seed Launch porque a lista atual tem 47 contactos e budget é €0")
+- [ ] Não foi assumido Internal Launch por defeito sem verificar se lista existe
+
+❌ NOT delivery-ready: "Recomendamos um Internal Launch para o teu produto."
+✅ Delivery-ready: "Recomendamos **Seed Launch** para a Cuidai — lista atual: 0 subscribers, budget disponível: €150, produto ainda em validação (plano de cuidados domiciliários €97/mês)."
+
+---
+
+### Gate 2 — Calendário com Datas Reais
+- [ ] Todos os dias têm datas de calendário concretas (não "Day -30", mas "2 de junho")
+- [ ] O cart open day está alinhado com um dia estratégico (evitar fins de semana, feriados nacionais PT/BR)
+- [ ] A sequência de emails de launch week tem horas de envio definidas (ex: 9h00 Lisboa / 10h00 São Paulo)
+- [ ] O post-launch termina com data-limite para análise e decisão sobre evergreen
+
+❌ NOT delivery-ready: "No Day 0, envia o email 'doors are open'."
+✅ Delivery-ready: "**Segunda, 9 junho 2025, 9h00 (Lisboa) / 10h00 (Brasília)** — enviar email 'As portas abriram: ARRECADA.GOV Professional está disponível'. Cart fecha **domingo, 16 junho, 23h59**."
+
+---
+
+### Gate 3 — PLC Content Personalizado
+- [ ] PLC 1/2/3 têm títulos concretos (não "The Opportunity" genérico, mas o hook específico do produto)
+- [ ] Cada PLC tem formato definido (vídeo vs. email longo vs. post) adequado ao canal do cliente
+- [ ] A pergunta de engagement no final de cada PLC está escrita, não "adicionar pergunta"
+- [ ] A call to action de waitlist aponta para URL real ou placeholder com nome do cliente
+
+❌ NOT delivery-ready: "PLC 1 deve criar curiosidade e estabelecer autoridade."
+✅ Delivery-ready: "**PLC 1 — LUSOconta:** 'Porque é que 73% dos freelancers portugueses pagam IRS a mais — e o que muda em 2025' (email longo, 800 palavras). Pergunta final: 'Isto acontece-te? Responde a este email com SIM ou NÃO.'"
+
+---
+
+### Gate 4 — Sequência de Email com Subject Lines Reais
+- [ ] Todos os 8 emails (Day 0–7) têm subject lines escritas, não templates com [OFFER NAME]
+- [ ] Day 1 (Story) tem nome real de cliente/caso de uso ou está marcado como "a preencher após primeiro comprador"
+- [ ] Days 5-7 (urgency/scarcity) têm a escassez específica definida (founding price, vagas, bónus expira)
+- [ ] O email Day 7 (cart close) tem hora exacta e mecanismo de fecho real
+
+❌ NOT delivery-ready: "Day 6: 'Last chance — [specific scarcity]'"
+✅ Delivery-ready: "**Day 6 — SAQUEI:** Subject: 'Amanhã à meia-noite, o preço founding sobe de €197 para €297 — e os 3 bónus desaparecem.' Scarcity: preço e bónus (template pack + sessão 1:1 de onboarding)."
+
+---
+
+### Gate 5 — Métricas de Sucesso e KPIs Definidos
+- [ ] Meta de conversão da lista → compradores está definida (ex: 2-5% lista = X vendas = €Y receita)
+- [ ] Thresholds de decisão estão documentados ("se <5 vendas no Day 0-1, activamos plano B: outreach manual aos 20 warm leads")
+- [ ] Post-mortem tem template com campos obrigatórios: CVR, receita total, top objecção, NPS primeiras 48h
+- [ ] KPI mínimo de sucesso do lançamento está acordado com o cliente antes de começar
+
+❌ NOT delivery-ready: "Acompanha as conversões e faz um post-mortem."
+✅ Delivery-ready: "**Pupli — KPIs Seed Launch:** Meta: 15 vendas × €197 = €2.955. Lista waitlist: 180 pessoas → CVR target 8,3%. Se Day 0 < 3 vendas até às 18h: activar DM pessoal para os 25 warm leads identificados no pré-launch."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets
+- [ ] Nenhum `[CLIENT NAME]`, `[OFFER NAME]`, `[PRICE]`, `[DATE]` por preencher no output final
+- [ ] URLs, preços, datas, nomes de produtos estão todos populados
+- [ ] Se dado não estava disponível, o output pede explicitamente ao utilizador antes de entregar (não deixa placeholder)
+- [ ] Nome do cliente aparece no mínimo 3x ao longo da sequência completa
+
+❌ NOT delivery-ready: "Envia email com subject '[OFFER NAME] está aqui' para [SEGMENTO]."
+✅ Delivery-ready: "Envia email com subject '**O Tributario.AI Pro está aqui — só para os 47 da lista de espera**' para segmento 'waitlist-tributario-maio25'."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Launch Sequence — Atrium · Internal Launch · Maio–Junho 2025
+
+**Produto:** Atrium Studio Membership — acesso mensal a templates jurídicos PT, €89/mês
+**Lista actual:** 1.240 subscribers (segmentados: 680 advogados independentes, 560 escritórios PME)
+**Budget:** €600 (€400 email + €200 Meta Ads retargeting)
+**Launch Type:** Internal Launch (Walker) — lista estabelecida, produto validado com 12 beta users
+**Cart Open:** Segunda, 2 junho 2025, 9h00 Lisboa
+**Cart Close:** Domingo, 8 junho 2025, 23h59 Lisboa
+
+---
+
+## FASE 1 — PRÉ-LAUNCH (5 mai → 1 jun)
+
+### PLC 1 — 12 maio | "A razão pela qual os teus templates estão a custar-te clientes"
+- Formato: Email longo (900 palavras) + vídeo 8 min (LinkedIn)
+- Hook: "Em 2024, 3 advogados independentes perderam contratos porque os seus contratos-tipo tinham cláusulas desactualizadas pós-reforma do CPC."
+- Pergunta final: "Já te aconteceu assinar um documento e perceber depois que faltava uma cláusula? Responde a este email."
+- CTA: Entrar na lista de espera Atrium Studio → atrium.pt/waitlist
+
+### PLC 2 — 19 maio | "O sistema de 4 camadas que mantém 47 escritórios sempre actualizados"
+- Formato: Email longo (700 palavras)
+- Ensina: framework Atrium (Base → Actualização → Customização → Auditoria)
+- Pergunta final: "Das 4 camadas, qual é a que consome mais tempo no teu escritório?"
+- CTA: Waitlist (reforço)
+
+### PLC 3 — 28 maio | "O que aconteceu quando o Escritório Ferreira & Associados implementou o Atrium"
+- Formato: Email com caso de estudo (cliente beta, autorizado)
+- Prova: "De 4h/semana em actualização de templates para 25 min. Primeira semana poupou €340 em horas."
+- CTA: "Amanhã em 5 dias, as portas abrem para os primeiros 50 membros founding."
+
+### Countdown Emails (29 mai → 1 jun)
+- 29 mai: "Abre em 4 dias — o que está incluído no Atrium Studio Membership"
+- 30 mai: "3 dias — resposta às vossas perguntas mais frequentes"
+- 31 mai: "Amanhã às 9h00 — preço founding €89/mês (sobe para €129 a 9 junho)"
+- 1 jun (tarde): "Última noite — tens até às 9h00 de amanhã para o preço founding"
+
+---
+
+## FASE 2 — LAUNCH WEEK (2–8 jun)
+
+| Dia | Data | Email (9h00) | Social (13h00) | KPI diário |
+|-----|------|--------------|----------------|------------|
+| 0 | Seg 2 jun | "As portas abriram — Atrium Studio Membership" | Post LinkedIn: anúncio oficial | Meta: 15 vendas |
+| 1 | Ter 3 jun | "Como o Dr. Rui Marques automatizou 80% dos seus templates" | Story: screenshot win | Meta: +8 |
+| 2 | Qua 4 jun | "As 5 perguntas que nos fizeram (respondidas)" | Carrossel: FAQ | Meta: +6 |
+| 3 | Qui 5 jun | "'Finalmente algo feito para advogados PT' — 3 testemunhos" | Repost testemunhos | Meta: +5 |
+| 4 | Sex 6 jun | "Porque criei o Atrium (história de 2022)" | Vídeo 3 min: Epiphany Bridge | Meta: +4 |
+| 5 | Sáb 7 jun | "48 horas — depois o preço sobe €40/mês" | Story countdown | Meta: +5 |
+| 6 | Dom 8 jun (manhã) | "Hoje à meia-noite: preço founding desaparece" | Post urgência | Meta: +8 |
+| 7 | Dom 8 jun (21h00) | "3 horas — última chamada Atrium Studio Founding" | Story: timer | Fechar |
+
+**Meta total:** 51 membros founding × €89/mês = €4.539 MRR
+**Plano B (se Day 0 < 8 vendas até 18h):** DM pessoal aos 25 warm leads identificados na lista (segmento "abriu PLC 1 + PLC 2 + PLC 3")
+
+---
+
+## FASE 3 — PÓS-LAUNCH (9–30 jun)
+
+- **9 jun:** Email "Obrigado + onboarding" para 51 compradores | Email "Ficaste de fora — waitlist próxima turma" para não-compradores
+- **11 jun:** Pedido de testemunho (template de 3 perguntas enviado por email)
+- **16 jun:** Survey compradores: "O que te fez decidir comprar? O que quase te impediu?"
+- **17 jun:** Survey não-compradores: "O que te fez hesitar?" (segmento: abriu ≥3 emails + não comprou)
+- **23 jun:** Post-mortem Atrium:
+  - CVR final: X% (meta: 4,1% da lista de 1.240)
+  - Receita: €Y MRR
+  - Top objecção identificada: a preencher
+  - NPS primeiras 48h: a preencher
+  - Decisão: activar evergreen funnel em julho ou repetir live launch em setembro?
+```
+
+---
+
+## Output anti-patterns
+
+- Entregar sequência com datas "Day 0 / Day -30" sem converter para calendário real do cliente
+- Usar `[OFFER NAME]`, `[PRICE]`, `[CLIENT NAME]` no output final sem preencher
+- Escolher launch type sem justificar com tamanho de lista e budget declarados
+- Escrever subject lines de email sem especificar scarcity real (vagas, preço, bónus, prazo)
+- Omitir o Plano B (o que fazer se Day 0 não atingir threshold mínimo de vendas)
+- Entregar PLC 1/2/3 como temas genéricos ("The Opportunity") sem os adaptar ao produto e avatar concretos
+- Não definir KPI mínimo de sucesso antes de o cliente executar o lançamento
+- Assumir que o cliente tem lista de email sem verificar tamanho e segmentação existentes
+- Gerar sequência de 8 emails sem perguntar se o cliente tem ESP configurado e domínio aquecido
+- Não incluir plano de testemunhos e survey pós-launch (o loop fecha aqui, não no cart close)

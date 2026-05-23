@@ -289,3 +289,179 @@ After case study creation:
 - Feed to `dario-content` for social media repurposing
 - Feed to `dario-social` for social media distribution
 - Save output to Obsidian: `05 - Claude - IA/Outputs/YYYY-MM-DD - A360 - Case Study - [ClientName].md`
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Client Profile está completo e específico
+
+- [ ] Nome real do cliente/empresa presente (não "Client X" ou `<company name>`)
+- [ ] Indústria, tamanho e localização especificados com detalhe suficiente para contextualizar o leitor
+- [ ] Duração do engagement e tipo de serviço claramente identificados
+- [ ] Investment amount incluído SE o ROI resultante for impressionante (>3x)
+
+❌ NOT delivery-ready: "A nossa cliente era uma empresa de médio porte no setor de saúde que queria crescer."
+✅ Delivery-ready: "Cuidai — plataforma portuguesa de cuidadores domiciliários, 12 colaboradores, Lisboa — contratou a Accelera 360 para um engagement de 90 dias de growth strategy em Março 2024."
+
+---
+
+### Gate 2 — Before State tem dor quantificada (mínimo 2 métricas hard)
+
+- [ ] Pelo menos 2 pain points com números concretos (não "poucos leads", mas "11 leads/mês")
+- [ ] Estado emocional do cliente descrito com uma frase real ou parafraseda
+- [ ] Trigger de compra identificado ("o que os fez agir AGORA")
+- [ ] Tentativas anteriores falhadas documentadas (anchors credibilidade)
+
+❌ NOT delivery-ready: "Tinham dificuldades em gerar clientes e o marketing não estava a funcionar bem."
+✅ Delivery-ready: "11 leads/mês via referral, 0 presença orgânica, €1.200/mês em Meta Ads sem tracking, CAC desconhecido. Frase da fundadora: 'Estávamos a gastar sem saber o que estava a funcionar.'"
+
+---
+
+### Gate 3 — After State com Before/After table preenchida (≥3 métricas)
+
+- [ ] Tabela de resultados com colunas Before / After / Change % preenchidas com dados reais
+- [ ] Pelo menos 1 resultado qualitativo documentado (além das métricas numéricas)
+- [ ] Timeframe explícito ("em 90 dias", "ao fim de 6 semanas")
+- [ ] Transformation Snapshot visual gerado com dados reais (não placeholders)
+
+❌ NOT delivery-ready: "Os leads aumentaram bastante e o cliente ficou muito satisfeito com os resultados obtidos."
+✅ Delivery-ready: "Leads: 11 → 67/mês (+509%) | CAC: desconhecido → €38 | Receita recorrente: €4.200 → €11.800/mês (+181%) — em 90 dias."
+
+---
+
+### Gate 4 — Narrative segue os 7 StoryBrand beats (todos presentes)
+
+- [ ] Beat 1 (Character) — cliente como herói, desejo claro definido
+- [ ] Beat 2 (Problem) — problema externo + interno + filosófico articulado
+- [ ] Beats 3-5 (Guide + Plan + CTA) — processo descrito em ≥3 fases com timelines
+- [ ] Beat 6 (Success) — resultados ligados a timeframe específico
+- [ ] Beat 7 (Failure Avoided) — consequência alternativa explícita e crível
+
+❌ NOT delivery-ready: "Identificámos os problemas, implementámos soluções e o cliente ficou satisfeito."
+✅ Delivery-ready: "Sem intervir, a Cuidai continuaria a perder €X/mês em ad spend sem atribuição, enquanto concorrentes como CuidarBem escalavam organicamente — e a janela de liderança de mercado fecharia em 12-18 meses."
+
+---
+
+### Gate 5 — Testemunho ou social proof presente e verificável
+
+- [ ] Pelo menos 1 testemunho extraído via Método 1 (guided) ou Método 2 (fill-in-the-blank)
+- [ ] Testemunho inclui: situação antes + resultado específico + recomendação
+- [ ] Formato identificado (written quote / screenshot / video) e uso recomendado anotado
+- [ ] Testemunho NÃO foi fabricado — citação real ou claramente marcada como "a recolher"
+
+❌ NOT delivery-ready: "O cliente disse que ficou muito contente e recomenda os nossos serviços."
+✅ Delivery-ready: *"Antes não sabia de onde vinham os clientes — era tudo referral e sorte. Agora temos um sistema: 67 leads no mês passado, 23 convertidos, e eu sei exatamente o que funcionar."* — Ana Rodrigues, CEO Cuidai (Maio 2024, recolhido via guided interview)"
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE REAL + dados reais, zero angle-brackets ou placeholders
+
+- [ ] Nenhum `<client name>`, `<metric>`, `[Your Company]`, `$X`, `Y%` no output final
+- [ ] Todos os campos da Step 1 (Raw Data Collection) preenchidos com dados do cliente real
+- [ ] Formato de entrega especificado (long-form PDF / one-pager / social snippet) e adequado ao uso previsto
+- [ ] Output é imediatamente utilizável em sales deck, website ou email — sem edições adicionais
+
+❌ NOT delivery-ready: "Revenue: $X/mo → $Y/mo (+Z%)" ou "Cliente: `<company name>`"
+✅ Delivery-ready: "Receita recorrente mensal: €4.200 → €11.800 (+181%) — Cuidai, Q1 2024"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Como a Cuidai passou de 11 leads/mês para 67 — em 90 dias
+
+## O Ponto de Partida
+
+A Cuidai é uma plataforma portuguesa que conecta famílias a cuidadores domiciliários
+certificados. Em Janeiro de 2024, a fundadora Ana Rodrigues chegou à Accelera 360
+com um problema concreto: €1.200/mês em Meta Ads, zero tracking de atribuição,
+e 11 leads por mês — quase todos via referral de amigos.
+
+"Estávamos a gastar sem saber o que estava a funcionar. Sentia que estávamos a
+perder mercado para concorrentes que tinham menos qualidade mas mais visibilidade."
+
+Tinham tentado: boost de posts no Instagram, um freelancer de SEO durante 3 meses,
+e uma agência que entregou um relatório de 40 páginas sem implementar nada.
+
+O trigger: um concorrente lançou campanha agressiva em Lisboa em Fevereiro 2024.
+
+---
+
+## TRANSFORMATION SNAPSHOT
+
+| Métrica              | Janeiro 2024 | Abril 2024   | Variação   |
+|----------------------|-------------|--------------|------------|
+| Leads/mês            | 11          | 67           | +509%      |
+| CAC (custo/cliente)  | Desconhecido| €38          | Baseline   |
+| Receita recorrente   | €4.200/mês  | €11.800/mês  | +181%      |
+| Taxa de conversão    | ~9%         | 34%          | +278%      |
+| Ad spend desperdício | ~70% est.   | <15%         | −55pp      |
+
+**Timeline:** 90 dias | **Engagement:** Growth Strategy + Implementação
+
+---
+
+## O Que Fizemos (3 Fases)
+
+**Fase 1 — Diagnóstico e Tracking (Semanas 1-2)**
+Instalação de Meta Pixel + GA4 com eventos customizados, criação de dashboard
+de atribuição em tempo real. Identificámos que 73% do ad spend ia para audiências
+que nunca convertiam.
+
+**Fase 2 — Reestruturação de Funil (Semanas 3-6)**
+Novo copy baseado em entrevistas com 8 clientes existentes. Criação de landing page
+dedicada (conversão 3,1% → 11,4%). Segmentação por intent: famílias de idosos
+em Lisboa com rendimento médio-alto.
+
+**Fase 3 — Scale e Automação (Semanas 7-12)**
+Sequência de email nurture de 5 steps (open rate 41%). Lookalike audiences baseadas
+nos 23 melhores clientes. Referral program estruturado: +18 leads orgânicos/mês.
+
+---
+
+## A Transformação em Palavras da Ana
+
+*"Antes não sabia de onde vinham os clientes — era tudo referral e sorte.
+Agora temos um sistema: 67 leads no mês passado, 23 convertidos, e eu sei
+exatamente o que funciona e o que não funciona. O melhor? O CAC de €38 significa
+que cada cliente novo paga-se em menos de 3 semanas."*
+
+— Ana Rodrigues, CEO & Co-fundadora, Cuidai (Maio 2024)
+
+---
+
+## Sem Esta Intervenção
+
+Sem tracking de atribuição, a Cuidai continuaria a queimar €840/mês em audiências
+que não convertem. Com um concorrente a escalar, a janela de liderança em Lisboa
+fecharia em 12-18 meses. A empresa seria invisível para as famílias que mais precisam
+dos seus serviços — e as que encontrariam seriam encaminhadas para alternativas
+de menor qualidade.
+
+---
+
+## Para Empresas na Mesma Situação
+
+Se está a investir em paid ads sem saber o que funciona, ou a perder mercado
+para concorrentes com menos qualidade — este é o ponto de partida.
+
+**→ Agendar diagnóstico gratuito:** [accelera360.pt/diagnostico]
+```
+
+---
+
+## Output anti-patterns
+
+- **Métricas fabricadas ou arredondadas suspeitas** — "+300%" sem dados de suporte; "duplicou a receita" sem before/after concreto
+- **Testemunho genérico não atribuído** — "Um cliente nosso disse que ficou muito satisfeito" sem nome, data ou contexto
+- **7 StoryBrand beats colapsados em 2** — saltando direto de "problema" para "resultados" sem Guide, Plan ou Failure Avoided
+- **Before State sem trigger de compra** — case study que explica o depois mas não explica *por que o cliente agiu naquele momento*
+- **Transformation Snapshot com placeholders** — entregar tabela com `$X → $Y` ao invés de dados reais do cliente
+- **Case study escrito na voz da empresa** — "nós fizemos X, implementámos Y" em vez de posicionar o *cliente como herói*
+- **Zero prova verificável** — nenhum testemunho, screenshot, data ou nome — apenas narrativa em prosa não ancorada
+- **Formato único para todos os usos** — gerar só long-form quando o cliente precisava de um one-pager para deck de vendas
+- **Failure Avoided inventado** — consequência alternativa vaga ("continuariam a ter problemas") em vez de consequência específica e crível com contexto de mercado

@@ -245,3 +245,191 @@ After offer construction:
 - Feed offer details to `dario-sales-letter` for long-form copy
 - Feed offer to `dario-email-seq` for email sequences
 - Save output to Obsidian: `05 - Claude - IA/Outputs/YYYY-MM-DD - A360 - Grand Slam Offer - [OfferName].md`
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Value Equation preenchida com dados reais do cliente
+
+- [ ] Dream Outcome escrito na voz do cliente (não paráfrase genérica do agente)
+- [ ] Perceived Likelihood inclui prova concreta: número de clientes, taxa de sucesso, case real
+- [ ] Time Delay especifica janela exata ("primeiros resultados em 14 dias", não "rapidamente")
+- [ ] Effort & Sacrifice lista o que o cliente NÃO precisa fazer (stack de eliminações)
+
+❌ NOT delivery-ready: "Dream Outcome: aumentar as vendas e crescer o negócio."
+✅ Delivery-ready: "Dream Outcome: fechar 8 novos contratos de condomínios até 31 de Agosto 2025 — sem fazer prospeção a frio — para que a Cuidai passe de 47 para 55 activos geridos."
+
+---
+
+### Gate 2 — Offer Stack com valores standalone credíveis e rácio ≥ 10:1
+
+- [ ] Todos os componentes têm nome com benefício explícito (não "Bónus 1")
+- [ ] Cada valor standalone é justificável se questionado pelo cliente
+- [ ] Rácio Valor Total / Preço calculado e visível na tabela
+- [ ] Pelo menos 1 bónus responde a "e se eu falhar?" e 1 a "não tenho tempo"
+
+❌ NOT delivery-ready: "Bónus 2 — Templates | $200 | PDF"
+✅ Delivery-ready: "Kit Onboarding Proprietário — 7 contratos + checklist de vistoria em PDF editável | Valor standalone: €480 (2h consultoria jurídica) | Entrega: Área de membros dia 1"
+
+---
+
+### Gate 3 — Guarantee declarado com condição, prazo e acção específica
+
+- [ ] Tipo de garantia escolhido (das 6 opções do Step 5) e justificado
+- [ ] Statement completo preenchido: [TIPO] + [PROMESSA] + [CONDIÇÃO] + [ACÇÃO] + [PRAZO]
+- [ ] Garantia está calibrada ao risco real do negócio (ex: DFY → performance guarantee)
+- [ ] Linguagem da garantia é a do cliente-alvo, não juridiquês
+
+❌ NOT delivery-ready: "Garantia de satisfação: se não gostar, devolvemos o dinheiro em 30 dias."
+✅ Delivery-ready: "Garantia Performance SAQUEI: se após completar os 3 módulos de validação (semanas 1-3) não tiveres um modelo de receita com LTV positivo, trabalhamos contigo gratuitamente até semana 6 — sem condições adicionais."
+
+---
+
+### Gate 4 — 3 Tiers com posicionamento de ancoragem correcto
+
+- [ ] Tier 1 existe apenas para fazer o Tier 2 parecer razoável (price anchor)
+- [ ] Tier 2 é o "óbvio" — tem o melhor rácio valor/preço percepcionado
+- [ ] Tier 3 tem acesso 1:1 ou DFY que justifica preço premium (não é Tier 2 + "mais bónus")
+- [ ] Target buyer de cada tier está descrito em 1 frase comportamental
+
+❌ NOT delivery-ready: "Tier 1: €97 | Tier 2: €297 | Tier 3: €997 — contacte-nos"
+✅ Delivery-ready: "Tier 3 Atlas — €2.400/ano | Para gestores com 20+ imóveis que precisam de relatórios automáticos para bancos | Inclui: integração API Tributario.AI + 4 sessões de strategy call trimestrais + SLA resposta 4h"
+
+---
+
+### Gate 5 — Urgência/Escassez com mecanismo real e deadline verificável
+
+- [ ] Escassez baseada em limitação real (capacidade, vagas, stock), não fabricada
+- [ ] Deadline tem data exacta (dia/mês/ano), não "esta semana" ou "brevemente"
+- [ ] Fast-action bonus reservado para primeiros N compradores com número definido
+- [ ] Consequência do não-agir é explicitada (o que perdem, não apenas o que ganham)
+
+❌ NOT delivery-ready: "Oferta por tempo limitado. Não percas esta oportunidade única!"
+✅ Delivery-ready: "Apenas 6 vagas disponíveis para onboarding em Julho 2025 (limite operacional da equipa Atrium). Fast-Action Bonus — Diagnóstico de Pipeline 1:1 (€350) incluído para os primeiros 3 que confirmarem antes de 20 Jun 2025."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, zero placeholders com angle-brackets
+
+- [ ] Nenhum `[nome do cliente]`, `[inserir aqui]`, `[X]`, `[seu produto]` visível no output final
+- [ ] Nome da empresa aparece no headline da oferta e no statement da garantia
+- [ ] Todos os valores monetários são números concretos (€ ou $ com moeda definida)
+- [ ] Datas, prazos e métricas são específicos ao contexto do cliente entregue
+
+❌ NOT delivery-ready: "A [EMPRESA] garante [RESULTADO] em [PRAZO] ou devolve [VALOR]."
+✅ Delivery-ready: "A LUSOconta garante a tua primeira declaração de IRS validada e submetida em 72 horas úteis ou devolvemos €49 integralmente — sem formulários, sem explicações."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Grand Slam Offer — Cuidai Gestão de Condomínios
+**Construído em:** 04 Jun 2025 | **Segmento:** Gestores de condomínio 20-80 fracções, Lisboa/Porto
+
+---
+
+## Value Equation — Cuidai
+
+| Componente | Estado Actual | Estado Optimizado |
+|---|---|---|
+| **Dream Outcome** | "Gerir mais condomínios sem contratar" | "Passar de 47 para 60 condomínios activos até Dez 2025 — com a mesma equipa de 3 pessoas — e ter domingos livres" |
+| **Perceived Likelihood** | Não quantificado | 23 gestores já usam Cuidai; média de +11 condomínios em 90 dias; NPS 74 |
+| **Time Delay** | "Resultados a médio prazo" | Primeira assembleia automatizada em 7 dias; relatório bancário gerado em 4 minutos |
+| **Effort & Sacrifice** | Gestores fazem tudo manualmente | Cuidai elimina: cobranças manuais, actas em Word, calls de urgência ao fim-de-semana |
+
+---
+
+## Dream Outcome — Na Voz do Cliente
+
+> "Quero gerir 60 condomínios até ao Natal sem precisar de contratar ninguém novo,
+> para que eu possa finalmente tirar 3 semanas de férias em Agosto sem o telefone tocar."
+
+| Dimensão | ANTES | DEPOIS |
+|---|---|---|
+| **Ter** | 47 condomínios, 1 funcionária administrativa, 14h/semana em burocracia | 60 condomínios, mesma equipa, 3h/semana em burocracia |
+| **Sentir** | Stressado, reativo, "apagador de incêndios" | No controlo, proativo, confiante para crescer |
+| **Status** | "Esse gestor que demora sempre a responder" | "O gestor que tem tudo digitalizado — os proprietários recomendam" |
+| **Dia-a-dia** | Segunda-feira: 2h a responder emails de moradores | Segunda-feira: dashboard actualizado; só actua em alertas reais |
+
+---
+
+## Delivery Cube — Decisões Cuidai
+
+| Dimensão | Escolha | Racional |
+|---|---|---|
+| **1:1 vs 1:Many** | Self-paced + Group onboarding mensal | Escala sem aumentar equipa de CS |
+| **DIY vs DFY** | DWY (Tier 2) e DFY (Tier 3) | Gestores têm conhecimento mas não tempo |
+| **Virtual vs In-Person** | 100% online + visita de setup opcional (Tier 3) | Base nacional; visita diferencia premium |
+| **Speed** | Imediato para módulos core; cohort mensal para advanced | Quick win em 7 dias retém; cohort cria comunidade |
+
+---
+
+## Offer Stack Completo
+
+| # | Componente | Tipo | Valor Standalone | Entrega |
+|---|---|---|---|---|
+| 1 | **Plataforma Cuidai Pro** — gestão completa de assembleias, cobranças e comunicação | Core | €1.800/ano | Acesso imediato após activação |
+| 2 | **Kit Arranque Rápido** — migração dos teus condomínios actuais feita pela equipa Cuidai em 48h | Bónus (DFY) | €480 | Primeiras 48h |
+| 3 | **Biblioteca de Actas Legais** — 14 modelos validados por advogado para assembleias PT 2024 | Bónus (elimina "e se eu errar?") | €320 | Área de membros dia 1 |
+| 4 | **Integração Tributario.AI** — relatórios fiscais de condomínio gerados automaticamente | Bónus (poupa tempo) | €600/ano | Activação em 72h |
+| 5 | **Comunidade Gestores Cuidai** — grupo privado com 340 gestores + Q&A semanal ao vivo | Bónus (status/network) | €240/ano | Acesso imediato |
+| 6 | **Fast-Action: Consultoria de Crescimento 1:1** — 90min com fundador para definir estratégia de escala | Bónus (primeiros 5) | €350 | Agendado em 15 dias |
+| | **Valor Total** | | **€3.790** | |
+| | **Teu Preço (Tier 2)** | | **€297/mês** (€1.188 primeiros 4 meses) | |
+| | **Rácio Valor/Preço** | | **3,2:1 aparente → 12:1 com ROI real** | |
+
+---
+
+## Garantia — Cuidai Performance Guarantee
+
+**Tipo:** Performance Guarantee
+
+> "Se nos primeiros 60 dias não automatizares pelo menos 3 processos que fazias manualmente
+> (cobranças, actas ou comunicação de urgência) — trabalhamos contigo gratuitamente
+> até atingires esse resultado. Sem limite de tempo. Sem letras pequenas.
+> Tens 60 dias para decidir se a Cuidai é para ti."
+
+---
+
+## Pricing Tiers
+
+| | Tier 1: Starter | Tier 2: Pro ⭐ RECOMENDADO | Tier 3: Atlas |
+|---|---|---|---|
+| **Preço** | €97/mês | €297/mês | €790/mês |
+| **Condomínios** | Até 15 | Até 50 | Ilimitados |
+| **Kit Arranque Rápido** | ❌ Auto-setup | ✅ Migração DFY 48h | ✅ + visita presencial |
+| **Biblioteca Actas** | 5 modelos base | ✅ 14 modelos completos | ✅ + actualizações legais |
+| **Tributario.AI** | ❌ | ✅ | ✅ |
+| **Comunidade** | ❌ | ✅ | ✅ + acesso VIP |
+| **Suporte** | Email 72h | Chat 24h + calls mensais | WhatsApp directo + SLA 2h |
+| **Garantia** | 14 dias | 60 dias Performance | 90 dias + ROI guarantee |
+| **Target buyer** | Gestor a começar, <15 condomínios | Gestor estabelecido que quer escalar sem contratar | Empresa de gestão com múltiplos gestores |
+
+---
+
+## Urgência — Real e Verificável
+
+- **6 vagas de onboarding DFY disponíveis em Julho 2025** (limite: 1 gestor de conta por cliente)
+- **Fast-Action Bonus expira:** primeiros 5 contratos assinados antes de 20 Jun 2025
+- **O que perdes ao esperar:** cada mês sem Cuidai = ~14h de burocracia = €420 em tempo de gestor
+  (com base em custo/hora médio de gestor autónomo PT: €30/h)
+```
+
+---
+
+## Output anti-patterns
+
+- **Rácio 10:1 fictício** — somar valores inventados para atingir o rácio sem justificação de standalone value
+- **Guarantee sem condição operacional** — "garantia total" sem especificar o que o cliente tem de fazer para a activar
+- **Dream Outcome na voz do agente** — "ajudamos a crescer o seu negócio" em vez da linguagem real do cliente
+- **Tiers com diferença só de quantidade** — Tier 3 = Tier 2 + mais bónus, sem mudança qualitativa no modelo de entrega
+- **Escassez fabricada** — "apenas 3 vagas restantes" em produto digital ilimitado sem mecanismo real de limite
+- **Bonuses sem nome de benefício** — "Bónus 3 — Checklist" em vez de "Checklist Anti-Calote: 9 passos para cobrar em atraso sem perder o cliente"
+- **Value Equation preenchida com defaults** — Time Delay = "rápido", Effort = "fácil" sem quantificação
+- **Preços sem moeda definida** — "$X" ou "€X" com símbolo inconsistente ao longo do documento
+- **Garantia sem prazo em data absoluta** — "30 dias após a compra" sem ancorar numa data concreta para o contexto
+- **Output entregue com angle-brackets visíveis** — qualquer `[nome]`, `[inserir]`, `[resultado]` no documento final

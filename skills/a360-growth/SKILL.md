@@ -303,3 +303,201 @@ After growth engine design:
 - Feed content strategy to `dario-content` for execution
 - Feed ad strategy to `dario-ads-blueprint` for campaign design
 - Save output to Obsidian: `05 - Claude - IA/Outputs/YYYY-MM-DD - A360 - Growth Engine - [BusinessName].md`
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — North Star Metric está definida, numerada e fundamentada
+
+- [ ] NSM nomeada explicitamente (não "a ser definida")
+- [ ] Valor atual + target 90 dias com números reais
+- [ ] 3-5 input metrics listadas que alimentam a NSM
+- [ ] NSM alinhada com o tipo de negócio (tabela Step 1 preenchida)
+
+❌ NOT delivery-ready: `North Star Metric: crescimento de utilizadores — target: aumentar`
+✅ Delivery-ready: `NSM: Famílias ativas com plano ativo (Cuidai) — atual: 340 famílias — target 90 dias: 510 famílias (+50%) — input metrics: trial activations/semana, caregiver match rate, NPS >8`
+
+---
+
+### Gate 2 — AARRR Audit tem scores reais e bottleneck identificado
+
+- [ ] Cada estágio tem métrica atual preenchida (não "X")
+- [ ] Score /10 atribuído a cada estágio
+- [ ] Bottleneck nomeado explicitamente com justificação
+- [ ] Benchmarks contextualizados ao sector do cliente
+
+❌ NOT delivery-ready: `Activation: X% — Score: /10 — Priority: alta`
+✅ Delivery-ready: `Activation (Cuidai): 18% completam match caregiver em 48h — benchmark SaaS >25% — Score: 4/10 — BOTTLENECK PRINCIPAL — fix: onboarding guided flow antes de escalar acquisition`
+
+---
+
+### Gate 3 — Growth Loop primário desenhado com ciclo completo e cycle time
+
+- [ ] Input → Action → Output → Reinvestment preenchidos com dados do cliente
+- [ ] Cycle time estimado (dias/semanas)
+- [ ] Amplification factor explicitado (crescimento ou flat)
+- [ ] Loop é self-reinforcing (output alimenta input — verificado logicamente)
+
+❌ NOT delivery-ready: `Input: utilizadores — Output: crescimento — Cycle time: curto`
+✅ Delivery-ready: `Cuidai Content Loop — Input: 1 artigo SEO "como escolher cuidador sénior Lisboa" — Action: visitante converte trial gratuito — Output: 8-12 trials/artigo/mês — Reinvestment: revenue financia 2 artigos novos — Cycle time: 6 semanas — Amplification: +15% orgânico MoM projetado`
+
+---
+
+### Gate 4 — K-factor calculado e programa de referral tem incentivos duplos concretos
+
+- [ ] K-factor calculado com fórmula real (invites/user × conversion rate)
+- [ ] Zona de K identificada (viral / amplified / low)
+- [ ] Incentivo referrer E referee especificados com valores reais
+- [ ] Trigger moment de pedido de referral ligado ao "first success moment" do cliente
+- [ ] Métricas alvo de referral explicitadas (participation rate, conversion rate)
+
+❌ NOT delivery-ready: `Referral program: dar desconto a quem trouxer amigos`
+✅ Delivery-ready: `SAQUEI Referral — K atual estimado: 0.3 invites × 22% conv = K=0.066 (low) — Target K=0.4 — Trigger: após primeiro saque aprovado (<24h) — Referrer: €15 crédito na conta — Referee: €10 bónus no primeiro saque — Mechanism: link único no app pós-aprovação — Target participation: >15% utilizadores ativos/mês`
+
+---
+
+### Gate 5 — Content Flywheel tem plataformas, frequências e KPIs do cliente
+
+- [ ] Pelo menos 3 plataformas definidas com formato e frequência real
+- [ ] Pillar content topic(s) listados (não genérico)
+- [ ] Flywheel ligado ao funil: como conteúdo converte em revenue
+- [ ] KPI de conteúdo definido (tráfego orgânico, lista de email, leads/mês)
+
+❌ NOT delivery-ready: `Blog: 1x/semana — Social: 5x/semana — Goal: crescimento`
+✅ Delivery-ready: `Tributario.AI Flywheel — Pillar: 1 guia fiscal/semana (ex: "IRS 2025: deduções que os contabilistas esquecem") → LinkedIn 4 posts/semana → Newsletter 1x/semana (target 2.000 subs em 90 dias) → Leads qualificados para trial → Revenue → financia webinar mensal com especialista fiscal → repurpose em 3 artigos novos [LOOP] — KPI: 500 visitas orgânicas/mês → 8% conversão trial`
+
+---
+
+### Gate 6 — Output uses CLIENT NAME + REAL data, no placeholder angle-brackets
+
+- [ ] Nenhum `____`, `X%`, `<client>`, `[your business]` ou placeholder visível no output final
+- [ ] Nome do cliente aparece em pelo menos 3 secções
+- [ ] Todos os números são justificados (fonte: cliente, benchmark de sector, ou estimativa explícita)
+- [ ] NSM, Loop, Referral e Content Flywheel são específicos ao modelo de negócio do cliente — não poderiam ser copiados para outro sector sem edição
+
+❌ NOT delivery-ready: `North Star Metric: ____ — Current value: ____ — 90-day target: ____`
+✅ Delivery-ready: `Lisbon Dog Care NSM: Passeios recorrentes semanais — atual: 180 passeios/semana — target 90 dias: 270 passeios/semana — input metrics: novos donos ativados, taxa de subscrição mensal, walker utilization rate`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Growth Engine — Cuidai
+
+## North Star Metric
+**Famílias ativas com cuidador em serviço** (medida semanal)
+- Valor atual: 340 famílias
+- Target 90 dias: 510 famílias (+50%)
+- Input metrics:
+  1. Trials iniciados/semana (atual: 28 → target: 45)
+  2. Match rate caregiver em <48h (atual: 61% → target: 80%)
+  3. Renovação mensal (atual: 74% → target: 85%)
+  4. NPS promotores que referem (atual: 22% → target: 35%)
+  5. Churn involuntário (billing failures) — atual: 4% → target: <2%
+
+---
+
+## AARRR Audit — Cuidai (Março 2025)
+
+| Stage       | Métrica                              | Atual | Benchmark | Score | Priority |
+|-------------|--------------------------------------|-------|-----------|-------|----------|
+| Acquisition | Leads qualificados/mês               | 210   | 400       | 5/10  | Alta     |
+| Activation  | % que completam match em 48h         | 18%   | >25%      | 4/10  | 🔴 BOTTLENECK |
+| Retention   | % famílias ativas ao fim de 30 dias  | 74%   | >80%      | 6/10  | Média    |
+| Revenue     | Trial → plano pago                   | 31%   | >35%      | 6/10  | Média    |
+| Referral    | % clientes que referem ≥1 família    | 9%    | >15%      | 3/10  | Alta     |
+
+**Diagnóstico:** Activation é o bottleneck. Escalar acquisition agora desperdiça
+orçamento — 82% dos trials que não fazem match em 48h cancelam antes de pagar.
+**Ação imediata:** Guided onboarding com assistência humana nas primeiras 48h.
+
+---
+
+## Growth Loop Primário — Cuidai
+
+**Loop: Referral + Trust**
+
+```
+Família contrata cuidador → Experiência positiva semana 2
+    ↓
+Cuidai envia NPS + pedido de referral (trigger: dia 14)
+    ↓
+Família partilha link único → 2,1 convites/família em média
+    ↓
+Nova família inicia trial com €30 desconto (referee)
+    ↓
+Família original recebe 1 mês de gestão grátis (referrer)
+    ↓
+Nova família ativa → repete ciclo
+```
+
+| Elemento        | Detalhe Cuidai                              |
+|-----------------|---------------------------------------------|
+| Input           | 1 família satisfeita (NPS >8)               |
+| Action          | Partilha link referral no dia 14            |
+| Output          | 2,1 invites × 24% conv = 0,5 família nova  |
+| Reinvestment    | Nova família entra no mesmo loop ao dia 14  |
+| Cycle time      | 14 dias                                     |
+| Amplification   | K atual = 0,50 → target K = 0,80 em 90 dias|
+
+---
+
+## Referral Program — Cuidai
+
+- **Trigger:** Dia 14 após primeiro serviço (NPS enviado — promotores ≥9)
+- **Referrer:** 1 mês de gestão de agenda grátis (valor €49)
+- **Referee:** €30 desconto no primeiro mês de plano
+- **Mechanism:** Link único gerado automaticamente no app após NPS submetido
+- **Double-sided:** Sim — ambas as partes beneficiam antes do primeiro pagamento
+- **Tracking:** UTM + código único por família no CRM (HubSpot)
+- **Sequence:** Email dia 14 → push notification dia 16 → email reminder dia 21
+
+Targets 90 dias:
+- Participation rate: 9% → 18%
+- Referee conversion: 24% → 32%
+- Novas famílias via referral/mês: 19 → 45
+
+---
+
+## Content Flywheel — Cuidai
+
+**Pillar topics Q2 2025:**
+1. "Como escolher um cuidador sénior em Lisboa: checklist de 12 pontos"
+2. "Sinais de alerta de burnout em cuidadores familiares"
+3. "Quanto custa cuidar em casa vs. lar: comparação real 2025"
+
+**Distribuição:**
+
+| Plataforma  | Formato            | Frequência    | KPI                          |
+|-------------|--------------------|---------------|------------------------------|
+| Blog/SEO    | Guia long-form     | 1x/semana     | 800 visitas orgânicas/mês    |
+| Instagram   | Carrossel + Reels  | 4x/semana     | 2.000 seguidores em 90 dias  |
+| LinkedIn    | Artigo de opinião  | 2x/semana     | Leads B2B (empresas + seguros)|
+| Email       | Newsletter semanal | 1x/semana     | 1.500 subs, open rate >30%   |
+| YouTube     | Vídeo testemunho   | 1x/quinzena   | 200 views/vídeo, SEO local   |
+
+**Loop:** Artigo SEO → visitante → trial gratuito → revenue → financia
+produção de 2 novos guias + 1 webinar/mês "Cuidar sem culpa"
+→ webinar repurposed em 4 artigos → [LOOP]
+
+**KPI agregado:** 60 leads orgânicos/mês em 90 dias (atual: 22)
+```
+
+---
+
+## Output anti-patterns
+
+- Deixar **qualquer placeholder** no output final (`____`, `X%`, `<NSM>`, `[your loop]`) — o cliente vê um template, não um entregável
+- Definir a **NSM como vanity metric** ("seguidores Instagram", "visitas ao site") sem ligação ao valor core entregue
+- Propor **K-factor > 1.0 sem justificação** — é viral growth teórico; para a maioria dos negócios K=0.3-0.6 já é excelente e mais credível
+- Desenhar um **growth loop que não fecha** — output não alimenta input, é apenas uma lista de táticas sequenciais
+- **AARRR sem bottleneck declarado** — listar os 5 estágios sem dizer qual fixar primeiro é análise sem diagnóstico
+- Recomendar **referral program antes de fixar Activation** — se o produto não entregou o "first success moment", referrals trazem churners
+- **Content flywheel sem frequência e KPI** — "fazer conteúdo" não é estratégia; sem cadência e métrica não é flywheel
+- Copiar **benchmarks de sector errado** (ex: aplicar benchmarks SaaS B2B a marketplace de cuidados domésticos)
+- **Ignorar o ciclo de tempo do loop** — um loop com cycle time de 6 meses tem impacto diferente de um de 14 dias; omitir é esconder risco
+- **Misturar AARRR com ICE scoring** sem explicar a relação — prioridade de estágio e prioridade de experimento são decisões diferentes

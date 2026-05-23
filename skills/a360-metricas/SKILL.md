@@ -263,3 +263,201 @@ After metrics review:
 - Route to `a360-pitch` with metrics for investor conversations
 - Feed to `dario-saas-metrics` for SaaS-specific deep dive
 - Save output to Obsidian: `05 - Claude - IA/Outputs/YYYY-MM-DD - A360 - Metrics - [BusinessName].md`
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Business model classification está explícito e coerente
+
+- [ ] O modelo foi identificado (SaaS / E-commerce / Service / Marketplace / Info Product / Hybrid)
+- [ ] As métricas selecionadas são as corretas para esse modelo (não apresentar MRR para e-commerce puro)
+- [ ] A tabela Step 1 tem a linha correta realçada ou indicada
+- [ ] Não há métricas irrelevantes ocupando espaço (ex: GMV para SaaS)
+
+❌ NOT delivery-ready: "O negócio é de tipo X, vamos ver as métricas."
+✅ Delivery-ready: "Cuidai opera modelo **Subscription (SaaS-like)** — foco em MRR, NRR, churn mensal e CAC payback. Métricas de AOV e GMV não aplicáveis."
+
+---
+
+### Gate 2 — Todas as métricas core têm número real ou flag explícito de "dado em falta"
+
+- [ ] Nenhuma célula da tabela contém "$X" ou "X%" sem substituição ou nota
+- [ ] Onde dados não foram fornecidos, aparece "⚠️ Dado não fornecido — necessário para calcular"
+- [ ] MRR, CAC, LTV e Gross Margin estão sempre preenchidos ou flagged
+- [ ] Unidade monetária está consistente (€ ou R$ — nunca misturar)
+
+❌ NOT delivery-ready: "CAC: $X | LTV: $X | LTV:CAC: X:1"
+✅ Delivery-ready: "CAC: €43 | LTV: €312 | LTV:CAC: **7,3:1** ✅ Excellent"
+
+---
+
+### Gate 3 — Health assessment tem veredito claro com benchmark comparado
+
+- [ ] Cada métrica crítica tem símbolo de saúde: ✅ Healthy / ⚠️ Warning / ❌ Critical
+- [ ] O benchmark de referência está citado (ex: "<5% churn mensal — SaaStr)
+- [ ] LTV:CAC tem o tier explícito (Excellent / Healthy / Warning / Critical)
+- [ ] CAC Payback tem interpretação em linguagem de negócio, não só o número
+
+❌ NOT delivery-ready: "Churn: 8% — acima do ideal."
+✅ Delivery-ready: "Churn mensal: **8%** ❌ Critical (benchmark SaaStr: <5%). Ao ritmo atual, perdes ~65% da base em 12 meses — prioridade #1."
+
+---
+
+### Gate 4 — CAC por canal está desagregado com ROI relativo
+
+- [ ] Tabela de CAC por canal tem pelo menos 2 canais com dados reais
+- [ ] Coluna LTV:CAC por canal está calculada (não genérica)
+- [ ] Canal mais eficiente está identificado e recomendação de alocação de budget feita
+- [ ] Canais com LTV:CAC < 1:1 têm recomendação explícita (pausar / otimizar)
+
+❌ NOT delivery-ready: "Facebook Ads: $X spend, X customers, CAC $X"
+✅ Delivery-ready: "Facebook Ads: €1.200 spend, 14 clientes, CAC €86, LTV:CAC 3,6:1 ⚠️ | Referral: €0 spend, 9 clientes, CAC €0, LTV:CAC ∞ ✅ → escalar programa de referral"
+
+---
+
+### Gate 5 — Runway e burn rate têm timeline concreta e trigger de ação
+
+- [ ] Runway calculado em meses com data de esgotamento projetada
+- [ ] Burn rate mensal (gross e net) está especificado
+- [ ] Break-even calculado com data estimada baseada em crescimento atual
+- [ ] "Default alive vs default dead" (Paul Graham) está avaliado explicitamente
+
+❌ NOT delivery-ready: "Runway: X meses. Precisas de mais receita."
+✅ Delivery-ready: "Burn rate net: €4.200/mês | Caixa: €38.000 | Runway: **9,0 meses** → esgotamento ~Fevereiro 2026. Break-even projetado: mês 11 (se crescimento MoM ≥8%). **Default dead** — janela crítica."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, zero placeholders com angle-brackets
+
+- [ ] Nome do cliente aparece no título ou header do dashboard
+- [ ] Zero ocorrências de `<client>`, `[nome]`, `$X`, `X%` no output final
+- [ ] Período de análise está explícito (ex: "Junho 2025" ou "Q2 2025")
+- [ ] Fonte dos dados está indicada (ex: "dados fornecidos pelo cliente via chat, 18 Jun 2025")
+
+❌ NOT delivery-ready: "Dashboard para `<client_name>` — período `<month>`"
+✅ Delivery-ready: "**ARRECADA.GOV — Business Metrics Dashboard | Junho 2025** (dados fornecidos pelo cliente, 18 Jun 2025)"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# SAQUEI — Business Metrics Dashboard | Junho 2025
+*Dados fornecidos pelo cliente via A360, 18 Jun 2025 | Modelo: SaaS / Subscription*
+
+---
+
+## 📊 Core Financial Metrics
+
+| Métrica | Valor | Saúde | Benchmark |
+|---------|-------|-------|-----------|
+| MRR | €18.400 | ✅ | — |
+| ARR | €220.800 | ✅ | — |
+| Crescimento MoM | +11,3% | ✅ | >10% early-stage |
+| Gross Margin | 71% | ✅ | >60% SaaS (Skok) |
+| Net Profit Margin | 18% | ✅ | >15% |
+
+---
+
+## 🎯 Customer Acquisition
+
+| Métrica | Valor | Saúde |
+|---------|-------|-------|
+| CAC blended | €52 | ✅ |
+| CAC payback | 4,1 meses | ✅ (<12 meses) |
+| Lead-to-Customer | 3,8% | ✅ (>2%) |
+| CPL (Facebook) | €4,20 | ✅ |
+
+**CAC por canal — Junho 2025:**
+
+| Canal | Spend | Clientes | CAC | LTV:CAC |
+|-------|-------|----------|-----|---------|
+| Facebook Ads | €1.800 | 22 | €82 | 5,1:1 ✅ |
+| Google Ads | €900 | 8 | €113 | 3,7:1 ⚠️ |
+| Referral | €0 | 14 | €0 | ∞ ✅ |
+| Email nurture | €120 | 6 | €20 | 20,9:1 ✅ |
+| **Total** | **€2.820** | **50** | **€56** | **7,4:1 ✅** |
+
+→ **Recomendação:** Escalar Referral (custo zero, 14 aquisições). Google Ads abaixo de threshold — testar otimização de keywords por 30 dias ou realocar budget para Facebook.
+
+---
+
+## 💰 LTV & Unit Economics
+
+| Métrica | Valor | Saúde |
+|---------|-------|-------|
+| ARPU | €214/mês | — |
+| Avg. lifespan | 19,4 meses | — |
+| LTV (com margin) | €2.975 | — |
+| LTV:CAC | **57,2:1** | ✅ Excellent |
+
+→ LTV:CAC > 5:1: considerar aumentar agressividade de aquisição — cada €1 em marketing retorna €57 de valor.
+
+---
+
+## 🔄 Retenção & Churn
+
+| Métrica | Valor | Saúde | Benchmark |
+|---------|-------|-------|-----------|
+| Churn mensal | 3,1% | ✅ | <5% (SaaStr) |
+| Churn anual | 32% | ⚠️ | <30% |
+| NRR | 108% | ✅ | >100% |
+| GRR | 96,9% | ✅ | >85% |
+| Logo Retention | 96,9% | ✅ | >90% |
+
+→ **Atenção:** Churn anual em 32% — 2pp acima do benchmark. Cohort de Janeiro mostra queda acentuada no mês 10. Investigar motivo de saída nesse período (pricing? onboarding? concorrência?).
+
+---
+
+## 💸 Runway & Burn Rate
+
+| Métrica | Valor |
+|---------|-------|
+| Burn rate gross | €14.200/mês |
+| Burn rate net | €2.800/mês |
+| Caixa disponível | €61.500 |
+| Runway | **21,9 meses** ✅ |
+| Break-even projetado | Já atingido (Março 2025) ✅ |
+
+→ **Default Alive** ✅ — ao crescimento atual (11,3% MoM), SAQUEI não precisa de capital externo para sobreviver. Runway de quase 2 anos dá flexibilidade para escalar sem pressão de fundraising.
+
+---
+
+## 🔺 Funil de Conversão (Junho 2025)
+
+| Etapa | Volume | Taxa | Saúde |
+|-------|--------|------|-------|
+| Website → Lead | 4.200 → 182 | 4,3% | ✅ |
+| Lead → MQL | 182 → 71 | 39% | ✅ |
+| MQL → SQL | 71 → 58 | 82% | ✅ |
+| SQL → Cliente | 58 → 50 | 86% | ✅ |
+
+---
+
+## 🏆 North Star Summary
+
+**Métrica North Star: MRR** — €18.400 (+11,3% MoM)
+
+Top 3 prioridades para Julho 2025:
+1. **Reduzir churn anual de 32% → <30%** — investigar cohort mês 10
+2. **Escalar programa de referral** — 14 clientes a custo zero em Junho
+3. **Monitorizar Google Ads** — 30 dias para otimizar ou pausar (CAC €113 borderline)
+```
+
+---
+
+## Output anti-patterns
+
+- **Placeholders não substituídos** — entregar dashboard com "$X", "X%", ou `<client>` ainda no output
+- **Modelo errado de métricas** — apresentar MRR e churn a um negócio de e-commerce transacional puro
+- **Health sem veredito** — listar métricas sem símbolo ✅/⚠️/❌ e sem comparação com benchmark
+- **CAC agregado sem desagregação por canal** — esconder ineficiências de canais caros num blended number
+- **Runway sem data concreta** — dizer "9 meses de runway" sem indicar mês de esgotamento projetado
+- **LTV:CAC calculado mas sem implicação de decisão** — o número existe mas não gera recomendação de ação
+- **Churn em % sem tradução para impacto real** — "8% churn" sem dizer "perdes 65% da base em 12 meses"
+- **North Star ausente** — dashboard extenso mas sem priorização clara do que mover primeiro
+- **Período de análise omitido** — dashboard sem indicar a que mês/trimestre os dados se referem
+- **Mistura de moedas** — alternar € e R$ no mesmo output sem aviso explícito de contexto

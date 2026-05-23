@@ -254,3 +254,192 @@ After business model design:
 - Route to `a360-metricas` to set up the metrics dashboard
 - Route to `a360-pitch` if seeking investment/partners
 - Save output to Obsidian: `05 - Claude - IA/Outputs/YYYY-MM-DD - A360 - Business Model - [BusinessName].md`
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Business Model Canvas preenchido com dados reais (não placeholders)
+
+- [ ] Todos os 9 blocos têm conteúdo específico do negócio do cliente (não "[from a360-avatar]")
+- [ ] Customer Segments inclui dimensão de mercado estimada (ex: "PMEs tech em PT, ~4.200 empresas")
+- [ ] Value Proposition articula 1 diferenciador concreto, não adjetivos genéricos
+- [ ] Revenue Streams ligados ao modelo selecionado no Step 2
+
+❌ NOT delivery-ready: "Customer Segments: [from a360-avatar] — quem são os clientes"
+✅ Delivery-ready: "Customer Segments: Donos de cães em Lisboa, 25-45 anos, rendimento >€2.000/mês, ~38.000 potenciais em área metropolitana (INE 2023)"
+
+---
+
+### Gate 2 — Revenue Model selecionado e justificado
+
+- [ ] Modelo principal escolhido com justificação explícita (não apenas listado)
+- [ ] Velocidade até primeira receita estimada (ex: "primeiros €500 em 30 dias via serviço direto")
+- [ ] Transição para recorrente mapeada se modelo inicial for one-time/service
+
+❌ NOT delivery-ready: "Modelo: Subscription/SaaS — alta escalabilidade"
+✅ Delivery-ready: "Cuidai usa Subscription: €29/mês (básico) + €79/mês (pro). Primeiros 90 dias: serviço direto a €150/onboarding para validar willingness-to-pay antes de automatizar."
+
+---
+
+### Gate 3 — Pricing com 3 tiers populados e lógica Hormozi aplicada
+
+- [ ] Dream outcome do cliente quantificado em € (base do cálculo Hormozi)
+- [ ] 3 price points calculados (Low / Mid / High) com percentagem-alvo de mix
+- [ ] Pelo menos 1 elemento de pricing psychology aplicado (charm, anchor, founding member)
+- [ ] Preços em moeda e periodicidade correctas para o mercado (€/mês, €/ano, €/unidade)
+
+❌ NOT delivery-ready: "Tier Pro: $X/mo — Core + advanced features"
+✅ Delivery-ready: "Cuidai Pro: €79/mês. Dream outcome = cão saudável + dono sem stress = valor percebido ~€600/ano. Preço = ~13% desse valor. Founding member: €59/mês para primeiros 50 utilizadores."
+
+---
+
+### Gate 4 — Cost Structure com números reais e burn total calculado
+
+- [ ] Todas as categorias têm valores mensais preenchidos (mesmo que estimativa fundamentada)
+- [ ] Custos fixos vs variáveis separados correctamente
+- [ ] Total Monthly Burn somado e visível
+- [ ] Fonte dos números indicada (ex: "Stripe fees: 1,4% + €0,25 por transação — tabela PT 2024")
+
+❌ NOT delivery-ready: "Hosting: $X | Tools: $X | Total: $X"
+✅ Delivery-ready: "Hosting (Railway): €25/mês | Stripe fees: ~€47/mês (@200 transações) | Suporte (freelancer 10h): €300/mês | **Total burn: €892/mês**"
+
+---
+
+### Gate 5 — Unit Economics calculados com LTV:CAC health verdict
+
+- [ ] CAC calculado com canal específico (não hipotético genérico)
+- [ ] LTV calculado com churn rate assumido explicitamente
+- [ ] LTV:CAC ratio com verdict: Healthy / Survivable / Unsustainable
+- [ ] Payback period em meses, com interpretação accionável
+- [ ] Break-even em unidades/clientes com data estimada
+
+❌ NOT delivery-ready: "LTV:CAC: X:1 — verificar se >3:1"
+✅ Delivery-ready: "CAC (Instagram ads): €38 | LTV (churn 4%/mês → 25 meses médio x €29 ARPU): €725 | LTV:CAC = 19:1 ✅ HEALTHY | Payback: 1,3 meses | Break-even: 31 clientes pro (~mês 4)"
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, zero angle-brackets
+
+- [ ] Nenhum `[placeholder]`, `$X`, `[Name]`, `[from a360-avatar]` visível no output final
+- [ ] Nome do negócio do cliente aparece no título e em pelo menos 3 secções
+- [ ] Todos os valores monetários em moeda correcta para o mercado do cliente
+- [ ] Datas/timelines em formato concreto (ex: "Q2 2025", "mês 3", "até 30 Jun 2025")
+
+❌ NOT delivery-ready: "Tier Premium: $X/mo | Inclui: [Everything + VIP] | Target: 10%"
+✅ Delivery-ready: "ARRECADA.GOV Premium: €499/mês | Inclui: API ilimitada + SLA 99,9% + gestor dedicado | Target mix: 8% da base"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Business Model Design — Cuidai
+**Gerado por A360 | Fase 2 — Validação | Maio 2025**
+
+---
+
+## 1. Business Model Canvas
+
+| Bloco | Conteúdo |
+|-------|----------|
+| **Customer Segments** | Donos de cães em Lisboa + Porto, 28-45 anos, rendimento >€2.000/mês. TAM estimado: 420.000 famílias com cão em PT (INE 2023). Foco inicial: 38.000 em área metropolitana de Lisboa. |
+| **Value Propositions** | Cuidado veterinário preventivo por subscrição — sem surpresas de fim de mês. "Sabe sempre quanto vai gastar." |
+| **Channels** | Instagram orgânico (principal), parcerias com clínicas veterinárias Lisboa (3 acordadas), boca-a-boca com referral program |
+| **Customer Relationships** | App self-serve + check-in mensal automatizado + grupo WhatsApp para tier Premium |
+| **Revenue Streams** | Subscrição mensal (79% da receita) + consultas avulsas pay-per-use (21%) |
+| **Key Resources** | App mobile, rede de 12 veterinários parceiros em Lisboa, marca Cuidai |
+| **Key Activities** | Gestão de rede veterinária, onboarding de novos clientes, CS proactivo |
+| **Key Partnerships** | Clínicas VetPoint (Lisboa), Royal Canin (produto complementar), Stripe (pagamentos) |
+| **Cost Structure** | Ver Secção 4 — burn mensal: €1.840 |
+
+---
+
+## 2. Revenue Model
+
+**Modelo escolhido: Subscription + Usage-based (híbrido)**
+
+Justificação: Recorrência maximiza LTV e reduz CAC amortizado.
+Consultas avulsas criam upsell natural e testam elasticidade de preço.
+
+**Velocidade até €1:** Serviço manual a €150/onboarding nos primeiros 60 dias
+→ Transição para subscrição digital no mês 3.
+
+---
+
+## 3. Pricing Strategy
+
+**Dream outcome do cliente:** Cão saudável, sem stress financeiro = €800/ano de valor percebido
+**Faixa Hormozi (10-20%):** €80–160/ano → €7–13/mês base
+
+| Tier | Nome | Preço | Inclui | Mix alvo |
+|------|------|-------|--------|----------|
+| Basic | Cuidai Essencial | €19/mês | 1 consulta/mês + vacinas em dia | 55% |
+| Pro | Cuidai Plus | €49/mês | 2 consultas + urgências + app | 35% |
+| Premium | Cuidai VIP | €99/mês | Ilimitado + nutricionista + concierge | 10% |
+
+**Anchoring:** Mostrar VIP primeiro na página de pricing.
+**Founding Member:** €39/mês para primeiros 100 subscritores (válido até 30 Jun 2025).
+**Anual:** 2 meses grátis (€470/ano vs €588 mensal) — activa push em Outubro (renovações de ano).
+
+---
+
+## 4. Cost Structure
+
+| Categoria | Mensal | Tipo |
+|-----------|--------|------|
+| Hosting (Railway + Supabase) | €45 | Fixo |
+| Tools (Notion, Figma, Intercom) | €120 | Fixo |
+| Stripe fees (~180 transações x €0,25 + 1,4%) | €82 | Variável |
+| Freelancer CS (15h/mês x €18) | €270 | Semi-variável |
+| Instagram Ads (validação) | €400 | Variável |
+| Veterinários parceiros (comissão 12%) | ~€923 | Variável |
+| **Total Monthly Burn** | **€1.840** | |
+
+---
+
+## 5. Unit Economics
+
+| Métrica | Cálculo | Resultado | Saúde |
+|---------|---------|-----------|-------|
+| CAC (Instagram) | €400 ads / 14 novos clientes | **€28,6** | ✅ |
+| ARPU | Mix ponderado tiers | **€43/mês** | |
+| Churn assumido | 3,5%/mês (benchmark PT apps) | | |
+| LTV | €43 x (1/0,035) = €43 x 28,6 meses | **€1.230** | |
+| LTV:CAC | €1.230 / €28,6 | **43:1** ✅ HEALTHY | |
+| Payback period | €28,6 / €43 | **0,7 meses** ✅ | |
+| Break-even | €1.840 / (€43 - €12 COGS) | **59 clientes** | Mês 5 est. |
+| Runway actual | €9.200 caixa / €1.840 burn | **5 meses** ⚠️ | |
+
+**Acção imediata:** Runway <6 meses — priorizar 59 clientes pagantes até Setembro 2025.
+
+---
+
+## 6. Value Chain
+
+```
+Dono de cão → App Cuidai → Matching veterinário → Consulta realizada → Follow-up automático
+   (lead)      €0 CAC app    €28,6 CAC ads          12% comissão         NPS + upsell
+```
+
+**Build:** App + matching algorithm (core IP — manter interno)
+**Buy:** Infraestrutura cloud (Railway)
+**Partner:** Rede veterinária (outsource delivery — foco em curadoria, não em clínicas próprias)
+```
+
+---
+
+## Output anti-patterns
+
+- Entregar tabela de pricing com `$X` ou `[Name]` sem substituir por valores reais do cliente
+- Calcular LTV:CAC sem declarar o churn rate assumido — torna o número não auditável
+- Copiar o Business Model Canvas com todos os blocos "[from a360-avatar]" sem integrar dados de skills anteriores (a360-avatar, a360-oferta)
+- Usar "healthy" / "unhealthy" sem explicar o que o cliente deve fazer a seguir com essa informação
+- Apresentar 3 tiers de pricing sem ancoragem visual ou lógica de mix (torna a tabela decorativa)
+- Ignorar a moeda e mercado do cliente (output em USD para empresa portuguesa)
+- Omitir o runway quando o burn rate é calculado — é a métrica mais accionável para founders early-stage
+- Recomendar "transição para recorrente" sem dar timeline e trigger concreto (ex: "quando atingir 30 clientes activos")
+- Listar "Key Partnerships" sem indicar se o acordo existe, está em negociação, ou é hipotético
+- Entregar unit economics com break-even em "X units" sem converter para data estimada no calendário do cliente
