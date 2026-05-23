@@ -342,3 +342,124 @@ When red flags are detected:
 2. If auto-fixable, apply the fix and re-check.
 3. If not auto-fixable, include the **Suggested Action** from the tables above.
 4. For CRITICAL flags, prefix the report with: `ALERT: System requires immediate attention.`
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — RAG Engine reportado com dados reais
+- [ ] Status UP/DOWN explícito (não "a verificar...")
+- [ ] Source count + chunk count numéricos presentes
+- [ ] Last ingest date em formato YYYY-MM-DD
+- [ ] Se DOWN: motivo indicado (connection refused / timeout)
+
+❌ NOT delivery-ready: `RAG Engine | UP | sources disponíveis, chunks carregados`
+✅ Delivery-ready: `RAG Engine | UP | 88 sources, 1 215 chunks, last ingest: 2026-04-25`
+
+---
+
+### Gate 2 — Query Log com métricas numéricas
+- [ ] Total de queries (número inteiro)
+- [ ] Timestamp da última query (HH:MM ou YYYY-MM-DD HH:MM)
+- [ ] avg top_score com 2 casas decimais
+- [ ] Gap queries count (mesmo que 0)
+
+❌ NOT delivery-ready: `Query Log | OK | queries recentes encontradas`
+✅ Delivery-ready: `Query Log | 347 rows | last: 09:42, avg score: 0.81, gap queries: 3`
+
+---
+
+### Gate 3 — Knowledge Decay categorizado por frescura
+- [ ] Contagem numérica para cada categoria: fresh / warning / stale
+- [ ] Itens stale listados por categoria (não apenas total)
+- [ ] Se stale > 0: categoria afectada identificada
+
+❌ NOT delivery-ready: `Knowledge Decay | alguns itens desactualizados`
+✅ Delivery-ready: `Knowledge Decay | 2 stale | fresh: 41, warning: 7, stale: 2 (fiscal-PT, concorrentes)`
+
+---
+
+### Gate 4 — AutoDiag com log code e timestamp
+- [ ] Resultado explícito: OK / WARN / FAIL (não "sem problemas detectados")
+- [ ] Log code presente: `DARIO_AUTODIAG_OK_20260426T0912` ou `DARIO_AUTODIAG_WARN_budget_drift_T007`
+- [ ] Se WARN/FAIL: check específica identificada (não genérico)
+- [ ] Timestamp da última execução em HH:MM
+
+❌ NOT delivery-ready: `AutoDiag | OK | nenhum problema`
+✅ Delivery-ready: `AutoDiag | WARN | DARIO_AUTODIAG_WARN_stale_review_T012, last: 09:44`
+
+---
+
+### Gate 5 — Scheduled Tasks com contagem X/4
+- [ ] Contagem no formato X/4 running
+- [ ] Nome de cada task visível (Engine / Watcher / Watchdog / Backup)
+- [ ] Estado individual de cada task (Running / Ready / Disabled)
+- [ ] Tasks não-Running assinaladas
+
+❌ NOT delivery-ready: `Scheduled Tasks | a maioria activa`
+✅ Delivery-ready: `Scheduled Tasks | 3/4 running | Engine: Running, Watcher: Running, Watchdog: Disabled, Backup: Running`
+
+---
+
+### Gate 6 — Output usa dados reais, zero placeholders angle-bracket
+- [ ] Nenhum `<client>`, `<date>`, `<score>`, `<model>` no output final
+- [ ] Ollama models com nomes reais (ex: `nomic-embed-text`, `llama3.2`)
+- [ ] Reactivation timestamp real (não `YYYY-MM-DD HH:MM`)
+- [ ] Overall health = HEALTHY / DEGRADED / DOWN com justificação
+
+❌ NOT delivery-ready: `Ollama | <X> models | embed: <model>, chat: <model>`
+✅ Delivery-ready: `Ollama | 2 models | embed: nomic-embed-text, chat: llama3.2:3b`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## DARIO System Status — 2026-04-26 09:47
+
+| Component         | Status        | Details                                                      |
+|-------------------|---------------|--------------------------------------------------------------|
+| RAG Engine        | UP            | 88 sources, 1 215 chunks, 3 collections, last ingest: 2026-04-25 |
+| Query Log         | 347 rows      | last: 09:42, avg score: 0.81, gap queries: 3                 |
+| Knowledge Decay   | 2 stale       | fresh: 41, warning: 7, stale: 2 (fiscal-PT, concorrentes)   |
+| Agent Memory      | 3/3 files     | DARIO: 2026-04-26, DIVA: 2026-04-24, Project: 2026-04-26    |
+| Eval Baseline     | 87.4%         | last run: 2026-04-22, 23/26 pass                             |
+| Scheduled Tasks   | 3/4 running   | Engine ✅ Watcher ✅ Watchdog ❌ Backup ✅                   |
+| Skills            | 17 dario + 4 seo | total 21                                                  |
+| Ollama            | 2 models      | embed: nomic-embed-text, chat: llama3.2:3b                   |
+| AutoDiag          | WARN          | DARIO_AUTODIAG_WARN_stale_review_T012, last: 09:44, issues: 1|
+| Fallback Matrix   | 14 skills mapped | missing: 0                                               |
+| Reactivation      | OK            | last: 2026-04-26 07:31, 0 degraded steps                     |
+| Obsidian Vaults   | DARIO ✅ DIVA ✅ | DARIO: 23 outputs (last: 2026-04-26), DIVA: 8 outputs (last: 2026-04-20) |
+| Overall           | DEGRADED      | Watchdog task inactivo + 2 stale knowledge items             |
+
+### ⚠️ Issues encontrados (2)
+
+**1. Scheduled Task — Watchdog inactivo**
+- Task: `Dario-Watchdog`
+- Estado actual: `Disabled`
+- Acção: `Task Scheduler → Enable → Run`
+
+**2. Knowledge Decay — 2 itens stale**
+- Categorias: `fiscal-PT` (last update: 2026-02-14), `concorrentes` (last update: 2026-01-30)
+- Acção: re-ingest sources ou marcar como arquivado
+
+### AutoDiag log
+`DARIO_AUTODIAG_WARN_stale_review_T012_20260426T0944`
+Stale review detectado em task T012 (revisão pendente há 9 dias, SLA = 4 dias).
+```
+
+---
+
+## Output anti-patterns
+
+- Status reportado como "OK" sem nenhum número de suporte (sources, chunks, score)
+- Usar "alguns", "vários", "recente" em vez de contagens e timestamps concretos
+- AutoDiag concluído sem log code — invalida rastreabilidade
+- Overall = HEALTHY quando existe qualquer task Disabled ou item stale
+- Scheduled Tasks reportadas como "X/4" sem nomear qual está em falta
+- Knowledge Decay apresentado apenas como total stale sem identificar categorias afectadas
+- Ollama section com modelo listado como "embedding model available" sem nome real
+- Issues section omitida quando Overall = DEGRADED (acções correctivas são obrigatórias)
+- Reactivation reportado como "OK" sem timestamp verificável da última execução
+- Placeholders `<model>`, `<date>`, `<score>` sobrevivem no output final entregue

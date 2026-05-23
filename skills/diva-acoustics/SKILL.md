@@ -342,3 +342,213 @@ tags: [acustica, RRAE, isolamento, <project>]
 - Referenced by `diva-licensing` -- RRAE is a mandatory specialty project for licenciamento
 - Tested during `diva-inspection` -- Phase 3 (item 3.6) covers acoustic insulation checks
 - Save via `diva-obsidian-save` to vault
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Parâmetros RRAE identificados e quantificados
+
+- [ ] Output especifica os parâmetros relevantes ao projeto (DnT,w, L'nT,w, D2m,nT,w, LAr,nT) com valores numéricos, não apenas "cumpre o regulamento"
+- [ ] Cada parâmetro comparado com o mínimo RRAE aplicável (ex: DnT,w >= 50 dB entre frações)
+- [ ] Indica se o projeto está em Classe C (mínimo), B ou A (NP 4499) quando aplicável
+- [ ] Gap entre solução proposta e mínimo legal está explícito (ex: "+4 dB de margem")
+
+❌ NOT delivery-ready: *"A parede cumpre os requisitos acústicos do RRAE."*
+✅ Delivery-ready: *"Parede dupla tijolo 11+11 + MW 5cm → DnT,w estimado 54 dB. Requisito RRAE: 50 dB. Margem: +4 dB (Classe B per NP 4499)."*
+
+---
+
+### Gate 2 — Localização e ruído exterior contextualizado
+
+- [ ] Zona de ruído identificada (quieta / moderada / ruidosa) com Lden estimado ou consultado no mapa de ruído municipal
+- [ ] Requisito de fachada D2m,nT,w correto para a zona (28 dB / 33 dB / 33 dB + correção)
+- [ ] Se localização é junto a eixo viário, ferrovia ou aeroporto, isso está explicitamente mencionado
+- [ ] Fonte do dado de ruído indicada (ex: "Mapa de Ruído CM Lisboa, 2022 — Lden 63 dB")
+
+❌ NOT delivery-ready: *"A fachada deve cumprir os requisitos do RRAE conforme a localização do edifício."*
+✅ Delivery-ready: *"Localização: Av. Almirante Reis, Lisboa. Lden estimado: 68 dB (zona ruidosa, mapa CM Lisboa). Requisito fachada: D2m,nT,w >= 33 dB + correção. Solução: janela PVC vidro duplo 4/16/6 → D2m,nT,w ≈ 36 dB. ✅ Cumpre."*
+
+---
+
+### Gate 3 — Soluções construtivas especificadas com materiais reais
+
+- [ ] Cada solução tem espessura total (mm), composição por camadas (da interior para exterior), e DnT,w ou L'nT,w estimado
+- [ ] Custo indicativo EUR/m² presente para pelo menos a solução recomendada
+- [ ] Materiais mencionam fornecedores ou produtos disponíveis em Portugal (ex: Isover, Knauf, Weber, Mapei, Saint-Gobain)
+- [ ] Princípio construtivo crítico verificado: ausência de ligações rígidas entre panos, selagem perimetral com mastique acústico
+
+❌ NOT delivery-ready: *"Recomenda-se piso flutuante com material resiliente para redução de ruído de impacto."*
+✅ Delivery-ready: *"Piso flutuante: betonilha 6cm + lã mineral resiliente Isover Floorrock SE 30mm (Rw 38 dB, rigidez dinâmica s' ≤ 10 MN/m³) + laje maciça 20cm → L'nT,w ≈ 52 dB. Requisito: ≤ 60 dB. Custo aprox. 28-35 €/m²."*
+
+---
+
+### Gate 4 — Ruído de equipamentos (LAr,nT) endereçado se relevante
+
+- [ ] Se o edifício tem AVAC, elevador, bombas, ou tubagens de queda, output verifica LAr,nT
+- [ ] Distingue equipamento contínuo (limite 32 dB(A)) vs. intermitente/elevador (limite 40 dB(A))
+- [ ] Medidas de isolamento de equipamentos especificadas quando LAr,nT previsto excede limite (anti-vibráticos, caixa técnica flutuante, shafts com lã mineral)
+- [ ] Adjacências críticas identificadas (ex: quarto de dormir junto a shaft de elevador)
+
+❌ NOT delivery-ready: *"Os equipamentos mecânicos devem ser instalados de forma a não causar incómodo acústico."*
+✅ Delivery-ready: *"Elevador previsto adjacente a quarto T2. Limite LAr,nT ≤ 40 dB(A). Medidas: revestimento shaft com pladur 2×15mm + MW 5cm; silentblocks no grupo motor; porta casa de máquinas com DnT,w ≥ 38 dB. LAr,nT estimado pós-medidas: 36 dB(A). ✅ Cumpre."*
+
+---
+
+### Gate 5 — Percursos de flanking e pontos críticos identificados
+
+- [ ] Output menciona pelo menos 1 percurso de flanking relevante ao projeto (laje contínua, pilar, condutas partilhadas, rodapé rígido)
+- [ ] Solução de descontinuidade proposta para percurso identificado (junta elástica, dessolidarização, sleeve resiliente)
+- [ ] Zonas de interface especiais tratadas: caixa de escada, garagem, zona comercial no piso 0
+- [ ] Para mistos residencial/comercial: parâmetro 58 dB aplicado (não 50 dB) e confirmado
+
+❌ NOT delivery-ready: *"Cuidado com as pontes acústicas na construção."*
+✅ Delivery-ready: *"Laje contínua entre fração A (piso 1) e restaurante (piso 0, Cuidai Lisboa). Flanking path via laje + parede estrutural. Solução: perfis Regupol 5010 sob parede divisória + junta perimetral betonilha com Knauf Trennfix 5mm. DnT,w necessário: 58 dB (residencial/comercial). Solução estimada: 60 dB. ✅ Margem +2 dB."*
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais do projeto, sem placeholders entre ângulos
+
+- [ ] Nenhum `<client_name>`, `<project_address>`, `<floor_type>`, `<insert_value>` presente no output
+- [ ] Morada ou localização do projeto aparece em pelo menos 1 ponto do output
+- [ ] Tipologia do edifício e ano de projeto/licença referenciados (ex: "Edificio novo, licença 2024, CM Porto")
+- [ ] Valores de desempenho são do projeto específico, não genéricos de tabela
+
+❌ NOT delivery-ready: *"Para o projeto em `<localização>`, o requisito de `<parametro>` é de `<valor>` dB."*
+✅ Delivery-ready: *"Vivenda — Edifício Almada Nova, Rua Prior do Crato 12, Almada. Licença 2024. Paredes entre frações T3: DnT,w 56 dB (solução: betão 20cm + Pladur F47 independente). Pavimentos: L'nT,w 54 dB (piso flutuante Floorrock 30mm). Todos os parâmetros RRAE cumpridos com Classe B."*
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Projeto Acústico — Vivenda Almada Nova
+**Cliente:** Vivenda — Promoção Imobiliária  
+**Obra:** Edifício Residencial + Comércio R/C, Rua Prior do Crato 12, Almada  
+**Tipologia:** 3 pisos residenciais (T2/T3) + loja R/C  
+**Licença de construção:** CM Almada, 2024  
+**Data análise:** Junho 2025
+
+---
+
+## 1. Contexto de ruído exterior
+
+Localização: arruamento urbano de tráfego moderado.  
+Lden estimado: 61 dB (Mapa de Ruído CM Almada, zona moderada 55–65 dB).  
+**Requisito fachada: D2m,nT,w ≥ 33 dB.**
+
+---
+
+## 2. Requisitos RRAE aplicáveis
+
+| Elemento | Parâmetro | Requisito mínimo | Classe-alvo |
+|---|---|---|---|
+| Parede entre frações (residencial) | DnT,w | ≥ 50 dB | Classe B (≥ 55 dB) |
+| Parede fração / loja R/C | DnT,w | ≥ 58 dB | Classe B (≥ 63 dB) |
+| Pavimento entre pisos | L'nT,w | ≤ 60 dB | Classe B (≤ 53 dB) |
+| Fachada | D2m,nT,w | ≥ 33 dB | ≥ 36 dB |
+| Elevador (junto a quarto) | LAr,nT | ≤ 40 dB(A) | ≤ 36 dB(A) |
+| AVAC (unidade interior) | LAr,nT | ≤ 32 dB(A) | ≤ 28 dB(A) |
+
+---
+
+## 3. Soluções construtivas especificadas
+
+### 3.1 Parede entre frações T2/T3 (pisos 1–3)
+**Solução:** Betão armado 20cm + perfis Knauf F47 independentes 
+(distância 3cm ao betão) + lã mineral Isover Façade 034 5cm + 
+Pladur N 2×13mm  
+**Espessura total:** 290mm  
+**DnT,w estimado:** 62 dB  ✅ Classe B (requisito 50 dB, meta 55 dB)  
+**Custo:** ~55 €/m²  
+**Atenção:** Perfis F47 NÃO podem ter contacto rígido com laje — 
+selar com Knauf Trennfix 5mm na base e topo.
+
+### 3.2 Parede fração / loja R/C (separação residencial-comercial)
+**Solução:** Laje BA 25cm (pré-existente) + piso flutuante face 
+superior (ver 3.3) + tecto falso suspenso face inferior com 
+Isover Calibel 13+45mm  
+**DnT,w estimado:** 61 dB  ✅ (requisito 58 dB)  
+**L'nT,w estimado:** 51 dB  ✅ Classe B (requisito 60 dB)  
+**Custo tecto falso:** ~38 €/m²
+
+### 3.3 Pavimento entre pisos (laje 20cm BA)
+**Solução piso flutuante:**  
+Laje BA 20cm + lã mineral resiliente Isover Floorrock SE 30mm  
+(s' ≤ 10 MN/m³, Rw 38 dB) + betonilha 6cm (120 kg/m²)  
++ junta perimetral Knauf Trennfix 5mm (dessolidarização total)  
+**L'nT,w estimado:** 52 dB  ✅ Classe B  
+**DnT,w estimado:** 58 dB  ✅  
+**Custo:** 30–38 €/m²  
+**Crítico:** rodapé colado apenas à betonilha, nunca à parede.
+
+### 3.4 Fachada (janelas, Rua Prior do Crato)
+**Caixilharia:** PVC Deceuninck Elegant 82 MD, vidro duplo 6/16Ar/6  
+**D2m,nT,w janela:** ≈ 35 dB  ✅ (requisito 33 dB)  
+**Parede exterior:** ETICS + pano tijolo 11cm — contribuição ≥ 48 dB  
+**Sistema global fachada:** D2m,nT,w ≈ 36 dB  ✅
+
+---
+
+## 4. Equipamentos — controlo LAr,nT
+
+**Elevador** (shaft adjacente a quarto T3, piso 2):  
+- Revestimento shaft: Pladur 2×15mm + Isover Acoustic 5cm  
+- Silentblocks Farrat TF25 no grupo motor  
+- Porta casa de máquinas: porta acústica DnT,w ≥ 40 dB  
+- **LAr,nT estimado: 37 dB(A)**  ✅ (limite 40 dB(A))
+
+**AVAC** (unidades split Mitsubishi Electric MSZ-LN — 3 frações):  
+- Unidades interiores sobre suportes anti-vibráticos  
+- Tubagens com manga resiliente Armacell AF/ArmaFlex nos 
+  atravessamentos de laje  
+- **LAr,nT estimado: 29 dB(A)**  ✅ (limite 32 dB(A))
+
+---
+
+## 5. Percursos de flanking identificados
+
+| Ponto crítico | Risco | Solução |
+|---|---|---|
+| Laje contínua piso 1 → loja R/C | Alto — flanking via laje | Junta Regupol 5010 sob parede divisória |
+| Pilar BA entre fração A e B | Médio — transmissão lateral | Pladur independente não solidário ao pilar |
+| Tubagem queda (PVC 110mm) | Médio — ruído plumbing | Manga Rockwool Pipe 40mm + braçadeiras resilientes |
+| Caixa de escada comum | Baixo | DnT,w ≥ 48 dB (parede tijolo 15 + reboco duplo) |
+
+---
+
+## 6. Classificação acústica final (NP 4499)
+
+| Elemento | Valor estimado | Classe |
+|---|---|---|
+| Paredes entre frações | DnT,w 62 dB | **Classe B** |
+| Pavimentos impacto | L'nT,w 52 dB | **Classe B** |
+| Fachada | D2m,nT,w 36 dB | **Classe B** |
+| Elevador | LAr,nT 37 dB(A) | **Classe C** |
+
+**Classificação global do edifício: Classe B** — adequado a 
+posicionamento de mercado premium-médio (Vivenda).
+
+---
+
+*Análise baseada em RRAE (DL 96/2008) e NP 4499. Valores estimados 
+por cálculo — confirmação por medição in-situ após construção 
+recomendada (RRAE Art. 11º).*
+```
+
+---
+
+## Output anti-patterns
+
+- Citar apenas "cumpre o RRAE" sem valores de DnT,w ou L'nT,w — compliance sem número não é verificável
+- Especificar "isolamento acústico adequado" sem indicar a camada resiliente, espessura e fornecedor concreto
+- Ignorar o percurso de flanking pela laje ou pilares (o ponto mais frequente de falha real em obra)
+- Tratar DnT,w e Rw como equivalentes — Rw é de laboratório, DnT,w é in-situ com correção de tempo de reverberação
+- Omitir distinção residencial/comercial (58 dB) vs. residencial/residencial (50 dB) — erro de 8 dB com impacto legal
+- Recomendar piso flutuante sem especificar rigidez dinâmica (s') do material resiliente — propriedade crítica para L'nT,w
+- Output genérico sem localização: "verifique o mapa de ruído municipal" sem indicar qual município, URL ou valor Lden
+- Listar soluções construtivas sem custo indicativo €/m² — impede tomada de decisão por promotor ou arquitecto
+- Confundir LAr,nT contínuo (32 dB(A)) com intermitente/elevador (40 dB(A)) — requisitos diferentes, não intercambiáveis
+- Produzir output sem identificar o cliente ou edifício específico — relatório sem cabeçalho não é documento de projeto

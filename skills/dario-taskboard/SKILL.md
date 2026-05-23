@@ -324,3 +324,129 @@ Tasks are stored as individual YAML files. This means:
 - Never delete tasks — archive to `done/` for audit trail
 - Never exceed revision_max_loops without escalating to user
 - Stale tasks (>48h) should trigger an alert in the orchestration report
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Task IDs e Schema completo
+- [ ] Cada tarefa tem ID no formato `<PREFIX>-<NNN>` com prefixo coerente com o projeto (ex: `CUI-001`, `ATR-007`)
+- [ ] Campos obrigatórios preenchidos: `id`, `title`, `status`, `priority`, `skill`, `created_at`, `assigned_by`
+- [ ] `depends_on` e `blocks` são listas (mesmo que vazias `[]`), nunca `null` implícito
+- [ ] `execution_policy` é um dos 4 valores válidos: `default | critical | client_facing | financial`
+- ❌ NOT delivery-ready: `assignee: <worker-id>` ou `project: <client-slug>`
+- ✅ Delivery-ready: `assignee: "lucas-dev"`, `project: "cuidai"`, `skill: "dario-brand"`
+
+### Gate 2 — Status Flow coerente
+- [ ] Status corresponde ao estado real da tarefa (não `todo` se ninguém está atribuído)
+- [ ] Toda tarefa `blocked` tem `blocked_reason` preenchido com texto explicativo
+- [ ] Tarefas `in_progress` têm `checked_out_at` com timestamp ISO 8601 real
+- [ ] Tarefas `done` têm `completed_at` + `completion_comment` + `approved_by` preenchidos
+- ❌ NOT delivery-ready: status `blocked` sem `blocked_reason`, ou `done` sem `completed_at`
+- ✅ Delivery-ready: `blocked_reason: "Aguarda aprovação de orçamento pelo cliente Cuidai — desbloqueio esperado 2026-05-02"`
+
+### Gate 3 — Dependências e Atomic Checkout
+- [ ] Não existe tarefa `in_progress` com `depends_on` contendo tarefas ainda `todo` ou `backlog`
+- [ ] Nenhuma tarefa tem dois `assignee` diferentes em simultâneo (regra 409 respeitada)
+- [ ] `revision_count` ≤ `revision_max_loops`; se atingido, tarefa está escalada para CEO
+- [ ] Tarefas com `execution_policy: critical` têm CEO (`dario-ceo`) em `watchers[]`
+- ❌ NOT delivery-ready: `in_progress` com `depends_on: ["ATR-003"]` e ATR-003 ainda `todo`
+- ✅ Delivery-ready: ATR-003 está `done` antes de ATR-004 passar a `in_progress`
+
+### Gate 4 — Audit Trail e Notas
+- [ ] Toda transição de status tem entrada no `notes[]` com timestamp e actor
+- [ ] `updated_at` foi actualizado em cada operação (nunca igual a `created_at` após mudanças)
+- [ ] `revision_count` incrementado correctamente em cada loop `in_review → in_progress`
+- [ ] `completion_comment` é substantivo (mínimo 1 frase descritiva), não `"done"` ou `"ok"`
+- ❌ NOT delivery-ready: `notes: []` numa tarefa que já passou por 3 status diferentes
+- ✅ Delivery-ready: `notes: [{ts: "2026-04-28T10:22:00Z", actor: "lucas-dev", text: "API Stripe integrada, testes unitários a 87% coverage"}]`
+
+### Gate 5 — Prioridades e Estimativas realistas
+- [ ] Distribuição de prioridades coerente: não existe sprint com 100% tarefas `critical`
+- [ ] `estimated_tokens` é número inteiro positivo e plausível para o scope da tarefa (≥500)
+- [ ] Tarefas `critical` têm `squad` ou `assignee` definido — nunca ficam `null` em ambos
+- [ ] `division` é um dos valores válidos: `dario | diva | lucas`
+- ❌ NOT delivery-ready: `estimated_tokens: null` ou `priority: critical` com `assignee: null` e `squad: null`
+- ✅ Delivery-ready: `estimated_tokens: 8000`, `priority: "high"`, `assignee: "dario-cfo"`, `division: "dario"`
+
+### Gate 6 — Output usa CLIENT NAME + REAL data, sem angle-brackets placeholder
+- [ ] Nenhum campo contém `<placeholder>`, `<client>`, `<worker-id>`, `<date>` ou similar
+- [ ] Project slug corresponde a cliente real ou projecto identificável
+- [ ] Timestamps são datas ISO 8601 plausíveis (não `0000-00-00` ou futuro impossível)
+- [ ] Worker IDs existem no universo DARIO (`dario-ceo`, `lucas-dev`, `dario-cfo`, etc.)
+- ❌ NOT delivery-ready: `project: "<client-slug>"`, `approved_by: "<approver>"`
+- ✅ Delivery-ready: `project: "saquei"`, `approved_by: "dario-ceo"`, `created_at: "2026-04-26T14:30:00Z"`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```yaml
+# ~/.claude/orchestrator/tasks/active/SAQ-003.yaml
+id: "SAQ-003"
+title: "Implementar webhook de confirmação de crédito Stripe → SAQUEI backend"
+description: |
+  Configurar endpoint /webhooks/stripe no backend SAQUEI para receber
+  eventos payment_intent.succeeded e credit.created. Validar assinatura
+  HMAC, actualizar estado do empréstimo em Supabase e disparar notificação
+  push ao utilizador. Critério de sucesso: 100% dos eventos de teste
+  processados sem erro 5xx em staging.
+project: "saquei"
+status: "in_review"
+priority: "critical"
+assignee: "lucas-dev"
+assigned_by: "dario-ceo"
+parent: "SAQ-001"
+children: []
+depends_on: ["SAQ-001", "SAQ-002"]
+blocks: ["SAQ-004", "SAQ-005"]
+execution_policy: "financial"
+estimated_tokens: 12000
+actual_tokens: 11340
+skill: "dario-code"
+squad: null
+division: "lucas"
+tags: ["stripe", "webhook", "backend", "financeiro"]
+created_at: "2026-04-22T09:00:00Z"
+updated_at: "2026-04-28T16:45:00Z"
+checked_out_at: "2026-04-23T08:15:00Z"
+completed_at: "2026-04-28T16:40:00Z"
+reviewed_by: "dario-cto"
+approved_by: null
+completion_comment: |
+  Webhook implementado em /webhooks/stripe. Validação HMAC activa com
+  secret rotacionado. Supabase actualiza campo loan_status para 'funded'
+  em <200ms. Testes em staging: 47/47 eventos processados, zero 5xx.
+  Aguarda aprovação final dario-ceo antes de deploy para produção.
+revision_count: 1
+revision_max_loops: 3
+blocked_reason: null
+watchers: ["dario-ceo", "dario-cfo"]
+notes:
+  - ts: "2026-04-23T08:15:00Z"
+    actor: "lucas-dev"
+    text: "Checkout atómico confirmado. A iniciar implementação do endpoint."
+  - ts: "2026-04-25T11:30:00Z"
+    actor: "dario-cto"
+    text: "Revisão intercalar: lógica HMAC correcta, falta idempotency key para retries."
+  - ts: "2026-04-25T14:00:00Z"
+    actor: "lucas-dev"
+    text: "Revisão 1 endereçada: adicionado idempotency_key via stripe-signature header hash."
+  - ts: "2026-04-28T16:45:00Z"
+    actor: "lucas-dev"
+    text: "Submetido para review final. 47/47 testes staging OK. Token spend: 11340."
+```
+
+---
+
+## Output anti-patterns
+
+- Criar tarefa com `status: in_progress` mas `checked_out_at: null` — viola o contrato de atomic checkout
+- Usar `blocked_reason: null` numa tarefa com `status: blocked` — bloqueia o dashboard sem contexto accionável
+- Tarefas `done` sem `completion_comment` — perde o audit trail e impossibilita retrospectivas
+- `depends_on` com IDs que não existem no sistema (ex: `SAQ-099` sem ficheiro correspondente)
+- `revision_count` maior que `revision_max_loops` sem escalação registada para `dario-ceo`
+- `priority: critical` com `watchers: []` — CEO nunca é notificado de tarefas de risco financeiro/operacional
+- `estimated_tokens: 500` numa tarefa descrita como "arquitectura completa do sistema de pagamentos"
+- Copiar template sem actualizar `id`, resultando em IDs duplicados no mesmo projecto
+- `notes[]` com entradas sem `actor` — impossível determinar quem fez o quê em auditoria

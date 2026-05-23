@@ -307,3 +307,150 @@ result: <aprovado / aprovado com reservas / reprovado>
 - Pair with `diva-licensing` for preparing the autorizacao de utilizacao vistoria
 - Follow up with `dario-obsidian-save` to archive inspection reports
 - Save via `dario-obsidian-save` to vault
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Fase de obra identificada e checklist correspondente gerada
+
+- [ ] A fase inspeccionada está explicitamente nomeada (Fundações / Estrutura / Impermeabilização / MEP / Final)
+- [ ] A checklist gerada é a da fase correcta — não uma checklist genérica
+- [ ] Se "final inspection", todas as fases relevantes estão incluídas com punch list
+- [ ] Itens inaplicáveis à fase estão omitidos ou marcados N/A com justificação
+
+❌ NOT delivery-ready: "Verifique a qualidade da obra conforme as normas aplicáveis."
+✅ Delivery-ready: "Fase 2 — Estrutura | Item 2.1 Pilares: desvio medido 7mm/piso (máx. EN 13670: 10mm) ✅ | Item 2.4 Lajes: desvio 14mm em 2m ❌ REPROVADO"
+
+---
+
+### Gate 2 — Tolerâncias e normas citadas com valores concretos
+
+- [ ] Cada item crítico inclui o valor de tolerância numérico (ex: ±5mm, L/500, min 4cm)
+- [ ] A norma ou regulamento fonte está identificado (EN 13670, REH, RRAE, RTIEBT, RGEU)
+- [ ] Desvios encontrados são comparados directamente à tolerância ("medido: X | limite: Y")
+- [ ] Ensaios obrigatórios (betão 28 dias, pressão 10 bar/2h, inundação 48h) têm resultado registado
+
+❌ NOT delivery-ready: "Verificar se a armadura está correcta conforme o projecto."
+✅ Delivery-ready: "Item 1.4 Armadura: recobrimento medido 3.2cm — REPROVADO (mínimo 4cm per projecto). Foto REF-ARM-003."
+
+---
+
+### Gate 3 — Sign-off e responsáveis identificados por fase
+
+- [ ] Cada fase tem o responsável de aprovação nomeado (engenheiro estruturas, fiscalização, etc.)
+- [ ] Data da inspecção está registada no output
+- [ ] Itens em aberto da vistoria anterior (se fornecidos) estão referenciados como "carry-over"
+- [ ] Pré-condição bloqueante indicada quando aplicável (ex: "Teste WC obrigatório ANTES de revestimento")
+
+❌ NOT delivery-ready: "Assinar quando estiver tudo conforme."
+✅ Delivery-ready: "Sign-off: Eng. Rui Faria (estruturas) — Data prevista: 2025-03-14 | BLOQUEANTE: ensaios betão C25/30 (cubos 28 dias) pendentes → betonagem laje P2 não autorizada"
+
+---
+
+### Gate 4 — Documentação fotográfica especificada por item
+
+- [ ] Cada item marcado "Req" tem referência fotográfica (código ou placeholder estruturado)
+- [ ] Fotos de itens reprovados estão explicitamente indicadas como obrigatórias
+- [ ] Se inspecção já realizada, o número real de fotos tiradas está registado
+- [ ] Ângulos/detalhes críticos sugeridos onde a foto genérica é insuficiente (ex: "foto regua sobre laje, 2m visível")
+
+❌ NOT delivery-ready: "Tirar fotos da obra."
+✅ Delivery-ready: "Item 3.3 Teste estanquidade WC Suite Master: foto ANTES enchimento (REF-WC-001), DURANTE 48h (REF-WC-002), resultado piso inferior sem mancha (REF-WC-003) ✅"
+
+---
+
+### Gate 5 — Punch list com estados RAG e prazo de resolução
+
+- [ ] Cada não-conformidade tem estado: 🔴 Crítico (bloqueia fase) / 🟡 Maior (resolver antes handover) / 🟢 Menor (remate)
+- [ ] Data-limite de resolução atribuída a cada item em aberto
+- [ ] Responsável pela correcção identificado (empreiteiro geral / subcontratado / fornecedor)
+- [ ] Critério de re-inspecção definido ("reinspeção em 5 dias úteis, Eng. X valida no local")
+
+❌ NOT delivery-ready: "Lista de remates: reparar pintura, verificar tomada, ajustar porta."
+✅ Delivery-ready: "PL-007 🟡 Porta WC serviço: folga superior 6mm (máx. 3mm, NP EN 1121) | Resp: Carpintaria Sousa | Prazo: 2025-04-02 | Re-inspecção: Arq. Marta Dias in loco"
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets
+
+- [ ] Nome do projecto real substituiu `<nome do projecto>` ou similar
+- [ ] Referências a morada/lote/fracção estão preenchidas
+- [ ] Datas concretas (inspecção, sign-off, prazo punch list) substituíram placeholders
+- [ ] Engenheiros/fiscalização nomeados com nome real ou "A definir" explícito — nunca `<engenheiro>`
+
+❌ NOT delivery-ready: "Projecto: `<inserir projecto>` | Inspector: `<nome>` | Data: `<data>`"
+✅ Delivery-ready: "Projecto: Cuidai HQ — Remodelação Piso 2, Rua Actor Isidoro 8, Lisboa | Inspector: Arq. Sofia Monteiro | Inspecção: 2025-03-11"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Relatório de Inspecção — Atrium Reabilitação Edifício Pombalino
+**Projecto:** ATR-2025-04 | Rua do Ouro 112, Lisboa | Fracção: Pisos 1-3
+**Tipo:** Milestone — Fase MEP Rough-In (Fase 4)
+**Inspector:** Eng. Paulo Guerreiro (fiscalização) + Arq. Inês Tavares
+**Data inspecção:** 2025-03-11 | **Hora:** 09h30
+**Inspecção anterior:** 2025-02-18 | Items carry-over: 2 (ver §Carry-Over)
+
+---
+
+## Fase 4 — MEP Rough-In: Canalizações, Electricidade, AVAC
+
+| # | Item | Critério / Tolerância | Medido / Observado | Estado | Fotos |
+|---|---|---|---|---|---|
+| 4.1 | Água — tubagem | Ø conforme projecto, isolamento AQ, sem cruzamentos esgoto | Ø22mm AQ ✅ Isolamento 9mm ✅ Sem cruzamentos ✅ | ✅ | ATR-MEP-001/002 |
+| 4.2 | Água — teste pressão | 10 bar durante 2h, queda <0.1 bar | 10 bar → 9.94 bar (2h) ✅ | ✅ | ATR-MEP-003 |
+| 4.3 | Esgoto — inclinação | Mín. 1% (verificado com nível digital) | WC Piso 1: 1.8% ✅ Cozinha: 0.7% ❌ | ❌ | ATR-MEP-004/005 |
+| 4.4 | Esgoto — estanquidade | Sem fugas em junções após carga 2h | 1 fuga detected junção PVC Piso 2 WC | ❌ | ATR-MEP-006 |
+| 4.5 | Elect. — tubagem ITED | Caminhos conf. projecto, sep. potência/dados mín 30cm | Separação 28cm troço corredor Piso 2 | 🟡 | ATR-MEP-007 |
+| 4.6 | Elect. — caixas | Interruptores 1.10m, tomadas 0.30m (±10mm) | Interruptores: 1.08–1.12m ✅ Tomadas: OK ✅ | ✅ | ATR-MEP-008 |
+| 4.7 | Quadro eléctrico | Acessível, espaço suficiente, conf. RTIEBT Art.º 412 | Localização OK, espaço 20% livre ✅ | ✅ | ATR-MEP-009 |
+| 4.8 | AVAC — condutas | Dimensões conf. projecto, isolamento, suspensões máx. 1.5m | Suspensões: 1.8m troço Piso 3 ❌ | ❌ | ATR-MEP-010 |
+| 4.9 | AVAC — unidades ext. | Suportes anti-vibráticos, posição conf. projecto | Instalação pendente (programada 2025-03-18) | ⏳ | — |
+
+---
+
+## Punch List — Items em Aberto
+
+| ID | Descrição | Severidade | Responsável | Prazo | Re-inspecção |
+|---|---|---|---|---|---|
+| PL-ATR-009 | Esgoto cozinha Piso 1: inclinação 0.7% (mín. 1%) — rectificar percurso | 🔴 Crítico | Canalizações Ferreira Lda | 2025-03-17 | Eng. Guerreiro in loco |
+| PL-ATR-010 | Fuga junção PVC Piso 2 WC — substituir luva, repetir teste 10 bar/2h | 🔴 Crítico | Canalizações Ferreira Lda | 2025-03-17 | Teste documentado foto |
+| PL-ATR-011 | Separação potência/dados 28cm (mín. 30cm) — troço corredor Piso 2 | 🟡 Maior | Electro-Tejo SA | 2025-03-21 | Medição no local |
+| PL-ATR-012 | Suspensões AVAC Piso 3: vão 1.8m (máx. 1.5m) — adicionar fixação | 🟡 Maior | ClimaTec Norte | 2025-03-21 | Eng. Guerreiro in loco |
+
+---
+
+## Carry-Over da Inspecção Anterior (2025-02-18)
+
+| ID | Item | Estado actual |
+|---|---|---|
+| PL-ATR-007 | Recobrimento armadura laje Piso 2: 3.6cm (mín. 4cm) | ✅ RESOLVIDO — foto ATR-EST-044 |
+| PL-ATR-008 | Ensaios betão C25/30 Piso 2 pendentes | ✅ RESOLVIDO — resultados 28 dias: 27.4 MPa (OK) |
+
+---
+
+## Sign-Off
+
+**FASE 4 — STATUS: 🔴 NÃO APROVADA**
+Condição de progressão: PL-ATR-009 e PL-ATR-010 resolvidos e validados.
+Próxima inspecção agendada: **2025-03-18, 10h00**
+Assinatura fiscalização: Eng. Paulo Guerreiro ________________
+```
+
+---
+
+## Output anti-patterns
+
+- Checklist gerada sem fase identificada — itens de fundações misturados com MEP numa lista indiferenciada
+- Tolerâncias escritas em prosa vaga ("verificar se está nivelado") sem valor numérico nem norma fonte
+- Punch list sem severidade RAG — cliente não sabe o que bloqueia progressão da obra
+- Sign-off "a assinar quando concluído" sem responsável nomeado nem data concreta
+- Fotos listadas como "tirar fotos" sem código de referência por item — impossível rastrear em obra
+- Teste de estanquidade WC ou pressão de água marcado ✅ sem registar valores medidos (pressão inicial, pressão final, duração)
+- Carry-over de inspecção anterior ignorado — itens em aberto desaparecem do relatório seguinte sem resolução documentada
+- Output entregue com `<nome do projecto>`, `<engenheiro>`, `<data>` por preencher — placeholders visíveis ao cliente

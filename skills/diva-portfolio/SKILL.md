@@ -179,3 +179,204 @@ tags: [portfolio, case-study, <tipo>]
 - NUNCA usar fotos sem creditos ao fotografo
 - SEMPRE pedir testimonial antes de publicar
 - SEMPRE verificar se ha acordo de confidencialidade
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Autorização e dados verificados antes de qualquer publicação
+
+- [ ] Existe confirmação escrita do cliente para publicação (referenciada no output)
+- [ ] Orçamento: indicado APENAS se autorizado, com nota explícita "publicação aprovada pelo cliente"
+- [ ] Fotógrafo creditado por nome/studio; sem imagens de stock apresentadas como do projecto
+- [ ] NDA ou acordo de confidencialidade verificado (mencionado ou descartado explicitamente)
+
+❌ NOT delivery-ready: `"Orçamento: €X (se autorizado)"` — placeholder sem resolução  
+✅ Delivery-ready: `"Orçamento total: €187.000 — publicação autorizada por Ana Costa, email 14 Jan 2025"` ou `"Orçamento: omitido a pedido do cliente (email 09 Fev 2025)"`
+
+---
+
+### Gate 2 — Hero section com dados reais e completos
+
+- [ ] Nome do projecto não genérico (não "Projecto X" ou `<nome>`)
+- [ ] Localização real (pelo menos cidade/freguesia, ex: "Príncipe Real, Lisboa")
+- [ ] Tipologia + área m² + ano de conclusão preenchidos com números concretos
+- [ ] Tagline de uma linha captura a identidade do projecto (não é uma frase-template)
+
+❌ NOT delivery-ready: `"# [Project Name] — [Location]"` ou `"> [One-line tagline that captures the essence]"`  
+✅ Delivery-ready: `"# Casa Mouraria 42 — Mouraria, Lisboa"` + `"> Uma T2 de 1910 transformada em loft contemporâneo sem apagar 114 anos de história"`
+
+---
+
+### Gate 3 — Narrativa de conceito e brief com substância real
+
+- [ ] Brief tem 3-5 bullets com pedidos reais do cliente (não genéricos)
+- [ ] Conceito tem 150-200 palavras com direcção de estilo nomeada + designer de referência específico
+- [ ] Decisões de design justificadas ("escolhemos X porque Y", não apenas "escolhemos X")
+- [ ] Se renovação: estado original descrito com problemas concretos (ex: "laje rebaixada a 2,30m, cozinha fechada de 7m²")
+
+❌ NOT delivery-ready: `"O cliente queria um espaço moderno e funcional"` — sem especificidade  
+✅ Delivery-ready: `"Cliente queria: (1) abrir cozinha para sala preservando IVV; (2) suite com WC encastrado em 12m²; (3) paleta neutra, sem branco puro — referência fornecida: Axel Vervoordt Wabi"`
+
+---
+
+### Gate 4 — Paleta de materiais e detalhes técnicos com referências verificáveis
+
+- [ ] Tabela de materiais preenchida: material + aplicação + marca/referência real (não `[marca + referencia]`)
+- [ ] Pelo menos 1 elemento técnico especial documentado (piso radiante, domotica, classe energética, etc.)
+- [ ] Código hex da paleta de cores incluído (mínimo 3 cores)
+- [ ] Elementos custom (carpintaria, serralharia) descritos com dimensão ou detalhe diferenciador
+
+❌ NOT delivery-ready: `"Pavimento: madeira natural | Sala | [marca + referência]"`  
+✅ Delivery-ready: `"Pavimento: carvalho europeu fumado 180mm | Sala + corredor | Bauwerk Colour 'Frei' | #6B5B47"`
+
+---
+
+### Gate 5 — The Numbers e Team sem vazios
+
+- [ ] Tabela de números completa: área, duração obra, equipa — sem células vazias ou "X meses"
+- [ ] Valorização estimada: incluída COM fonte/método ou explicitamente omitida com razão
+- [ ] Equipa: pelo menos arquitecto + empreiteiro nomeados (nome real ou "confidencial a pedido do cliente")
+- [ ] Data de conclusão real no frontmatter (não `YYYY-MM-DD`)
+
+❌ NOT delivery-ready: `"Duração obra: X meses"` / `"Valorização estimada: +X%"` — literais do template  
+✅ Delivery-ready: `"Duração obra: 11 meses (Abr 2024 – Mar 2025)"` / `"Valorização: +22% vs. avaliação pré-obra (fonte: avaliação bancária Fev 2025)"`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets ou placeholders
+
+- [ ] Zero ocorrências de `<nome>`, `<morada>`, `<N>`, `[...]`, `[Project Name]`, `[Location]` no output final
+- [ ] Frontmatter YAML completamente preenchido com valores reais
+- [ ] Tags incluem tipologia real (ex: `remodelacao-t2`, `moradia-nova`, `hotel-boutique`)
+- [ ] Save path tem data real + nome real do projecto (ex: `2025-03-18 - Casa Mouraria 42 - Portfolio Case Study.md`)
+
+❌ NOT delivery-ready: `project: <nome>` / `location: <morada>` / `tags: [portfolio, case-study, <tipo>]`  
+✅ Delivery-ready: `project: "Casa Mouraria 42"` / `location: "Mouraria, Lisboa"` / `tags: [portfolio, case-study, remodelacao-t2, lisboa]`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+---
+project: "Casa Príncipe Real 78"
+date: 2025-03-18
+type: portfolio
+location: "Príncipe Real, Lisboa"
+area_m2: 94
+year: 2024
+style: "contemporâneo orgânico"
+designer_ref: "Axel Vervoordt + Vincent Van Duysen"
+tags: [portfolio, case-study, remodelacao-t3, lisboa, principe-real]
+client_approved: true
+client_approval_ref: "email Marta Figueiredo 02 Mar 2025"
+---
+
+# Casa Príncipe Real 78 — Príncipe Real, Lisboa
+
+> Um T3 de 1934 despido até à estrutura e recomposto em torno da luz que sempre existiu, mas nunca foi deixada entrar.
+
+## The Brief
+
+- Remover três divisórias interiores para criar sala-cozinha integrada de 42m²
+- Manter tecto de estuque original do corredor (cota 3,10m) como elemento nobre
+- Suite principal com closet encastrado em parede de betão aparente — sem portas visíveis
+- Paleta total de neutros quentes; referência explícita da cliente: apartamento Rijksmuseum de Piet Boon
+- Orçamento fechado: €210.000 (publicação autorizada pela cliente)
+
+## The Concept
+
+A intervenção partiu de uma lógica de subtracção: em vez de acrescentar, removemos tudo o que impedia
+a casa de ser o que a sua estrutura pedia. As paredes interiores da década de 1970 — uma adição
+infeliz — escondiam um pé-direito de 3,40m na sala e uma janela de sacada voltada a poente que
+mal se via. Retiradas essas camadas, surgiu o projecto.
+
+A direcção estética segue Axel Vervoordt na relação entre rugosidade e refinamento: betão
+desempenado a lado de linho natural; ferro preto mate em caixilharia nova com perfil de 38mm;
+pavimento contínuo de microcimento Mortex em toda a área social. O resultado é uma casa que
+parece ter sempre sido assim — o sinal mais certo de que o trabalho correu bem.
+
+## Design Highlights
+
+### Sala + Cozinha (42 m²)
+Piso contínuo Mortex cor 'Ash Grey' (#8C8378) elimina transições visuais. Ilha de cozinha em
+betão polido com tampo de quartzite 'Taj Mahal' 20mm (Antolini). Armários lacados em tom
+'Jotun Burlywood 2287' — uma leitura da pedra, não um branco.
+
+### Suite Principal (18 m²)
+Parede de closet em betão aparente texturado com sistema de calha oculta Häfele Slido.
+Portadas de madeira de carvalho fumado sem puxadores (abertura por toque). WC encastrado
+resolvido com parede de gesso curvo que não toca o tecto — efeito de volume flutuante.
+
+### Casa de Banho Social (6 m²)
+Parede inteira em mármore Estremoz 'Rosado' em lâminas horizontais 600×1200mm com veio
+corrido (bookmatched). Torneiras Fantini 'Aboutwater' by Boffi. Lavatório de encastrar
+Cielo 'Fluid' em cerâmica bruta.
+
+## Materials Palette
+
+| Material | Aplicação | Referência | Cor/Código |
+|---|---|---|---|
+| Mortex microcimento | Pavimento social + WC | Beal Mortex 'Ash Grey' | #8C8378 |
+| Carvalho europeu fumado | Suite + quartos | Bauwerk Colour 'Frei' 180mm | #5C4B3A |
+| Betão aparente texturado | Parede closet | Execução in-situ, textura juta | — |
+| Quartzite 'Taj Mahal' | Ilha cozinha | Antolini, 20mm polido | natural |
+| Mármore Estremoz Rosado | WC social | Moleanos & Filhos, bookmatched | natural |
+| Ferro preto mate | Caixilharia nova | Perfil 38mm, tratamento epóxi | RAL 9005M |
+
+## Technical Highlights
+
+- **Estrutura:** remoção de 3 paredes com colocação de perfis HEB 140 + HEB 100
+- **MEP:** piso radiante eléctrico Thermaflex em suite e WC social
+- **Domótica:** sistema KNX básico (iluminação + estores) com app Gira
+- **Classe energética:** B+ (certificado SCE n.º SCE-QD-123847, Dez 2024)
+- **Caixilharia:** alumínio Cortizo 4500 com corte térmico, vidro duplo 6/16/6 Low-E
+
+## The Numbers
+
+| Métrica | Valor |
+|---|---|
+| Área intervencionada | 94 m² |
+| Duração obra | 9 meses (Mar – Nov 2024) |
+| Orçamento final | €210.000 (aprovado para publicação) |
+| Valorização estimada | +31% vs. avaliação pré-obra (Caixa Geral, Jan 2025) |
+| Classe energética | B+ |
+
+## Team
+
+| Função | Nome |
+|---|---|
+| Arquitecta responsável | Diva Antunes |
+| Empreiteiro geral | Construções Palmeira & Filhos, Lda. |
+| Serralharia custom | Ferro & Arte — João Marques |
+| Carpintaria | Atelier Mogno — Ricardo Esteves |
+| Fotografia | © Ivo Tavares Studio |
+
+## Client Testimonial
+
+> "Entregámos uma casa que nunca nos tinha convencido e recebemos de volta algo que não sabíamos
+> que queríamos — mas que agora não consigo imaginar de outra forma. A Diva ouviu o que não
+> conseguimos dizer."
+> — Marta Figueiredo, proprietária, Fevereiro 2025
+
+---
+*Publicação autorizada por escrito pela cliente (email 02 Mar 2025). Fotografia © Ivo Tavares Studio — uso editorial condicionado a crédito.*
+```
+
+---
+
+## Output anti-patterns
+
+- Entregar output com qualquer `<placeholder>` ou `[campo]` por preencher — é um template devolvido, não um case study
+- Mencionar orçamento sem nota de autorização explícita do cliente com data e forma de confirmação
+- Escrever "Design moderno e funcional" ou "o cliente queria uma casa bonita" — taglines sem identidade não vendem portfólio
+- Tabela de materiais sem marcas reais: `"pedra natural | casa de banho | pedreira local"` é inútil para diferenciação
+- Omitir crédito fotográfico ou apresentar renders Midjourney como fotografia real sem disclaimer
+- Instagram carousel com slides 4–7 todos a dizer "Depois — [divisão]" sem copy diferenciador por slide
+- Frontmatter YAML com `date: YYYY-MM-DD` ou `year: YYYY` — são literais do template, não dados
+- Case study sem testimonial nem nota explicando porque está ausente (em revisão / cliente recusou / projecto confidencial)
+- "Valorização estimada: +X%" sem fonte — é afirmação de marketing sem substância; omitir ou citar fonte bancária/avaliador
+- Publicar antes de verificar NDA — RED FLAG que o skill indica mas o output deve confirmar ter verificado

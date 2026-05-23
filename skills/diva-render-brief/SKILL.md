@@ -254,3 +254,218 @@ purpose: <client presentation / marketing / social>
 - Pair with `diva-timeline` to schedule render production in project timeline
 - Follow up with `dario-proposal` for render costs in client proposal
 - Save via `dario-obsidian-save` to vault
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
+
+---
+
+### Gate 1 — Camera setup completo (cada view)
+
+- [ ] Viewpoint, lens (mm), composition type e focus mode especificados por view
+- [ ] Posição exacta da câmara descrita em linguagem de floor plan ("from doorway looking toward north window wall, 1.5m height")
+- [ ] Aspect ratio alinhado com plataforma de destino declarada
+- [ ] Mínimo de 2 views, máximo definido pelo número de views acordado com cliente
+
+❌ NOT delivery-ready: `"câmara no canto da sala, lente normal, vista geral"`  
+✅ Delivery-ready: `View 1 — Hero shot: eye-level 1.5m, 24mm wide, 2-point perspective, deep focus, 16:9 landscape. Posição: canto SW do living, orientação NE para fachada de vidro. View 2 — Detail: 85mm, shallow focus (f/2.8), 3:2 editorial, bancada de calcário Moleanos em destaque.`
+
+---
+
+### Gate 2 — Lighting com hora do dia + temperatura de cor
+
+- [ ] Time of day explicitamente declarado (não "luz natural bonita")
+- [ ] Direcção solar especificada (N/S/E/W + ângulo estimado se golden hour)
+- [ ] Temperatura de cor em Kelvin ou no range (2700K / 4000K / 5500K)
+- [ ] Modo de exposição (bright & airy / balanced / moody) alinhado com brief de marca/propósito
+
+❌ NOT delivery-ready: `"luz quente ao entardecer, ambiente acolhedor"`  
+✅ Delivery-ready: `Golden hour 18h45, sol a SW (225°, altitude 12°), sombras longas para NE. Temperatura interior: 2700K (candeeiro Flos Kelvin + LED strips escondidas) + 5000K entrada de luz natural. Exposição: bright & airy, sem clipping nas janelas.`
+
+---
+
+### Gate 3 — Material spec com finish + reflectividade
+
+- [ ] Cada superfície visível tem: material nomeado + tom/cor + finish + nível de reflectividade (%)
+- [ ] Materiais especiais (pedra, madeira) têm nota de veio / textura visível
+- [ ] Nenhum material descrito com adjectivos vagos sem referência ("moderno", "claro", "bonito")
+- [ ] Metais e vidros têm reflectividade numérica (% ou IOR se para V-Ray/Corona)
+
+❌ NOT delivery-ready: `"chão de madeira clara, paredes brancas, bancada em pedra natural"`  
+✅ Delivery-ready: `Chão: carvalho europeu mel médio, mate acetinado, veio natural visível, reflectividade 5-8%. Paredes: estuco tradicional branco quente NCS S 0502-Y, mate, textura irregular subtil, 0%. Bancada: Calcário Moleanos amaciado, bege claro, reflectividade 10-12%, sem polimento especular.`
+
+---
+
+### Gate 4 — Styling e props com quantidade e assimetria
+
+- [ ] Têxteis especificados com número concreto (almofadas: quantidade, cores, tamanhos)
+- [ ] Plantas com altura mínima e tipo (não "plantas decorativas")
+- [ ] Props de lifestyle contextualizados ao uso do espaço (não genéricos)
+- [ ] Indicação de negative space intencional (áreas deliberadamente vazias)
+
+❌ NOT delivery-ready: `"almofadas no sofá, plantas, alguns livros e objectos decorativos"`  
+✅ Delivery-ready: `Sofá: 3 almofadas linho areia 50x50cm + 1 almofada accent terracota 40x40cm (disposição assimétrica, 1 inclinada). Manta bouclé branca drapeada no braço esquerdo. Plantas: Ficus Lyrata 1.6m canto NW, Sansevieria média aparador. Props: livro aberto + chávena espresso Jansen+co mesa de apoio direita — sem toque humano visível, mas presença implícita.`
+
+---
+
+### Gate 5 — AI prompts prontos a copiar (se deliverable inclui Midjourney/DALL-E)
+
+- [ ] Prompt inclui: style, renderer simulado, room type, materials, lighting, aspect ratio flag
+- [ ] Negative prompt presente com exclusões relevantes (sem pessoas, sem cartazes, sem distorção)
+- [ ] Versão do Midjourney declarada (--v 6.1 ou superior para architectural viz)
+- [ ] Prompt testado mentalmente: sem ambiguidade que gere resultados aleatórios
+
+❌ NOT delivery-ready: `"living room moderno, luz natural, fotorrealista --v 6"`  
+✅ Delivery-ready: `photorealistic interior render, Portuguese apartment living room, European oak floors warm honey tone, white stucco walls, Moleanos limestone countertop, Flos Kelvin pendant, golden hour soft southwest light, 24mm wide angle, 2-point perspective, deep focus, bright and airy exposure, architectural photography, V-Ray quality --ar 16:9 --v 6.1 --style raw --q 2` + negative: `--no people, text, watermark, fisheye distortion, oversaturated, CGI plastic look`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+
+- [ ] Nome do projecto/cliente aparece no cabeçalho do brief (ex: "Render Brief — Vivenda Comporta, Quarto Principal")
+- [ ] Nenhum campo contém `<nome do cliente>`, `<inserir material>`, `<TBD>` ou equivalente
+- [ ] Deadline real declarada (data específica, não "em breve" ou "urgente")
+- [ ] Referências a ficheiros reais quando existem (ex: "Floor plan: Piso1_Rev03.dwg", "Moodboard: MB_Sala_v2.pdf")
+
+❌ NOT delivery-ready: `"Projeto: <nome do projeto>, prazo: <inserir deadline>, materiais conforme <moodboard>"`  
+✅ Delivery-ready: `Render Brief — Cuidai HQ Lisboa, Sala de Reuniões Principal. Deadline: 14 Fev 2025 (apresentação ao board). Floor plan: CuidaiHQ_Piso2_Rev04.dwg. Moodboard: gerado por diva-moodboard sessão 2024-01-28.`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Render Brief — Vivenda Comporta · Suite Principal (Piso 1)
+
+**Cliente:** Vivenda Comporta  
+**Criado por:** DIVA  
+**Data:** 2025-02-10  
+**Deadline entrega renders:** 2025-02-24 (apresentação ao comprador Herdade do Pinheirinho)  
+**Propósito:** Marketing premium + listagem Idealista Luxe + redes sociais @vivenda.comporta  
+**Budget render:** Estúdio externo (Corona Renderer) — nível fotorrealista completo  
+**Referência floor plan:** VivComp_SuitePrincipal_Rev02.dwg
+
+---
+
+## Views solicitadas (3 vistas)
+
+### View 1 — Hero Shot (wide, living area da suite)
+- **Posição:** canto SW do quarto, altura 1.5m, orientação NE para parede de janelas floor-to-ceiling
+- **Lens:** 24mm wide angle
+- **Composição:** 2-point perspective, eixo ligeiramente descentrado para direita (+15cm)
+- **Focus:** deep focus, tudo nítido f/8
+- **Aspect ratio:** 16:9 (3840×2160 / 4K)
+- **Plataforma:** apresentação PDF + Idealista header
+
+### View 2 — Detail Shot (cabeceira + nicho leitura)
+- **Posição:** lateral esquerda da cama, altura 0.9m, orientação E
+- **Lens:** 50mm standard
+- **Composição:** 1-point perspective, simetria ligeira da cabeceira
+- **Focus:** shallow, f/2.8, bokeh suave nas almofadas traseiras
+- **Aspect ratio:** 4:5 (1080×1350 — Instagram feed)
+
+### View 3 — Window View (interior-exterior)
+- **Posição:** interior, 2m da janela principal, altura 1.5m, orientação S (para dunas)
+- **Lens:** 35mm
+- **Composição:** diagonal natural guiada pelo caixilho
+- **Focus:** deep, equilíbrio interior/exterior exposição (HDR blend)
+- **Aspect ratio:** 3:2 editorial (para revista/press)
+
+---
+
+## Lighting
+
+| Parâmetro | Especificação |
+|---|---|
+| Time of day | Golden hour 18h30, final de Setembro |
+| Sol direcção | SW (225°), altitude 8° — sombras longas para NE |
+| Luz natural | Soft golden, ligeira névoa costeira (reduz harshness) |
+| Temperatura natural | 4200K luz difusa + 2800K raios directos janela |
+| Artificial | Candeeiro leitura Flos 265 (2700K) + LED strip escondida cabeceira (2400K dimmado 40%) |
+| Exposição | Bright & airy — highlights controladas, sem clipping céu |
+| Exterior (View 3) | Céu pós-sol, gradiente rosa-laranja, vegetação dunar em silhueta |
+
+---
+
+## Material Specifications
+
+| Superfície | Material | Cor/Tom | Finish | Textura | Reflectividade |
+|---|---|---|---|---|---|
+| Pavimento | Calcário Moleanos Bege | NCS S 2010-Y10R | Amaciado | Veio natural subtil | 8% |
+| Paredes | Estuco Marmorino | Branco concha OC-17 Benjamin Moore | Polido subtil | Variação manual visível | 3% |
+| Tecto | Gesso liso | Branco puro | Mate | Liso | 0% |
+| Cabeceira | Linho belga | Areia dourada | Texturado | Weave visível | 0% |
+| Cama lençóis | Percal algodão 400TC | Branco puro | Levemente brilhante | Dobras naturais | 4% |
+| Pernas cama | Carvalho fumado | Castanho escuro | Mate oleado | Veio horizontal | 2% |
+| Candeeiro | Latão | Dourado envelhecido | Escovado | Micro-riscos direccionais | 35% |
+| Janelas caixilho | Alumínio termolacado | Antracite RAL 7021 | Mate | Liso | 15% |
+
+---
+
+## Furniture & Placement (ref. VivComp_SuitePrincipal_Rev02.dwg)
+
+- **Cama:** King 180×200cm, centrada parede N, cabeceira a 15cm da parede
+- **Mesa cabeceira E:** Fritz Hansen Nap Table, carvalho, x=4.2m y=2.1m planta
+- **Mesa cabeceira W:** idem espelhado, x=2.6m y=2.1m
+- **Cadeira leitura:** HAY Soft Edge, linho, canto SE junto janela, orientação SW
+- **Chaise longue:** B&B Italia, frente janela S, orientação paralela à fachada
+- **Negative space intencional:** corredor livre entre porta e cama (1.2m mínimo)
+
+---
+
+## Styling & Props
+
+| Categoria | Items | Detalhe |
+|---|---|---|
+| Almofadas | 4×50×50cm linho areia + 2×40×40cm areia-terrracota + 2×60cm cilíndricas brancas | Disposição assimétrica, 1 tombada |
+| Mantas | 1 manta bouclé branca, drapeada organicamente braço esq chaise | Não dobrada, natural |
+| Plantas | Strelitzia 1.4m canto NW; Sansevieria 60cm mesa junto janela | Vasos terracota fosco |
+| Props cama | Livro aberto "Comporta" ed. Taschen face down mesa E; chávena espresso vazia | Sem pessoa visível |
+| Props janela | Tule linho branco semi-corrido, movimento leve (simular brisa) | Não bloquear vista dunas |
+| Artwork | Fotografia P&B Comporta 80×60cm parede W, frame latão escovado | Não centrada — offset 20cm acima centro visual |
+
+---
+
+## AI Concept Prompts (Midjourney — para aprovação rápida antes de render full)
+
+**View 1 Hero:**
+```
+photorealistic interior render, luxury Portuguese beach house master bedroom, Comporta, 
+Moleanos limestone floors warm beige, marmorino plaster walls oyster white, Belgian linen 
+headboard sandy gold, smoked oak bed frame, Flos 265 brass reading lamp, golden hour 
+southwest light 18:30 September, soft coastal haze, 24mm wide angle 2-point perspective, 
+deep focus, bright and airy, Corona Renderer quality, architectural photography --ar 16:9 
+--v 6.1 --style raw --q 2
+```
+*Negative:* `--no people, text, watermark, fisheye distortion, oversaturated, plastic CGI, 
+purple shadows, extra furniture`
+
+**View 3 Window:**
+```
+photorealistic luxury bedroom interior looking through floor-to-ceiling anthracite aluminum 
+windows toward Comporta sand dunes, golden hour sunset gradient pink orange sky, dune 
+grasses silhouette, interior warm 2700K lamp glow visible, 35mm diagonal composition, 
+HDR balanced exposure, architectural photography editorial --ar 3:2 --v 6.1 --style raw
+```
+
+---
+
+**Formato entrega estúdio:** TIFF 16-bit + JPEG 95% qualidade  
+**Ficheiros de referência:** VivComp_SuitePrincipal_Rev02.dwg · MB_Suite_Comporta_v3.pdf · MaterialBoard_Calcario_Linho_Lato.pdf
+```
+
+---
+
+## Output anti-patterns
+
+- Lighting descrito com adjectivos de mood sem parâmetros técnicos: "luz quente e acolhedora" sem hora, direcção, Kelvin ou exposição
+- Materiais com "pedra natural clara" ou "madeira escura" — sem nome, tom NCS/RAL, finish ou reflectividade numérica
+- Views nomeadas sem posição de câmara: "vista do quarto" não é brief, é intenção
+- AI prompts sem `--ar`, `--v` e negative prompt — geram resultados não-arquitectónicos por default
+- Styling com "decoração adequada ao estilo" — o artista 3D não é stylist, precisa de lista de props com quantidades
+- Brief sem deadline real — "o mais rápido possível" cria conflito de prioridades no estúdio externo
+- Número de views deixado aberto ("quantas forem necessárias") sem tecto acordado com cliente
+- Furniture placement sem referência ao floor plan — proporcões erradas invalidam o render inteiro
+- Misturar especificações de AI concept com especificações de render de estúdio no mesmo campo sem separação clara
+- Placeholders `<inserir cor>` ou `<ver moodboard>` enviados para estúdio — causa re-trabalho e custos extra

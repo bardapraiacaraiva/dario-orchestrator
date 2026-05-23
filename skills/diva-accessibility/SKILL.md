@@ -393,3 +393,163 @@ tags: [acessibilidade, DL163, universal-design, <project>]
 - Coordinates with `diva-materials` for slip-resistant and tactile floor specifications
 - Informs `diva-smart-home` for voice-control and assistive technology integration
 - Save via `diva-obsidian-save` to vault
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Percurso acessível completamente especificado
+- [ ] Largura de corredor indicada com valor real (ex: "corredor de 1.35m → upgrade para 1.50m")
+- [ ] Inclinação de rampa calculada com comprimento e desnível reais do projeto
+- [ ] Revestimento de piso especificado com classificação antiderrapante (R10, R11, R12)
+- [ ] Faixa tátil de aviso indicada com dimensão e cor contrastante
+- ❌ NOT delivery-ready: "A rampa deve ter uma inclinação adequada e superfície antiderrapante."
+- ✅ Delivery-ready: "Rampa de acesso (desnível 0.42m, comprimento 5.25m): inclinação resultante 8.0% — excede limite de 6% para >2m. Solução: comprimento mínimo 7.00m ou rampa em dois lanços com patamar intermédio 1.50m×1.50m. Revestimento R11 exigido."
+
+### Gate 2 — Conformidade DL 163/2006 explicitamente classificada
+- [ ] Tipo de edifício cruzado com tabela de âmbito (novo/reabilitação, nº fogos, acesso público)
+- [ ] Isenções RERU ou patrimônio indicadas se aplicáveis, com fundamentação
+- [ ] Elementos obrigatórios vs. recomendados claramente distinguidos
+- [ ] Referência ao artigo ou anexo do DL 163/2006 quando se cita dimensão normativa
+- ❌ NOT delivery-ready: "O projeto deve cumprir as normas de acessibilidade aplicáveis."
+- ✅ Delivery-ready: "Edifício comercial novo, 320m², acesso público → conformidade total DL 163/2006 obrigatória (Artigo 10º). Elevador não exigido (piso único). WC acessível obrigatório: mínimo 1 por estabelecimento (Anexo, §4.3)."
+
+### Gate 3 — Instalações sanitárias acessíveis dimensionadas
+- [ ] Dimensões reais da IS existente ou proposta indicadas (LxC em metros)
+- [ ] Espaço de manobra de cadeira de rodas verificado (círculo 1.50m ou transfer 0.90m lateral)
+- [ ] Barras de apoio especificadas: posição, comprimento, altura, rebatível ou fixo
+- [ ] Lavatório sem coluna, torneira de alavanca ou sensor indicados
+- ❌ NOT delivery-ready: "A instalação sanitária deve ter barras de apoio e espaço suficiente para cadeira de rodas."
+- ✅ Delivery-ready: "IS proposta 1.80m×2.20m (3.96m²): espaço de manobra 1.50m×1.50m disponível lateral à sanita ✓. Barra rebatível: lado esquerdo (transfer), 0.85m altura, comprimento 0.80m. Barra fixa: parede posterior, 0.85m altura. Lavatório suspenso regulável 0.70–0.85m, sem coluna, torneira monocomando."
+
+### Gate 4 — Elevador ou solução de acesso vertical avaliada
+- [ ] Número de pisos e condição de acesso público verificados para determinar obrigatoriedade
+- [ ] Dimensão de cabine especificada em LxC com largura de porta (se elevador obrigatório ou recomendado)
+- [ ] Alternativa justificada se elevador não viável (plataforma elevatória, salva-escadas), com dimensões
+- [ ] Controlos: altura de botões, braile, anúncio sonoro, indicados
+- ❌ NOT delivery-ready: "Prever elevador acessível conforme legislação."
+- ✅ Delivery-ready: "Edifício Cuidai — sede Porto, 4 pisos + r/c, acesso público: elevador obrigatório (DL 163/2006, Artigo 11º). Cabine mínima 1.10×1.40m, porta 0.80m → recomendado 1.40×1.60m, porta 0.90m para conforto cadeira + acompanhante. Botoneiras: 0.90–1.20m altura, braile + relevo, anúncio sonoro por piso."
+
+### Gate 5 — Sinalética e orientação inclusiva especificada
+- [ ] Sinalização tátil/podoguia indicada nos percursos principais
+- [ ] Contraste visual (≥70% LRV) verificado para portas, degraus, mudanças de nível
+- [ ] Sinalética em braile ou pictograma nas IS acessíveis e elevadores
+- [ ] Iluminação mínima nos percursos acessíveis indicada (lux)
+- ❌ NOT delivery-ready: "Prever sinalética acessível nos espaços comuns."
+- ✅ Delivery-ready: "Piso podoguia (cor amarela, contraste ≥70% LRV sobre pavimento cinza claro) no hall de entrada até elevador e IS acessível. Placa IS: pictograma cadeira de rodas + braile, altura 1.40–1.60m (centro). Iluminação percurso acessível: mínimo 200 lux ao nível do piso."
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais do projeto, sem angle-brackets
+- [ ] Nome do cliente ou projeto real mencionado (ex: "Vivenda Cascais — Fam. Rodrigues", "Atrium Lisboa Piso 3")
+- [ ] Endereço ou localização real indicada onde relevante para contexto regulatório
+- [ ] Zero ocorrências de `<nome>`, `[CLIENT]`, `[ADDRESS]`, `[INSERT]` ou equivalentes
+- [ ] Todas as dimensões são valores calculados para o projeto em questão, não ranges genéricos copiados da norma
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Análise de Acessibilidade — Cuidai Centro de Dia Braga
+**Projeto:** Adaptação de edifício existente (1980), 3 pisos, uso misto saúde/serviços
+**Endereço:** Rua do Castelo 47, Braga | **Data:** Junho 2025
+**Compliance:** DL 163/2006 — reabilitação >25% valor → ajustes razoáveis obrigatórios
+
+---
+
+## 1. Percurso acessível exterior
+
+**Situação existente:** 4 degraus (desnível total 0.68m) entre passeio e entrada principal.
+**Solução proposta:** Rampa lateral a sul, aproveitando recuo de 6.20m disponível.
+
+| Parâmetro | Valor calculado | Requisito DL 163/2006 | Estado |
+|---|---|---|---|
+| Desnível | 0.68m | — | — |
+| Comprimento rampa | 8.50m (incl. patamares) | mínimo livre | ✓ |
+| Inclinação | 6.0% | ≤6% para >2m | ✓ |
+| Largura entre corrimãos | 1.30m | mínimo 1.20m | ✓ |
+| Patamar inicial (passeio) | 1.50×1.60m | mínimo 1.50×1.50m | ✓ |
+| Patamar intermédio | 1.50×1.50m (a 5.50m) | obrigatório a cada 6m | ✓ |
+| Patamar superior (entrada) | 1.80×1.80m | mínimo 1.50×1.50m | ✓ |
+
+**Corrimãos:** Duplo (0.70m + 0.90m), ambos os lados, extensão 0.30m além do topo e base.
+**Revestimento:** Betão com acabamento estriado transversal, classificação R11.
+**Guarda lateral:** Bordão de 0.07m altura nas duas faces longitudinais.
+
+---
+
+## 2. Acesso vertical interno
+
+**Situação:** Edifício 3 pisos + cave técnica. Acesso público ao piso 1 (consultas) e piso 2 (fisioterapia).
+
+**Conclusão de obrigatoriedade:** Acesso público em múltiplos pisos → elevador obrigatório (Artigo 11º).
+
+**Especificação elevador proposto (shaft existente 1.80×2.10m útil):**
+- Cabine: 1.40×1.60m — conforto cadeira de rodas + acompanhante ✓
+- Porta: 0.90m largura, automática, proteção de bordo sensível
+- Botoneiras: 0.95m–1.15m do piso (centro botão)
+- Braile + relevo em todos os botões
+- Anúncio sonoro: "Piso zero — entrada", "Piso um — consultas", "Piso dois — fisioterapia"
+- Indicador visual: display digital exterior por piso
+- Dimensões de espera exterior: 1.60×1.60m disponíveis em todos os pisos ✓
+- Norma aplicável: EN 81-70 Categoria 2
+
+---
+
+## 3. Instalação sanitária acessível — Piso 0
+
+**Dimensões propostas** (reconfiguração de IS existente 2.20×2.60m = 5.72m²):
+
+```
+┌─────────────────────────┐ 2.20m
+│  [LAV]     [↑BARRA 0.80]│
+│                          │
+│ ○ 1.50m    [SANITA]     │
+│                          │
+│  [PORTA 0.90m →]        │
+└─────────────────────────┘ 2.60m
+```
+
+- **Sanita:** Altura assento 0.46m, espaço transfer lateral esquerdo 0.90m ✓
+- **Barra rebatível esquerda:** altura 0.85m, comprimento 0.80m, carga 100kg
+- **Barra fixa posterior:** altura 0.85m, comprimento 0.60m
+- **Lavatório:** Suspenso, regulável 0.70–0.85m, espaço inferior livre 0.65m (para aproximação frontal cadeira)
+- **Torneira:** Monocomando alavanca longa, acessível a 0.40m da borda frontal
+- **Espelho:** Inclinado 10° ou regulável, borda inferior a 0.90m
+- **Círculo de manobra 1.50m:** disponível com porta aberta ✓
+- **Porta:** Abertura para o exterior (ou painéis removíveis), puxador barra horizontal 0.90–1.10m
+
+---
+
+## 4. Sinalética e orientação
+
+| Elemento | Especificação | Localização |
+|---|---|---|
+| Piso podoguia | Amarelo RAL 1018, relevo 5mm, contraste ≥70% LRV | Hall → elevador → IS acessível |
+| Placa IS acessível | Pictograma ISo 7001 + braile "WC ACESSIVEL", altura 1.50m centro | Exterior porta IS |
+| Degraus escada | Nosing contraste RAL 9016 sobre degrau cinza, faixa tátil 0.40m no patamar superior | Todas as escadas |
+| Iluminação percurso | Mínimo 200 lux ao nível do piso, sensor movimento | Corredor piso 0, hall elevador |
+| Planta tátil | Mapa em relevo da planta do piso 0, a 1.20m do chão | Entrada principal |
+
+---
+
+## 5. Checklist de entrega — Cuidai Braga
+
+- [x] Percurso acessível exterior: rampa 6.0%, R11, corrimãos duplos ✓
+- [x] Elevador EN 81-70 Cat.2, cabine 1.40×1.60m, botoneiras braile ✓
+- [x] IS acessível 5.72m², transfer 0.90m, barras especificadas ✓
+- [x] Sinalética tátil + visual + braile em todos os pontos críticos ✓
+- [x] DL 163/2006 Artigos 10º, 11º e Anexo §§ 3.1, 4.3 verificados ✓
+```
+
+---
+
+## Output anti-patterns
+
+- **Dimensões sem contexto do projeto:** citar "mínimo 1.20m" sem calcular ou comparar com a dimensão real existente ou proposta
+- **"Cumprir DL 163/2006" sem classificar o tipo de edifício:** a obrigatoriedade varia radicalmente — novo vs. reabilitação, nº de fogos, acesso público
+- **IS acessível sem diagrama ou layout:** barras de apoio sem posição (esquerda/direita do transfer) são inúteis para o projetista
+- **Elevador "conforme norma" sem especificar cabine:** omitir dimensão LxC e largura de porta impede verificação do shaft disponível
+- **Isenções ignoradas:** não mencionar RERU ou estatuto de patrimônio quando aplicável é um erro de compliance, não apenas de qualidade
+- **Sinalética tratada como cosmética:** omitir contraste LRV, braile, piso podoguia faz o output falhar na perspetiva do utilizador com deficiência visual
+- **Recomendações sem priorização:** misturar requisitos obrigatórios com melhorias voluntárias sem distinção clara induz o cliente a erro na tomada de decisão orçamental
+- **Aging-in-place genérico:** "preparar casa para o futuro" sem especificar reforços estruturais para barras, larguras de porta mínimas futuras, ou pré-instalação de plataforma elevatória

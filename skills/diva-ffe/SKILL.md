@@ -315,3 +315,195 @@ tags: [mobiliario, FF&E, procurement, <project>]
 - Coordinates with `diva-timeline` for procurement scheduling
 - May trigger `diva-render-brief` for visualization of furnished rooms
 - Save via `diva-obsidian-save` to vault
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Room-by-room coverage completa
+
+- [ ] Cada divisão do projecto tem a sua secção no schedule (não "sala + quarto" agrupados)
+- [ ] Cada item tem: nome descritivo, quantidade, dimensões LxWxH (cm), material/acabamento, cor
+- [ ] Nenhuma dimensão omitida — sofás sem "TBD", mesas sem "ver catálogo"
+- [ ] Items marcam se substituem mobiliário existente ou são adições novas
+
+❌ NOT delivery-ready: `Sofá sala — ver opções com cliente, dimensão a confirmar`
+✅ Delivery-ready: `Sofá 3 lugares | 240×95×78cm | Tecido bouclé creme | Qty 1 | Substitui sofá actual cor castanha`
+
+---
+
+### Gate 2 — Três tier de opções por item principal
+
+- [ ] Cada peça de mobiliário principal tem Opção 1 (Recomendado), Opção 2 (Económico), Opção 3 (Premium)
+- [ ] Cada opção inclui: Marca + Modelo + Preço (€) + Fornecedor + URL ou loja
+- [ ] Pelo menos uma opção portuguesa identificada quando aplicável (Wewood, DAM, Branca Lisboa, etc.)
+- [ ] Lead time indicado: "stock" / "8 semanas" / "12–16 semanas made-to-order"
+
+❌ NOT delivery-ready: `Cama casal — sugestão: IKEA ou algo parecido, preço médio`
+✅ Delivery-ready: `Cama 180×200 | Rec: Wewood Frame Oak €1.890 / Econ: IKEA MALM €399 / Premium: De La Espada Ira €3.200 | Lead: 10 sem / stock / 14 sem`
+
+---
+
+### Gate 3 — Budget tracking e totais por categoria
+
+- [ ] Tabela resumo com subtotal por categoria FF&E (Mobiliário, Iluminação, Têxteis, Decoração, Arte, Electrodomésticos, Fixtures)
+- [ ] Total geral em três cenários: Económico / Recomendado / Premium
+- [ ] % do orçamento total de obra indicado (FF&E tipicamente 15–30% do total)
+- [ ] Contingência de 10% incluída na linha final do budget
+
+❌ NOT delivery-ready: `Total estimado: €15.000–€40.000 dependendo das escolhas`
+✅ Delivery-ready: `Mobiliário: €8.400 | Iluminação: €1.200 | Têxteis: €950 | Decoração: €600 | Total Rec: €11.150 + 10% cont. = €12.265`
+
+---
+
+### Gate 4 — Timeline e coordenação de entregas
+
+- [ ] Data de conclusão de obra indicada e usada como âncora do procurement timeline
+- [ ] Items com lead time >8 semanas têm data de encomenda calculada (deadline real)
+- [ ] Sequência de entregas definida: obra acabada → pisos/pintura secos → móveis → têxteis → decoração
+- [ ] Restrições de acesso documentadas: elevador (dim máx), porta de entrada (largura), escadas
+
+❌ NOT delivery-ready: `Encomendar com antecedência, especialmente made-to-order`
+✅ Delivery-ready: `Obra conclui 15 Mar 2026 → Sofá made-to-order encomendar até 20 Jan (8 sem) → Entrega prevista 17 Mar → Têxteis e decoração: semana de 23 Mar`
+
+---
+
+### Gate 5 — Fornecedores verificáveis e contactos accionáveis
+
+- [ ] Nome do fornecedor escrito por extenso (não "loja de design em Lisboa")
+- [ ] URL, morada ou contacto incluído por cada fornecedor principal
+- [ ] Showrooms físicos em PT identificados para itens premium (Minotti Lisboa, B&B Italia, etc.)
+- [ ] Alternativas online com envio para PT confirmado (La Redoute, Kave Home, Maisons du Monde)
+
+❌ NOT delivery-ready: `Ver showrooms de design em Lisboa para opções premium`
+✅ Delivery-ready: `Minotti Lisboa — Av. da Liberdade 169, Lisboa | minotti.com/pt | Lead 12–16 sem | Pedir cotação a João Ferreira (contacto via showroom)`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets
+
+- [ ] Nenhum `[CLIENT NAME]`, `[INSERT ROOM]`, `[TBD]`, `[ver moodboard]` no output final
+- [ ] Nome do projecto/cliente no cabeçalho do schedule (ex: "FF&E Schedule — Apartamento Cuidai, Av. Defensores de Chaves")
+- [ ] Todos os preços são €, não "$" ou "price on request" sem contexto
+- [ ] Datas são datas reais (DD/MM/AAAA), não "in X weeks" ou "soon"
+
+❌ NOT delivery-ready: `FF&E Schedule — [NOME PROJECTO] | Preço: a consultar | Entrega: a definir`
+✅ Delivery-ready: `FF&E Schedule — Vivenda Cascais, Rua das Flores 12 | Rev. 1 — 14 Jan 2026 | Budget Recomendado: €28.400`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# FF&E Schedule — Apartamento Cuidai HQ Lisboa
+**Projecto:** Escritório + Sala de Reuniões + Zona de Descanso
+**Morada:** Rua Rodrigo da Fonseca 44, 1250-189 Lisboa
+**Área:** 120 m² | **Revisão:** 1.0 — 14 Janeiro 2026
+**Obra conclui:** 28 Fevereiro 2026 | **Ocupação alvo:** 16 Março 2026
+**Budget FF&E aprovado:** €22.000 (Recomendado) | Contingência 10%: €2.200
+
+---
+
+## SALA DE REUNIÕES — 18 m²
+
+### 01 — Mesa de reuniões
+**Qtd:** 1 | **Dim:** 280×100×75 cm | **Material:** Carvalho maciço, pés aço preto
+| | Marca/Modelo | Preço | Fornecedor | Lead |
+|---|---|---|---|---|
+| ⭐ Rec | AROUNDtheTREE Tack Table Oak | €2.890 | aroundthetree.pt | 8 sem |
+| 💰 Econ | IKEA MÖRBYLÅNGA 280cm | €699 | ikea.com/pt | Stock |
+| 💎 Premium | Wewood Branch Table | €4.200 | wewood.eu | 10 sem |
+**⚠️ Encomenda Rec até: 2 Janeiro 2026 (8 sem para 28 Fev)**
+
+### 02 — Cadeiras de reunião (x10)
+**Qtd:** 10 | **Dim:** 55×55×82 cm | **Material:** Tecido cinza antracite, pés cromados
+| | Marca/Modelo | Preço unit | Total (x10) | Lead |
+|---|---|---|---|---|
+| ⭐ Rec | Fenabel Mia Chair Anthracite | €285 | €2.850 | 6 sem |
+| 💰 Econ | Kave Home Shila Chair | €129 | €1.290 | 2–3 sem |
+| 💎 Premium | B&B Italia Alphabeta | €680 | €6.800 | 12 sem |
+**Fornecedor Rec:** Fenabel — fenabel.pt | T. +351 255 860 430
+
+### 03 — Aparador lateral
+**Qtd:** 1 | **Dim:** 180×45×85 cm | **Material:** Carvalho, frentes lacadas branco
+| | Marca/Modelo | Preço | Fornecedor | Lead |
+|---|---|---|---|---|
+| ⭐ Rec | DAM Sideboard S01 Oak/White | €1.650 | dam.pt | 8 sem |
+| 💰 Econ | Maisons du Monde Calvi | €449 | maisonsdumonde.com | 3 sem |
+
+---
+
+## ZONA DE DESCANSO — 22 m²
+
+### 04 — Sofá modular
+**Qtd:** 1 (config. 3 módulos) | **Dim:** 300×95×78 cm | **Material:** Bouclé cinza claro, pés carvalho
+| | Marca/Modelo | Preço | Fornecedor | Lead |
+|---|---|---|---|---|
+| ⭐ Rec | Gual Modular Boucle Grey | €3.200 | gual.pt / Parede | 10 sem |
+| 💰 Econ | La Redoute Miliboo Elysee | €1.190 | laredoute.pt | 4 sem |
+| 💎 Premium | Roche Bobois Mah Jong | €7.800 | rochebobois.com | 14 sem |
+**⚠️ Encomenda Rec até: 19 Dezembro 2025**
+**Acesso elevador Cuidai HQ:** 140×100×220 cm — módulos Gual entram individualmente ✅
+
+### 05 — Mesa de centro
+**Qtd:** 1 | **Dim:** 120×70×38 cm | **Material:** Mármore Estremoz branco, pés latão
+| | Marca/Modelo | Preço | Fornecedor | Lead |
+|---|---|---|---|---|
+| ⭐ Rec | Branca Lisboa Slab Table | €1.890 | brancalisboa.com | 6 sem |
+| 💰 Econ | Area Store Marble Look | €520 | areastore.pt | 3 sem |
+
+### 06 — Iluminação — Candeeiro de pé (x2)
+**Qtd:** 2 | **Material:** Latão envelhecido, abajur linho bege
+| | Marca/Modelo | Preço unit | Total | Lead |
+|---|---|---|---|---|
+| ⭐ Rec | Traços Interiores Arched Brass | €380 | tracosinteriores.com | 4 sem |
+| 💰 Econ | IKEA HEKTAR Floor | €79 | ikea.com/pt | Stock |
+
+---
+
+## BUDGET RESUMO — CUIDAI HQ
+
+| Categoria | Econ (€) | Recomendado (€) | Premium (€) |
+|---|---|---|---|
+| Mobiliário solto | 3.837 | 12.430 | 21.690 |
+| Iluminação decorativa | 158 | 760 | 1.400 |
+| Têxteis (tapete, almofadas) | 320 | 890 | 1.800 |
+| Decoração + plantas | 180 | 450 | 950 |
+| **Subtotal** | **4.495** | **14.530** | **25.840** |
+| **Contingência 10%** | 450 | 1.453 | 2.584 |
+| **TOTAL** | **€4.945** | **€15.983** | **€28.424** |
+
+---
+
+## TIMELINE DE ENCOMENDAS
+
+| Item | Prazo encomenda | Lead time | Entrega prevista |
+|---|---|---|---|
+| Sofá Gual (10 sem) | 19 Dez 2025 | 10 sem | 28 Fev 2026 |
+| Mesa AROUNDtheTREE (8 sem) | 2 Jan 2026 | 8 sem | 28 Fev 2026 |
+| Cadeiras Fenabel (6 sem) | 16 Jan 2026 | 6 sem | 27 Fev 2026 |
+| Mesa Branca Lisboa (6 sem) | 16 Jan 2026 | 6 sem | 27 Fev 2026 |
+| Restantes itens stock | Mar 2026 | Imediato | Semana 16 Mar |
+
+**Sequência de entrega:**
+1. 28 Fev — Obra concluída, pisos e pintura secos
+2. 1–5 Mar — Mobiliário estrutural (mesa reuniões, sofá, aparador)
+3. 6–9 Mar — Iluminação e têxteis
+4. 10–15 Mar — Decoração, plantas, arte
+5. 16 Mar — Ocupação Cuidai HQ ✅
+```
+
+---
+
+## Output anti-patterns
+
+- Listar opções sem preço ("ver website do fornecedor para pricing actualizado") — o cliente não tem tempo para isso
+- Dimensões genéricas ("sofá grande, aprox. 3m") sem confirmação de que cabem no espaço do floor plan
+- Lead times vagos ("pode demorar algum tempo") sem semanas concretas ou data de encomenda calculada
+- Misturar FF&E com obra: especificar cozinha embutida, roupeiros à medida ou iluminação técnica de tecto no schedule de FF&E
+- Budget range demasiado amplo sem critério ("€5.000 a €50.000 dependendo das opções") — usar cenários Econ/Rec/Premium com totais reais
+- Fornecedores sem localização nem contacto accionável ("marca portuguesa de qualidade, pesquisar online")
+- Omitir restrições físicas de entrega — recomendar peça de 3m num apartamento com elevador de 1,2m é erro grave
+- Não marcar deadline de encomenda para made-to-order — cliente fica sem móveis na mudança

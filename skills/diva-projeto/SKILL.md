@@ -231,3 +231,187 @@ DIVA: loads Vila Cascais — new build, phase: licenciamento submitted 2 months 
 - Don't assume regulatory status — always caveat with "ultimo estado registado em <date>"
 - If project has no RAG entries, suggest ingesting key documents: caderno de encargos, memoria descritiva, orcamento
 - Don't forget to check for related projects at the same location (e.g., interiors project + landscape project for same property)
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
+
+---
+
+### Gate 1 — Projeto identificado e sem ambiguidade
+
+- [ ] Nome do projeto corresponde a uma entrada real em agent-memory, RAG DIVA, ou Obsidian vault (não inferido)
+- [ ] Tipo de projecto está categorizado (moradia / apartamento / comercial / misto)
+- [ ] Localização inclui morada OU município OU freguesia — não "local desconhecido"
+- [ ] Se houver mais de um projecto com nome similar, foi pedida clarificação ao utilizador antes de carregar contexto
+
+❌ NOT delivery-ready: `Projeto: Vila Cascais — localização: a definir`
+✅ Delivery-ready: `Projeto: Moradia Vila Cascais — Rua das Acácias 12, Cascais, Município de Cascais`
+
+---
+
+### Gate 2 — Dados de orçamento com valores reais e datas
+
+- [ ] Tabela de orçamento tem pelo menos 3 rubricas preenchidas com valores EUR reais
+- [ ] Colunas Aprovado / Gasto / Restante têm números concretos (mesmo que Gasto = EUR 0 com data de início)
+- [ ] Contingência está explícita como rubrica separada
+- [ ] Nenhuma célula contém apenas "EUR X" ou "a definir" sem nota explicativa
+
+❌ NOT delivery-ready: `Construção | EUR X | EUR Y | EUR Z`
+✅ Delivery-ready: `Construção | EUR 285 000 | EUR 47 200 | EUR 237 800`
+
+---
+
+### Gate 3 — Timeline com estados actualizados e desvios assinalados
+
+- [ ] Todas as fases têm data Previsto preenchida
+- [ ] Fases concluídas têm data Real preenchida
+- [ ] Fases com atraso têm Estado marcado como "Atrasado (N semanas)" não apenas "Pendente"
+- [ ] Fase actual está inequivocamente identificada (não duas fases marcadas "Em curso")
+
+❌ NOT delivery-ready: `Licenciamento | 03/2025 | — | Pendente`
+✅ Delivery-ready: `Licenciamento | 03/2025 | — | Atrasado (6 semanas) — aguarda parecer DGPC`
+
+---
+
+### Gate 4 — Estatuto regulamentar / licenciamento completo
+
+- [ ] RJUE status indica fase concreta: PIP / Comunicação Prévia submetida / Alvará emitido / nenhum ainda iniciado
+- [ ] SCE tem estado claro: não iniciado / em curso / classe obtida (letra)
+- [ ] Especialidades indicam quais estão aprovadas e quais pendentes individualmente
+- [ ] PDM/PP menciona pelo menos COS, cércea máxima, ou afastamentos mínimos se informação existir
+
+❌ NOT delivery-ready: `RJUE: em processo. SCE: pendente.`
+✅ Delivery-ready: `RJUE: Comunicação Prévia submetida 2024-11-14, referência CM-CAS-2024-4421. SCE: não iniciado. Especialidades: estrutural aprovado 2025-01-08; AVAC pendente. PDM Cascais: COS máx 0,35; cércea máx 7,5 m; afastamento lateral mín 3 m.`
+
+---
+
+### Gate 5 — Decisões activas e pendentes accionáveis
+
+- [ ] Cada decisão activa tem data e sumário com 1 linha de contexto — não apenas palavra-chave
+- [ ] Lista de pendentes usa checkbox `[ ]` com responsável ou prazo quando conhecido
+- [ ] Bloqueios críticos estão separados de pendentes de rotina (ou assinalados com 🔴)
+- [ ] Nenhum item de pendentes está vazio ou genérico como "ver com equipa"
+
+❌ NOT delivery-ready: `[ ] Acabamentos — ver com cliente`
+✅ Delivery-ready: `[ ] Seleccionar revestimento piso cozinha — cliente enviou 3 amostras Margres, decisão esperada até 2025-03-28 (bloqueante para encomenda)`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem placeholders angle-brackets
+
+- [ ] Zero ocorrências de `<project name>`, `<address>`, `<name>`, `<X>`, `<Y>`, `<Z>` no output final
+- [ ] Nome do cliente/projecto aparece no título H2 e pelo menos uma vez no corpo
+- [ ] Equipa tem nomes reais ou "a confirmar" explícito — não `<architect>` ou `<empreiteiro>`
+- [ ] Últimos outputs Obsidian têm títulos reais com datas YYYY-MM-DD, não `<title> (<type>)`
+
+❌ NOT delivery-ready: `Arquitecto: <name> | Empreiteiro: <name>`
+✅ Delivery-ready: `Arquitecto: Arq. Rui Menezes | Empreiteiro: Construções Barata Lda (a confirmar — proposta recebida 2025-02-10)`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## Projeto DIVA: Moradia Unifamiliar Birre
+
+**Tipo:** Moradia nova construção
+**Localização:** Rua do Moinho 34, Birre, Cascais
+**Área:** 320 m² brutos / 278 m² úteis / Lote 890 m²
+**Fase actual:** Projecto Base — em curso
+**Working dir:** `VCHOME segundo cerebro/01 - Projetos/DIVA/Moradia-Birre/`
+
+---
+
+### Equipa
+- **Arquitecto:** Arq. Rui Menezes (Atelier Menezes & Associados)
+- **Engenheiro estruturas:** Eng. Paulo Saraiva (EST.Lda)
+- **Engenheiro MEP:** Eng. Catarina Lopes (TecnoMEP)
+- **Empreiteiro:** Construções Barata Lda (proposta aceite 2025-02-10)
+- **Instalador AVAC:** ClimaSul (a contratar — concurso aberto)
+- **Instalador domótica:** KNX Home Cascais
+
+---
+
+### Orçamento
+| Rubrica          | Aprovado     | Gasto       | Restante     |
+|------------------|--------------|-------------|--------------|
+| Construção       | EUR 285 000  | EUR 47 200  | EUR 237 800  |
+| Especialidades   | EUR 38 000   | EUR 12 400  | EUR 25 600   |
+| Acabamentos      | EUR 64 000   | EUR 0       | EUR 64 000   |
+| Equipamento      | EUR 22 000   | EUR 0       | EUR 22 000   |
+| Arquitectura     | EUR 31 500   | EUR 15 750  | EUR 15 750   |
+| Contingência     | EUR 24 000   | EUR 0       | EUR 24 000   |
+| **Total**        | **EUR 464 500** | **EUR 75 350** | **EUR 389 150** |
+
+> ⚠️ Acabamentos: orçamento Margres recebido (EUR 18 400) — aguarda aprovação cliente.
+
+---
+
+### Timeline
+| Fase               | Previsto    | Real        | Estado                        |
+|--------------------|-------------|-------------|-------------------------------|
+| Programa           | 06/2024     | 06/2024     | Concluído                     |
+| Estudo Prévio      | 09/2024     | 10/2024     | Concluído (4 sem. atraso)     |
+| Projecto Base      | 01/2025     | —           | Em curso (entrega 2025-04-15) |
+| Licenciamento      | 04/2025     | —           | Pendente                      |
+| Projecto Execução  | 09/2025     | —           | Pendente                      |
+| Obra               | 11/2025     | —           | Pendente                      |
+| Conclusão          | 06/2027     | —           | Pendente                      |
+
+---
+
+### Licenciamento / Regulamentar
+- **RJUE:** Comunicação Prévia em preparação — submissão prevista 2025-04-22 na CM Cascais
+- **SCE:** Não iniciado — perito SCE Eng. Filipa Antunes contactada, proposta pendente
+- **Especialidades:** Projecto estrutural aprovado 2025-01-08; MEP em curso (entrega EST. 2025-03-31); AVAC aguarda definição equipamentos
+- **PDM Cascais:** COS máx 0,35 (projecto em 0,31 ✅); cércea máx 7,5 m (projecto 7,2 m ✅); afastamento lateral mín 3 m (cumprido ✅); afastamento frontal mín 5 m (cumprido ✅)
+
+---
+
+### Decisões activas
+1. **2025-02-10** — Empreiteiro seleccionado: Construções Barata Lda (proposta EUR 268 000, prazo 18 meses)
+2. **2025-01-22** — Sistema domótica: KNX (descartado Z-Wave por incompatibilidade com painel solar SMA)
+3. **2024-12-05** — Laje fungiforme aligeirada aprovada para cave (redução de peso vs. maciça, poupança EUR 8 200)
+4. **2024-11-18** — Orientação principal da moradia rodada 12° Sul para optimizar ganhos solares passivos
+5. **2024-10-30** — Área de piscina removida do programa (cliente: restrições orçamentais — adicionada como fase 2 opcional)
+
+---
+
+### Pendente / Bloqueios
+- 🔴 [ ] Aprovação cliente orçamento Margres (EUR 18 400) — bloqueante para peça de acabamentos do Proj. Base — prazo: 2025-03-28
+- 🔴 [ ] Definir equipamentos AVAC (VRF vs. Split DC) — bloqueante para projecto MEP de ClimaSul — decidir até 2025-04-05
+- [ ] Receber proposta perito SCE Eng. Filipa Antunes — enviado pedido 2025-03-10, aguarda resposta
+- [ ] Confirmar ponto de ligação EPAL — requerimento enviado 2025-02-28, referência EPAL-2025-03847
+- [ ] Reunião cliente revisão Projecto Base — agendar semana de 2025-04-07
+
+---
+
+### Últimos outputs (Obsidian)
+1. 2025-03-12 — `Moradia-Birre_Comparativo-AVAC_VRF-vs-Split.md` (análise técnica)
+2. 2025-02-25 — `Moradia-Birre_Acta-Reuniao-Cliente-Rev2.md` (acta)
+3. 2025-02-10 — `Moradia-Birre_Avaliacao-Proposta-Barata.md` (análise de proposta)
+4. 2025-01-22 — `Moradia-Birre_Decisao-Domotica-KNX.md` (registo de decisão)
+5. 2025-01-08 — `Moradia-Birre_Aprovacao-Estrutural-EST.md` (output regulamentar)
+
+---
+
+### RAG DIVA — contexto disponível
+- 23 sources indexadas, 147 chunks relevantes
+- Temas indexados: regulamento PDM Cascais, RJUE comunicação prévia, sistema KNX Birre, especificações Margres, caderno de encargos Barata Lda, peças desenhadas EP Rev.2
+```
+
+---
+
+## Output anti-patterns
+
+- Entregar output com `<project name>`, `<X>`, `<address>` ou qualquer placeholder angle-bracket visível ao cliente
+- Tabela de orçamento com todas as colunas "EUR X / EUR Y / EUR Z" — pior do que omitir a tabela
+- Estado de timeline igual para múltiplas fases simultâneas ("Em curso" em 3 linhas ao mesmo tempo)
+- Licenciamento resumido a uma linha genérica ("em processo") sem número de referência ou data de submissão
+- Decisões activas sem data — impossível auditar cronologia do projecto
+- Pendentes sem responsável nem prazo em itens marcados como bloqueantes (🔴 sem contexto)
+- Carregar contexto de projecto errado por match parcial de nome sem pedir confirmação ao utilizador
+- Equipa com campos em branco silenciosos — preferir "a confirmar" explícito a célula vazia
+- RAG summary sem número de sources — "contexto disponível" sem quantificação não é auditável
+- Omitir secção de Licenciamento/Regulamentar porque "ainda não há nada" — deve aparecer com estado "não iniciado" e próximo passo

@@ -481,3 +481,156 @@ tags: [MEP, instalacoes, especialidades, <project>]
 - Referenced by `diva-licensing` for specialty project submissions
 - Verified during `diva-inspection` Phase 4 (MEP rough-in)
 - Save via `diva-obsidian-save` to vault
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Regulamentação portuguesa citada correctamente
+- [ ] Norma referenciada com designação completa (ex: RTIEBT, ITED 4.ª edição, RJSCIE DL 220/2008)
+- [ ] Versão/edição vigente identificada, não genérica
+- [ ] Aplicabilidade ao tipo de obra confirmada (residencial/comercial/hospitality)
+- [ ] Sem referências a normas estrangeiras não homologadas em PT sem nota de equivalência
+- ❌ NOT delivery-ready: "segundo as normas eléctricas aplicáveis..."
+- ✅ Delivery-ready: "RTIEBT Artigo 4.3 — circuitos de tomadas com cabo 2,5mm² H07V-K, disjuntor 16A, diferencial 30mA Tipo A (obrigatório para cargas inversoras como ar condicionado e carregador EV)"
+
+### Gate 2 — Potência eléctrica e dimensionamento do quadro com números reais
+- [ ] Potência contratada especificada em kVA e amperagem (ex: trifásico 20,7kVA / 3×30A)
+- [ ] Número de circuitos listado com breaker e secção de cabo por circuito
+- [ ] Cargas dedicadas identificadas (forno, AC, bomba calor, EV) com amperagem própria
+- [ ] Número de diferenciais e tipo (A vs AC) justificado
+- ❌ NOT delivery-ready: "quadro eléctrico dimensionado para as necessidades da habitação"
+- ✅ Delivery-ready: "Apartamento T3 Cuidai Porto: trifásico 13,8kVA (3×20A) — 14 circuitos, 2 diferenciais 30mA Tipo A; circuito dedicado placa de indução 32A / 6mm²; circuito EV 32A / 6mm² pré-instalação"
+
+### Gate 3 — Sistema AVAC/aquecimento dimensionado para o espaço real
+- [ ] Área condicionada em m² especificada por zona/divisão
+- [ ] Carga de aquecimento ou arrefecimento estimada (kW ou BTU) com base em área e tipo de envolvente
+- [ ] Sistema seleccionado justificado (split, VRV, bomba calor, piso radiante) com marca/modelo tier ou equivalente
+- [ ] COP/EER ou classe energética do equipamento indicada
+- ❌ NOT delivery-ready: "recomenda-se sistema de ar condicionado adequado"
+- ✅ Delivery-ready: "Sala 42m² + cozinha 18m² = 60m² — carga estimada 6kW arrefecimento / 5kW aquecimento; Daikin Perfera 7kW (R32, SEER 8,74 / SCOP 5,1, classe A+++) — circuito dedicado 20A / 4mm²"
+
+### Gate 4 — Redes de águas e drenagem com traçado e diâmetros
+- [ ] Pontos de consumo listados por divisão (lavatório, sanita, duche, máquina, etc.)
+- [ ] Diâmetros de alimentação indicados (ex: ½" ou ¾" para colectores principais)
+- [ ] Sistema de drenagem descrito (colunas, ramais, pendentes mínimas 1%)
+- [ ] Localização de contador, válvula de corte geral e esquentador/caldeira identificada
+- ❌ NOT delivery-ready: "canalizações a instalar conforme projecto"
+- ✅ Delivery-ready: "Moradia Vivenda Cascais: colector alimentação ¾" PEX-A entrada → 2 ramais ½" (IS social + cozinha); esquentador a gás 24kW no corredor técnico; drenagem coluna 110mm PVC com ramal sanita 90mm, pendente 2%"
+
+### Gate 5 — Segurança contra incêndio (SCIE) referenciada se aplicável
+- [ ] Categoria de risco SCIE identificada (Utilização-Tipo e Categoria 1-4)
+- [ ] Medidas de autoprotecção ou sistemas activos listados se categoria ≥ 2
+- [ ] Detectores de fumo, extintores e sinalização referenciados com localização
+- [ ] Nota explícita se edifício isento de SCIE obrigatório (UT I Categoria 1)
+- ❌ NOT delivery-ready: "verificar requisitos de segurança contra incêndio"
+- ✅ Delivery-ready: "Edifício Tributario.AI Lisboa (UT IX — serviços, Categoria 2): 4 detectores iónicos corredor + sala técnica, extintor pó ABC 6kg por piso, bloco autónomo emergência em saídas — conforme RJSCIE DL 220/2008 Anexo III"
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+- [ ] Nenhum `<nome_cliente>`, `<area>`, `<morada>` ou similar no output final
+- [ ] Nome do projecto/cliente aparece pelo menos 2× no documento
+- [ ] Morada ou localização real presente (bairro, cidade, rua se disponível)
+- [ ] Datas e fases do projecto com referências temporais concretas se fornecidas
+- ❌ NOT delivery-ready: "Para o projecto `<nome_projecto>` com área de `<X>`m²..."
+- ✅ Delivery-ready: "Projecto Cuidai — Clínica Veterinária Matosinhos, 320m², Fase Especialidades Outubro 2025: quadro eléctrico trifásico 34,5kVA, 3 splits Mitsubishi Electric R32..."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# MEP Coordination — Apartamento T3 | LUSOconta HQ Lisboa
+**Morada:** Rua Rodrigo da Fonseca 45, 2.º Esq., Lisboa
+**Área total:** 138m² | **Tipo:** Renovação total | **Data:** Novembro 2025
+
+---
+
+## 1. Electrical System
+
+**Alimentação:** Monofásico 10,35kVA (45A) — suficiente para T3 sem EV
+**Quadro eléctrico:** 24 módulos DIN, 3 diferenciais 30mA (Tipo A circuitos AC + MW)
+
+| Circuito | Disjuntor | Cabo | Notas |
+|---|---|---|---|
+| Iluminação zona 1 (sala/hall/quartos) | 10A | 1,5mm² H07V-K | 9 pontos |
+| Iluminação zona 2 (cozinha/WC/lavandaria) | 10A | 1,5mm² H07V-K | 6 pontos |
+| Tomadas sala + corredor | 16A | 2,5mm² | 6 tomadas |
+| Tomadas quarto 1 + 2 | 16A | 2,5mm² | 8 tomadas |
+| Tomadas quarto 3 + escritório | 16A | 2,5mm² | 6 tomadas |
+| Tomadas bancada cozinha | 16A | 2,5mm² | 5 tomadas |
+| Placa de indução Bosch 7,4kW | 32A | 6mm² | Dedicado |
+| Forno encastrar | 20A | 4mm² | Dedicado |
+| Máquina lavar roupa | 16A | 2,5mm² | Dedicado, lavandaria |
+| Máquina lavar loiça | 16A | 2,5mm² | Dedicado, cozinha |
+| Split sala 9.000BTU (Daikin Perfera) | 16A | 2,5mm² | Dedicado, Tipo A |
+| Split quarto principal 7.000BTU | 16A | 2,5mm² | Dedicado, Tipo A |
+| Pré-instalação EV (cave) | 32A | 6mm² | Para futuro EVSE |
+
+**SPD Tipo 2:** instalado imediatamente após contador (preparação para PV futuro)
+**ITED:** 2 caixas ATI (sala + escritório), cablagem CAT6A + coaxial RG6, riser 63mm
+
+---
+
+## 2. AVAC
+
+**Método:** EN 15243 simplificado, orientação Sul, envolvente após isolamento ETICS 80mm
+
+| Zona | Área | Carga Arref. | Carga Aquec. | Equipamento |
+|---|---|---|---|---|
+| Sala + cozinha aberta | 58m² | 5,8kW | 4,5kW | Daikin Perfera 7kW SEER 8,74 / SCOP 5,10 |
+| Quarto principal | 22m² | 2,2kW | 1,8kW | Daikin Perfera 2,5kW |
+| Quartos 2+3 | 28m² | — | — | Pré-instalação (canalização + circuito) |
+
+**AQS:** Bomba de calor Ariston Nuos Evo 80L (COP 3,2) — lavandaria
+**Ventilação:** VMC simples fluxo Aerauliqa QR80 — extracção WC + cozinha, 90m³/h total
+
+---
+
+## 3. Redes de Águas e Drenagem
+
+**Alimentação geral:** ¾" PEX-A desde contador entrada → colector distribuição
+**Ramais individuais:**
+- Cozinha: ½" quente + fria, ponto máquina ¾" à rede
+- IS social: ½" fria (sanita), ½" quente + fria (lavatório)
+- IS suite: ½" quente + fria (duche + lavatório), sanita ½" fria
+- IS quartos: ½" quente + fria, bidé ½" fria
+
+**Drenagem:** coluna existente 110mm PVC mantida; ramais novos 50mm (lavatórios),
+90mm (sanitas), pendente mínima 2%; sifão individual em todos os aparelhos
+
+**Válvula de corte geral:** sob lava-loiça cozinha, acessível
+
+---
+
+## 4. SCIE
+
+**Utilização-Tipo:** UT I (Habitacional) — **Categoria 1** (< 9m altura, < 9 fogos)
+→ **Isento de medidas de autoprotecção obrigatórias** (RJSCIE DL 220/2008 Artigo 19.º)
+
+Recomendado (boa prática): 2 detectores de fumo iónicos (hall + corredor quartos),
+1 extintor pó ABC 1kg em cozinha — não obrigatório, incluído no caderno de encargos.
+
+---
+
+## 5. Coordenação entre Especialidades
+
+- Riser técnico 30×60cm (parede cozinha/lavandaria): passa coluna AVAC + canalização AQS
+- Tecto falso corredor 2,50m: reserva 15cm para condutas VMC (ø125mm)
+- Quadro eléctrico: parede entrada, 40×60cm superfície, 24 módulos + espaço 30% expansão
+- Conflito resolvido: condutas VMC cruzam com viga hall → desvio 20cm confirmado com
+  diva-diagnose planta existente
+```
+
+---
+
+## Output anti-patterns
+
+- Citar "normas aplicáveis" sem nomear decreto-lei, edição ou artigo específico
+- Dimensionar potência eléctrica sem listar os circuitos individuais com cabo e disjuntor
+- Recomendar "sistema de ar condicionado adequado" sem área, kW estimado ou modelo tier
+- Usar placeholders `<morada>`, `<área>`, `<cliente>` no output entregue ao cliente
+- Descrever drenagem sem indicar diâmetros, materiais (PVC/PEX) ou pendentes mínimas
+- Omitir a categoria de risco SCIE mesmo em habitações (a isenção deve ser declarada, não ignorada)
+- Misturar specs de engenharia de cálculo certificadas com especificações de coordenação sem nota de disclaimer ("requere validação por engenheiro responsável")
+- Copiar tabela de circuitos do template sem adaptar ao número de divisões e cargas reais do projecto
+- Indicar COP/SEER de equipamento sem associar ao circuito eléctrico dedicado correspondente

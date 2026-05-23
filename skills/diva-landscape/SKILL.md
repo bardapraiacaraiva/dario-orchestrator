@@ -403,3 +403,217 @@ tags: [paisagismo, jardim, exterior, <project>]
 - Coordinates with `diva-smart-home` for outdoor automation (irrigation, lighting, pool)
 - References `diva-materials` for hardscape consistency with interior palette
 - Save via `diva-obsidian-save` to vault
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Climate zone e contexto hídrico identificados
+
+- [ ] Zona climática do projecto declarada (Atlantic North / Central / Mediterranean Interior / South / Mountain)
+- [ ] Fonte de água especificada (municipal, furo, cisterna) com restrições locais mencionadas
+- [ ] Estratégia de eficiência hídrica incluída (rega gota-a-gota, mulching, espécies adaptadas)
+- [ ] Restrições municipais de rega referenciadas se projeto em Algarve ou Alentejo
+
+❌ NOT delivery-ready: "Plants selected for the local climate with appropriate irrigation."
+✅ Delivery-ready: "Zona Mediterranean South (Algarve, Loulé). Precipitação ~480mm/ano. Fonte: furo existente (caudal verificar antes de projeto executivo). Rega restrita Junho–Setembro per Deliberação CCDR Algarve 2022. Palette 90% espécies com necessidade hídrica baixa (WUCOl 1-2)."
+
+---
+
+### Gate 2 — Zonamento funcional mapeado e dimensionado
+
+- [ ] Mínimo 4 zonas funcionais identificadas com área estimada (m²) cada
+- [ ] Zona de transição interior–exterior com cota de soleira indicada
+- [ ] Zona social dimensionada (mín. 4×4m para mesa 8 pessoas se pedido)
+- [ ] Zonas de serviço (arrumos, contentores, técnica piscina) screened e localizadas
+
+❌ NOT delivery-ready: "The outdoor space is divided into living, garden, and service areas."
+✅ Delivery-ready: "Zona 1 Transição 28m² — pergola madeira thermowood sobre terraço Sul, cota ±0.00 (flush com sala de estar). Zona 2 Social 45m² — dining 4×5m + lounge 3×4m + churrasqueira encostada a muro Norte. Zona 6 Serviço 8m² — técnica piscina + rega screened com sebe de Pittosporum tobira."
+
+---
+
+### Gate 3 — Paleta vegetal com nomes científicos e notas de protecção legal
+
+- [ ] Todas as espécies listadas com nome científico + nome PT
+- [ ] Espécies protegidas sinalizadas (DL 169/2001: sobreiro, azinheira)
+- [ ] Espécies invasoras excluídas ou substituídas (Acacia, Hakea, Carpobrotus — DL 92/2019)
+- [ ] Palette organizada por estrato (árvore / arbusto / herbácea / coberto do solo)
+- [ ] Associação estrato–zona do jardim indicada
+
+❌ NOT delivery-ready: "Native drought-tolerant species will be used throughout the garden."
+✅ Delivery-ready: "Árvores: Olea europaea (oliveira, 3 un, Zona 2+5) + Cercis siliquastrum (olaia, 2 un, Zona 1). ATENÇÃO: 1 sobreiro existente (Quercus suber) a preservar — DL 169/2001, corte proibido sem autorização ICNF. Excluídas: Acacia dealbata (invasora Cat. A1, DL 92/2019). Coberto solo: Rosmarinus prostatus + Thymus caespititius."
+
+---
+
+### Gate 4 — Sistema de rega e drenagem especificados
+
+- [ ] Tipo de rega por zona (gota-a-gota, aspersão, micro-aspersão) com caudal estimado
+- [ ] Controlador automático e sensor de chuva mencionados
+- [ ] Solução de drenagem superficial indicada (pontos baixos, linear channel, French drain)
+- [ ] Aproveitamento de águas pluviais referenciado se área ≥500m² ou exigência municipal
+
+❌ NOT delivery-ready: "Irrigation will be installed with appropriate drainage."
+✅ Delivery-ready: "Rega: circuito A (relvado 180m²) aspersão rotativa 4 un Hunter PGP-ADJ, caudal 1.2 m³/h. Circuito B (herbáceas + arbustos) gota-a-gota Ram 17mm, 16L/h por zona. Controlador Hunter Pro-HC + sensor chuva wireless. Drenagem: caleira linear ACO K100 na transição pergola–jardim + French drain perimetral talude Norte, descarga em poço absorvente 1.5m³."
+
+---
+
+### Gate 5 — Hardscape, materiais e iluminação especificados
+
+- [ ] Pavimentos exteriores especificados com referência a material, acabamento e anti-derrapante
+- [ ] Estruturas (pergola, muro, vedação) com materiais e acabamento indicados
+- [ ] Esquema de iluminação com mínimo 3 tipos (funcional, ambiental, destaque)
+- [ ] Outdoor kitchen/BBQ com lista de equipamentos e ligações técnicas se solicitado
+
+❌ NOT delivery-ready: "Natural stone paving will be used in outdoor areas with appropriate lighting."
+✅ Delivery-ready: "Pavimento Zona 2: laje calcário Moleanos 60×40cm esp.3cm, acabamento amaciado (R11 anti-derrapante). Pergola: madeira thermowood pinho escand. 9×9cm, tratamento Osmo 420 Teca. Iluminação: balizadores Bega 22170 (percurso), projetores embutidos Modular Lotis 3000K (pérgola), uplight LED 6W (oliveiras). Churrasqueira: Röshults Built-in Grill 75 + bancada betão polido + ponto de água fria 1/2""."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+
+- [ ] Nome do cliente/projeto aparece no título ou cabeçalho
+- [ ] Endereço ou localização real do projeto mencionada (ou "conforme briefing" se confidencial)
+- [ ] Nenhum placeholder `[CLIENT NAME]`, `[ADDRESS]`, `[AREA]`, `<inserir>` no output final
+- [ ] Budget tier declarado (economico / recomendado / premium) com implicações na paleta e materiais
+
+❌ NOT delivery-ready: "Landscape proposal for [CLIENT NAME] at [PROJECT ADDRESS], area [XX]m²."
+✅ Delivery-ready: "Proposta de Paisagismo — Vivenda Quinta do Lago, Loulé | Cuidai Projects. Área exterior total: 1.840m². Budget: Premium. Elaborado: Junho 2025."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Proposta de Paisagismo — Vivenda Comporta Dunas | Atrium Architecture Studio
+**Localização:** Herdade da Comporta, Grândola, Setúbal
+**Área exterior:** 2.200m² | **Budget:** Premium | **Data:** Junho 2025
+**Zona climática:** Mediterranean Interior (transição para Atlantic Central costeiro)
+**Precipitação média:** 560mm/ano | **Fonte de água:** Furo existente (8m³/h, análise Fev 2025 OK)
+
+---
+
+## Contexto e condicionantes
+
+- Microclima costeiro: ventos dominantes NW, salinidade moderada (dist. 800m do estuário)
+- Solo arenoso-limoso, drenagem natural boa, pH 6.8
+- Vegetação existente a preservar: 4 pinheiros mansos (Pinus pinea, ht. ~12m) + 1 sobreiro
+  (Quercus suber, DAP 38cm — PROTEGIDO, DL 169/2001, mantido como ponto focal Zona 5)
+- Vizinhança Norte: muro existente 1.8m (privacidade garantida)
+- Vista Sul: estuário do Sado — a enquadrar e proteger
+
+---
+
+## Zonamento funcional
+
+| Zona | Função | Área | Localização |
+|---|---|---|---|
+| Z1 Transição | Pergola + loggia | 42m² | Sul — flush com sala de estar cota ±0.00 |
+| Z2 Social | Dining + lounge + piscina | 380m² | Sul/Poente — orientação solar máxima |
+| Z3 Activa | Piscina (12×6m) + solarium | 180m² | Poente — incluído em Z2 |
+| Z4 Produtiva | Horta + pomar | 120m² | Norte — sem sombra de estruturas |
+| Z5 Contemplativa | Percurso + tanque + sobreiro | 240m² | Centro |
+| Z6 Serviço | Técnica + arrumos + contentores | 35m² | Nordeste — acesso independente |
+| Jardim / plantação | Bordaduras + tapete vegetal | ~1.200m² | Perimetral |
+
+---
+
+## Paleta vegetal
+
+### Árvores (estrutura e enquadramento)
+| Espécie | Nome PT | Un. | Zona | Água | Notas |
+|---|---|---|---|---|---|
+| Pinus pinea (existente) | Pinheiro manso | 4 | Z5 | Baixa | Preservar — identidade local |
+| Quercus suber (existente) | Sobreiro | 1 | Z5 | Baixa | **PROTEGIDO DL 169/2001** |
+| Olea europaea 'Arbequina' | Oliveira | 6 | Z2+Z5 | Baixa | Presença escultórica |
+| Citrus × sinensis | Laranjeira | 4 | Z4 | Média | Produtiva + fragrância |
+| Cercis siliquastrum | Olaia | 3 | Z1 | Baixa | Flor rosa Março-Abril |
+
+### Arbustos (estrutura média + privacidade)
+| Espécie | Nome PT | Un. | Zona | Água |
+|---|---|---|---|---|
+| Pittosporum tobira | Tobira | 18 | Z6+Z4 | Baixa |
+| Cistus × purpureus | Esteva roxa | 24 | Perimetral | Mínima |
+| Lavandula pedunculata | Rosmaninho | 60 | Z2+Z5 | Mínima |
+| Viburnum tinus | Folhado | 12 | Z1 | Baixa |
+| Myrtus communis | Murta | 30 | Sebes Z4 | Baixa |
+
+### Coberto do solo + herbáceas
+- *Rosmarinus officinalis* prostrado (bordaduras Z2)
+- *Thymus caespititius* (talude Z5 — nativa PT)
+- *Festuca glauca* (coberto entre oliveiras)
+- *Pennisetum setaceum* — **EXCLUÍDA** (invasora Cat. A1, DL 92/2019); substituída por
+  *Stipa tenuissima* (não invasiva, efeito idêntico)
+
+---
+
+## Sistema de rega
+
+**Circuito A — Relvado Z3 solarium (140m²)**
+Aspersão rotativa Hunter PGP-ADJ (6 un), caudal 1.4m³/h, programa nocturno 22h-02h
+
+**Circuito B — Arbustos + coberto do solo (870m²)**
+Gota-a-gota Ram 17mm, emissores 2L/h a cada 40cm, caudal total 0.8m³/h
+
+**Circuito C — Horta + pomar Z4**
+Gota-a-gota enterrado Netafim Techline CV, 1.6L/h por emissor
+
+**Controlador:** Hunter Pro-HC 12 estações + sensor chuva wireless + sonda humidade solo Z4
+**Nota hídrica:** Rega restrita Julho–Setembro per Plano Seca EMAS Grândola 2024.
+Estimativa consumo Agosto: 3.2m³/dia (dentro caudal furo disponível).
+
+---
+
+## Drenagem
+
+- Caleira linear ACO K100 Helix na transição Z1–Z2 (pendente 0.5% para Poente)
+- French drain perimetral talude Norte (tubo ranhurado Ø100 em brita 20-40mm, caixa de visita 0.6×0.6m)
+- Poço absorvente 2m³ + overflow para valeta municipal (conf. câmara Grândola)
+- Paving Z2 com pendente 1.5% para jardim (reutilização de águas pluviais no solo)
+
+---
+
+## Hardscape e materiais
+
+| Elemento | Material | Acabamento | Referência |
+|---|---|---|---|
+| Pavimento Z2 dining | Calcário Moleanos 60×40cm esp.3cm | Amaciado R11 | Cantão Moleanos ref. M-40 |
+| Deck piscina Z3 | IPE 140×21mm | Natural — rev. Owatrol 2×/ano | Madeira Bros PT |
+| Pergola Z1 | Thermowood pinho 9×9cm | Osmo 420 Teca | Estrutura eng.º calculada |
+| Muros bordadura | Pedra calcário regional | Rustico aparelhado | Fornecedor local Grândola |
+| Piso percurso Z5 | Gravilha calcária 10-20mm | Natural | 15cm compactado |
+
+---
+
+## Iluminação exterior
+
+- **Funcional (percursos):** Bega 22170 balizador LED 3000K, 0.5m alt., esp. 3.5m (18 un)
+- **Ambiental (pergola Z1):** Modular Lotis recessed LED 9W 3000K (8 un embutidas)
+- **Destaque (oliveiras + sobreiro):** Spike uplight LED 6W 2700K (10 un)
+- **Piscina:** LED subaquático Astralpool Lumiplus Flexi RGBW (4 un)
+- **Segurança:** detector movimento Philips Hue Outdoor Sensor + 2 projetores 20W fachada N
+
+---
+
+## Manutenção
+
+**Nível:** Jardim+piscina — serviço profissional mensal recomendado
+**Operações críticas:** poda oliveiras (Jan-Fev), adubo horta (Mar+Out), revisão rega (Abr+Set)
+**Serviço sugerido:** contrato anual jardineiro certificado; estimativa €180-240/mês
+```
+
+---
+
+## Output anti-patterns
+
+- Listar plantas apenas por nome comum PT sem nome científico (impossibilita verificação e compra)
+- Omitir aviso de espécies protegidas (sobreiro, azinheira) quando existem em projeto
+- Incluir espécies invasoras da Lista DL 92/2019 sem substituição explícita (Acacia, Pennisetum, Carpobrotus)
+- Propor rega por aspersão em Algarve/Alentejo sem mencionar restrições municipais de rega
+- Dimensionar zona social sem área mínima (resultado: mesa + cadeiras não cabe no espaço proposto)
+- Ignorar topografia e drenagem em terrenos com declive > 5% (risco de erosão e inundação)
+- Usar iluminação exterior sem temperatura de cor (3000K vs 6500K muda completamente o ambiente noturno)
+- Não distinguir budget tier — premium e económico partilham mesma paleta de materiais
+- Placeholder genérico `[zona climática a confirmar]` no output final entregue ao cliente
+- Propor piscina ou estruturas sem mencionar necessidade de licenciamento municipal (Portaria 232/2019)

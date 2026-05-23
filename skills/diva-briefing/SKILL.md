@@ -229,3 +229,202 @@ budget_range: <min-max EUR>
 - Feeds into `diva-materials` for material palette aligned with preferences
 - Feeds into `diva-budget` with validated budget expectations
 - Save via `dario-obsidian-save` to vault
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Identificação do projecto está completa e sem placeholders
+
+- [ ] Cliente nomeado (nome real, não "o cliente" ou `[NOME]`)
+- [ ] Morada ou localização concreta do imóvel (não "Lisboa" genérico)
+- [ ] Scope definido: cosmético / remodelação média / gut / nova construção / extensão
+- [ ] Regime de posse claro: próprio, CPCV assinado, herança, arrendado
+- [ ] Pelo menos uma data-chave registada (entrega, casamento, fim de arrendamento)
+
+❌ NOT delivery-ready: "Cliente quer renovar o apartamento em Lisboa. Prazo a confirmar."
+✅ Delivery-ready: "Ana Ferreira — Rua Rodrigues Sampaio 14, 2ºDto, Lisboa. Remodelação integral. CPCV assinado a 3/Jun/2025. Prazo duro: 15/Dez/2025 (filha nasce em Jan/2026)."
+
+---
+
+### Gate 2 — Quem habita o espaço está especificado com detalhe de rotinas
+
+- [ ] Composição do agregado: adultos + crianças (idades) + animais
+- [ ] Pelo menos 2 rotinas diárias registadas (ex.: trabalha em casa 4 dias/semana, cozinha todos os dias)
+- [ ] Necessidades especiais sinalizadas ou explicitamente descartadas ("sem mobilidade reduzida, sem alergias")
+- [ ] Horizonte temporal capturado (venda em X anos? aging-in-place?)
+
+❌ NOT delivery-ready: "Casal com filhos. Precisam de escritório."
+✅ Delivery-ready: "Mariana (38) + Paulo (41) + Tomás (6) + Inês (3) + gato. Paulo WFH 5 dias, precisa de isolamento acústico. Mariana cozinha diariamente, quer cozinha fechada. Horizonte: ficam 10+ anos, possível aging-in-place."
+
+---
+
+### Gate 3 — Estilo e preferências têm referências verificáveis, não adjectivos vagos
+
+- [ ] Estilo nomeado com pelo menos um qualificador concreto (ex.: "contemporâneo quente, sem minimalismo frio")
+- [ ] Must-haves listados (mínimo 2 elementos específicos)
+- [ ] Absolutely-not listados (mínimo 1 recusa clara)
+- [ ] Referência de imagem ou direcção de paleta indicada (board Pinterest, revista, projecto de referência)
+
+❌ NOT delivery-ready: "Gostam de moderno mas aconchegante. Paleta neutra."
+✅ Delivery-ready: "Estilo: contemporâneo mediterrâneo. Must-haves: ilha de cozinha em madeira de carvalho, banheira free-standing na suite, lareira a gás na sala. Absolutely-not: carpetes, prateleiras abertas na cozinha. Referência: board Pinterest 'Casa de Comporta' partilhado por Ana."
+
+---
+
+### Gate 4 — Programa funcional cobre todos os espaços com prioridade atribuída
+
+- [ ] Cada divisão listada com função primária + secundária (se aplicável)
+- [ ] Prioridade explícita: essencial / desejado / nice-to-have
+- [ ] Pelo menos um requisito específico por espaço prioritário (dimensão, equipamento, adjacência)
+- [ ] Espaços recusados ou fundidos registados explicitamente (ex.: "sem sala de jantar separada, espaço open-plan")
+
+❌ NOT delivery-ready: "3 quartos, 2 casas de banho, cozinha open-space."
+✅ Delivery-ready: "Suite (essencial): ensuite com duche walk-in 120×90 + duplo lavatório. Quarto 2 (essencial): Tomás, 12m² mín., secretária integrada. Quarto 3 (desejado): Inês agora, escritório em 8 anos. WC serviço (nice-to-have): apenas se orçamento permitir. Lavandaria: separada da cozinha, adjacente à suite."
+
+---
+
+### Gate 5 — Orçamento está estruturado com breakdown de consciência e prioridades de alocação
+
+- [ ] Range min-max explícito em euros (não "orçamento médio" ou "razoável")
+- [ ] Clarificado se inclui/exclui honorários, mobiliário, electrodomésticos
+- [ ] Pelo menos uma prioridade de alocação: "investir em X, poupar em Y"
+- [ ] Situação de mobiliário existente: o que fica, o que sai, o que compra
+
+❌ NOT delivery-ready: "Orçamento à volta de 80K. Querem qualidade mas sem exageros."
+✅ Delivery-ready: "Budget total: 95K–115K (inclui obra e acabamentos, exclui honorários e mobiliário). Investir: cozinha (25K+) e suite. Poupar: casas de banho secundárias (sanitários Roca linha Debba). Mobiliário: guardar sofá Cassina, cama suite e roupeiros — resto novo. Pagamento: 40% entrada, restante faseado por autos de medição."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets nem placeholders
+
+- [ ] Nenhuma ocorrência de `[NOME]`, `[MORADA]`, `[DATA]`, `[VALOR]` ou equivalente no documento final
+- [ ] Nome do cliente aparece no cabeçalho do briefing e na secção de gestão de projecto
+- [ ] Datas no formato DD/Mês/AAAA ou Mês/AAAA (não "TBD" nem "a confirmar" em campos obrigatórios)
+- [ ] Decisor principal identificado pelo nome (não "o cliente" ou "eles")
+
+❌ NOT delivery-ready: "Briefing para [CLIENTE] — Projecto [LOCALIZAÇÃO] — Budget [VALOR]"
+✅ Delivery-ready: "Briefing — Ana & Paulo Ferreira | Rua Rodrigues Sampaio 14, 2ºDto, Lisboa | Versão 1.0 — 10/Jun/2025 | Decisor principal: Ana Ferreira"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# BRIEFING DE PROJECTO
+**Cliente:** Mariana Costa & Rui Teixeira
+**Imóvel:** Av. Almirante Reis 210, 4ºEsq, Lisboa 1150-020
+**Tipo:** Apartamento T3 — 98m² — Edifício anos 60
+**Scope:** Remodelação integral (gut)
+**Data do briefing:** 12/Jun/2025
+**Decisor principal:** Mariana Costa (Rui valida orçamento)
+**Próxima reunião:** 19/Jun/2025 — visita ao imóvel com arquitecta
+
+---
+
+## A — Identificação do Projecto
+- **Posse:** Próprio — escritura lavrada a 5/Maio/2025
+- **Uso actual:** Devoluto (herança)
+- **Uso pretendido:** Habitação permanente
+- **Data de entrega desejada:** 28/Fev/2026
+- **Prazo duro:** Antes de Mar/2026 (contrato de arrendamento actual termina a 28/Fev/2026)
+- **Condicionantes conhecidas:** Condomínio proíbe obras com ruído antes das 9h e ao fim-de-semana
+
+---
+
+## B — Agregado e Rotinas
+- **Residentes:** Mariana (35), Rui (38), Benedita (7 anos), Afonso (4 anos)
+- **Animais:** 1 cão (Labrador, porte grande)
+- **Routinas-chave:**
+  - Mariana trabalha em casa 3 dias/semana — precisa de escritório com porta
+  - Rui sai às 7h30 — duche rápido, não partilha WC com as crianças de manhã
+  - Benedita tem aulas de piano — espaço para piano vertical na sala
+  - Jantares familiares frequentes (pais de ambos, ~8 pessoas, bi-semanais)
+- **Necessidades especiais:** Afonso tem asma leve — sem alcatifas, preferência por materiais fáceis de limpar
+- **Horizonte:** 15+ anos. Possível venda quando as crianças saírem (não antes)
+
+---
+
+## C — Estilo e Preferências
+- **Direcção:** Contemporâneo quente. Influências escandinavas + pontos de cor mediterrâneos
+- **Referências:** Board Pinterest "Casa Nova" (link partilhado) + projecto Casa em Melides (Architectural Digest PT, Jan/2025)
+- **Paleta:** Branco quente base, madeira de carvalho natural, verde-salva como cor de acento
+- **Must-haves:**
+  1. Cozinha em U com ilha — granito cinza Pietra Grey
+  2. Suite com closet walk-in (mínimo 4m²)
+  3. Banheira de encastrar na casa de banho das crianças
+  4. Espaço piano na sala (parede norte, 160×70cm livre)
+- **Absolutely-not:** Alcatifas (asma Afonso), prateleiras abertas em qualquer cozinha, armários de espelho em corredores, tons de bege/creme
+
+---
+
+## D — Programa Funcional
+
+| Espaço | Prioridade | Requisitos-chave |
+|---|---|---|
+| Cozinha | Essencial | Cozinha em U + ilha. Gás (manter ramal). Lava-louça Bosch. Frigorífico americano. Roupa: fora da cozinha |
+| Sala estar/jantar | Essencial | Open-plan. Mesa para 8 (extensível). Zona piano parede norte |
+| Suite principal | Essencial | Ensuite com duche 120×80 + closet walk-in ≥4m² |
+| Quarto Benedita | Essencial | 10m² mín. Secretária integrada. Tomadas USB |
+| Quarto Afonso | Essencial | 9m² mín. Convertível a escritório em ~10 anos |
+| WC crianças | Essencial | Banheira encastrar + duche separado. Duplo lavatório |
+| Escritório Mariana | Essencial | Porta com fecho. Mínimo 7m². Fibra dedicada (ponto de rede) |
+| Lavandaria | Desejado | Separada. Máquina + secador sobrepostos. Teto alto (varal eléctrico) |
+| Arrumos entrada | Nice-to-have | Cacifo para cão + bengaleiro embutido |
+
+---
+
+## E — Orçamento
+- **Budget total:** 130K–155K
+- **Inclui:** Obra, acabamentos, cozinha (móveis + electrodomésticos), casas de banho
+- **Exclui:** Honorários de arquitectura, mobiliário sala/quartos, decoração
+- **Prioridade de alocação:**
+  - Investir: Cozinha (≥30K) + Suite (≥18K)
+  - Poupar: WC serviço (sanitários linha básica), pintura quartos (cor única)
+- **Mobiliário existente:** Sofá Roche Bobois (fica), cama suite (fica), resto novo
+- **Electrodomésticos:** Marca preferida Bosch/Siemens. Forno a vapor desejado
+- **Pagamento:** 30% no início da obra, 50% a meio, 20% na conclusão
+
+---
+
+## F — Condicionantes Técnicas e Legais
+- **Diagnóstico prévio:** diva-diagnose realizado a 8/Jun/2025 — instalação eléctrica a substituir integralmente (monofásico → trifásico), canalizações em ferro (substituir), tecto falso a remover
+- **Condomínio:** Regulamento proíbe obras ruidosas antes das 9h e ao sábado/domingo
+- **Classificação:** Edifício sem classificação patrimonial
+- **Energia:** Querem subir de certificado D para B. Solar fotovoltaico a avaliar (cobertura partilhada — aguarda aprovação condominial)
+- **Smart home:** Básico — domótica de estores e iluminação (Shelly ou equivalente)
+- **Segurança:** Porta blindada (já orçamentada à parte), alarme DSC com app
+
+---
+
+## G — Gestão do Projecto
+- **Decisão:** Mariana decide estilo/acabamentos. Rui valida orçamento acima de 5K/item
+- **Comunicação:** WhatsApp para updates rápidos + reunião quinzenal por videochamada (Thursdays 20h)
+- **Envolvimento:** Colaborativo — querem aprovar cada selecção de material antes de encomendar
+- **Experiência prévia:** Remodelação de cozinha em 2019 (experiência positiva, empreiteiro de confiança disponível)
+- **Empreiteiro:** Têm contacto (Jorge Ferreira Construções, Loures) — aguardam recomendação da arquitecta para comparar
+- **Situação durante obras:** Arrendamento actual até 28/Fev/2026 — obra tem de terminar ANTES dessa data
+
+---
+
+## Gaps e Contradições a Resolver
+⚠️ **Gap 1:** Closet walk-in ≥4m² na suite pode conflituar com área disponível — validar na visita de 19/Jun
+⚠️ **Gap 2:** Solar fotovoltaico dependente de aprovação de condomínio — prazo de resposta?
+⚠️ **Gap 3:** Piano vertical na sala — confirmar dimensões exactas do instrumento para garantir circulação
+```
+
+---
+
+## Output anti-patterns
+
+- Usar adjectivos de estilo sem ancoragem: "moderno", "clássico" e "aconchegante" sem must-haves ou referências concretas tornam o briefing inutilizável pelo designer
+- Deixar o orçamento como valor único sem breakdown: "80K" sem clarificar o que inclui garante conflito futuro com o cliente
+- Omitir o decisor real: escrever "o casal decide em conjunto" sem nomear quem tem voto final em impasses paralisa o projecto
+- Preencher campos de data com "TBD" ou "a combinar": datas vagas em campos de prazo duro são o risco de gestão de projecto mais caro do sector
+- Listar divisões sem prioridade: sem a coluna essencial/desejado/nice-to-have, o arquitecto não sabe o que cortar quando o orçamento aperta
+- Não registar os "absolutely-not": descobrir na fase de projecto que o cliente odeia prateleiras abertas depois de as ter desenhado é retrabalho evitável
+- Gerar o briefing em modo template com todos os campos vazios sem perguntar o modo preferido (interactivo vs template vs from notes)
+- Misturar informação de diva-diagnose com wishlist do cliente sem distinguir as fontes: condicionantes técnicas e preferências estéticas são secções separadas por razão
+- Não sinalizar gaps e contradições: um briefing sem a secção ⚠️ Gaps dá falsa sensação de completude e cria surpresas em fase de projecto
+- Usar angle-brackets `[NOME DO CLIENTE]` no documento entregue: qualquer placeholder não substituído invalida o documento como fonte de verdade do projecto

@@ -216,3 +216,149 @@ tags: [energia, SCE, certificacao, <project>]
 - **PQ search:** https://www.sce.pt/pesquisa-de-tecnicos/
 - **DL 118/2013:** https://dre.pt/dre/detalhe/decreto-lei/118-2013-499237
 - **Despacho 15793-F/2013:** Climate zone definitions by municipality
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Identificação do edifício e quadro regulatório correto
+- [ ] Tipo de edifício declarado (REH residencial vs RECS comercial/serviços) com justificação explícita
+- [ ] Situação clara: obra nova / grande reabilitação / existente (venda/arrendamento) / voluntário
+- [ ] Zona climática atribuída por município real (ex: Lisboa = I1-V2, Bragança = I3-V1)
+- [ ] Regulamentação aplicável citada: DL 118/2013, Portaria 349-B ou 349-D, DL 101-D/2020
+- ❌ NOT delivery-ready: "Edifício em zona I2, regulamentação aplicável a definir"
+- ✅ Delivery-ready: "Moradia em Braga (I2-V2), REH aplicável — DL 118/2013 + Portaria 349-B/2013; obra nova obriga a classe mínima B- e NZEB desde jan 2021"
+
+### Gate 2 — Análise da envolvente com valores U verificáveis
+- [ ] U-value declarado para cada elemento (paredes, cobertura, pavimento, vãos envidraçados)
+- [ ] Comparação explícita com limites máximos da zona climática (tabela I1/I2/I3)
+- [ ] Pontes térmicas identificadas (lineares ψ W/m.K) e tratamento indicado
+- [ ] Conformidade ou não-conformidade assinalada por elemento com delta numérico
+- ❌ NOT delivery-ready: "Paredes com isolamento adequado para a zona climática"
+- ✅ Delivery-ready: "Parede exterior ETICS 6cm EPS: U = 0.38 W/m²K — conforme I2 (máx 0.40); cobertura XPS 8cm: U = 0.32 W/m²K — conforme (máx 0.35); janelas PVC duplo 4-16-4 Argon: Uw = 1.9 W/m²K, gT = 0.37 — conforme I2 (máx 2.40)"
+
+### Gate 3 — Indicadores energéticos REH/RECS calculados
+- [ ] Para REH: Nic, Nvc, Nac declarados em kWh/m².ano com valores de referência Ni, Nv, Na
+- [ ] R_Ntc calculado (Ntc/Nt) e classe resultante identificada na tabela de classes A+→F
+- [ ] Para RECS: IEE por uso final (AVAC, iluminação, AQS, outros) em kWh/m².ano
+- [ ] Contribuição de renováveis (Eren,p) declarada e impacto no R_Ntc quantificado
+- ❌ NOT delivery-ready: "Classe energética estimada B, sujeita a confirmação por perito"
+- ✅ Delivery-ready: "Nic = 48 kWh/m²·ano (Ni ref = 62); Nvc = 6 kWh/m²·ano; Nac = 18 kWh/m²·ano; Ntc = 89 kWh/m²·ano → R_Ntc = 0.81 → Classe B-; solar térmico contribui Esolar = 1.240 kWh/ano (54% da AQS)"
+
+### Gate 4 — Sistemas AVAC e AQS com eficiências declaradas
+- [ ] Sistema de aquecimento: tipo, potência nominal, COP/EER ou rendimento η declarado
+- [ ] Sistema de arrefecimento: tipo, EER nominal, classe EU Energy Label se aplicável
+- [ ] AQS: sistema declarado + cumprimento solar térmico obrigatório (DL 118/2013, Art. 27)
+- [ ] Exceção solar justificada tecnicamente se aplicável (sombreamento, orientação, estrutura)
+- ❌ NOT delivery-ready: "Bomba de calor ar-ar eficiente; solar térmico a considerar"
+- ✅ Delivery-ready: "Bomba de calor ar-água Daikin Altherma 3 8kW: COP 4.1 (A55/W35); arrefecimento EER 3.2; AQS: termoacumulador 200L + coletores Vulcano FKC-2 (2×2m²) — Esolar = 1.180 kWh/ano = 52% AQS — cumpre Art. 27"
+
+### Gate 5 — Recomendações de melhoria com ROI e incentivos reais
+- [ ] Mínimo 3 medidas de melhoria com custo estimado (€) e poupança (kWh/ano) declarados
+- [ ] Payback calculado em anos com fórmula custo/poupança×preço energia
+- [ ] Melhoria de classe potencial indicada por medida (ex: C→B-)
+- [ ] Incentivos aplicáveis citados com nome correto: Fundo Ambiental, PRR, IFRRU 2020, IRS dedução 30%
+- ❌ NOT delivery-ready: "Isolamento da cobertura melhora eficiência e tem apoios disponíveis"
+- ✅ Delivery-ready: "ETICS fachada 8cm EPS: custo ~€8.500, poupança 2.100 kWh/ano (€294/ano a €0.14/kWh), payback 29 anos sem apoio → 18 anos com Fundo Ambiental (35% fundo perdido); melhoria de classe D→C confirmada por redução Nic de 98→61 kWh/m²·ano"
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets por preencher
+- [ ] Frontmatter YAML sem campos `<placeholder>` por preencher
+- [ ] Nome do projeto, município, Ap (m²), n.º de pisos todos preenchidos com valores reais
+- [ ] Zona climática correta para o município declarado (não genérica)
+- [ ] Classe atual e classe alvo numéricas/letras reais (não `<X>` e `<Y>`)
+- ❌ NOT delivery-ready: `project: <project-name>`, `climate_zone: I1-V2`, `current_class: <X>`
+- ✅ Delivery-ready: `project: vivenda-cascais-2024`, `climate_zone: I1-V2`, `current_class: D`, `target_class: B-`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+---
+project: vivenda-cascais-2024
+date: 2025-06-15
+type: energy-certification-prep
+building_type: residential
+regulation: REH
+climate_zone: I1-V2
+current_class: D
+target_class: B-
+tags: [energia, SCE, certificacao, REH, Cascais, vivenda]
+---
+
+# Preparação Certificação Energética — Vivenda Cascais 2024
+
+## 1. Dados do Edifício
+- **Tipo:** Residencial unifamiliar — REH (Portaria 349-B/2013)
+- **Situação:** Existente — remodelação major (>25% envolvente) → obriga classe mínima B-
+- **Localização:** Cascais, Lisboa — zona climática I1 (inverno) / V2 (verão)
+- **Área útil (Ap):** 187 m²
+- **N.º de pisos:** 2 (r/c + 1.º andar)
+- **Fator de forma (Ff):** 0.68 m⁻¹
+- **Orientação fachada principal:** Sul (azimute 175°)
+
+## 2. Análise da Envolvente
+
+| Elemento | Composição | U calculado | U máx I1 | Conformidade |
+|---|---|---|---|---|
+| Parede exterior | Tijolo 11 + caixa-de-ar 4cm + ETICS 8cm EPS | 0.34 W/m²K | 0.50 | ✅ Conforme |
+| Cobertura inclinada | Desvão ventilado + XPS 10cm sob laje | 0.28 W/m²K | 0.40 | ✅ Conforme |
+| Pavimento térreo | Laje + XPS 5cm + betonilha | 0.37 W/m²K | 0.40 | ✅ Conforme |
+| Vãos envidraçados | PVC 5 câmaras + 4-16-4 Argon Low-E | Uw = 1.6, gT = 0.37 | 2.80 | ✅ Conforme |
+| Pontes térmicas | Caixa de estore: ψ = 0.30 W/m·K | — | — | ⚠️ Tratamento recomendado |
+
+**Permeabilidade ao ar:** n50 = 3.2 h⁻¹ (blower door realizado em 12/05/2025)
+
+## 3. Sistemas AVAC e AQS
+
+- **Aquecimento:** Bomba de calor ar-água Daikin Altherma 3 R 8kW — COP = 4.08 (A7/W35)
+- **Arrefecimento:** Mesmo circuito, modo reversível — EER = 3.2 (Eurovent 2024)
+- **AQS:** Termoacumulador 200L + 2× coletores Vulcano FKC-2W (4 m² total, orientação Sul, inclinação 32°)
+  - Esolar calculado = 1.340 kWh/ano = **56% das necessidades de AQS** — ✅ cumpre Art. 27 DL 118/2013
+- **Ventilação:** Natural por abertura de fachada; grelhas de admissão em sala e quartos
+
+## 4. Indicadores Energéticos REH
+
+| Indicador | Valor calculado | Valor referência | Rácio |
+|---|---|---|---|
+| Nic (aquecimento) | 43 kWh/m²·ano | Ni = 66 kWh/m²·ano | 0.65 ✅ |
+| Nvc (arrefecimento) | 5 kWh/m²·ano | Nv = 16 kWh/m²·ano | 0.31 ✅ |
+| Nac (AQS) | 19 kWh/m²·ano | Na = 26 kWh/m²·ano | 0.73 ✅ |
+| **Ntc (primária total)** | **76 kWh/m²·ano** | **Nt = 94 kWh/m²·ano** | — |
+| **R_Ntc = Ntc/Nt** | — | — | **0.81 → Classe B-** ✅ |
+
+Eren,p (renováveis): 1.340 kWh/ano solar térmico + 720 kWh/ano fração renovável BC (SPF 3.2 > 2.5)
+
+## 5. Recomendações de Melhoria (para atingir classe B ou superior)
+
+| # | Medida | Custo est. | Poupança/ano | Payback bruto | Payback c/ apoio | Melhoria de classe |
+|---|---|---|---|---|---|---|
+| 1 | Estores inteligentes + termostat Tado | €420 | €85/ano | 5 anos | — | +0.04 R_Ntc |
+| 2 | Tratamento caixa de estore (ψ: 0.30→0.10) | €1.200 | €140/ano | 8.6 anos | 6 anos (Fundo Ambiental 30%) | B- → B |
+| 3 | PV 3 kWp (12 painéis 250W) telhado Sul | €5.400 | €520/ano | 10.4 anos | 7.2 anos (IRS dedução 30% + PRR) | B → A |
+| 4 | MVHR Zehnder ComfoAir Q350 | €4.800 | €310/ano | 15.5 anos | 11 anos (IFRRU 2020) | +0.06 R_Ntc |
+
+**Classe atual pós-obra:** B- (R_Ntc = 0.81) — cumpre mínimo legal para grande reabilitação
+**Classe potencial (medidas 1+2+3):** A (R_Ntc estimado 0.48)
+
+## 6. Próximos Passos
+1. Submissão a perito qualificado SCE para emissão de certificado (prazo médio: 15 dias úteis)
+2. Registo no Portal SCE (www.sce.pt) — taxa: €65 (residencial até 250 m²)
+3. Validade do certificado: **10 anos** (DL 118/2013, Art. 8.º)
+4. Candidatura Fundo Ambiental aberta até 31/12/2025 — submissão recomendada antes de setembro
+```
+
+---
+
+## Output anti-patterns
+
+- Zona climática genérica ("I2-V2 típico") sem verificação do município real do projeto
+- U-values declarados sem composição construtiva que os sustente (ex: "parede isolada U=0.35" sem espessura/material)
+- R_Ntc calculado mas classe energética omitida ou invertida (confundir Ntc com Nt)
+- Solar térmico descrito como "previsto" sem área de coletores, orientação e Esolar calculado — Art. 27 fica sem verificação
+- Recomendações sem custo (€) e poupança (kWh/ano) — não é possível calcular payback nem comparar incentivos
+- Incentivos citados com nomes errados ou desatualizados (ex: "POSEUR" encerrado; usar Fundo Ambiental, PRR, IFRRU 2020)
+- Frontmatter com `<placeholders>` entregue ao cliente — revela template não preenchido
+- Confundir REH com RECS para edifícios mistos sem justificação da dominante regulatória
+- Classe "estimada sujeita a perito" sem R_Ntc numérico — impede decisão do cliente sobre investimento
+- Omitir validade do certificado (10 anos) e referência ao Portal SCE para registo obrigatório

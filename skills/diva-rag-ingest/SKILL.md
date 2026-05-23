@@ -171,3 +171,150 @@ Pesquisavel com: mcp__dario-rag__search_kb(query: "...", collection: "diva")
 - Called manually when user shares architecture/construction knowledge
 - Uses same engine as `dario-rag-ingest` but different collection (`diva` vs `dario`)
 - Can cross-reference: `search_kb(query: "...", collection: "diva")` for architecture, `search_kb(query: "...", collection: "dario")` for business
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Source type identificado e workflow correcto
+
+- [ ] Identificou corretamente o tipo de fonte: file path / URL / raw text / DIVA output
+- [ ] Usou o método correto (`ingest_text` vs `ingest_url` vs `curl` file upload)
+- [ ] Nome segue o padrão canónico `diva/<domain>/<slug>` sem espaços ou maiúsculas
+- [ ] Source type declarado corresponde ao conteúdo real (`pdf` não está marcado como `markdown`)
+
+❌ NOT delivery-ready: `name: "documento arquitetura"`, source_type não declarado  
+✅ Delivery-ready: `name: "diva/materials/xps-danosa-300kpa"`, `source_type: "pdf"`
+
+---
+
+### Gate 2 — Taxonomia de tags aplicada correctamente
+
+- [ ] Pelo menos 1 domain tag da taxonomia oficial (ex: `architecture`, `energy`, `regulations`)
+- [ ] 1-2 topic tags específicos ao conteúdo real (ex: `nzeb`, `u-value`, `rgeu`)
+- [ ] 1 content-type tag obrigatório: `spec` / `regulation` / `catalog` / `report` / `guide` / `datasheet` / `notes`
+- [ ] Se project-specific: project tag presente (ex: `moradia-sintra-2024`)
+- [ ] Tags sem duplicados, sem tags inventadas fora da taxonomia
+
+❌ NOT delivery-ready: `tags: ["arquitetura", "documento", "importante"]`  
+✅ Delivery-ready: `tags: ["energy", "nzeb", "insulation", "reh", "report"]`
+
+---
+
+### Gate 3 — Engine health verificado antes do ingest
+
+- [ ] `mcp__dario-rag__kb_health()` chamado antes de ingest
+- [ ] Se unhealthy: instruções de arranque incluídas ao utilizador
+- [ ] Collection confirmada como `diva` (não `dario`, não omitida)
+- [ ] Endpoint `localhost:8420` acessível (sem timeout na resposta de health)
+
+❌ NOT delivery-ready: ingest chamado sem verificar health, collection omitida (usa default `dario`)  
+✅ Delivery-ready: health OK → `collection: "diva"` explícito em todos os calls
+
+---
+
+### Gate 4 — Resposta de ingest validada e comunicada
+
+- [ ] Verificou `status: "ok"` na resposta
+- [ ] Reportou `chunks: N` — N > 0 (conteúdo efectivamente indexado)
+- [ ] Se `status: "duplicate"`: informou utilizador que conteúdo já existe, não tratou como erro
+- [ ] Se erro: diagnóstico comunicado (engine down / ficheiro ilegível / conteúdo < 50 chars)
+
+❌ NOT delivery-ready: "foi ingerido" sem confirmar chunks, silêncio em caso de erro  
+✅ Delivery-ready: `Ingerido 14 chunks · status: ok · collection: diva`
+
+---
+
+### Gate 5 — Conteúdo respeita limites de ingestão DIVA
+
+- [ ] Conteúdo ≥ 50 caracteres (abaixo disso: sem valor de retrieval, recusar)
+- [ ] Não é ficheiro binário CAD (.dwg, .rvt, .skp) — extrair notas de texto primeiro
+- [ ] Não é conteúdo marketing/SEO — redirecionar para `dario-rag-ingest`
+- [ ] Ficheiros confidenciais (BIM, plantas proprietárias): aviso explícito ao utilizador
+
+❌ NOT delivery-ready: ingere `.dwg` directamente; ingere "Revigrés é boa marca." (< 50 chars)  
+✅ Delivery-ready: PDF de caderno de encargos → extrai texto → ingere com tags `construction,spec`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets por preencher
+
+- [ ] `<project>`, `<domain>`, `<slug>`, `<brand>` substituídos por valores reais
+- [ ] Confirmação final mostra nome canónico real, não template
+- [ ] Query de pesquisa sugerida usa termos do conteúdo real ingerido
+- [ ] Nenhum placeholder `<...>` visível no output entregue ao utilizador
+
+❌ NOT delivery-ready: `name: "diva/<domain>/<slug>"`, `tags: ["<brand>", "<material-type>"]`  
+✅ Delivery-ready: `name: "diva/suppliers/revigres-porcelanico-2026"`, query: `"porcelânico retificado 60x60 revigrés"`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+**Utilizador:** "Guarda isto na RAG DIVA — são as especificações do pavimento para a Vivenda Cascais."
+
+---
+
+[A verificar engine RAG...]
+
+mcp__dario-rag__kb_health()
+→ status: healthy · engine: localhost:8420 · collections: ["dario", "diva"]
+
+[A analisar conteúdo...]
+Domínio detectado: Materiais / Interiores
+Tipo de conteúdo: Especificação técnica de fornecedor
+Projeto: Vivenda Cascais
+
+mcp__dario-rag__ingest_text(
+  content: "Pavimento: Porcelânico Revigrés Série NEXO STONE 60x60cm, acabamento mate,
+  retificado, R10, esp. 10mm. Assentamento com argamassa Mapei Keraflex Maxi S1
+  cinzento. Juntas de 3mm com Mapei Ultracolor Plus cor 111 Prata. Rodapé em
+  porcelânico Revigrés NEXO STONE 8x60cm. Zona húmida: mesmo material com
+  impermeabilização prévia Mapei Mapelastic AquaDefense. Fornecedor local:
+  Cerâmica Torres, Cascais, ref. orçamento CT-2024-0892.",
+  name: "diva/projects/vivenda-cascais/pavimento-revigres-nexo-stone",
+  source_type: "notes",
+  collection: "diva",
+  tags: ["materials", "ceramic", "finishes", "spec", "vivenda-cascais"]
+)
+
+→ status: ok
+→ chunks: 6
+→ collection: diva
+→ doc_id: diva-proj-cascais-pav-001
+
+---
+
+✅ Ingerido na coleção DIVA:
+
+**Nome:** `diva/projects/vivenda-cascais/pavimento-revigres-nexo-stone`
+**Chunks indexados:** 6
+**Tags:** `materials` · `ceramic` · `finishes` · `spec` · `vivenda-cascais`
+
+Pesquisável com:
+mcp__dario-rag__search_kb(
+  query: "pavimento porcelânico Revigrés Vivenda Cascais",
+  collection: "diva"
+)
+
+> 💡 Para pesquisar toda a documentação do projeto:
+> query: "vivenda-cascais" · collection: "diva"
+```
+
+---
+
+## Output anti-patterns
+
+- Usar `collection: "dario"` (default) em vez de `collection: "diva"` — contamina a RAG errada
+- Reportar sucesso sem confirmar `chunks: N > 0` — ingest pode ter falhado silenciosamente
+- Tags inventadas fora da taxonomia (`"premium"`, `"importante"`, `"2024"`) — degradam retrieval
+- Ingerir conteúdo < 50 caracteres — sem valor semântico, gera chunks inúteis
+- Deixar `<project>`, `<slug>` ou `<brand>` por preencher no nome canónico final
+- Saltar `kb_health()` e assumir engine up — utilizador recebe erro opaco sem diagnóstico
+- Usar `ingest_text` para PDFs grandes sem extrair texto primeiro — trunca ou falha
+- Ignorar `status: "duplicate"` e reportar como erro — causa confusão desnecessária ao cliente
+- Sugerir query de pesquisa genérica (`"arquitetura"`) em vez de termos do conteúdo real ingerido
+- Não indicar coleção no exemplo de pesquisa sugerido — search cai na coleção default errada

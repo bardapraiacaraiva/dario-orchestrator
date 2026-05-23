@@ -247,3 +247,201 @@ municipality: <name>
 - Pair with `diva-inspection` for final vistoria preparation
 - Follow up with `dario-proposal` for licensing cost inclusion in client proposal
 - Save via `dario-obsidian-save` to vault
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Procedure type correctly determined (isentas / comunicação prévia / licenciamento)
+
+- [ ] Decision tree aplicado com base nos inputs reais (project type + facade changes + heritage zone + loteamento)
+- [ ] Artigo RJUE correto citado (art.6, art.34-36, ou art.4)
+- [ ] Se "comunicação prévia", prazo de 20 dias mencionado explicitamente
+- [ ] Autorizações de utilização identificadas quando aplicável (art.62-65)
+
+❌ NOT delivery-ready: "Provavelmente precisa de licenciamento, confirme com a câmara."
+✅ Delivery-ready: "Projeto de extensão com alteração de fachada em Cascais → **Licenciamento (art.4 RJUE)**. Sem zona de proteção — não requer parecer DGPC. Prazo expectável câmara: 30 dias (arquitetura) + 45 dias (especialidades)."
+
+---
+
+### Gate 2 — Checklist de documentos completa e calibrada ao projeto
+
+- [ ] Documentos base listados (certidão registo predial < 6 meses, caderneta predial, legitimidade)
+- [ ] Projeto de arquitetura com todos os elementos (plantas, alçados, cortes, mapa de áreas, termo responsabilidade OA)
+- [ ] Especialidades filtradas ao projeto real (ex: AVAC só se sistema central; gás só se aplicável)
+- [ ] Heritage zone → documentação DGPC/IGESPAR adicionada se ZP confirmada
+
+❌ NOT delivery-ready: "Documentos necessários: projeto de arquitetura, especialidades, requerimento."
+✅ Delivery-ready: "Para reabilitação interior (sem fachada) em edifício pré-1951, Lisboa: Requerimento CM Lisboa + Certidão Registo Predial (< 6 meses) + Caderneta Predial Finanças + Projeto Arquitetura (plantas 1:50, alçados, cortes, mapa áreas) + Termo Responsabilidade Arquiteto OA + REH (comportamento térmico ADENE). Estruturas **não obrigatórias** se sem alterações estruturais."
+
+---
+
+### Gate 3 — Entidades externas e pareceres corretamente mapeados
+
+- [ ] Tabela de entidades gerada com prazo de resposta por entidade
+- [ ] ANPC/Bombeiros referenciado se SCIE categoria ≥ 2ª
+- [ ] CCDR/APA/ARH identificados se fora perímetro urbano ou junto a linha de água
+- [ ] DGPC com prazo 30-60 dias se zona de proteção ativa
+- [ ] ANACOM para telecomunicações (ITED) se obra nova ou reabilitação com alteração de redes
+
+❌ NOT delivery-ready: "Pode ser necessário consultar entidades externas dependendo do local."
+✅ Delivery-ready: "Projeto em ZP do Convento de Cristo, Tomar → Parecer DGPC obrigatório (prazo: 30-60 dias, vinculativo). SCIE categoria 2ª → Parecer Bombeiros Tomar (30 dias). ITED → ANACOM. Total pipeline externo estimado: 60-90 dias antes de aprovação final."
+
+---
+
+### Gate 4 — Timelines e custos com dados concretos do município
+
+- [ ] Timeline total estimada (procedimento + entidades + prazo câmara) em dias/semanas
+- [ ] Taxas municipais referenciadas por nome (ex: "TMU Lisboa tabela 2024") ou estimativa range €
+- [ ] RERU mencionado e aplicabilidade avaliada (reabilitação urbana, ARU, edifício pré-1990)
+- [ ] Eventuais suspensões de prazo (art.24 RJUE) identificadas se parecer externo bloqueante
+
+❌ NOT delivery-ready: "O processo pode demorar vários meses e há taxas a pagar."
+✅ Delivery-ready: "Comunicação prévia Porto, renovação interior 120m²: prazo câmara 20 dias úteis (tacit approval). Taxas estimadas CM Porto: €800–1.400 (tabela municipal 2024, base m² + coeficiente uso). RERU aplicável se edifício em ARU Baixa do Porto → isenção IMT + desconto taxas. Timeline total estimada: 6–10 semanas (incluindo preparação dossier)."
+
+---
+
+### Gate 5 — RERU / regimes especiais avaliados explicitamente
+
+- [ ] RERU applicability declarada (sim/não + justificação: edifício em ARU? pré-1990? reabilitação ≥ 25% valor?)
+- [ ] Se RERU aplicável: isenções listadas (IMT, IMI, taxas municipais, IVA 6%)
+- [ ] PDM constraints identificados (índice de construção, cércea, recuos) se nova construção ou extensão
+- [ ] Regime simplificado art.6 descartado ou confirmado com artigo exato
+
+❌ NOT delivery-ready: "Verifique se há benefícios fiscais para reabilitação."
+✅ Delivery-ready: "Edifício 1967, Rua do Almada 55, Porto (ARU Centro Histórico confirmada) → **RERU aplicável**. Benefícios: IVA 6% na obra, isenção IMT na venda pós-reabilitação, isenção IMI 3 anos (renovável 5). Condição: reabilitação atingir nível 'médio' (MANR). Arquiteto deve emitir ficha de avaliação NRAU antes de submissão."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+
+- [ ] Nenhum `<nome do cliente>`, `<município>`, `<endereço>`, `<área m²>` no output final
+- [ ] Morada ou referência de localização real presente (município + freguesia, ou endereço)
+- [ ] Técnicos/entidades referenciados com nomes concretos quando disponíveis (ex: "CM Lisboa — portal LisboaOnline")
+- [ ] Datas ou anos de referência legislativa explícitos (ex: "DL 163/2006 acessibilidades", "RJUE art.4, redação 2023")
+
+❌ NOT delivery-ready: "Para o projeto de `<cliente>` em `<município>`, serão necessários os seguintes documentos..."
+✅ Delivery-ready: "Para Cuidai — reabilitação Rua Padre António Vieira 12, Lisboa (Estrela): procedimento Comunicação Prévia CM Lisboa (art.34 RJUE). Submissão via portal Lisboa Urbanismo. Certidão registo predial solicitada a 14 jan 2025 — válida até 14 jul 2025."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## Licenciamento — Atrium Escritórios, Rua Castilho 39, Lisboa (Marquês de Pombal)
+
+**Projeto:** Alteração interior + mudança de uso (residencial → escritórios), 3º andar, 210 m²
+**Edifício:** 1958 (pré-1990) | Sem zona de proteção | PDM Lisboa: solo urbano consolidado
+**RERU:** Aplicável (ARU Avenidas Novas, edifício pré-1990, intervenção > 25% valor)
+
+---
+
+### Procedimento determinado: Autorização de Utilização (art.62 RJUE) + Comunicação Prévia (art.34)
+
+- Obras interiores sem alteração de fachada → **Comunicação Prévia**
+- Mudança de uso residencial → serviços → **Autorização de Utilização** obrigatória após obras
+- Prazo tacit approval câmara: **20 dias úteis**
+- Prazo autorização utilização: **10 dias úteis** (art.64 RJUE)
+
+---
+
+### Checklist de documentos — Comunicação Prévia CM Lisboa
+
+**Documentos base**
+- [ ] Requerimento portal Lisboa Urbanismo (formulário CP-2024)
+- [ ] Certidão Registo Predial — solicitar Conservatória Lisboa 3 (válida 6 meses)
+- [ ] Caderneta Predial Urbana — Finanças Lisboa (artigo urbano U-4421-Lisboa)
+- [ ] Cópia escritura / procuração Atrium Gestão Lda (legitimidade requerente)
+- [ ] Fotografias estado atual — datadas, mínimo 12 fotos interiores + 4 fachada
+
+**Projeto de Arquitetura** (Arq. Sofia Mendes, OA nº 34.221)
+- [ ] Memória descritiva e justificativa (inclui justificação PDM: uso serviços permitido ZU consolidado)
+- [ ] Plantas piso 3 — estado atual e estado proposto, escala 1:50
+- [ ] Alçados (não há alteração exterior — declaração expressa na memória)
+- [ ] Cortes longitudinal e transversal, escala 1:50
+- [ ] Mapa de áreas: ABC 210 m² | AU 187 m² | implantação n/a
+- [ ] Mapa de acabamentos
+- [ ] Estimativa orçamental: €148.000 (base certidão fiscal)
+- [ ] Declaração autora + Termo de Responsabilidade OA
+- [ ] Seguro RC Arq. Sofia Mendes — apólice Fidelidade nº 2024-ARQ-8841 (válida dez 2025)
+
+**Especialidades necessárias para este projeto**
+- [ ] Instalações elétricas (ITED) — Eng. Paulo Ramos, OE nº 52.109
+- [ ] Comportamento térmico REH — Perito ADENE certificado (cert. nº PT-QAI-0334)
+- [ ] Acústica RRAE — obrigatório mudança de uso para serviços (DL 96/2008)
+- [ ] Segurança contra incêndios SCIE — uso serviços 2ª categoria (> 1.000 m² ou > 2 pisos) → **Parecer Bombeiros Lisboa obrigatório**
+- [ ] Acessibilidades DL 163/2006 — verificar rampas e instalações sanitárias adaptadas
+
+**Especialidades NÃO necessárias**
+- ~~Estruturas~~ — sem alterações estruturais (declaração arquiteta)
+- ~~Gás~~ — sem instalações de gás no projeto
+- ~~AVAC~~ — sistema split individual, não central
+
+---
+
+### Entidades externas
+
+| Entidade | Motivo | Prazo | Portal / Contacto |
+|---|---|---|---|
+| Bombeiros Lisboa | SCIE 2ª categoria | 30 dias | requerimentos@bombeiros-lisboa.pt |
+| ANACOM | ITED telecomunicações | 15 dias | anacom.pt/ited |
+| CM Lisboa — DAU | Aprovação CP | 20 dias úteis | lisboaurbanismo.pt |
+
+→ **Sem DGPC** (não é zona de proteção)
+→ **Sem CCDR** (perímetro urbano consolidado)
+
+---
+
+### Regime RERU — Benefícios Aplicáveis
+
+✅ Edifício em ARU Avenidas Novas (Deliberação CM Lisboa 523/2019)
+✅ Construção 1958 (pré-1990)
+✅ Intervenção estimada €148.000 > 25% valor patrimonial (VPT: €390.000 → limiar RERU: €97.500)
+
+**Benefícios confirmados:**
+- IVA 6% sobre obras de reabilitação (vs. 23% standard)
+- Isenção IMI 3 anos (renovável até 5) após conclusão
+- Isenção IMT se venda/transmissão no prazo de 3 anos pós-reabilitação
+- **Ação necessária:** Arq. Sofia Mendes emite ficha NRAU antes de submissão; nível mínimo "médio" exigido
+
+---
+
+### Timeline estimada
+
+| Fase | Duração | Data estimada |
+|---|---|---|
+| Preparação dossier | 3 semanas | até 10 fev 2025 |
+| Submissão CM Lisboa | — | 11 fev 2025 |
+| Parecer Bombeiros | 30 dias | 13 mar 2025 |
+| Tacit approval CP | 20 dias úteis | 11 mar 2025 |
+| Início obras | — | 17 mar 2025 |
+| Conclusão obras (estimada) | 12 semanas | 9 jun 2025 |
+| Autorização Utilização | 10 dias úteis | 23 jun 2025 |
+
+**Total: ~20 semanas até ocupação**
+
+---
+
+### Taxas CM Lisboa (estimativa 2024)
+
+- Comunicação Prévia mudança uso: **€1.240** (base: 210 m² × €4,80 coef. serviços tabela CM Lisboa 2024)
+- Autorização Utilização: **€380**
+- SCIE taxa: **€210**
+- **Total estimado: ~€1.830** (excl. honorários técnicos)
+```
+
+---
+
+## Output anti-patterns
+
+- Listar "pode precisar de comunicação prévia ou licenciamento" sem determinar qual — o skill existe precisamente para fazer essa determinação com os inputs disponíveis
+- Incluir **todas** as especialidades de engenharia por omissão, sem filtrar ao projeto real (e.g., listar gás e AVAC numa renovação de escritório sem esses sistemas)
+- Mencionar RERU como "verifique se aplicável" sem avaliar os três critérios concretos (ARU + pré-1990 + limiar 25%)
+- Timelines em linguagem vaga ("vários meses", "processo demorado") em vez de semanas/dias úteis por fase
+- Omitir autorizações de utilização em projetos com mudança de uso — erro que causa ocupação ilegal
+- Pareceres externos listados sem prazo de resposta — impede o cliente de planear o pipeline crítico
+- Taxas municipais omitidas ou referenciadas como "consulte a câmara" quando estimativa por m² é calculável
+- Não distinguir entre parecer vinculativo (DGPC, ANPC) e não vinculativo — têm implicações contratuais e de prazo completamente diferentes
+- Usar `<município>` ou `<nome do cliente>` no output entregue — qualquer placeholder visível é falha imediata de delivery

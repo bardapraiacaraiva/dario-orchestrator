@@ -146,3 +146,147 @@ SCIE,AutoCAD,DWG,Eng. SCIE,LOD 200,"Arquitectura"
 - Never assume software compatibility between project team members — always confirm file format support before exchanging models, and provide IFC as fallback for every deliverable
 - Always use mm as the base unit for all BIM dimensions — mixing cm or m causes scaling errors that propagate silently across linked models and only surface during construction
 - Never generate LOD 400/500 specifications without verified construction drawings — high-detail BIM data based on preliminary design creates false confidence and leads to costly fabrication errors
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Room Data Sheets completos e conformes
+- [ ] Todos os compartimentos do projeto têm Room_ID único e sequencial (R.0.01, R.1.01…)
+- [ ] Área e pé-direito preenchidos com valores reais do projeto (não "TBD" ou 0.0)
+- [ ] Campo RGEU_Compliant calculado contra área mínima real (quarto ≥ 9 m², cozinha ≥ 6 m²)
+- [ ] HVAC_BTU e Electrical_Points não estão em branco para espaços habitáveis
+
+❌ NOT delivery-ready: `R.1.01,Quarto,,,,,,,,,,,,`
+✅ Delivery-ready: `R.1.01,Suite Principal,1,16.0,2.70,Soalho carvalho eng.,Estuque pintado,Gesso cartonado,2.50,200,Split,12000,8,2,0,Blackout motorizado,10.5,SIM`
+
+---
+
+### Gate 2 — Mapa de Vaos com especificação técnica completa
+- [ ] Cada vão tem ID único, dimensões em mm (não cm), material e acabamento especificados
+- [ ] Caixilharia exterior inclui Uw (transmitância térmica), tipo de vidro e espessura
+- [ ] Portas interiores têm isolamento acústico em dB e classificação corta-fogo quando aplicável
+- [ ] Hardware (ferragens) especificado — não genérico ("fechadura") mas marca/tipo real
+
+❌ NOT delivery-ready: `J.01,Janela,Sala,Exterior,grande,aluminio,duplo`
+✅ Delivery-ready: `J.01,Janela fixa+batente,0,Sala,Exterior,2400,2200,Aluminio Cortizo COR-70,Lacado RAL 7016,Duplo low-E 6/16Ar/6,Oscilo-batente Roto,Nao,38,Peitoril pedra,Uw=1.4`
+
+---
+
+### Gate 3 — Mapa de Acabamentos com rastreabilidade comercial
+- [ ] Fabricante + referência de catálogo real para cada material (não "mármore genérico")
+- [ ] Cor especificada em RAL, NCS ou nome comercial verificável
+- [ ] Prazo de entrega (Lead_Time_weeks) preenchido — crítico para coordenação de obra
+- [ ] Campo Rooms_Applied lista todos os compartimentos onde o material é aplicado
+
+❌ NOT delivery-ready: `PAV.01,Soalho,,,Natural,,Pavimento,,,,"Quartos"`
+✅ Delivery-ready: `PAV.01,Soalho eng. carvalho,Jular,Oak Classic 190mm,Natural,Oleo Osmo,Pavimento,15,65,4,"R.0.02,R.1.01,R.1.03,R.1.04"`
+
+---
+
+### Gate 4 — Equipment Schedule com dados de instalação
+- [ ] Dimensões em mm para cada equipamento (necessárias para clash detection)
+- [ ] Potência elétrica (W), ligações de água, gás e esgoto identificadas por equipamento
+- [ ] Modelo especificado com referência comercial real (não "frigorífico XXX")
+- [ ] Room ID referencia compartimento existente na Room Data Sheet
+
+❌ NOT delivery-ready: `EQ.01,Placa indução,Bosch,—,grande,sim,nao,nao,Cozinha`
+✅ Delivery-ready: `EQ.01,Placa inducao,Bosch,PXE875DC1E,816x527x51,7400,Nao,Nao,Nao,R.0.03,Requer disj. 32A`
+
+---
+
+### Gate 5 — LOD e fase de projeto declarados
+- [ ] Output indica explicitamente LOD (100/200/300/350/400) para o qual foi gerado
+- [ ] Parâmetros omitidos em LOD inferior estão sinalizados como "n/a — LOD 200" (não vazios)
+- [ ] Coordenação de especialidades (AVAC, elétrica, hidráulica) tem matriz clash-check quando LOD ≥ 300
+- [ ] IFC export notes incluem disciplina, phase e classification system (Uniclass/OmniClass) se solicitado
+
+❌ NOT delivery-ready: schedule gerado sem indicar fase, com campos vazios sem justificação
+✅ Delivery-ready: cabeçalho `# LOD 300 — Fase Licenciamento | Projeto: Vivenda Cascais | Data: 2025-06` com nota `HVAC_BTU: n/a LOD 200 → dimensionar fase execução`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+
+- [ ] Nenhum campo contém `<client>`, `<project>`, `<material>`, `<room>` ou similar
+- [ ] Project ID / nome do projeto aparece no cabeçalho do CSV ou documento
+- [ ] Datas de entrega e lead times são absolutas (semana de obra, não "em X semanas")
+- [ ] Todos os Room_IDs, códigos de material e IDs de vão são internamente consistentes e não duplicados
+
+❌ NOT delivery-ready: `<nome_cliente>,<projeto>,<piso>,<area>`
+✅ Delivery-ready: `Cuidai — Clínica Lisboa Norte | PAV.03,Porcelanato,Marazzi,Grande 120x60,Statuario,Polido,Pavimento,9,55,3,"R.0.01,R.0.03"`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# BIM SCHEDULES — Vivenda Aroeira | LOD 300 | Fase: Execução | 2025-06
+
+---
+
+## ROOM DATA SHEETS
+
+Room_ID,Room_Name,Floor,Area_m2,Height_m,Floor_Finish,Wall_Finish,Ceiling_Finish,Ceiling_Height_m,Lighting_Lux,HVAC_Type,HVAC_BTU,Electrical_Points,Data_Points,Water_Points,Special_Requirements,RGEU_Min_Area,RGEU_Compliant
+R.0.01,Hall Entrada,0,5.2,2.75,Calcario Moca Creme polido 60x60,Estuque cal RAL 9010,GKB Knauf pintado,2.55,150,Split Daikin,9000,4,1,0,Videoporteiro Comelit,3.0,SIM
+R.0.02,Sala Estar+Jantar,0,32.0,2.75,Soalho carvalho Jular Oak 190mm,Estuque cal Farrow&Ball Pointing 2003,GKB Knauf pintado,2.55,300,Piso radiante Uponor,n/a,14,4,0,Cortinas motoriz. Somfy,18.0,SIM
+R.0.03,Cozinha,0,15.5,2.75,Porcelanato Marazzi Grande Statuario 120x60,Azulejo Aleluia Heritage 15x15 atras bancada,GKBI Knauf hidrofugo,2.45,500,Extracao Aerauliqa+Split,12000,16,2,5,Extracao 450m3/h,6.0,SIM
+R.0.04,WC Social,0,3.2,2.75,Micro-cimento Topciment RAL 7038,Micro-cimento continuo + espelho full,GKBI Knauf hidrofugo,2.45,200,Extracao,n/a,4,0,3,Ventilacao mecanica,1.5,SIM
+R.1.01,Suite Principal,1,18.0,2.75,Soalho carvalho Jular Oak 190mm,Estuque cal RAL 9010,GKB Knauf pintado,2.55,200,Split Daikin FTXM50,12000,10,2,0,Blackout motorizado Somfy,10.5,SIM
+R.1.02,WC Suite Principal,1,7.0,2.75,Marmore Estremoz Branco Polido 60x30,Marmore ate cota 1.20m + pintura CIN,GKBI Knauf hidrofugo,2.45,300,Extracao+toalheiro Runtal,n/a,5,0,5,Piso radiante elétrico Warmup,3.5,SIM
+R.1.03,Quarto 2,1,12.5,2.75,Soalho carvalho Jular Oak 190mm,Estuque cal RAL 9010,GKB Knauf pintado,2.55,200,Split Daikin FTXM35,9000,7,2,0,,9.0,SIM
+R.1.04,WC Comum,1,4.8,2.75,Ceramica Revigres Touch 30x60 cinza,Ceramica Revigres Touch ate 2.10m,GKBI Knauf hidrofugo,2.45,200,Extracao,n/a,4,0,4,,3.5,SIM
+
+---
+
+## MAPA DE VAOS
+
+ID,Type,Floor,Room_From,Room_To,Width_mm,Height_mm,Material,Finish,Glass,Hardware,Fire_Rating,Acoustic_dB,Threshold,Notes
+P.01,Porta entrada,0,Exterior,R.0.01,1000,2200,Carvalho macico,Verniz Rubio Monocoat Natural,Visor 200x200 temperado,Mottura 3571 3 pontos,EI30,42,Soleira aluminio anodizado,Certificado RC2
+P.02,Porta interior,0,R.0.01,R.0.02,900,2200,MDF lacado,RAL 9010 mate,Nao,Magnetica + puxador Colombo inox,Nao,32,Nao,Batente oculto Eclisse
+P.03,Porta correr vidro,0,R.0.02,R.0.03,1200,2200,Vidro temperado 10mm VSG,Transparente,Full height,Sistema Eclisse Syntesis,Nao,28,Nao,Embutida parede 200mm
+P.04,Porta WC,0,Corredor,R.0.04,700,2200,MDF lacado,RAL 9010 mate,Nao,Trinco Colombo + indicador,Nao,32,Nao,Grelha ventilacao 200cm2
+J.01,Janela+porta varanda,0,R.0.02,Exterior,3200,2400,Cortizo COR-70 Break,Lacado RAL 7016 mate,SGG Climatop Ultra N 6/18Ar/6,Levante-correr Roto,Nao,40,Soleira inox nivelada,Uw=1.2 Sw=0.36
+J.02,Janela batente,0,R.0.03,Exterior,1200,1200,Cortizo COR-70 Break,Lacado RAL 7016 mate,SGG Duplo 6/16Ar/6,Oscilo-batente Roto,Nao,36,Peitoril pedra calcario,Uw=1.4
+J.03,Porta varanda suite,1,R.1.01,Varanda,1800,2400,Cortizo COR-70 Break,Lacado RAL 7016 mate,SGG Climatop Ultra N 6/18Ar/6,Levante-correr Roto,Nao,40,Soleira inox nivelada,Uw=1.2
+
+---
+
+## MAPA DE ACABAMENTOS
+
+Code,Material,Manufacturer,Reference,Colour,Finish,Application,Thickness_mm,Price_EUR_m2,Lead_Time_weeks,Rooms_Applied
+PAV.01,Soalho eng. carvalho,Jular,Oak Classic 190x15mm,Natural,Oleo Osmo 3044,Pavimento,15,68,4,"R.0.02,R.1.01,R.1.03"
+PAV.02,Calcario Moca Creme,Solancis,Moca Creme Amaciado 60x60,Creme,Amaciado,Pavimento,20,88,3,"R.0.01"
+PAV.03,Porcelanato,Marazzi,Grande Marble Look Statuario 120x60,Branco/cinza,Polido,Pavimento,9,58,3,"R.0.03"
+PAV.04,Micro-cimento,Topciment,Sttandard NC,RAL 7038 cinza medio,Selante PU mate,Pav+paredes,3,98,2,"R.0.04"
+PAV.05,Marmore Estremoz,Marmetal,Branco Estremoz Polido 60x30,Branco veio cinza,Polido,Pav+paredes,20,125,5,"R.1.02"
+REV.01,Estuque cal,Aplicador Mestre Gil Figueiredo,Cal hidraulica + areia fina,RAL 9010,CIN Cinacryl 4L/100m2,Paredes,15,30,1,"R.0.01,R.0.02,R.1.01,R.1.03"
+REV.02,Azulejo artesanal,Aleluia Ceramicas,Heritage 15x15,Branco craquele,Vidrado brilhante,Parede cozinha,8,48,4,"R.0.03"
+REV.03,Ceramica parede,Revigres,Touch 30x60,Cinza claro NCS S 2005-B,Matt,Paredes WC,9,34,2,"R.1.04"
+TEC.01,Gesso cartonado std,Knauf,GKB 12.5mm,Branco,CIN Branco Mate 2 demaos,Tectos,12.5,23,1,"R.0.01,R.0.02,R.1.01,R.1.03"
+TEC.02,Gesso cartonado hidrofugo,Knauf,GKBI 12.5mm,Branco,CIN Hydrostop 2 demaos,Tectos WC+Coz,12.5,28,1,"R.0.03,R.0.04,R.1.02,R.1.04"
+
+---
+
+## NOTA LOD
+Schedules gerados a LOD 300.
+Parametros em branco marcados n/a transitam para LOD 350 na fase de especialidades (prevista set-2025).
+IFC export: IFC2x3 | Disciplina: Architecture | Classification: OmniClass Table 13
+```
+
+---
+
+## Output anti-patterns
+
+- Dimensões de vãos em cm em vez de mm (quebra compatibilidade Revit/ArchiCAD)
+- Campos deixados em branco sem nota "n/a — LOD XXX" — o modelo BIM importa zeros ou nulos silenciosos
+- Cor especificada como "branco" sem RAL/NCS — impossível para o fornecedor produzir
+- Lead time omitido no mapa de acabamentos — crítico para planeamento de obra, ausência bloqueia o empreiteiro
+- Room_ID inconsistente entre schedules (R01 numa tabela, R.0.01 noutra) — quebra linked data no modelo
+- Material sem fabricante + referência comercial real (ex: "mármore italiano") — não rastreável nem orçamentável
+- Caixilharia exterior sem Uw e tipo de vidro — incumpre RCCTE e bloqueia simulação energética
+- Equipment schedule sem dimensões físicas — clash detection impossível sem bounding box real
+- Output gerado sem declarar LOD — o utilizador não sabe o que está incompleto por design vs. por omissão
+- Placeholder `<project_name>` ou `<room>` sobrevive no output entregue ao cliente

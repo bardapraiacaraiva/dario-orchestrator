@@ -259,3 +259,195 @@ tags: [domotica, smart-home, <protocol>, <project>]
 - Do NOT specify outdoor cameras without checking RGPD/CNPD requirements for recording public spaces
 - Do NOT undersize the electrical panel — automation adds 12-48 DIN modules depending on tier
 - Do NOT assume all ISPs support port forwarding for remote access — recommend Tailscale/WireGuard VPN instead
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Needs assessment completo por divisão
+
+- [ ] Tabela de divisões preenchida com TODAS as divisões do projeto (não "Sala/Quarto genérico")
+- [ ] Cada subsistema (lighting, blinds, HVAC, security, audio, special) avaliado por divisão — células vazias só com "—" intencional
+- [ ] Cenas de iluminação nomeadas explicitamente (ex: "Jantar", "Filme", "Leitura") — não "3 scenes"
+- [ ] Equipamentos especiais identificados (lareira, piscina, portão, carregador EV)
+
+❌ NOT delivery-ready: `| Suite | Dim+CCT | Motorized | Floor heating | Motion | — | — |`
+✅ Delivery-ready: `| Suite Principal | Dim+CCT 2700-5000K, cenas: Acordar/Relaxar/Leitura | 2x motor SOMFY RS100 io, sun-tracking sul | Termostato chão Danfoss CF-SG, 2 zonas | PIR Aqara MS-S02, contacto janela | Sonos Era 100 (embutido) | Tomadas USB-C x4 cabeceira |`
+
+---
+
+### Gate 2 — Protocolo justificado com dados do projeto
+
+- [ ] Decisão de protocolo explicada com referência explícita ao projeto (nova construção vs. retrofit, m², nº estimado de dispositivos)
+- [ ] Híbridos justificados (ex: "backbone KNX + sensores Zigbee porque retrofit parcial")
+- [ ] Plataforma de integração escolhida e versão indicada (ex: Home Assistant OS 2024.11 / Loxone Miniserver Gen 2)
+- [ ] Limitações conhecidas do protocolo escolhido mencionadas (ex: "Wi-Fi limitado a <30 dispositivos — expansão futura requer migração")
+
+❌ NOT delivery-ready: `Recomendamos KNX para este projeto premium.`
+✅ Delivery-ready: `Moradia Cuidai — 280m², nova construção, estimativa 87 pontos de controlo → KNX TP backbone (Schneider MTN) + Zigbee 3.0 para sensores de presença (Aqara hub local) + Home Assistant OS 2024.11 como camada de integração. Matter Thread reservado para expansão 2025+.`
+
+---
+
+### Gate 3 — Pré-instalação específica e acionável
+
+- [ ] Lista de cabos com especificação técnica real (secção, tipo, norma) — não genérica
+- [ ] Posições de cablagem identificadas por divisão/ponto (ex: "Cat6A × 2 pontos sala, 1 ponto câmara hall")
+- [ ] Dimensionamento do quadro elétrico indicado (nº módulos DIN reservados, UPS VA, VLAN IoT)
+- [ ] Notas "deixar vazio agora / instalar depois" marcadas explicitamente para decisões adiadas
+
+❌ NOT delivery-ready: `Passar cabo de rede em todas as divisões e preparar para estores motorizados.`
+✅ Delivery-ready: `Vivenda Sintra — Quadro técnico: 2 calhas DIN livres (24 módulos) para automação KNX, UPS Salicru SPS 700VA, SPD Hager MN125. Cablagem: Cat6A Legrand 2×/divisão + 1×câmara (hall, garagem, jardim N/S), bus KNX LSZH 2×2×0.8mm estrela a partir de quadro, speaker OFC 2×2.5mm para tetos sala+suite, conduit ∅20mm a motores estores (pull-wire instalado). EV: circuito 32A trifásico garagem pré-instalado.`
+
+---
+
+### Gate 4 — Especificação de subsistema com automações concretas
+
+- [ ] Pelo menos 4 automações-chave descritas (trigger → condição → ação) — não só nomeadas
+- [ ] Comportamento de fallback definido para falha do controlador
+- [ ] Marcas e modelos reais indicados (não "actuador KNX genérico")
+- [ ] Regras de segurança/alarme separadas de conforto (criticidade diferente)
+
+❌ NOT delivery-ready: `Modo Boa Noite: luzes apagam, estores fecham, alarme ativa.`
+✅ Delivery-ready: `Modo Boa Noite (trigger: botão hall ou 23h30 se presença detetada): 1) Luzes todas OFF exceto corredor 5% cálido (Philips Hue Gradient, 2200K); 2) Estores SOMFY todas as suites fecham 100%; 3) Termostato Danfoss recua para 17°C; 4) DSC Neo arma em modo perímetro (zonas internas inativas). Fallback KNX: botão físico Schneider E/S atua direto sem Miniserver.`
+
+---
+
+### Gate 5 — Estimativa de custo por tier com itemização real
+
+- [ ] Três tiers apresentados (Basic / Smart / Premium) com intervalo de preço em € para o projeto específico
+- [ ] Custo de mão-de-obra e programação separado do material
+- [ ] Componentes mais caros itemizados (não apenas total)
+- [ ] Nota clara sobre IVA e exclusões (obra civil, pintura, rede elétrica base)
+
+❌ NOT delivery-ready: `Tier Premium: €25.000 - €50.000 dependendo do projeto.`
+✅ Delivery-ready: `Moradia Atrium Cascais 220m² — Tier Smart (Zigbee + HA): material €8.400 (Hub Sonoff iHost €89, 24× actuador Aqara €38/un, 12× dimmer Aqara €45/un, 8× motor Zemismart €65/un, NAS Synology DS223 €320) + mão-de-obra + programação €3.200 = **Total ~€11.600 + IVA 23%**. Exclui quadro elétrico base, obra civil e pintura.`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+
+- [ ] Zero ocorrências de `<nome>`, `<morada>`, `<protocolo>`, `<marca>`, `[INSERIR]` ou equivalentes no output final
+- [ ] Nome do cliente/projeto aparece no título e em pelo menos 2 secções
+- [ ] Endereço ou tipologia real da habitação mencionados (ex: "T4 nova construção Comporta", "V3 retrofit Cascais")
+- [ ] Data de entrega do documento e versão indicadas no cabeçalho
+
+❌ NOT delivery-ready: `Especificação Smart Home para <Cliente> — <tipologia> em <localidade>.`
+✅ Delivery-ready: `**Especificação Domotica — Vivenda LUSOconta, V4 Nova Construção, Comporta** | Versão 1.0 | Janeiro 2025 | Preparado por DIVA para João Ferreira`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Especificação Domotica — Moradia Cuidai, V4 Nova Construção, Cascais
+**Versão 1.2 | Fevereiro 2025 | DIVA Smart Home Specification**
+Cliente: Cuidai Residências | Contacto: Ana Lopes | Entrega obra: Setembro 2025
+
+---
+
+## Needs Assessment por Divisão
+
+| Divisão | Iluminação | Estores | HVAC | Segurança | Áudio | Especial |
+|---|---|---|---|---|---|---|
+| Hall Entrada | On/off 3000K, deteção presença | — | — | PIR + contacto porta | — | Vídeo porteiro |
+| Sala Estar | Dim+CCT 2700-5000K, cenas: Jantar/Filme/Leitura/Festa | 3× motor sul + 1× motor poente | Zona AC + FCU | PIR Aqara | Sonos Era 300 (2×) | Controlo lareira bioetanol |
+| Cozinha | On/off + sob-armário CCT | 1× motor | Zona AC | Detetor fumo+gás | — | Monitorização consumo eletrodomésticos |
+| Suite Principal | Dim+CCT, cenas: Acordar/Relaxar/Noite | 2× motor blackout | Piso radiante 2 zonas + AC | PIR + contacto janela | Sonos Era 100 (embutido teto) | Tomadas USB-C × 4 cabeceiras |
+| Suite 2 | Dim+CCT, cenas: Acordar/Relaxar | 2× motor | Piso radiante 1 zona | PIR + contacto janela | Sonos Era 100 | — |
+| Escritório | Dim+CCT, cena: Foco circadiano | 1× motor | AC zona | — | — | KVM + monitor retractil |
+| Garagem | On/off deteção presença | — | Ventilação CO | PIR + sensor CO | — | Carregador EV 22kW |
+| Jardim/Ext. | Caminhos + destaque vegetação | — | — | 4× câmara PoE | — | Irrigação 6 zonas |
+
+---
+
+## Protocolo Selecionado
+
+**Projeto:** V4, 310m², nova construção, estimativa 112 pontos de controlo
+→ **Backbone KNX TP** (Schneider Electric MTN series) para iluminação, estores, HVAC
+→ **Zigbee 3.0** (Aqara Hub M3, local processing) para sensores de presença, temperatura, humidade, contactos
+→ **DALI-2** para circuitos iluminação técnica cozinha e escritório
+→ **Plataforma:** Home Assistant OS 2025.1 em NAS Synology DS923+ (redundância RAID-1)
+→ **UI:** Apple HomeKit (família) + painel wall Schneider Touch Multitouch KNX (hall, sala, suite)
+→ **Limitação conhecida:** Zigbee limitado a ~100 dispositivos neste hub — sensores jardim via Zigbee 2º hub
+
+---
+
+## Pré-Instalação (Entregar ao Empreiteiro até Março 2025)
+
+**Quadro Elétrico Técnico (cave):**
+- Reservar 3 calhas DIN (36 módulos) para automação KNX
+- UPS Salicru SPS.One 1000VA para controlador + NAS
+- SPD Hager MN125 na saída bus KNX
+- Circuito dedicado 16A para rack automação
+
+**Cablagem obrigatória antes de fechar paredes:**
+- Cat6A Legrand (U/FTP) × 2 pontos por divisão + 1 ponto por câmara (hall ext N/S, garagem, jardim)
+- Bus KNX LSZH 2×2×0.8mm — topologia estrela a partir do quadro técnico cave
+- Speaker OFC 2×2.5mm para posições teto: sala (4 pontos), suite 1 (2), suite 2 (2), exterior (2)
+- Conduit ∅20mm a cada motor de estore com pull-wire instalado (motor decidido fase 2)
+- HDMI 2.1 + fibra OM3 entre sala e armário AV (distância ~8m)
+- Conduit ∅32mm para eletroválvulas irrigação jardim (6 zonas, central a norte)
+- Circuito 32A trifásico garagem para carregador EV (Schneider EVlink Pro AC 22kW)
+
+**Rede:**
+- Ubiquiti UniFi Switch Pro 24 PoE (400W) no rack cave
+- VLAN 10 (IoT isolada), VLAN 20 (câmeras), VLAN 30 (automação KNX/IP)
+- Access Points: UniFi U6-Pro × 3 (piso 0, piso 1, exterior) — ceiling mount, Cat6A PoE
+- Uplink mínimo 300Mbps (NOS Empresas recomendado)
+
+---
+
+## Automações Principais
+
+**Chegar a Casa** (trigger: geofence 500m OU reconhecimento matrícula câmara portão):
+Condição: modo Away ativo → portão abre, hall 70% 3000K, sala 40% 3000K, HVAC retoma conforto (21°C), alarme DSC Neo desarma, Sonos retoma playlist habitual a 25%.
+
+**Boa Noite** (trigger: botão hall "moon" OU 23h30 se presença sala):
+Luzes ALL OFF exceto corredor 8% 2200K (Schneider MTN630619) → estores suites fecham 100% blackout → Danfoss CF2+ recua 17°C pisos → DSC Neo arma perímetro. Fallback: botão físico KNX atua direto sem HA.
+
+**Proteção Solar** (trigger: radiação > 600W/m² sensor exterior E hora solar entre 10h-18h):
+Estores sala e suites descem para 40% (posição lâminas orientadas) → suspende se vento > 40km/h (anemómetro ELSNER P03/3-RS485).
+
+**Irrigação Inteligente** (trigger: diário 6h30):
+Condição: precipitação prevista < 3mm (API IPMA) AND humidade solo < 45% (sensor Xiaomi HHCCJCY10) → abre eletroválvulas Rain Bird por zona (6×8min), registo em HA Energy.
+
+---
+
+## Estimativa de Custo — Moradia Cuidai
+
+| Componente | Qtd | Preço Unit. | Total |
+|---|---|---|---|
+| KNX Schneider MTN actuadores (iluminação + estores) | 18 | €185 | €3.330 |
+| KNX Schneider MTN paineis tácteis | 5 | €420 | €2.100 |
+| Motores estore SOMFY RS100 io | 9 | €145 | €1.305 |
+| Sensores Zigbee Aqara (PIR, contactos, temp) | 28 | €35 | €980 |
+| Sonos Era 100/300 + Sub Mini | 6 | €280 avg | €1.680 |
+| NAS Synology DS923+ + 2×HDD 4TB | 1 | €680 | €680 |
+| UniFi Switch + APs + câmaras PoE G4 | 1 lot | €1.450 | €1.450 |
+| DSC Neo alarme (central + sensores) | 1 lot | €890 | €890 |
+| Rain Bird irrigação (central + 6 válvulas) | 1 lot | €380 | €380 |
+| Carregador EV Schneider 22kW | 1 | €650 | €650 |
+| **Material total** | | | **€13.445** |
+| Programação HA + KNX + comissionamento | | | €4.200 |
+| **TOTAL + IVA 23%** | | | **~€21.800** |
+
+*Exclui: quadro elétrico base, obra civil, pintura, instalação elétrica convencional.*
+*Tier Basic (só Zigbee + HA, sem KNX): ~€9.200 + IVA*
+```
+
+---
+
+## Output anti-patterns
+
+- **Protocolo sem justificação de projeto** — recomendar KNX sem referir m², nº dispositivos ou nova construção vs. retrofit
+- **Tabela de divisões com dados genéricos** — "Quarto 1 / Dim / Motorized / AC" sem nomes de cenas, marcas ou especificações técnicas
+- **Pré-instalação sem especificação de cabo** — "passar rede e KNX" sem secção, norma ou topologia
+- **Automações só nomeadas** — listar "Modo Férias" sem trigger → condição → ação → fallback
+- **Custo em banda larga vaga** — "€15k–€40k dependendo do projeto" sem itemização de componentes principais
+- **Angle-brackets no output final** — `<localidade>`, `<protocolo escolhido>`, `[INSERIR MARCA]` chegam ao cliente
+- **Fallback de falha de controlador omitido** — especificação que não responde "o que acontece se o Home Assistant reiniciar?"
+- **IVA e exclusões não declarados** — cliente interpreta custo de material como preço final chave-na-mão
+- **Marcas placeholder** — "actuador KNX de uma marca reconhecida" em vez de Schneider MTN / ABB i-bus / Gira
+- **Cablagem de áudio/AV esquecida** — especificação que planeia multi-room audio sem speaker cable nas paredes
