@@ -201,13 +201,143 @@ For <target> who <insight>, <brand> is the <category> that <key benefit> because
 ## Save location
 `05 - Claude - IA/Outputs/YYYY-MM-DD - <Client> - Brand Strategy.md`
 
-## Red flags / anti-patterns
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+A brand strategy output is **delivery-ready (90+/100)** only if ALL of these are true. If any is missing, mark as draft and complete before delivery.
+
+### 1. Archetype JUSTIFICATION (not just naming)
+- [ ] Archetype name (one of the 12)
+- [ ] **3+ sentence rationale** citing: (a) founder's actual values, (b) customer's emotional driver, (c) why NOT the closest alternative archetype
+- [ ] Optional secondary archetype with the same rationale depth
+
+❌ NOT delivery-ready: "Archetype: Sage" (no rationale)
+✅ Delivery-ready: "Archetype: Sage. Founder's 12 years in BdP supervision means truth-telling is more than positioning — it's identity. Customer (PME CFO) optimises for confidence in numbers, not features. Sage chosen over Caregiver because the client is sold to as a thinking partner, not a protective parent."
+
+### 2. Differentiators MUST be 3-5 CONCRETE items (not generic)
+- [ ] Each differentiator names a SPECIFIC mechanism, integration, certification, or contractual term
+- [ ] Each differentiator passes the "competitor claim test": no direct competitor offers exactly this
+- [ ] At least one differentiator has a number or measurable bound
+
+❌ NOT delivery-ready: "Quality, innovation, customer focus"
+✅ Delivery-ready:
+  - "Native SAFT-PT validation in real-time, not at month-end close (Moloni does month-end)"
+  - "Banco de Portugal SIBS/IBAN integration validated by the BdP API directly (SAGE uses screen-scrape)"
+  - "30-day deploy SLA with €5K refund if missed (industry standard is 90 days, no penalty)"
+
+### 3. Onlyness statement passes the unique-mechanism test
+- [ ] Each <slot> in the template is unique to this brand vs ALL named competitors
+- [ ] The "because <why>" maps to a founder belief or proven track record, not aspiration
+
+### 4. Positioning statement is SPECIFIC, not template-filled
+- [ ] <target> names a precise sub-segment (not "everyone in PT")
+- [ ] <insight> is something the target would actually agree with if asked
+- [ ] <reason to believe> is verifiable (numbers, customers, integrations, certifications)
+
+### 5. Voice guide has "Is / Is Not" populated
+- [ ] At least 4 voice attributes
+- [ ] At least 5 "is / is not" pairs
+
+### 6. Output uses CLIENT NAME + REAL data throughout
+- [ ] Client name appears in every section title
+- [ ] No placeholder phrases like "<target>", "<brand>", or unfilled angle brackets
+- [ ] All examples reference the client's actual product, market, or stage
+
+## Red flags / anti-patterns (mirror of self-check, for fast spotting)
 - Archetype chosen because "it's cool" vs genuinely fitting
 - Positioning that says "quality and innovation" (zero differentiation)
 - "Unique" claims that competitors also claim
 - Customer as Hero is violated (brand plays Hero instead of Guide)
 - Voice guide without "is not" examples (leaves ambiguity)
 - Brand decision taken without founder values input
+- Generic differentiator without a specific mechanism, integration, or measurable bound
+- Output contains placeholder angle-brackets (<target>, <brand>) instead of real names
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+This is what a 92+/100 dario-brand output looks like. Use as anchor for self-check.
+
+```markdown
+---
+project: LUSOconta
+date: 2026-05-23
+type: brand-strategy
+archetype: Sage
+---
+
+# Brand Strategy — LUSOconta
+
+## Context & Scope
+- Business: SaaS de contabilidade para PMEs portuguesas, integração nativa
+  com Banco de Portugal + SAFT-PT real-time.
+- Target: CFOs e contabilistas sénior de empresas 50-250 colaboradores em PT.
+- Competitors: Moloni, SAGE Negócios, Primavera SOL.
+- Ambition: Padrão de mercado para PMEs PT em 36 meses.
+
+## Archetype
+**Primary:** Sage
+
+**Rationale:**
+O founder passou 12 anos na supervisão prudencial do Banco de Portugal —
+truth-telling sobre contabilidade não é positioning, é identidade. O
+target (CFO de PME) optimiza decisão por *confiança nos números*, não
+por features bonitas. Sage escolhido em vez de Caregiver porque LUSOconta
+vende-se como *thinking partner do CFO*, não como pai protector. E em
+vez de Magician porque o produto promete clareza, não transformação.
+
+## Onlyness Statement
+LUSOconta é a única plataforma de contabilidade que valida SAFT-PT
+em tempo real através da API direta do Banco de Portugal para CFOs e
+contabilistas de PMEs 50-250 colaboradores em Portugal que tratam
+compliance como vantagem competitiva, porque o founder construiu a
+ferramenta que ele próprio queria ter tido enquanto supervisor do BdP.
+
+## Differentiators (5 concrete, defensible)
+1. **Native SAFT-PT validation in real-time** — não no fecho do mês,
+   continuous (Moloni e SAGE só validam no fecho mensal)
+2. **Banco de Portugal SIBS/IBAN via API directa** — validation oficial
+   (SAGE faz screen-scrape, Moloni manual entry)
+3. **30-day deploy SLA com €5K refund** se missed (mercado: 90 dias, zero
+   penalty)
+4. **Dashboard CFO real-time com 10 KPIs decisórios** (concorrência
+   foca em compliance, não em decisão)
+5. **Audit-proof guarantee** — se AT aplicar penalty por compliance que
+   devíamos detectar, devolvemos 12 meses + multa
+
+## Positioning Statement
+Para CFOs e contabilistas de PMEs 50-250 em PT que vêem compliance
+como vantagem competitiva e não burocracia, LUSOconta é a plataforma
+de contabilidade que valida SAFT-PT em tempo real porque o founder
+construiu-a a partir da experiência de 12 anos a supervisor o sistema
+no Banco de Portugal. Unlike Moloni e SAGE, fornecemos validação BdP
+directa em vez de screen-scraping e oferecemos audit-proof guarantee.
+
+## Voice attributes (4)
+1. Confiante mas humilde — afirma sem floreados, admite incertezas
+2. Técnico mas claro — usa termos correctos, explica quando necessário
+3. Profundo, não rápido — preferimos parágrafos certos a slogans
+4. Português europeu rigoroso — sem brasileirismos nem anglicismos
+
+### Is / Is Not
+| Is | Is Not |
+|---|---|
+| "A regra do CIVA artigo 36 é..." | "Tipo, IVA sabe?" |
+| "Validámos contra a base do BdP" | "Trust us, está certo" |
+| "Recomendamos hesitar antes de..." | "Vai, depois logo se vê" |
+| "Cá entre nós, este caso é raro" | "Hahaha cuidado!" |
+| "O nosso compromisso é compliance" | "Vamos ser inovadores!" |
+
+## Differentiation Test
+- [x] Specific (5 differentiators com mecanismos nomeados)
+- [x] True (cada um verificável + entregável)
+- [x] Valuable (CFO PME paga premium por estes)
+- [x] Defensible (Moloni/SAGE não pode copiar tudo)
+- [x] Memorable ("BdP direct" é hook que cola)
+
+## Next Steps
+- Visual identity brief — logo conservador + paleta deep-blue/gold/cream
+- Copy rollout — homepage, comparison page vs Moloni/SAGE, audit landing
+- Brand guidelines doc — voice cheatsheet + caveats em 1 página
+```
 
 ## Interactions
 - Pairs with `dario-sales-letter` (provides voice + positioning)
