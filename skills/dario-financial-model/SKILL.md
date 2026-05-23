@@ -212,3 +212,65 @@ Alertar SEMPRE que qualquer destas situações for detectada:
 | IVA em atraso | Qualquer declaração não entregue | URGENTE — multas + juros automáticos da AT |
 | Tributação autónoma crescente | TA > 5% do lucro | Rever política de despesas, documentação |
 | Freelancer > 50% do COGS | Sem equipa interna suficiente | Risco operacional — considerar contratação |
+
+## Delivery-ready self-check (run BEFORE delivering financial model ao cliente)
+
+Financial model é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### 1. Inputs CONCRETOS (não assumptions genéricas)
+- [ ] Capital inicial em € ou R$ com fonte (bootstrap/seed/grant)
+- [ ] Burn rate mensal com breakdown (salários + tools + infra + freelancers)
+- [ ] Revenue assumptions com unit economics (price × quantity × growth rate)
+- [ ] Tax rate efectivo PT/BR aplicado
+
+✅ Delivery-ready: "Capital seed R$ 100K. Burn M1-M3 R$ 18K/mo (founder €1.2K + dev junior R$ 5.5K + infra R$ 2.3K + advisory R$ 1.5K + reserva R$ 7.5K). Revenue: 5 design partners M1 → 50 paying M6. BE M11."
+
+### 2. 3 Cenários (base/best/worst) com SENSITIVITY analysis
+- [ ] Base case com probability subjetiva
+- [ ] Best case (1.5-2x growth base)
+- [ ] Worst case (50% growth + churn higher)
+- [ ] Sensitivity tabela ±20% nos 3 drivers principais
+
+### 3. P&L mensal mínimo 12 meses (ideal 36)
+- [ ] Revenue por linha de produto
+- [ ] COGS detalhado (não bucket único)
+- [ ] OpEx por categoria (sales/marketing/R&D/G&A)
+- [ ] EBITDA + Net margin per month
+- [ ] Cash flow ≠ P&L line
+- [ ] Acumulado cash position
+
+### 4. Break-even CONCRETO
+- [ ] Mês exacto (não "approx M6-M8")
+- [ ] Revenue level needed (R$ X/mo MRR)
+- [ ] Sensibilidade ±2 meses cenários
+- [ ] Cash bridge needed
+
+### 5. KPIs financeiros + benchmarks
+- [ ] LTV, CAC, LTV/CAC ratio per scenario
+- [ ] Payback period em meses
+- [ ] Gross margin + industry benchmark fonte
+- [ ] Net margin + benchmark
+- [ ] Revenue growth rate + benchmark
+- [ ] Cash runway months
+
+### 6. Client name + REAL data throughout
+- [ ] Currency consistent (€/R$/USD)
+- [ ] Date format YYYY-MM consistent
+- [ ] Sem placeholder angle-brackets <valor>/<projecto>
+
+## Fully-worked A-tier example
+
+Tributario.AI 36-month model: capital R$ 500K (110K bootstrap + 390K seed @ Q3 2026), burn ramp R$ 20K→R$ 111K, MRR 0→R$ 450K M24, BE M9, sensitivity preço é driver dominante (+20% → BE -2 meses), LTV R$ 540K + CAC R$ 12K = 45x ratio, gross margin 78%. Includes 3 scenarios with probability + monthly P&L 36-month + risks/mitigations table + recommendations sequenced.
+
+## Output anti-patterns
+
+- "Capital adequado" sem valor concreto
+- Burn rate sem breakdown por categoria
+- Revenue sem unit economics (price × quantity × growth)
+- 1 cenário só (sem best/worst)
+- Sensitivity vaga ("mais ou menos")
+- Break-even "M6-M8" sem número exato
+- KPIs sem industry benchmark + fonte
+- P&L sem cash flow (timing mismatch hidden)
+- Output sem frontmatter
+- Placeholder <valor>/<projecto> em vez de números reais
