@@ -250,3 +250,228 @@ If DataForSEO MCP tools are available, use `ai_optimization_chat_gpt_scraper` to
 | AI crawlers blocked by robots.txt | Report exactly which crawlers are blocked and which are allowed. Provide specific robots.txt directives to add for enabling AI search visibility. |
 | No llms.txt found | Note the absence and provide a ready-to-use llms.txt template based on the site's content structure. |
 | No structured data detected | Report the gap and provide specific schema recommendations (Article, Organization, Person) for improving AI discoverability. |
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — GEO Readiness Score é fundamentado, não estimado
+
+- [ ] Score XX/100 tem breakdown explícito por componente (Citability 25%, Structural 20%, Multi-Modal 15%, Authority 20%, Technical 20%)
+- [ ] Cada sub-score tem evidência específica da URL analisada (não "parece ter boa estrutura")
+- [ ] Pontuações não são todas redondas (49/100, não 50/100; 17/25, não 15/25)
+- [ ] Score final é acompanhado de benchmark de contexto ("acima da mediana para SaaS PT")
+
+❌ NOT delivery-ready: `GEO Score: 60/100 — o site tem boa estrutura mas pode melhorar a autoridade.`
+✅ Delivery-ready: `GEO Score: 63/100 — Citability: 14/25 (sem blocos self-contained <167 palavras), Structural: 16/20 (H1→H2 correto, sem FAQ), Multi-Modal: 7/15 (0 vídeos, 2 imagens sem alt-text), Authority: 14/20 (sem Wikipedia, Reddit: 0 menções), Technical: 12/20 (GPTBot bloqueado em robots.txt, sem llms.txt).`
+
+---
+
+### Gate 2 — Análise de robots.txt e AI crawlers é concreta
+
+- [ ] Lista exata dos crawlers permitidos/bloqueados encontrados no robots.txt real do cliente
+- [ ] GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot têm status explícito (Allow / Disallow / Ausente)
+- [ ] Impacto de cada bloqueio é quantificado em termos de plataforma afetada
+- [ ] Recomendação de acção é específica (linha exacta a adicionar/remover do robots.txt)
+
+❌ NOT delivery-ready: `O robots.txt pode estar a bloquear alguns crawlers de IA. Recomendamos verificar.`
+✅ Delivery-ready: `robots.txt de cuidai.pt (fetch 2026-02-14): GPTBot → Disallow (❌ bloqueia ChatGPT Search), PerplexityBot → ausente (não explicitamente permitido), ClaudeBot → Allow ✅. Acção: adicionar \`User-agent: GPTBot\nAllow: /\` — remove bloqueio a 900M utilizadores ChatGPT.`
+
+---
+
+### Gate 3 — Citability Score tem exemplos de passagens reais do site
+
+- [ ] Pelo menos 2 passagens reais extraídas do URL do cliente são avaliadas (com quote literal)
+- [ ] Comprimento de cada passagem é medido contra benchmark 134-167 palavras
+- [ ] Identificado se resposta directa aparece nos primeiros 40-60 palavras da secção
+- [ ] Pelo menos 1 passagem "forte" e 1 "fraca" exemplificadas com texto real
+
+❌ NOT delivery-ready: `O conteúdo não tem passagens citáveis claras. Recomendamos adicionar estatísticas e factos.`
+✅ Delivery-ready: `Passagem fraca (saquei.pt/como-funciona): "O SAQUEI é uma plataforma inovadora que ajuda os portugueses a gerir melhor o seu dinheiro." — 18 palavras, sem dados, sem padrão "X is...", citability: 2/10. Passagem forte (saquei.pt/taxas): "O SAQUEI cobra 2,9% por transação, sem mensalidade. Para saque de €1.000 o custo total é €29." — 22 palavras, dado concreto, self-contained, citability: 8/10.`
+
+---
+
+### Gate 4 — Platform breakdown é diferenciado (não genérico para todas as plataformas)
+
+- [ ] Google AIO, ChatGPT, Perplexity e Bing Copilot têm análise separada
+- [ ] Cada plataforma tem probabilidade de citação baseada em sinais reais encontrados no site
+- [ ] Presença em fontes-chave por plataforma é verificada (Wikipedia para ChatGPT 47.9%, Reddit para Perplexity 46.7%)
+- [ ] Quick wins são ordenados por plataforma com maior ROI potencial para o cliente primeiro
+
+❌ NOT delivery-ready: `O site tem potencial para aparecer em AI Overviews, ChatGPT e Perplexity com as melhorias recomendadas.`
+✅ Delivery-ready: `ChatGPT visibility: BAIXA — Tributario.AI ausente na Wikipedia PT (47.9% das citações ChatGPT vêm de lá), 0 menções Reddit r/financaspessoais. Perplexity visibility: MÉDIA — 3 menções Reddit identificadas, sem thread própria. Google AIO: ALTA — ranking #4 para "irc portugal 2025", dentro dos top-10 que geram 92% das citações AIO.`
+
+---
+
+### Gate 5 — llms.txt e RSL 1.0 têm diagnóstico accionável
+
+- [ ] Verificação real de `[domínio]/llms.txt` com resultado (200 OK / 404 / redirect)
+- [ ] Se existir, conteúdo actual é avaliado contra formato padrão (secções, links, descrições)
+- [ ] Se ausente, template mínimo funcional é gerado para o cliente (não descrito — escrito)
+- [ ] RSL 1.0 status verificado; implicação para treino de modelos é explicada em 1 frase
+
+❌ NOT delivery-ready: `Recomendamos criar um ficheiro llms.txt para melhorar a visibilidade em AI search.`
+✅ Delivery-ready: `lusoconta.pt/llms.txt → 404. Template gerado: \`# LUSOconta\n> Conta bancária portuguesa sem comissões para emigrantes.\n## Principais páginas\n- [Como abrir conta](https://lusoconta.pt/abrir-conta): Processo 100% digital, 3 passos.\n- [Taxas e comissões](https://lusoconta.pt/taxas): Tabela comparativa actualizada 2026.\`  RSL 1.0: ausente — sem declaração machine-readable de licença, modelos podem excluir conteúdo por incerteza legal.`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, zero placeholders entre angle-brackets
+
+- [ ] Nenhum `[client name]`, `[URL]`, `[inserir aqui]`, `<domain>` ou variante no output final
+- [ ] Data de análise é explícita (ex: "fetch realizado 2026-02-14")
+- [ ] Todas as métricas citadas (527% crescimento, correlação 0.737) são atribuídas à fonte original, não apresentadas como dados do cliente
+- [ ] Nome do produto/marca do cliente aparece em cada secção do relatório
+
+❌ NOT delivery-ready: `A análise de [CLIENT WEBSITE] mostra que [METRIC] precisa de melhorias.`
+✅ Delivery-ready: `Análise Atrium.pt — GEO-ANALYSIS.md gerado 2026-02-14. Score 71/100. Citability 19/25 · Structural 15/20 · Multi-Modal 9/15 · Authority 16/20 · Technical 12/20.`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# GEO-ANALYSIS.md — Cuidai.pt
+*Análise realizada: 2026-02-14 | Analista: DARIO seo-geo skill*
+
+---
+
+## GEO Readiness Score: 61/100
+
+| Componente         | Peso | Score   | Evidência                                              |
+|--------------------|------|---------|--------------------------------------------------------|
+| Citability         | 25%  | 13/25   | Sem blocos self-contained; maior secção: 312 palavras  |
+| Structural         | 20%  | 14/20   | H1→H2 correto; 0 FAQ sections; 0 tabelas comparativas  |
+| Multi-Modal        | 15%  | 9/15    | 14 imagens (8 sem alt-text); 0 vídeos; 0 calculadoras |
+| Authority          | 20%  | 13/20   | Sem Wikipedia; 2 menções Reddit; LinkedIn ativo        |
+| Technical          | 20%  | 12/20   | GPTBot bloqueado; llms.txt ausente; SSR confirmado     |
+
+**Benchmark:** Média sector healthtech PT = 58/100. Cuidai está ligeiramente acima.
+**Gap para top quartile:** +17 pontos (necessário: 78/100).
+
+---
+
+## Platform Breakdown
+
+### 🔵 Google AI Overviews — Probabilidade: MÉDIA (estimativa 35%)
+- Ranking #6 para "cuidados domiciliários Lisboa" → dentro dos top-10 (92% AIO citations)
+- Passagem mais citável encontrada: *"A Cuidai oferece cuidadores certificados em 48h, disponíveis 7 dias por semana em Lisboa e Porto."* (19 palavras — abaixo do óptimo 134-167, mas self-contained ✅)
+- Bloqueador principal: secções de serviços em parágrafos densos sem headers de pergunta
+
+### 🟠 ChatGPT Search — Probabilidade: BAIXA (estimativa 12%)
+- Wikipedia PT: **ausente** (ChatGPT cita Wikipedia em 47.9% dos casos)
+- Wikidata entity: **ausente**
+- GPTBot: **Disallow** em robots.txt → bloqueio directo a indexação ChatGPT
+- Acção prioritária: desbloquear GPTBot + criar stub Wikipedia "Cuidai (empresa)"
+
+### 🟣 Perplexity — Probabilidade: MÉDIA-BAIXA (estimativa 22%)
+- Reddit: 2 menções em r/portugal (thread "melhores cuidadores idosos LX 2024") ✅
+- Sem presença em r/saudeportugal ou r/envelhecimento
+- PerplexityBot: **ausente** em robots.txt (não bloqueado, mas não explicitamente permitido)
+- Acção: adicionar `User-agent: PerplexityBot\nAllow: /`
+
+### ⚪ Bing Copilot — Probabilidade: BAIXA (estimativa 18%)
+- IndexNow: **não implementado**
+- Bing Webmaster Tools: não verificado
+- Autoridade de domínio Bing: DR equivalente 31 (abaixo do threshold recomendado 45+)
+
+---
+
+## Diagnóstico Técnico
+
+### robots.txt (fetch 2026-02-14 — cuidai.pt/robots.txt)
+```
+User-agent: GPTBot
+Disallow: /          ← ❌ BLOQUEIA ChatGPT Search (900M utilizadores)
+
+User-agent: CCBot
+Disallow: /          ← ✅ Correto (bloqueia treino Common Crawl)
+
+# ClaudeBot, PerplexityBot, OAI-SearchBot — ausentes (zona cinzenta)
+```
+
+**Fix imediato** (adicionar ao robots.txt):
+```
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+```
+
+### llms.txt — 404 Not Found
+**Template gerado para implementação imediata:**
+```
+# Cuidai
+> Plataforma portuguesa de cuidadores domiciliários certificados para idosos e
+> pessoas com mobilidade reduzida. Operacional em Lisboa, Porto e Braga.
+
+## Serviços principais
+- [Cuidadores ao Domicílio](https://cuidai.pt/servicos): Disponibilidade 48h,
+  certificação SNS validada.
+- [Como funciona](https://cuidai.pt/como-funciona): Processo de 3 passos para
+  contratar cuidador.
+- [Preços e planos](https://cuidai.pt/precos): Tabela de preços por hora e
+  pacotes mensais 2026.
+
+## Factos-chave
+- Fundada em 2021, Lisboa
+- +1.200 cuidadores certificados na rede
+- Cobertura: Lisboa, Porto, Braga, Setúbal
+- Certificação: Segurança Social Portuguesa
+```
+
+### RSL 1.0 — Ausente
+Sem declaração machine-readable de licença. Risco: modelos conservadores podem
+omitir conteúdo Cuidai por incerteza legal. Recomendação: implementar RSL com
+termo `ai-training: disallow, ai-search: allow`.
+
+---
+
+## Top 5 Quick Wins (ordenados por impacto/esforço)
+
+| # | Acção | Impacto | Esforço | Plataforma |
+|---|-------|---------|---------|------------|
+| 1 | Desbloquear GPTBot no robots.txt | 🔴 Alto | 15 min | ChatGPT |
+| 2 | Criar llms.txt (template acima) | 🔴 Alto | 1h | Todas |
+| 3 | Reescrever 3 secções em blocos 134-167 palavras | 🟠 Médio | 3h | Google AIO |
+| 4 | Adicionar FAQ com 5 perguntas reais de utilizadores | 🟠 Médio | 2h | Google AIO + Perplexity |
+| 5 | Criar stub Wikipedia PT "Cuidai" | 🟡 Médio | 4h | ChatGPT |
+
+---
+
+## Passagens — Antes/Depois
+
+**Passagem actual (fraca):**
+> "A Cuidai é uma empresa inovadora no sector dos cuidados. Trabalhamos com
+> profissionais de saúde para oferecer os melhores serviços."
+*Citability: 2/10 — vago, sem dados, não self-contained.*
+
+**Passagem reescrita (forte):**
+> "A Cuidai disponibiliza cuidadores domiciliários certificados em até 48 horas
+> em Lisboa, Porto e Braga. Todos os cuidadores passam por verificação de
+> antecedentes e formação validada pela Segurança Social Portuguesa. O custo
+> médio é €12-18/hora, sem taxas de subscrição."
+*Citability: 9/10 — 47 palavras, resposta directa, dados concretos, self-contained.*
+```
+
+---
+
+## Output anti-patterns
+
+- Score arredondado suspeito: "60/100" ou "80/100" sem breakdown granular por componente
+- Recomendação de llms.txt sem gerar o ficheiro real para o cliente (descrever ≠ entregar)
+- Analisar robots.txt "em teoria" sem fazer fetch real ao URL do cliente
+- Citar estatísticas do SKILL (527% crescimento, correlação 0.737) como se fossem métricas do site do cliente
+- Platform breakdown idêntico para todas as plataformas ("recomendamos melhorar conteúdo para AIO, ChatGPT e Perplexity")
+- Passagens de exemplo inventadas em vez de extraídas do URL real analisado
+- Ausência de benchmark comparativo (score sem contexto de sector/concorrência é ruído)
+- Quick wins sem estimativa de esforço — cliente não consegue priorizar
+- Output com `[domain]`, `<client name>`, `[inserir URL]` ou qualquer placeholder não substituído

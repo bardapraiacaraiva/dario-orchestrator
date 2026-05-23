@@ -198,3 +198,152 @@ Key rules:
 | URL unreachable (DNS failure, connection refused) | Report the error clearly. Do not guess site structure. Suggest the user verify the URL and try again. |
 | No hreflang tags found | Report the absence. Check for other internationalization signals (subdirectories, subdomains, ccTLDs) and recommend the appropriate hreflang implementation method. |
 | Invalid language/region codes detected | List each invalid code with the correct replacement. Provide a corrected hreflang tag set ready to implement. |
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Códigos de língua e região são ISO-válidos
+- [ ] Todos os `hreflang` usam ISO 639-1 (2 letras: `en`, `fr`, `pt`) — nunca `eng`, `jp`, `por`
+- [ ] Qualificadores de região usam ISO 3166-1 Alpha-2 em maiúsculas: `pt-BR`, `en-GB`, `zh-Hant` — nunca `en-uk`, `es-LA`
+- [ ] `zh` sempre qualificado (`zh-Hans` ou `zh-Hant`) — nunca nu
+- ❌ NOT delivery-ready: `hreflang="pt"` numa página que serve exclusivamente o mercado brasileiro
+- ✅ Delivery-ready: `hreflang="pt-BR"` em `https://luso conta.com.br/conta-digital` + `hreflang="pt-PT"` em `https://lusoconta.pt/conta-digital`
+
+### Gate 2 — Self-referencing tag presente em cada página
+- [ ] Cada URL do set inclui um `<link rel="alternate" hreflang="xx-XX" href="[própria URL]" />`
+- [ ] A URL da self-reference corresponde **exactamente** ao canonical (trailing slash, protocolo, subdomínio)
+- [ ] Verificado em pelo menos 3 páginas distintas do site (homepage, produto, blog)
+- ❌ NOT delivery-ready: página `https://cuidai.pt/servicos` sem tag apontando para si mesma
+- ✅ Delivery-ready: `<link rel="alternate" hreflang="pt-PT" href="https://cuidai.pt/servicos" />` presente no `<head>` de `https://cuidai.pt/servicos`
+
+### Gate 3 — Return tags formam malha completa (full mesh)
+- [ ] Para cada par A↔B, a tag existe em A apontando para B **e** em B apontando para A
+- [ ] `x-default` tem return tags de **todas** as variantes de língua/região
+- [ ] Número de tags em cada página = número total de variantes (incluindo x-default)
+- ❌ NOT delivery-ready: `saquei.pt` tem tag para `saquei.com/en` mas `saquei.com/en` não referencia `saquei.pt`
+- ✅ Delivery-ready: 4 variantes (`pt-PT`, `pt-BR`, `en`, `x-default`) → cada página tem exactamente 4 tags, auditadas em todas as URLs do set
+
+### Gate 4 — Alinhamento com canonical e protocolo único
+- [ ] Nenhuma página com `rel=canonical` apontando para outro URL tem tags hreflang
+- [ ] Todas as URLs do set usam HTTPS — zero mixed HTTP/HTTPS
+- [ ] Trailing slash consistente em todo o set (ou sempre com `/` ou nunca)
+- ❌ NOT delivery-ready: `http://atrium.pt/en/` no hreflang enquanto canonical é `https://atrium.pt/en`
+- ✅ Delivery-ready: todos os 6 URLs do set de `atrium.pt` usam `https://` sem trailing slash, verificado por inspecção de source e headers
+
+### Gate 5 — Método de implementação justificado e correcto
+- [ ] Método escolhido (HTML / HTTP header / XML sitemap) está documentado com justificação
+- [ ] Para sites >50 variantes ou cross-domain: XML sitemap obrigatório, com `<xhtml:link>` correcto
+- [ ] Não existe duplicação entre métodos (HTML tags **e** sitemap simultaneamente) sem aviso explícito
+- ❌ NOT delivery-ready: site com 3 domínios TLD (`tributario.ai`, `.pt`, `.br`) implementado só via HTML tags sem justificação
+- ✅ Delivery-ready: "Recomendado XML sitemap — site cross-domain (3 TLDs) com 120+ páginas; HTML tags removidas do `<head>` para evitar conflito"
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+- [ ] Zero instâncias de `<url>`, `<language>`, `<site>`, `[INSERT]`, `example.com` no output final
+- [ ] URLs são os reais do cliente (verificados por WebFetch ou fornecidos pelo utilizador)
+- [ ] Códigos de língua são os reais das páginas existentes, não genéricos de template
+- ❌ NOT delivery-ready: `<link rel="alternate" hreflang="<language>" href="<your-url>" />`
+- ✅ Delivery-ready: `<link rel="alternate" hreflang="pt-PT" href="https://lusoconta.pt/abrir-conta" />`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## Auditoria Hreflang — LUSOconta (lusoconta.pt + lusoconta.com.br)
+
+**Data:** 2025-06-10  
+**Páginas auditadas:** Homepage, /abrir-conta, /tarifario, /contactos  
+**Método actual:** HTML link tags  
+**Erros encontrados:** 3 críticos, 1 médio
+
+---
+
+### Erros Críticos Detectados
+
+#### 1. Missing return tags — `lusoconta.com.br` não referencia `lusoconta.pt`
+`lusoconta.pt/abrir-conta` tem:
+```html
+<link rel="alternate" hreflang="pt-PT" href="https://lusoconta.pt/abrir-conta" />
+<link rel="alternate" hreflang="pt-BR" href="https://lusoconta.com.br/abrir-conta" />
+<link rel="alternate" hreflang="x-default" href="https://lusoconta.pt/abrir-conta" />
+```
+`lusoconta.com.br/abrir-conta` tem apenas:
+```html
+<link rel="alternate" hreflang="pt-BR" href="https://lusoconta.com.br/abrir-conta" />
+```
+**Fix:** Adicionar em `lusoconta.com.br/abrir-conta`:
+```html
+<link rel="alternate" hreflang="pt-PT" href="https://lusoconta.pt/abrir-conta" />
+<link rel="alternate" hreflang="pt-BR" href="https://lusoconta.com.br/abrir-conta" />
+<link rel="alternate" hreflang="x-default" href="https://lusoconta.pt/abrir-conta" />
+```
+
+#### 2. Missing self-referencing tag — `/tarifario` (pt-BR)
+`lusoconta.com.br/tarifario` não inclui tag apontando para si mesma.  
+Google ignora o set completo desta página.
+
+#### 3. Código inválido — `hreflang="pt"` em vez de `hreflang="pt-BR"`
+Encontrado em `lusoconta.com.br/contactos`. Código `pt` sem qualificador
+é ambíguo entre mercado PT e BR.
+
+---
+
+### Erro Médio
+
+#### 4. Trailing slash inconsistente
+- `lusoconta.pt/abrir-conta` (sem slash) referencia `lusoconta.com.br/abrir-conta/` (com slash)
+- Canonical de `.com.br` é sem slash → mismatch
+
+---
+
+### Implementação Corrigida — Página `/abrir-conta`
+
+**Em `lusoconta.pt/abrir-conta`** (sem alterações estruturais, já correcto):
+```html
+<link rel="alternate" hreflang="pt-PT" href="https://lusoconta.pt/abrir-conta" />
+<link rel="alternate" hreflang="pt-BR" href="https://lusoconta.com.br/abrir-conta" />
+<link rel="alternate" hreflang="x-default" href="https://lusoconta.pt/abrir-conta" />
+```
+
+**Em `lusoconta.com.br/abrir-conta`** (corrigido):
+```html
+<link rel="alternate" hreflang="pt-PT" href="https://lusoconta.pt/abrir-conta" />
+<link rel="alternate" hreflang="pt-BR" href="https://lusoconta.com.br/abrir-conta" />
+<link rel="alternate" hreflang="x-default" href="https://lusoconta.pt/abrir-conta" />
+```
+
+---
+
+### Recomendação de Método
+
+Site cross-domain (2 TLDs: `.pt` + `.com.br`) com 40 páginas actuais.  
+**Manter HTML tags** é viável agora. Se o site crescer para >80 páginas,  
+migrar para **XML sitemap centralizado** em `lusoconta.pt/sitemap-hreflang.xml`.
+
+---
+
+### Checklist de Validação Pós-Fix
+
+- [x] ISO 639-1 + ISO 3166-1 válidos (`pt-PT`, `pt-BR`)
+- [x] Self-referencing em todas as 8 URLs auditadas
+- [x] Full mesh: 3 tags por página em ambos os domínios
+- [x] x-default aponta para `lusoconta.pt` (versão PT como fallback)
+- [x] 100% HTTPS, zero trailing slash mismatch
+- [x] Zero placeholders — todos os URLs verificados via WebFetch em 2025-06-10
+```
+
+---
+
+## Output anti-patterns
+
+- Usar `example.com`, `<your-url>` ou `[INSERT LANGUAGE]` no output final entregue ao cliente
+- Listar erros sem indicar severidade (Critical / High / Medium) — o cliente não sabe por onde começar
+- Gerar tags para apenas uma página sem verificar return tags nas páginas alternativas
+- Recomendar XML sitemap para site de 3 páginas, ou HTML tags para site cross-domain com 200 variantes
+- Validar códigos de língua apenas visualmente sem cruzar com ISO 639-1 (e.g., aceitar `jp`, `eng`, `zh` sem aviso)
+- Omitir x-default com a justificação "o cliente decide depois" — é required na entrega
+- Apresentar hreflang correcto sem verificar alinhamento com `rel=canonical` existente
+- Misturar HTTP e HTTPS nas URLs geradas sem assinalar o erro
+- Entregar implementação sem especificar se deve ir no `<head>`, HTTP headers, ou sitemap
+- Auditar só a homepage e assumir que o resto do site está correcto

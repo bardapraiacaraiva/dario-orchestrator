@@ -246,3 +246,167 @@ Generate a humanized 2D floor plan as SVG/HTML:
 - After material ID: `/diva-materials` for specification
 - After construction check: `/diva-inspection` + `/diva-planradar`
 - For render from plan: `/diva-render` with Midjourney prompts
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Modo correcto activado e declarado
+
+- [ ] Output abre identificando explicitamente qual dos 7 modos foi activado (ex: "**Mode 4: Construction Progress**")
+- [ ] Trigger da activação está alinhado com o input do utilizador (foto de obra ≠ Mode 1)
+- [ ] Se imagem é ambígua, modo escolhido está justificado com evidências visuais concretas
+- [ ] Não activaste Mode 7 (geração SVG) quando utilizador pediu apenas diagnóstico
+
+❌ NOT delivery-ready: "Analisei a imagem e vejo um espaço com potencial..."
+✅ Delivery-ready: "**Mode 1 — Space Analysis** activado. Foto mostra sala de estar ~25m², pé-direito estimado 2.70m, pavimento vinílico em estado razoável, patologia de humidade visível no canto NE."
+
+---
+
+### Gate 2 — Dimensões estimadas com referência visual explícita
+
+- [ ] Toda estimativa dimensional cita o elemento de referência usado (porta, bancada, sanita, cama)
+- [ ] Dimensões estão em metros com uma casa decimal (ex: 3.8m × 5.2m, não "uns 4 metros")
+- [ ] Área total calculada está presente quando aplicável (L × C = XX m²)
+- [ ] Incerteza alta está sinalizada com "±" ou nota "estimativa visual — confirmar com medição"
+
+❌ NOT delivery-ready: "A sala parece ter uns 20 metros quadrados..."
+✅ Delivery-ready: "Largura estimada 3.8m (referência: porta standard 0.90m visível à direita × escala proporcional). Comprimento 6.0m. Área estimada: **22.8m²** ±15% — confirmar com fita."
+
+---
+
+### Gate 3 — Patologias e issues com localização na imagem
+
+- [ ] Cada patologia identificada tem localização precisa (canto SE, parede Norte, tecto junto à janela)
+- [ ] Severidade classificada: Crítico / Moderado / Estético
+- [ ] Causa provável indicada (infiltração, condensação, assentamento, uso)
+- [ ] Action item sugerido por cada issue (ticket PlanRadar se obra, intervenção se espaço)
+
+❌ NOT delivery-ready: "Existem algumas manchas de humidade nas paredes."
+✅ Delivery-ready: "**Patologia 1 — Humidade** [Canto NE, parede exterior, ~0.8m × 0.6m] Severidade: **Moderado**. Causa provável: ponte térmica ou infiltração pela caixilharia. Acção: inspeção impermeabilização exterior antes de acabamentos. → Ticket PlanRadar sugerido: 'Humidade canto NE — verificar antes de estuque.'"
+
+---
+
+### Gate 4 — Entregáveis do modo completos e sem omissões
+
+- [ ] Todos os bullets da secção "Deliver" do modo activado estão presentes no output
+- [ ] Se Mode 7 foi activado: ficheiro HTML/SVG gerado (não apenas descrito)
+- [ ] Se Mode 5 (materiais): pelo menos 2 fornecedores PT com preço por m² ou unidade
+- [ ] Se Mode 3 (planta): tabela areas vs RGEU presente com ✅/❌ por divisão
+
+❌ NOT delivery-ready: "Aqui estão algumas sugestões de design para o espaço..."
+✅ Delivery-ready: "**Tabela RGEU — Apartamento Rua do Ouro 47, Lisboa:** | Divisão | Área est. | RGEU mínimo | Status | | Quarto 1 | 11.2m² | 10.5m² | ✅ | | WC | 3.1m² | 3.5m² | ❌ |"
+
+---
+
+### Gate 5 — Potencial de design com 3 direcções distintas e orçamento
+
+- [ ] 3 direcções de intervenção nomeadas com conceito claro (não "moderna", "clássica", "minimalista" genérico)
+- [ ] Cada direcção tem estimativa orçamental em €/m² ou total (economico / recomendado / premium)
+- [ ] Squad member recomendado está nomeado (arquiteto/designer específico se disponível)
+- [ ] Quick wins separados de intervenção estrutural (o que resolve em <1 semana vs obra)
+
+❌ NOT delivery-ready: "O espaço tem potencial para uma remodelação moderna ou clássica, dependendo do gosto."
+✅ Delivery-ready: "**Direcção A — Loft Industrial** (demolir tecto falso, expor laje, pavimento microcimento) ~€18.000–22.000 total. **Direcção B — Escandinavo Quente** (manter estrutura, madeira clara, iluminação embutida) ~€9.000–12.000. **Direcção C — Quick Win Sem Obra** (pintura, iluminação, mobiliário) ~€2.500–4.000. Squad recomendado: **Sofia Andrade** (interiores residencial mid-range)."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+
+- [ ] Nenhum `[PROJECTO]`, `[CLIENTE]`, `[ENDEREÇO]`, `[DATA]` visível no output final
+- [ ] Nome do projecto ou morada usada no título do plano/análise
+- [ ] Se SVG/HTML gerado: `<title>` e cabeçalho têm nome real
+- [ ] Datas de obra (se Mode 4) são datas reais ou "data não fornecida — inserir"
+
+❌ NOT delivery-ready: "Planta — [Projecto] | Cliente: [Nome do Cliente]"
+✅ Delivery-ready: "Planta — Apartamento T3, Rua Castilho 112, 3º Esq., Lisboa | Análise: 14 Jun 2025"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## 🔍 DIVA Vision — Mode 1: Space Analysis
+**Foto recebida:** Cozinha Cuidai HQ, Rua Filipe Folque 12, Lisboa — 12 Jun 2025
+
+---
+
+### Identificação do Espaço
+- **Tipo:** Cozinha de apoio / copa (uso escritório)
+- **Dimensões estimadas:** 2.8m × 3.6m = **10.1m²** ±12%
+  - Referência: frigorífico standard 0.60m profundidade × escala proporcional
+- **Pé-direito estimado:** 2.50m (proporção janela/parede)
+- **Orientação luz natural:** Janela Oeste (~0.90m × 1.10m) — luz de tarde, sem luz matinal direta
+
+---
+
+### Estado e Materiais
+
+| Elemento | Material identificado | Estado |
+|---|---|---|
+| Pavimento | Vinílico em régua, imitação madeira clara | Razoável — 2 juntas abertas junto ao rodapé |
+| Paredes | Tinta lavável branco fosco | Mau — marcas de gordura zona fogão, descascamento junto ao tecto |
+| Tecto | Tecto falso gesso cartonado | Bom |
+| Bancada | Estratificado bege | Razoável — canto junto ao lava-loiça com início de inchamento |
+| Frentes | MDF lacado branco mate | Razoável — 1 dobradiça partida (porta inferior direita) |
+
+---
+
+### Patologias Identificadas
+
+**P1 — Inchamento bancada [canto NE, junto ao lava-loiça]**
+Severidade: **Moderado** | Causa: infiltração água por vedante degradado
+Acção imediata: substituir vedante silicone perimetral lava-loiça (DIY, <€15, 2h)
+
+**P2 — Descascamento tinta [parede Norte, zona superior, ~40cm faixa]**
+Severidade: **Estético** | Causa provável: condensação vapor sem extracção adequada
+Acção: instalar extractor (ausente na foto) + repintura zona após limpeza fungicida
+
+**P3 — Dobradiça partida [frente inferior direita]**
+Severidade: **Estético** | Acção: substituição dobradiça Blum €4 — peça idêntica visível nas outras portas
+
+---
+
+### Potencial de Design — 3 Direcções
+
+**Direcção A — Renovação Express (sem obra)**
+Frentes lacadas cinza antracite, puxadores barra latão, bancada laminam pedra, iluminação LED fita sob armários
+Estimativa: **€2.800–3.500** | Prazo: 5 dias úteis
+Squad: João Ferreira (marceneiro parceiro, disponível Julho)
+
+**Direcção B — Remodelação Intermédia**
+Nova bancada Dekton Sirius 2cm, lava-loiça undermount, frentes PVC hidrofugado, azulejo metro branco brilhante, extractor encastrado
+Estimativa: **€7.500–9.000** | Prazo: 3 semanas
+Squad: Sofia Andrade (projecto) + Obra Cuidai parceiro
+
+**Direcção C — Substituição Total**
+Layout optimizado (bancada em L), electrodomésticos Bosch Serie 4 encastrados, pavimento microcimento contínuo, iluminação Flos
+Estimativa: **€18.000–22.000** | Prazo: 6–8 semanas
+
+---
+
+### Quick Wins (esta semana, sem obra)
+1. ✅ Substituir vedante lava-loiça — €15, evita dano progressivo bancada
+2. ✅ Reparar dobradiça — €4 + 20min
+3. ✅ Instalar extractor portátil provisório — €45 Leroy Merlin, elimina condensação imediata
+4. ✅ Limpeza gordura parede com Mr. Muscle cozinha — repintura local com tinta restante
+
+---
+
+*Análise DIVA Vision — Cuidai | 12 Jun 2025 | Foto: Copa RFF12 | Confiança estimativas: Média (foto única, sem medições)*
+```
+
+---
+
+## Output anti-patterns
+
+- Activar Mode 7 (gerar SVG) e entregar apenas descrição textual da planta — "ficaria assim: sala à esquerda, quarto à direita..."
+- Dimensões sem referência visual — "a sala tem aproximadamente 20m²" sem citar o elemento de escala usado
+- Patologias sem localização — "há humidade" sem indicar parede, canto, área afectada ou severidade
+- Materiais identificados sem fornecedor PT nem preço — identificação académica sem utilidade comercial
+- 3 direcções de design com nomes genéricos e sem orçamento — "moderno", "clássico", "rústico" como entregável
+- Planta gerada com `[PROJECTO]` ou `[CLIENTE]` não substituídos no título HTML/SVG
+- Mode 4 (obra) sem verificação safety e sem sugestão de ticket PlanRadar quando issue encontrado
+- Incerteza dimensional mascarada como precisão — dar "3.80m × 5.20m" sem ±% quando é estimativa visual de foto
+- Análise sem squad member recomendado — diagnóstico sem próximo passo humano atribuído
+- Before/after comparison sem categorização das mudanças — comentário impressionista em vez de tabela estruturada por categoria

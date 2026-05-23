@@ -853,3 +853,156 @@ dario-brand:
   last_execution: "2026-04-27T14:00:15Z"
 """
 ```
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — State Machine avaliada e resultado refletido na execução
+- [ ] `state_machine.py --evaluate --json` foi chamado como **primeira ação** do pulse
+- [ ] `max_parallel` foi lido do JSON retornado (não hardcoded)
+- [ ] Se state = `GUARDIAN`, autopilot parou imediatamente e notificou o utilizador
+- [ ] Se state machine falhou, degraded mode `ACTIVE / max_parallel=2` foi aplicado e logado
+
+❌ NOT delivery-ready: "Executei 3 tasks em paralelo" — sem evidência do state check, estado pode ser REFLECTIVE_PAUSE  
+✅ Delivery-ready: `STATE: ACTIVE | autonomy_level=P-A2 | max_parallel=3 | system_health=0.95 — proceeding with full wave`
+
+---
+
+### Gate 2 — SCAN completo com contagem real de tasks
+- [ ] Leu todos os `.yaml` em `~/.claude/orchestrator/tasks/active/`
+- [ ] Reportou totais por status: backlog / todo / in_progress / in_review / done / blocked
+- [ ] Identificou tarefas com `depends_on` ainda não resolvidas
+- [ ] Output inclui linha de scan com números concretos
+
+❌ NOT delivery-ready: "Há algumas tasks pendentes no sistema"  
+✅ Delivery-ready: `SCAN: 9 tasks total | 4 done | 1 in_progress | 3 todo | 0 backlog | 1 blocked (CUIDAI-007: awaits CUIDAI-004)`
+
+---
+
+### Gate 3 — Budget verificado com percentagem real e limite respeitado
+- [ ] Leu `~/.claude/orchestrator/budgets/YYYY-MM.yaml` (mês corrente)
+- [ ] Percentagem calculada e comparada aos thresholds 80% / 95%
+- [ ] Se ≥95%: HARD STOP executado, zero tasks lançadas
+- [ ] Se ≥80%: `max_parallel` reduzido para 1 e warning logado com percentagem
+
+❌ NOT delivery-ready: "Budget OK" — sem percentagem, sem mês, sem fonte  
+✅ Delivery-ready: `BUDGET: 2025-07 | 67.3% used ($134.60/$200.00) — normal operation, max_parallel=3`
+
+---
+
+### Gate 4 — Dispatch Engine chamado e resultado reportado
+- [ ] `dispatch_engine.py --json` invocado (ou fallback inline documentado se falhou)
+- [ ] JSON de output inclui `dispatched`, `queued`, `total_analyzed`
+- [ ] Tarefas com `reason: NO_WORKER` foram logadas com aviso de assignment manual
+- [ ] Assignee + dispatch_reason escritos nos YAMLs das tasks dispatched
+
+❌ NOT delivery-ready: "Atribuí as tasks aos workers disponíveis" — sem prova do engine, sem task IDs  
+✅ Delivery-ready: `DISPATCH: 2 dispatched | 1 queued (NO_WORKER: custom-skill) | CUIDAI-005→worker-brand (AVAILABLE), CUIDAI-006→worker-copy (SIBLING_FALLBACK)`
+
+---
+
+### Gate 5 — Wave executada via Agent tool com prioridade e estado corretos
+- [ ] Wave limitada a `max_parallel` tasks (não mais)
+- [ ] Ordenação por prioridade aplicada: critical > high > medium > low
+- [ ] Cada task teve `status=in_progress` + `checked_out_at` escritos antes de lançar Agent
+- [ ] Adapter correto usado (`diva-v1-design-architect` para division=diva, `dario-v2-digital-ceo` default)
+
+❌ NOT delivery-ready: Lançou 4 tasks quando max_parallel=3, ou não registou `checked_out_at`  
+✅ Delivery-ready: `WAVE: CUIDAI-002 [critical/dario], CUIDAI-005 [high/dario], CUIDAI-008 [high/diva] — checked_out 2025-07-14T09:42:11Z`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets
+- [ ] Nenhum placeholder `<CLIENT>`, `<TASK_ID>`, `<WORKER>`, `<DATE>` no output
+- [ ] Project prefix real no ID das tasks (ex: `CUIDAI-`, `SAQU-`, `ATRI-`, não `PROJ-`)
+- [ ] Budget com mês/ano real e valores monetários reais
+- [ ] Log lines com timestamps ISO reais, não `{timestamp}`
+
+❌ NOT delivery-ready: `BUDGET: {percentage}% — {status}` ou `Task PROJ-001 assigned to {worker}`  
+✅ Delivery-ready: `BUDGET: 2025-07 | 67.3% | SAQU-003→worker-legal (AVAILABLE) | wave launched 2025-07-14T09:42Z`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## LUCAS Autopilot — Pulse #7 | 2025-07-14T09:42:03Z
+
+### STATE CHECK
+python state_machine.py --evaluate --json
+→ { "state": "ACTIVE", "autonomy_level": "P-A2", "max_parallel": 3, "system_health": 0.91 }
+Proceeding with full autonomous wave.
+
+### SCAN
+Directory: ~/.claude/orchestrator/tasks/active/ (Cuidai)
+SCAN: 11 tasks total | 5 done | 1 in_progress | 4 todo | 0 backlog | 1 blocked
+
+  done:       CUIDAI-001, CUIDAI-002, CUIDAI-003, CUIDAI-004, CUIDAI-006
+  in_progress: CUIDAI-005 (worker-brand, checked_out 09:15Z)
+  todo:       CUIDAI-007, CUIDAI-008, CUIDAI-009, CUIDAI-010
+  blocked:    CUIDAI-011 (awaits CUIDAI-009, CUIDAI-010)
+
+### BUDGET
+File: ~/.claude/orchestrator/budgets/2025-07.yaml
+Spent: $142.80 / $200.00 — 71.4%
+Status: NORMAL — max_parallel=3 (no throttle applied)
+
+### UNBLOCK CASCADE
+CUIDAI-007 depends_on: [CUIDAI-003, CUIDAI-004] → both done → UNBLOCKED → status: todo
+(already todo — no change needed)
+CUIDAI-011 depends_on: [CUIDAI-009, CUIDAI-010] → pending → remains blocked
+
+### DISPATCH
+python dispatch_engine.py --json
+→ {
+    "dispatched": 3,
+    "queued": 1,
+    "total_analyzed": 4,
+    "assignments": [
+      {"task_id": "CUIDAI-007", "assigned_to": "worker-ops",   "skill": "lucas-project", "reason": "AVAILABLE"},
+      {"task_id": "CUIDAI-008", "assigned_to": "worker-brand", "skill": "dario-brand",   "reason": "SIBLING_FALLBACK"},
+      {"task_id": "CUIDAI-009", "assigned_to": "worker-copy",  "skill": "dario-copy",    "reason": "AVAILABLE"},
+      {"task_id": "CUIDAI-010", "assigned_to": null,           "skill": "dario-legal",   "reason": "NO_WORKER"}
+    ]
+  }
+⚠ DISPATCH WARNING: 1 task queued — CUIDAI-010 requires dario-legal, no worker available. Manual assignment needed.
+
+### WAVE EXECUTION
+Executable tasks (todo + assignee + deps done): CUIDAI-007, CUIDAI-008, CUIDAI-009
+Sorted by priority: CUIDAI-008 [high], CUIDAI-007 [medium], CUIDAI-009 [medium]
+Wave size: 3 (= max_parallel)
+
+→ CUIDAI-008: status=in_progress | checked_out=2025-07-14T09:42:11Z | adapter=dario-v2-digital-ceo
+   Agent: "Autopilot: CUIDAI-008 — Criar guia de identidade visual Cuidai v2"
+
+→ CUIDAI-007: status=in_progress | checked_out=2025-07-14T09:42:12Z | adapter=dario-v2-digital-ceo
+   Agent: "Autopilot: CUIDAI-007 — Mapear fluxo de onboarding cuidadores"
+
+→ CUIDAI-009: status=in_progress | checked_out=2025-07-14T09:42:12Z | adapter=dario-v2-digital-ceo
+   Agent: "Autopilot: CUIDAI-009 — Redigir FAQ para famílias plataforma Cuidai"
+
+### AUDIT LOG
+Appended to: ~/.claude/orchestrator/audit/dispatch_2025-07-14.log
+  09:42:11Z | pulse=7 | state=ACTIVE | budget=71.4% | wave=3 | dispatched=3 | queued=1
+
+### PACE
+Tasks remaining after wave: 1 blocked (CUIDAI-011) + 1 queued (CUIDAI-010/NO_WORKER)
+→ Scheduling next pulse in 60s (tasks in flight)
+   /loop /lucas-autopilot — pulse #8 at 09:43:03Z
+```
+
+---
+
+## Output anti-patterns
+
+- Executar wave sem mostrar resultado do `state_machine.py` — viola Gate 1, pode violar GUARDIAN silenciosamente
+- Escrever `max_parallel=3` hardcoded em vez de ler do JSON do state machine — ignora REFLECTIVE_PAUSE
+- Reportar "budget OK" sem percentagem, mês e ficheiro fonte — não é auditável
+- Usar IDs genéricos `PROJ-001`, `PROJ-002` em vez dos prefixos reais do cliente (CUIDAI-, SAQU-, ATRI-)
+- Fazer dispatch sem invocar `dispatch_engine.py` e sem documentar que usou fallback inline
+- Lançar mais tasks do que `max_parallel` porque "eram todas prioritárias"
+- Não escrever `checked_out_at` no YAML antes de lançar o Agent — task fica sem timestamp de início
+- Marcar task como `in_progress` só após o Agent terminar — perde rastreabilidade mid-execution
+- Não logar tasks com `NO_WORKER` — ficam silenciosamente esquecidas no backlog
+- Deixar `<CLIENT>`, `<DATE>`, `<PERCENTAGE>` no output final — nunca é delivery-ready com placeholders

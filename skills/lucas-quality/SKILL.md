@@ -706,3 +706,174 @@ Special checks:
 
 Final: 19 + 14 + 18 + 16 + 15 = 82
 ```
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Rubric dimensions scored with real data (not estimates)
+
+- [ ] Cada dimensão (Specificity, Actionability, Completeness, Accuracy, Tone) tem score numérico entre 0.0 e 1.0
+- [ ] O tipo de task foi identificado e os pesos context-adaptive foram aplicados (não os Default por omissão lazy)
+- [ ] A fórmula `QS = (W1*S + W2*A + W3*C + W4*Ac + W5*T) * 100` foi calculada explicitamente, passo a passo
+- [ ] O confidence mode (HIGH / UNCERTAINTY / EXPLORATION) foi declarado e ajuste aplicado
+
+❌ NOT delivery-ready: "Score estimado: 78/100 — output razoável, pode melhorar."
+✅ Delivery-ready: "Task Type: Client Deliverable → Pesos: S=0.30, A=0.20, C=0.20, Ac=0.15, T=0.15. Scores: S=0.90, A=0.80, C=1.0, Ac=0.85, T=0.90. QS = (0.30×0.90 + 0.20×0.80 + 0.20×1.0 + 0.15×0.85 + 0.15×0.90)×100 = **87.25/100**. Confidence: HIGH_CONFIDENCE — sem penalidade aplicada."
+
+---
+
+### Gate 2 — Grade label + ação consequente declarados
+
+- [ ] Grade label (Harmonia Plena / Harmonia Organica / Harmonia Fragmentada / Desalinhamento / Ruptura) explicitamente atribuído
+- [ ] Ação imediata prescrita: ship / minor revision / director review / revision required / reject+escalate
+- [ ] Se score < 60: root cause identificada (não apenas "needs improvement")
+- [ ] Se score ≥ 90: marcado para log como success_pattern + extração para RAG
+
+❌ NOT delivery-ready: "Score 65 — precisa de revisão."
+✅ Delivery-ready: "Score 65/100 → **Harmonia Fragmentada** → Director review obrigatório. Root cause: Accuracy=0.50 (dados financeiros da Cuidai não verificados contra RAG) + Specificity=0.55 (secção de diferenciação genérica, sem referência ao modelo de subscrição €29/mês). Ação: reprocessar com contexto `cuidai-pricing-2025.yaml`."
+
+---
+
+### Gate 3 — Skill performance metrics actualizadas em `skill-metrics.yaml`
+
+- [ ] `total_executions` incrementado para a skill avaliada
+- [ ] Array `scores` tem o novo score appended
+- [ ] `avg_quality_score` recalculado (não estimado — média aritmética real dos scores no array)
+- [ ] `revision_rate` recalculado; se ≥ 0.30, flag RED explícita no output
+- [ ] `improvement_trend` revisitado: "improving" / "stable" / "declining" com critério declarado (ex: últimas 5 execuções vs 5 anteriores)
+
+❌ NOT delivery-ready: "`dario-offer` avg: ~72, tendência ok."
+✅ Delivery-ready: "`dario-offer` → scores: [65,70,78,72,75,**80**] → avg recalculado: 73.3 (+1.3 vs 72.0). revision_rate: 3/6 = 0.50 → 🔴 RED FLAG. improvement_trend: últimas 3 execuções [75,75,80] vs primeiras 3 [65,70,78] → média 76.7 vs 71.0 → **'improving'**."
+
+---
+
+### Gate 4 — SystemHealth calculado com todas as 4 variáveis
+
+- [ ] `quality_avg` calculado sobre as últimas 10 tasks (ou todas se < 10), normalizado 0–1
+- [ ] `budget_health`, `task_velocity`, `memory_freshness` têm valores concretos (não "N/A" ou "a verificar")
+- [ ] `SystemHealth = avg(quality_avg, budget_health, task_velocity, memory_freshness)` calculado explicitamente
+- [ ] Threshold label atribuído: Fluidez / Normal / Atencao / Intervencao — com consequência operacional activada
+
+❌ NOT delivery-ready: "SystemHealth ≈ 0.78 — Normal. Sistema a funcionar bem."
+✅ Delivery-ready: "quality_avg=(87.3/100)=0.873 | budget_health=1-(34/100)=0.660 | task_velocity=11/15=0.733 | memory_freshness=8/10 memories updated=0.800 → SystemHealth=avg(0.873,0.660,0.733,0.800)=**0.767** → **Normal** → standard operation, parallelism mantido."
+
+---
+
+### Gate 5 — Feedback loop fechado (manual override + RAG log)
+
+- [ ] Se user override foi fornecido (`/lucas-quality score PROJ-XXX`), esse score substituiu o automático e razão foi registada
+- [ ] Se score ≥ 90: entrada adicionada ao success_pattern log com skill + task_type + winning dimensions
+- [ ] Se score < 60: `common_weakness` field actualizado com pattern específico (não genérico)
+- [ ] Output referencia o ficheiro concreto onde o score foi persistido (`skill-metrics.yaml` path explícito)
+
+❌ NOT delivery-ready: "Pattern de fraqueza: output podia ser mais específico."
+✅ Delivery-ready: "common_weakness actualizado → `dario-brand`: 'Secção de diferenciação tende a omitir pricing anchor vs concorrência directa (Cuidai vs Kinder Care) quando task não inclui competitor_data explícito.' Ficheiro: `~/.claude/orchestrator/quality/skill-metrics.yaml` linha 14. Success pattern logged: `seo-local` × `Technical Audit` × Accuracy=0.95 → RAG entry `seo-local-success-2026-04-27`."
+
+---
+
+### Gate 6 — Output usa CLIENT NAME + dados reais, sem angle-brackets placeholder
+
+- [ ] Nenhum `<client_name>`, `<score>`, `<skill>`, `<date>` presente no output final
+- [ ] Datas são reais (formato ISO `2026-04-27`, não `YYYY-MM-DD`)
+- [ ] Skill names são os reais do sistema (`dario-brand`, `seo-local`, `lucas-quality`), não genéricos
+- [ ] Cliente ou projecto referenciado pelo nome real (Cuidai, SAQUEI, Atrium, LUSOconta, etc.)
+
+❌ NOT delivery-ready: "Score para `<skill_name>` do projecto `<project_id>`: `<score>`/100 em `<date>`."
+✅ Delivery-ready: "Score para `dario-brand` — PROJ-CUIDAI-007 (Cuidai Homepage Copy, 2026-04-27): **88.5/100** → Harmonia Organica → minor revision, then ship."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## LUCAS Quality Report — PROJ-CUIDAI-007
+**Gerado:** 2026-04-27T14:32:00Z | **Skill:** dario-brand | **Task:** Homepage copy refresh
+
+---
+
+### Score Breakdown
+
+**Task Type detectado:** Client Deliverable
+**Pesos aplicados:** Specificity=0.30 · Actionability=0.20 · Completeness=0.20 · Accuracy=0.15 · Tone=0.15
+**Confidence Mode:** HIGH_CONFIDENCE (RAG knowledge base confirmado para Cuidai)
+
+| Dimensão       | Score | Justificação                                                              |
+|----------------|-------|---------------------------------------------------------------------------|
+| Specificity    | 0.90  | Menciona "subscrição €29/mês", "cobertura Lisboa e Porto", nome Cuidai 7× |
+| Actionability  | 0.85  | 4 CTA claros; 1 recomendação vaga ("melhorar SEO") sem keyword específica  |
+| Completeness   | 1.00  | Todos os 5 blocos do brief cobertos (hero, features, pricing, FAQ, CTA)   |
+| Accuracy       | 0.80  | Pricing verificado; claim "4.9★ App Store" não verificável via RAG        |
+| Tone           | 0.95  | Alinhado com brand voice Cuidai: empático, directo, sem jargão médico     |
+
+**QS = (0.30×0.90 + 0.20×0.85 + 0.20×1.00 + 0.15×0.80 + 0.15×0.95) × 100**
+**QS = (0.270 + 0.170 + 0.200 + 0.120 + 0.143) × 100 = 90.3/100**
+
+**HIGH_CONFIDENCE penalty check:** Accuracy < 1.0 → penalidade 2× em delta.
+Accuracy raw delta = 0.20 × (1.0 - 0.80) = 0.04 → penalidade 2× = -0.04
+**QS ajustado: 90.3 - 4.0 = 86.3/100**
+
+---
+
+### Grade: Harmonia Organica (75–89)
+
+**Acção:** Minor revision, then ship.
+**Revision point:** Verificar claim "4.9★ App Store" — confirmar com equipa Cuidai ou remover.
+**Estimated revision time:** 10 min.
+
+---
+
+### skill-metrics.yaml update — dario-brand
+
+```yaml
+dario-brand:
+  last_updated: "2026-04-27T14:32:00Z"
+  total_executions: 13          # era 12
+  scores: [92,85,88,90,78,85,92,88,85,90,88,87,86]  # 86.3 rounded
+  avg_quality_score: 86.8       # recalculado: soma=1128/13
+  revision_rate: 0.08           # 1 revision em 13 — mantém
+  best_score: 92
+  worst_score: 78
+  common_weakness: "Unverified social proof claims (App Store ratings, review counts)"
+  improvement_trend: "stable"   # últimas 5: [87,88,86,86,87] vs anteriores 5: [88,85,90,78,85]
+```
+
+---
+
+### SystemHealth — 2026-04-27
+
+| Variável          | Cálculo                                    | Valor  |
+|-------------------|--------------------------------------------|--------|
+| quality_avg       | avg últimas 10 tasks: 876/10               | 0.876  |
+| budget_health     | 1 - (34% budget usado)                     | 0.660  |
+| task_velocity     | 11 tasks completas / 15 planeadas          | 0.733  |
+| memory_freshness  | 8/10 project memories updated < 30 dias    | 0.800  |
+| **SystemHealth**  | avg(0.876, 0.660, 0.733, 0.800)            | **0.767** |
+
+**Status: Normal** — standard operation. Parallelism mantido em 2.
+⚠️ budget_health=0.660 é o indicador mais fraco — monitorizar na próxima semana.
+
+---
+
+### Feedback Loop
+
+- ✅ Score < 90 (86.3) → NÃO adicionado a success_patterns
+- 📝 common_weakness actualizado com novo padrão detectado
+- 📁 Persistido em: `~/.claude/orchestrator/quality/skill-metrics.yaml`
+- 🔁 Próxima avaliação automática: após próxima execução de `dario-brand`
+```
+
+---
+
+## Output anti-patterns
+
+- **Score sem breakdown dimensional** — "Output score: 78/100" sem mostrar S/A/C/Ac/T individualmente é inauditável e não accionável
+- **Pesos Default aplicados a tudo** — usar 0.25/0.20/0.20/0.25/0.10 numa task financeira da LUSOconta ignora os pesos Accuracy=0.35 que são a única coisa que importa ali
+- **SystemHealth com variáveis em N/A** — calcular SystemHealth com 2 de 4 variáveis reais contamina o threshold; se `memory_freshness` é desconhecido, declarar explicitamente e usar 0.5 como conservative default
+- **revision_rate sem RED FLAG** — skill com revision_rate ≥ 0.30 que não dispara alerta visual leva o director a não intervir (padrão `dario-offer` no exemplo original ignorado durante semanas)
+- **common_weakness genérico** — "output podia ser mais específico" não alimenta nenhum loop de melhoria; o pattern tem de ser reproducível e actionable para o próximo prompt engineer
+- **Confidence Mode omitido** — HIGH_CONFIDENCE sem aplicar penalidade 2× em erros de Accuracy é o erro mais silencioso: infla scores de skills "confiantes mas erradas"
+- **avg_quality_score estimado** — recalcular manualmente só quando "parece diferente" cria drift acumulado; a média tem de ser recalculada do array completo a cada update
+- **User override sem registo de razão** — aceitar `/lucas-quality score PROJ-001 85` sem gravar o comentário do utilizador desperdiça o único sinal de qualidade ground-truth que o sistema tem

@@ -182,3 +182,165 @@ Sorted by file size impact (largest savings first):
 | URL unreachable | Report connection error with status code. Suggest verifying URL and checking if site requires authentication. |
 | No images found on page | Report that no `<img>` elements were detected. Suggest checking if images are loaded via JavaScript or CSS background-image. |
 | Images behind CDN or authentication | Note that image files could not be directly accessed for size analysis. Report available metadata (alt text, dimensions, format from markup) and flag inaccessible resources. |
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Image Audit Summary preenchido com números reais
+- [ ] Tabela Summary tem valores numéricos concretos em todas as células (não `XX` ou `-`)
+- [ ] Total Images ≥ 1; contagens de issues são consistentes (soma ≤ Total)
+- [ ] Status usa ✅/⚠️/❌ correctamente, não genérico "OK/NOK"
+- ❌ NOT delivery-ready: `| Missing Alt Text | ❌ | XX |`
+- ✅ Delivery-ready: `| Missing Alt Text | ❌ | 7 |` (das 23 imagens indexadas em cuidai.pt)
+
+### Gate 2 — Prioritized Optimization List ordenada por impacto real
+- [ ] Tabela listada do maior para menor `Est. Savings` em KB/MB
+- [ ] `Current Size` com valor em KB ou MB medido (não estimado sem base)
+- [ ] `Issues` cita problema específico: "JPEG 847KB, sem srcset, sem dimensões" — não "vários problemas"
+- [ ] `Est. Savings` calculado: WebP conversion tipicamente 25-35%, AVIF 40-50% vs JPEG
+- ❌ NOT delivery-ready: `| hero.jpg | ... | ... | ... | ... |`
+- ✅ Delivery-ready: `| hero-cuidador.jpg | 1.2MB | JPEG | Sem WebP, loading="lazy" no LCP, sem width/height | ~780KB |`
+
+### Gate 3 — Alt text issues com texto actual citado
+- [ ] Para cada imagem com alt text em falta ou incorrecto, cita o `src` real
+- [ ] Para alt text genérico, mostra o valor actual entre aspas e propõe substituição
+- [ ] Comprimento validado: flag alts < 10 chars ou > 125 chars com contagem exacta
+- ❌ NOT delivery-ready: "Várias imagens têm alt text genérico"
+- ✅ Delivery-ready: `logotipo.png` → alt atual: `"logo"` (4 chars) → proposta: `"Logótipo Cuidai — plataforma de cuidadores profissionais"` (57 chars)
+
+### Gate 4 — Formato e CLS com código HTML corrigido
+- [ ] Para cada imagem sem WebP/AVIF, fornece `<picture>` element pronto a usar com paths reais
+- [ ] Imagens sem `width`/`height` listadas por nome de ficheiro real (não "imagem X")
+- [ ] LCP image identificada: confirma ausência de `loading="lazy"` e presença de `fetchpriority="high"`
+- [ ] `decoding="async"` verificado nas imagens below-fold
+- ❌ NOT delivery-ready: "Adicionar width e height às imagens"
+- ✅ Delivery-ready: `equipa-atrium.jpg` (linha 247 de team.html) — falta `width="800" height="533"`, causa CLS estimado de 0.18
+
+### Gate 5 — Recomendações com savings totais e prioridade
+- [ ] Recomendações numeradas por ROI decrescente (maior saving primeiro)
+- [ ] Cada recomendação tem estimativa de saving em KB e/ou impacto em Core Web Vital (LCP/CLS)
+- [ ] Referência a lazy loading só para imagens below-fold — nunca hero/LCP
+- [ ] CDN mencionado se imagens servidas do mesmo domínio de origem
+- ❌ NOT delivery-ready: "1. Converter imagens para WebP"
+- ✅ Delivery-ready: "1. Converter 14 JPEGs para WebP (est. -2.3MB total, ~30% redução); hero.jpg → fetchpriority='high' pode reduzir LCP em 0.4-0.8s"
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets
+- [ ] URL auditada aparece explicitamente no output (ex: `lusoconta.pt/sobre`)
+- [ ] Nomes de ficheiro são os reais encontrados na página, não `image.jpg` ou `[filename]`
+- [ ] Nenhum placeholder `[url]`, `[client]`, `[XX]`, `<valor>` sobrevive no output final
+- ❌ NOT delivery-ready: `| [hero image] | [size] | JPEG | [issues] | [savings] |`
+- ✅ Delivery-ready: `| banner-saquei-home.jpg | 934KB | JPEG | Sem AVIF/WebP, sem srcset, loading="lazy" no LCP | ~610KB |`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Image Optimization Analysis — lusoconta.pt
+
+## Image Audit Summary
+
+| Metric              | Status | Count |
+|---------------------|--------|-------|
+| Total Images        | —      | 31    |
+| Missing Alt Text    | ❌     | 9     |
+| Oversized (>200KB)  | ⚠️     | 6     |
+| Wrong Format (JPEG/PNG quando WebP disponível) | ⚠️ | 18 |
+| No Dimensions (CLS risk) | ⚠️  | 11    |
+| Not Lazy Loaded (below-fold) | ⚠️ | 14 |
+| LCP com loading="lazy" | ❌  | 1     |
+
+**URL auditada:** https://lusoconta.pt — 2025-01-14
+
+---
+
+## Prioritized Optimization List
+
+| Imagem | Tamanho Atual | Formato | Issues | Est. Savings |
+|--------|--------------|---------|--------|--------------|
+| hero-banner-conta.jpg | 1.4MB | JPEG | LCP image com `loading="lazy"` ❌, sem `fetchpriority="high"`, sem WebP | ~910KB |
+| equipa-lusoconta.jpg | 847KB | JPEG | Sem WebP/AVIF, sem srcset, sem width/height | ~550KB |
+| simulador-preview.png | 612KB | PNG | Sem transparência (devia ser WebP), sem dimensões | ~430KB |
+| parceiros-banner.jpg | 389KB | JPEG | Sem WebP, sem srcset, `loading="lazy"` ausente | ~253KB |
+| app-screenshot-mobile.jpg | 334KB | JPEG | Sem srcset para mobile/desktop, sem dimensões | ~217KB |
+| sobre-nos-escritorio.jpg | 287KB | JPEG | Sem WebP, sem width/height, alt: `"foto"` (4 chars) | ~187KB |
+
+**Saving total estimado: ~2.55MB** (conversão WebP + compressão)
+
+---
+
+## Imagens com Alt Text em Falta ou Incorrecto
+
+| Imagem | Alt Atual | Problema | Proposta |
+|--------|-----------|----------|----------|
+| hero-banner-conta.jpg | `""` (vazio) | Ausente | `"Conta ordenado LUSOconta — abertura 100% online em 5 minutos"` |
+| logo-mbway.png | `"logo"` | Genérico, 4 chars | `"Pagamentos MB WAY aceites na LUSOconta"` |
+| sobre-nos-escritorio.jpg | `"foto"` | Não descritivo, 4 chars | `"Equipa LUSOconta no escritório em Lisboa"` |
+| icone-seguranca.svg | ausente | Decorativo? Adicionar `role="presentation"` ou alt descritivo | Se funcional: `"Segurança bancária certificada"` |
+
+---
+
+## Correções HTML Prioritárias
+
+### 1. Hero LCP Image — crítico para Core Web Vitals
+
+**Atual (problemático):**
+```html
+<img src="hero-banner-conta.jpg" loading="lazy" alt="">
+```
+
+**Corrigido:**
+```html
+<picture>
+  <source srcset="hero-banner-conta.avif" type="image/avif">
+  <source srcset="hero-banner-conta.webp" type="image/webp">
+  <img src="hero-banner-conta.jpg"
+       alt="Conta ordenado LUSOconta — abertura 100% online em 5 minutos"
+       width="1440" height="680"
+       fetchpriority="high"
+       decoding="sync">
+</picture>
+```
+> ⚠️ `loading="lazy"` removido — aplicá-lo ao LCP penaliza directamente o LCP score.
+
+### 2. Imagem de conteúdo below-fold — padrão correcto
+
+```html
+<picture>
+  <source srcset="equipa-lusoconta.avif" type="image/avif">
+  <source srcset="equipa-lusoconta.webp" type="image/webp">
+  <img src="equipa-lusoconta.jpg"
+       alt="Equipa LUSOconta no escritório em Lisboa"
+       width="800" height="533"
+       loading="lazy"
+       decoding="async">
+</picture>
+```
+
+---
+
+## Recomendações (por ROI decrescente)
+
+1. **Corrigir LCP image** (`hero-banner-conta.jpg`): remover `loading="lazy"`, adicionar `fetchpriority="high"` → impacto estimado: -0.6–1.1s no LCP
+2. **Converter 18 JPEG/PNG para WebP + AVIF** com `<picture>` fallback → saving estimado: ~2.55MB, redução de ~35% no peso total de imagens
+3. **Adicionar `width`/`height`** às 11 imagens sem dimensões → elimina CLS estimado de 0.23 (threshold "Needs Improvement": >0.1)
+4. **Alt text** em 9 imagens → correcção directa de acessibilidade e indexação Google Images
+5. **Lazy loading** nas 14 imagens below-fold sem `loading="lazy"` → reduz bytes no critical path
+6. **CDN**: imagens servidas de `lusoconta.pt` (origem directa). Recomendar Cloudflare Images ou Bunny.net para edge caching + conversão automática WebP/AVIF
+```
+
+---
+
+## Output anti-patterns
+
+- Deixar células da tabela Summary com `XX`, `-`, ou `...` — o cliente recebe um template, não uma auditoria
+- Escrever "várias imagens têm problemas" sem listar os `src` reais de cada uma
+- Recomendar `loading="lazy"` sem verificar se a imagem é above-fold ou LCP (erro de consequência directa em Core Web Vitals)
+- Calcular savings sem base: dizer "economize espaço" em vez de "~35% via WebP = 2.55MB"
+- Fornecer `<picture>` element com paths genéricos (`image.avif`, `photo.webp`) em vez dos nomes de ficheiro reais encontrados
+- Omitir `fetchpriority="high"` na LCP image — é a correcção de maior impacto e frequentemente esquecida
+- Reportar alt text como "ausente" sem mostrar o valor actual (`""`, `"logo"`, `"foto"`) e propor substituição concreta
+- Misturar recomendações sem ordenação por impacto — CLS fix de 5 imagens e "renomear ficheiros" não têm o mesmo peso
+- Não identificar qual imagem é o LCP antes de dar recomendações de lazy loading
+- Ignorar `decoding="async"` em imagens below-fold (omissão frequente que deixa o output incompleto vs. skill spec)

@@ -175,3 +175,145 @@ After generating, always provide:
 3. **Settings**:model, aspect ratio, resolution
 4. **SEO checklist**:alt text suggestion, file naming, WebP conversion
 5. **Schema snippet**:ImageObject or og:image markup if applicable
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Use case identificado e parâmetros SEO aplicados
+- [ ] Tipo de imagem explícito (og, hero, product, infographic, schema, favicon, pinterest)
+- [ ] Aspect ratio correto aplicado via `set_aspect_ratio` antes da geração (não depois)
+- [ ] Resolução do defaults table usada (512/1K/2K/4K), não inventada
+- [ ] Domain mode mapeado ao use case (ex: hero → Cinema ou Editorial, nunca Product)
+- ❌ NOT delivery-ready: "Gerei a imagem com as configurações padrão"
+- ✅ Delivery-ready: "OG image gerada: `set_aspect_ratio 16:9` + resolução 1K + domain mode UI/Web — parâmetros da tabela SEO defaults"
+
+### Gate 2 — Reasoning Brief construído com o pipeline Creative Director
+- [ ] 6 componentes do `references/prompt-engineering.md` presentes (Subject, Style, Context, etc.)
+- [ ] Prompt é ESPECÍFICO e VISCERAL: descreve o que a câmara vê, não intenções abstratas
+- [ ] Pesos de domínio respeitados (Subject 30%, Style 25%, Context 15%...)
+- [ ] Presets verificados via `presets.py list` se cliente com brand conhecida
+- ❌ NOT delivery-ready: "Uma imagem profissional para o blog sobre finanças"
+- ✅ Delivery-ready: "Overhead shot of a worn leather notebook open on a marble desk, single espresso cup casting long shadow, warm 5600K key light from left, shallow DOF, editorial texture — LUSOconta blog hero 16:9 2K"
+
+### Gate 3 — Post-generation SEO checklist completa e entregue
+- [ ] Alt text escrito (keyword-rich, descritivo, não genérico)
+- [ ] Nome de ficheiro sugerido em formato SEO: `keyword-descricao-1200x630.webp`
+- [ ] Comando WebP de conversão incluído com `-quality 85`
+- [ ] Target de file size mencionado (≤200KB hero, ≤100KB thumbnail)
+- ❌ NOT delivery-ready: "Lembra-te de otimizar a imagem para SEO"
+- ✅ Delivery-ready: "Alt: `Conta poupança LUSOconta com juro de 4.2% ao ano` · Ficheiro: `conta-poupanca-lusoconta-1200x630.webp` · Converter: `magick output.png -quality 85 conta-poupanca-lusoconta-1200x630.webp` · Target: <200KB"
+
+### Gate 4 — Schema markup e OG meta tags fornecidos (quando aplicável)
+- [ ] `ImageObject` schema JSON-LD incluído para schema images e hero images
+- [ ] `url`, `width`, `height`, `caption` populados com valores reais (não `example.com`)
+- [ ] OG meta tags HTML incluídas para social preview images
+- [ ] `og:image:width` e `og:image:height` com valores numéricos corretos
+- ❌ NOT delivery-ready: `"url": "https://example.com/images/og-image.webp"`
+- ✅ Delivery-ready: `"url": "https://lusoconta.pt/images/conta-poupanca-lusoconta-1200x630.webp", "width": 1200, "height": 630`
+
+### Gate 5 — Custo transparente e logging executado
+- [ ] Custo estimado mostrado ANTES de gerar (especialmente batch)
+- [ ] `cost_tracker.py log` executado após geração com model, resolution e prompt
+- [ ] Para batch: custo total = N × custo unitário explicitamente calculado
+- [ ] Se extensão banana não disponível: erro claro + instrução `./extensions/banana/install.sh`
+- ❌ NOT delivery-ready: (silêncio sobre custos, geração directa sem aviso)
+- ✅ Delivery-ready: "Estimativa: 3 variações × $0.08 (2K) = **$0.24** — confirmas? · Após geração: `cost_tracker.py log --model gemini-3.1-flash-image-preview --resolution 2K --prompt 'Atrium hero blog'`"
+
+### Gate 6 — Output usa CLIENT NAME + dados reais, sem angle-brackets placeholder
+- [ ] URL do cliente real (não `example.com` nem `<your-domain>`)
+- [ ] Keywords reais do negócio do cliente no alt text e caption
+- [ ] Nome de ficheiro contém termos do produto/serviço real, não `image-1` ou `output`
+- [ ] Schema `caption` contém keyword target real, não `Descriptive caption with target keyword`
+- ❌ NOT delivery-ready: `"caption": "Descriptive caption with target keyword"`, URL `example.com`
+- ✅ Delivery-ready: `"caption": "Armazém ARRECADA.GOV Lisboa — aluguer de box desde 29€/mês"`, URL `arrecada.gov.pt/images/...`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## Geração de OG Image — Cuidai
+
+**Use case detectado:** OG/Social Preview
+**Parâmetros SEO aplicados:**
+- Aspect ratio: `16:9` → `set_aspect_ratio 16:9` ✓
+- Resolução: `1K` ($0.04)
+- Domain mode: UI/Web (clean, text-friendly)
+
+**Custo estimado: $0.04 — confirmas a geração?**
+
+---
+
+### Reasoning Brief (Creative Director Pipeline)
+
+```
+[Subject 30%] Caring professional caregiver holding hands of elderly woman
+in bright home setting, warm eye contact, genuine smile
+[Style 25%] Clean editorial photography, flat-lay impossible here — 
+soft bokeh background, pastel palette #F7F3EF dominant
+[Context 15%] Portuguese home care service, trustworthy, family-oriented
+[Mood 15%] Warmth, safety, relief — the feeling of "mãe está bem"
+[Technical 10%] 1200×630px final crop, text-safe margins 120px each side
+[Negative 5%] No stock-photo stiffness, no hospital aesthetic, no blue tones
+```
+
+**Gerado via:** `gemini_generate_image` — `gemini-3.1-flash-image-preview` @ 1K ✓
+
+---
+
+### Post-Generation SEO Checklist
+
+**Alt text:**
+`Cuidadora Cuidai a acompanhar idosa em casa — serviço de apoio domiciliário em Lisboa`
+
+**Nome de ficheiro:**
+`apoio-domiciliario-cuidai-1200x630.webp`
+
+**Conversão WebP:**
+```bash
+magick output.png -quality 85 apoio-domiciliario-cuidai-1200x630.webp
+```
+Target: **<100KB** ✓ (OG images devem ser leves)
+
+**Schema ImageObject:**
+```json
+{
+  "@type": "ImageObject",
+  "url": "https://cuidai.pt/images/apoio-domiciliario-cuidai-1200x630.webp",
+  "width": 1200,
+  "height": 630,
+  "caption": "Serviço de apoio domiciliário Cuidai — cuidadores certificados em Lisboa e Grande Lisboa"
+}
+```
+
+**OG Meta Tags:**
+```html
+<meta property="og:image" content="https://cuidai.pt/images/apoio-domiciliario-cuidai-1200x630.webp" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Cuidadora Cuidai a acompanhar idosa em casa — apoio domiciliário Lisboa" />
+```
+
+**Cost log executado:**
+```bash
+python3 ~/.claude/skills/seo-image-gen/scripts/cost_tracker.py log \
+  --model gemini-3.1-flash-image-preview \
+  --resolution 1K \
+  --prompt "caregiver holding hands elderly woman Portuguese home care"
+```
+```
+
+---
+
+## Output anti-patterns
+
+- Gerar imagem sem confirmar custo estimado primeiro, especialmente em batch (3 imagens = $0.24 a $0.48 sem aviso)
+- Post-generation checklist omitida ou resumida a "lembra-te de otimizar" sem alt text, filename e WebP command concretos
+- Schema e OG tags com `example.com` ou `<your-domain>` em vez do domínio real do cliente
+- Aspect ratio definido DEPOIS da geração ou não chamado via `set_aspect_ratio` MCP tool
+- Reasoning Brief vago: "imagem profissional de cuidados" sem Subject/Style/Context/Mood/Technical/Negative
+- Resolução inventada (ex: `3K`) em vez das opções documentadas (512/1K/2K/4K)
+- Não verificar disponibilidade do banana MCP antes de tentar gerar — falha silenciosa confunde o utilizador
+- `caption` no schema igual ao alt text — devem ser distintos (schema é para indexação, alt é para acessibilidade)
+- Batch sem especificar N explicitamente e sem custo total calculado antes de executar

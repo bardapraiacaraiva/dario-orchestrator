@@ -768,3 +768,196 @@ Eight specific operational warnings that protect the agency from real financial 
    - Lisboa: 1.5% derrama. Porto: 1.5%. Some concelhos: 0%
    - Total effective rate (PME, Lisboa): 17% + 1.5% = 18.5% on first €50K, then 21% + 1.5% = 22.5%
    - Always ask contabilista for the exact derrama of your sede fiscal
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
+
+---
+
+### Gate 1 — Regime fiscal correctamente identificado
+
+- [ ] Output identifica explicitamente o regime do utilizador (Simplificado / Lda / Unipessoal)
+- [ ] Obrigações listadas correspondem ao regime detectado (ex: sem IRC para Cat B)
+- [ ] Se regime ambíguo, output pede clarificação antes de calcular
+
+❌ NOT delivery-ready: "Tens obrigações de IVA trimestrais e possivelmente IRC."
+✅ Delivery-ready: "Estás em **Regime Simplificado (Cat B IRS)** → IVA trimestral até 15 Ago 2026, **sem IRC**, IRS Modelo 3 até 31 Mar 2027."
+
+---
+
+### Gate 2 — Tax calendar com datas reais e próximo prazo destacado
+
+- [ ] Pelo menos 3 datas concretas listadas com DD/MM/AAAA
+- [ ] Prazo mais próximo marcado explicitamente ("⚠️ Próximo em X dias")
+- [ ] Regime fiscal do utilizador filtra quais datas são aplicáveis (não dump genérico)
+- [ ] Alerta antecipado se prazo < 7 dias
+
+❌ NOT delivery-ready: "O IVA é entregue trimestralmente. Verifica as datas na AT."
+✅ Delivery-ready: "⚠️ **IVA Q2 vence em 15 Ago 2026 (18 dias).** Valor estimado: 1.081 EUR. Próximas: IRC Pagamento por conta 15 Nov 2026, IES 15 Jul 2026 ✓ já passou."
+
+---
+
+### Gate 3 — Invoice / factura com todos os campos obrigatórios AT preenchidos
+
+- [ ] Número de série sequencial presente (ex: F/2026/004)
+- [ ] NIF emitente + NIF cliente + moradas completas
+- [ ] IVA calculado correctamente (23% / 6% / 0% com justificação legal)
+- [ ] IBAN e condições de pagamento incluídas
+- [ ] Nota de software certificado AT presente (nunca emitir via DARIO)
+
+❌ NOT delivery-ready: "Factura para o cliente com total de 3.500 EUR + IVA."
+✅ Delivery-ready: "**F/2026/004** — Atrium Hospitality, NIF 501 234 567, SEO mensal Mai 2026: 2.500,00 + IVA 23% (575,00) = **3.075,00 EUR** — vence 01/Jun/2026 — emitir no InvoiceXpress/Moloni."
+
+---
+
+### Gate 4 — P&L com separação explícita IVA ≠ receita
+
+- [ ] IVA liquidado listado separadamente das receitas (nunca somado ao resultado)
+- [ ] Receita cobrada vs. pendente discriminadas
+- [ ] Resultado líquido estimado com taxa IRC/IRS aplicada correctamente ao regime
+- [ ] Margem líquida calculada sobre receita bruta (não sobre cobrada)
+
+❌ NOT delivery-ready: "Resultado do mês: 4.300 EUR de receitas menos 340 EUR de despesas = 3.960 EUR."
+✅ Delivery-ready: "Receita bruta: 4.300 EUR | IVA a entregar (não é teu): −667 EUR | Despesas: −340 EUR | Base tributável: 3.293 EUR | IRS est. 25%: −823 EUR | **Resultado líquido: ~2.470 EUR (57.4% margem)**."
+
+---
+
+### Gate 5 — Cash flow com saldo actual + previsão 30 dias
+
+- [ ] Entradas e saídas reais com datas DD/MM listadas
+- [ ] Saldo actual calculado (entradas − saídas verificadas)
+- [ ] Previsão 30 dias inclui receivables pendentes + despesas recorrentes conhecidas
+- [ ] Receivables em overdue (vencimento passado + não pago) assinalados com ❗
+
+❌ NOT delivery-ready: "O teu saldo está positivo e tens alguns pagamentos pendentes."
+✅ Delivery-ready: "Saldo actual: **1.675 EUR** | A receber ≤30d: +2.500 EUR (Atrium, vence 01/Jun) | Despesas previstas: −340 EUR | **Saldo projectado 30d: 3.835 EUR** | ❗ Mar & Brasa F/2026/001 venceu há 3 dias — sem pagamento registado."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, zero placeholders entre `< >`
+
+- [ ] Nenhum `[NOME]`, `[VALOR]`, `[DATA]`, `[NIF]` ou `<angle-bracket>` no output final
+- [ ] Cliente nomeado (ex: Atrium, Mar & Brasa, Vivenda) ou pedida clarificação explícita
+- [ ] Valores numéricos concretos presentes — nunca "X EUR" ou "valor acordado"
+- [ ] Se dados em falta, output lista exactamente o que precisa: "Para continuar preciso do NIF do cliente e valor do serviço"
+
+❌ NOT delivery-ready: "Factura para `<cliente>` no valor de `<total>` EUR com IVA de `<taxa>`%."
+✅ Delivery-ready: "Factura F/2026/005 — **Vivenda**, NIF 509 876 543, Manutenção WP Mai 2026: **300,00 EUR** + IVA 23% = **369,00 EUR**."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## P&L + Cash Flow — Abril 2026
+**Regime:** Lda (IRC) | **Software facturação:** InvoiceXpress
+
+---
+
+### RECEITA — Abril 2026
+
+| Cliente         | Serviço                        | Factura      | Valor      | Estado                        |
+|-----------------|-------------------------------|--------------|------------|-------------------------------|
+| Atrium          | SEO mensal Abr                | F/2026/002   | 2.500,00   | ⚠️ Pendente (vence 01/Mai)    |
+| Mar & Brasa     | Estratégia digital + setup    | F/2026/003   | 1.500,00   | ✅ Pago (10/04)                |
+| Vivenda         | Manutenção WP Abr             | F/2026/004   | 300,00     | ✅ Pago (02/04)                |
+
+**Receita Bruta:** 4.300,00 EUR
+**Cobrada (Abril):** 1.800,00 EUR
+**Pendente:** 2.500,00 EUR (Atrium — vence 01/Mai/2026)
+
+> ⚠️ IVA liquidado nas facturas: 989,00 EUR — **não é receita tua, é imposto a entregar à AT.**
+
+---
+
+### DESPESAS — Abril 2026
+
+| Categoria   | Descrição              | Valor    | Dedutível IRC |
+|-------------|------------------------|----------|---------------|
+| Software    | Claude Code Pro        | 100,00   | ✅ Sim         |
+| Software    | Hosting Hetzner        | 25,00    | ✅ Sim         |
+| Software    | DataForSEO             | 50,00    | ✅ Sim         |
+| Serviços    | Contabilista (mensal)  | 150,00   | ✅ Sim         |
+| Marketing   | Domínio .pt (anual/12) | 15,00    | ✅ Sim         |
+
+**Total Despesas:** 340,00 EUR
+
+---
+
+### RESULTADO — Abril 2026
+
+| Métrica                          | Valor         |
+|----------------------------------|---------------|
+| Receita bruta                    | 4.300,00 EUR  |
+| IVA liquidado (entregar AT)      | −989,00 EUR   |
+| Receita líquida de IVA           | 3.311,00 EUR  |
+| Despesas dedutíveis              | −340,00 EUR   |
+| Resultado antes impostos         | 2.971,00 EUR  |
+| Estimativa IRC (21% taxa normal) | −623,91 EUR   |
+| **Resultado líquido estimado**   | **2.347,09 EUR** |
+| Margem líquida                   | **54,6%**     |
+
+---
+
+### CASH FLOW — Abril 2026
+
+**Entradas**
+| Data  | Origem            | Valor    | Acumulado  |
+|-------|-------------------|----------|------------|
+| 02/04 | Vivenda (Mar→Abr) | 300,00   | 300,00     |
+| 10/04 | Mar & Brasa       | 1.500,00 | 1.800,00   |
+
+**Saídas**
+| Data  | Destino        | Valor   | Acumulado |
+|-------|----------------|---------|-----------|
+| 01/04 | Hetzner        | 25,00   | −25,00    |
+| 05/04 | Claude Code    | 100,00  | −125,00   |
+| 15/04 | Contabilista   | 150,00  | −275,00   |
+| 20/04 | DataForSEO     | 50,00   | −325,00   |
+
+**Saldo actual (30 Abr):** 1.475,00 EUR
+
+**Previsão Maio 2026**
+| Esperado              | Quando  | Valor     |
+|-----------------------|---------|-----------|
+| Atrium F/2026/002     | 01/Mai  | 2.500,00  |
+| Despesas recorrentes  | Mai     | −340,00   |
+| IVA Q1 entregue ✓     | —       | —         |
+
+**Saldo projectado 31 Mai:** 3.635,00 EUR
+
+---
+
+### 📅 Próximos prazos fiscais (Lda)
+
+| Prazo      | Obrigação                           | Urgência              |
+|------------|-------------------------------------|----------------------|
+| 20/Mai/2026 | IVA mensal Abril → AT (SAFT)       | ⚠️ 20 dias          |
+| 31/Mai/2026 | IRC Modelo 22 (ano 2025)           | ⚠️ 31 dias          |
+| 15/Jul/2026 | IES                                | 🟡 76 dias          |
+| 15/Ago/2026 | IVA Q2 (se trimestral)             | 🟢 107 dias         |
+
+> 🔴 **Acção imediata:** IRC Modelo 22 vence 31 Mai — confirma com contabilista
+> esta semana se valores de 2025 estão fechados.
+
+---
+
+*Este output é auxiliar de gestão — não substitui contabilista certificado (OCC).
+Facturas emitidas exclusivamente via InvoiceXpress (software certificado AT n.º 1234).*
+```
+
+---
+
+## Output anti-patterns
+
+- Incluir IVA no resultado líquido como se fosse receita da agência ("ganhei 4.989 EUR")
+- Listar datas fiscais genéricas sem filtrar pelo regime do utilizador detectado
+- Gerar template de factura com campos `[NIF]` / `[CLIENTE]` por preencher, sem pedir os dados em falta
+- Dar estimativa de IRC/IRS sem especificar a taxa aplicada e porquê (21% IRC normal vs. 17% PME vs. 25% IRS Cat B)
+- Omitir separação entre receita cobrada e receita pendente no P&L (distorce percepção de liquidez)
+- Recomendar optimização fiscal concreta (ex: "deduz X como despesa") sem remeter para contabilista — fora de âmbito deste skill
+- Calcular margem líquida sobre receita cobrada em vez de receita bruta (favorece artificialmente meses com pagamentos atrasados)
+- Apresentar saldo de cash flow sem distinguir saldo actual (verificado) de saldo projectado (estimado)
+- Esquecer alerta de 7 dias para prazos iminentes — output entregue sem ⚠️ quando vencimento < 7 dias
+- Tratar SAFT-PT como opcional — comunicação à AT é obrigatória e contínua, não periódica

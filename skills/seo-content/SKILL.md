@@ -175,3 +175,172 @@ If DataForSEO MCP tools are available, use `kw_data_google_ads_search_volume` fo
 | URL unreachable (DNS failure, connection refused) | Report the error clearly. Do not guess page content. Suggest the user verify the URL and try again. |
 | Content behind paywall (402/403, login wall) | Report that the content is not publicly accessible. Analyze only the visible portion (meta tags, headers) and note the limitation. |
 | Thin content (fewer than 100 words retrievable) | Report the findings as-is rather than guessing. Flag the page as potentially JavaScript-rendered or gated, and suggest the user provide the full text directly. |
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — E-E-A-T scoring é específico, não genérico
+- [ ] Cada dimensão (Experience, Expertise, Authoritativeness, Trustworthiness) tem score explícito (ex: 3/5) com justificação baseada no conteúdo real
+- [ ] Sinais presentes **e ausentes** estão identificados com exemplos da página
+- [ ] Não usa linguagem vaga como "o conteúdo demonstra alguma expertise"
+- ❌ NOT delivery-ready: "A página tem boa autoridade e demonstra expertise no tema."
+- ✅ Delivery-ready: "Expertise: 2/5 — Sem bio de autor, sem credenciais, sem fontes citadas. A secção 'Como funciona' usa linguagem genérica sem referência a metodologia própria."
+
+### Gate 2 — Word count e cobertura temática são avaliados em conjunto
+- [ ] Word count real da página está registado (ex: "812 palavras")
+- [ ] Floor relevante para o page type está citado (ex: "service page: mínimo 800")
+- [ ] Conclusão distingue entre "abaixo do floor" e "cobre o tópico adequadamente"
+- [ ] Não trata word count como ranking factor direto — menciona cobertura temática como critério real
+- ❌ NOT delivery-ready: "A página tem poucas palavras e precisa de mais conteúdo para rankear."
+- ✅ Delivery-ready: "647 palavras (service page floor: 800). Conteúdo abaixo do floor E com gaps temáticos: não aborda preços, processo de onboarding nem FAQs — subcobertura real, não apenas contagem."
+
+### Gate 3 — AI Content Assessment tem diagnóstico concreto
+- [ ] Identifica marcadores específicos de AI-generated low-quality presentes/ausentes na página
+- [ ] Refere presença ou ausência de author attribution com nome real
+- [ ] Avalia se existe insight original ou apenas reformulação genérica
+- [ ] Menciona alinhamento com March 2024 core update (Helpful Content integrado no core)
+- ❌ NOT delivery-ready: "O conteúdo parece gerado por IA e falta personalização."
+- ✅ Delivery-ready: "3 marcadores de AI low-quality detetados: estrutura repetitiva entre parágrafos 2–4, ausência de autor nomeado, zero dados originais. Nenhuma anedota/caso real. Risco de penalização em próximo core update."
+
+### Gate 4 — AI Citation Readiness / GEO tem recomendações acionáveis
+- [ ] Avalia se existem statements quotáveis com estatísticas ou factos verificáveis
+- [ ] Verifica presença de schema markup relevante (Article, FAQ, Organization, Person)
+- [ ] Indica cobertura multi-plataforma: Google AI Overviews, AI Mode, Perplexity, ChatGPT
+- [ ] Recomendações são específicas: "adicionar X" não "melhorar structured data"
+- ❌ NOT delivery-ready: "A página deveria otimizar para GEO e melhorar a estrutura para AI."
+- ✅ Delivery-ready: "0 statements quotáveis com dados numéricos. Sem Article schema. Sem FAQ schema. Recomendação: adicionar bloco resposta-direta após cada H2, implementar FAQPage schema com 4–6 perguntas, adicionar stat original (ex: resultado de cliente com número real)."
+
+### Gate 5 — Keyword optimization e estrutura têm diagnóstico página a página
+- [ ] Keyword primária identificada explicitamente com localização na página (título, H1, primeiras 100 palavras)
+- [ ] Hierarquia de headings auditada (H1→H2→H3) com problemas específicos listados
+- [ ] Internal linking count real vs benchmark (3–5 por 1000 palavras) está calculado
+- [ ] Density estimada ou sinalizada como risco (stuffing ou ausência)
+- ❌ NOT delivery-ready: "Os headings poderiam ser melhorados e há pouca linkagem interna."
+- ✅ Delivery-ready: "Keyword 'software de faturação PME' ausente nas primeiras 100 palavras. H1 presente mas H2s não usam variações semânticas. 1 internal link para 1.200 palavras (benchmark: 3–5). Hierarquia: H1→H3 direto (H2 em falta)."
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets
+- [ ] Nome do cliente/marca aparece no output (ex: Cuidai, SAQUEI, Tributario.AI)
+- [ ] URL ou página auditada está identificada explicitamente
+- [ ] Nenhum placeholder do tipo `[CLIENT NAME]`, `[URL]`, `[INSERT KEYWORD]` sobreviveu
+- [ ] Todos os scores, counts e recomendações referem conteúdo real da página analisada
+- ❌ NOT delivery-ready: "A página [URL] do cliente [NOME] tem [X] palavras e keyword [KEYWORD] ausente."
+- ✅ Delivery-ready: "Página auditada: tributario.ai/blog/irs-2025. 934 palavras. Keyword 'IRS 2025 prazo' presente no H1 mas ausente nas primeiras 100 palavras do body."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Análise E-E-A-T & Content Quality — Cuidai.pt/blog/cuidadores-idosos-lisboa
+
+**URL:** cuidai.pt/blog/cuidadores-idosos-lisboa
+**Data da análise:** 14 junho 2025
+**Page type:** Blog post
+**Keyword primária:** "cuidadores de idosos Lisboa"
+
+---
+
+## E-E-A-T Scoring
+
+| Dimensão | Score | Justificação |
+|---|---|---|
+| Experience | 2/5 | Sem casos reais de famílias assistidas, sem fotos de cuidadores em contexto, sem dados de resultados |
+| Expertise | 3/5 | Mencionada "equipa especializada" mas sem bio de autor, sem certificações ACSS citadas |
+| Authoritativeness | 2/5 | 0 fontes externas citadas, sem menção de parcerias ou reconhecimento sectorial |
+| Trustworthiness | 4/5 | HTTPS ✓, morada física ✓, política de privacidade ✓, sem data de publicação visível |
+
+**Score E-E-A-T global: 11/20 — abaixo do threshold recomendado (14/20) para conteúdo YMYL (saúde/cuidados).**
+
+---
+
+## Word Count & Cobertura Temática
+
+- **Contagem real:** 1.087 palavras
+- **Floor para blog post:** 1.500 palavras
+- **Gap:** −413 palavras — E com subcobertura real
+
+**Tópicos em falta detetados:**
+1. Critérios de seleção/formação dos cuidadores Cuidai
+2. Preços ou como funciona o orçamento
+3. Diferença cuidados temporários vs. permanentes
+4. Perguntas frequentes de famílias (FAQ)
+
+→ Recomendação: expandir para ~1.700 palavras adicionando secções em falta, não padding.
+
+---
+
+## AI Content Assessment
+
+**Marcadores low-quality detetados: 2/5**
+
+- ✅ Ausência de estrutura repetitiva entre parágrafos
+- ✅ Tom consistente com voz da marca
+- ❌ Zero dados originais (sem números de cuidadores, sem anos de operação, sem casos)
+- ❌ Sem autor nomeado (byline ausente)
+- ✅ Sem incoerências factuais detetadas
+
+**Diagnóstico:** Conteúdo human-written mas sem prova de experiência direta.
+Risco médio num próximo core update por ausência de E-E-A-T signals em página YMYL.
+
+---
+
+## AI Citation Readiness (GEO)
+
+**Score de quotabilidade:** 1/10 statements com dado numérico concreto.
+
+| Signal GEO | Status |
+|---|---|
+| Statements quotáveis com stats | ❌ 0 detetados |
+| Formato answer-first após H2s | ❌ Ausente |
+| Article schema | ❌ Não implementado |
+| FAQPage schema | ❌ Não implementado |
+| Person/Organization schema | ✅ Organization parcial |
+| Visibilidade AI Overviews (estimada) | ❌ Baixa — sem dados citáveis |
+
+**Recomendações GEO prioritárias:**
+1. Adicionar stat Cuidai real no parágrafo de abertura: ex. "Mais de 340 famílias assistidas em Lisboa desde 2019"
+2. Criar bloco resposta-direta após H2 "Quanto custa um cuidador de idosos em Lisboa"
+3. Implementar FAQPage schema com 5 perguntas de intenção transacional
+4. Monitorizar citações em Perplexity e Google AI Overviews mensalmente como KPI autónomo
+
+---
+
+## Keyword & Estrutura
+
+- **Keyword "cuidadores de idosos Lisboa":** presente no H1 ✓, ausente nas primeiras 100 palavras ❌, density ~0,8% (abaixo de 1%)
+- **Variações semânticas detetadas:** "apoio domiciliário", "cuidados geriátricos" — ✓
+- **Hierarquia headings:** H1 → H2 → H2 → H3 → H2 — estrutura válida ✓
+- **Internal links:** 2 links para 1.087 palavras (benchmark: 3–5 por 1.000 palavras) — ❌ défice
+
+**Internal links em falta sugeridos:**
+- → cuidai.pt/servicos/apoio-domiciliario
+- → cuidai.pt/como-funciona
+- → cuidai.pt/faq
+
+---
+
+## Próximos passos (por prioridade)
+
+1. 🔴 Adicionar author bio com credenciais (nome, formação na área de saúde/cuidados)
+2. 🔴 Inserir 1 caso real / testemunho com resultado mensurável
+3. 🟡 Expandir para 1.700 palavras com secções em falta
+4. 🟡 Implementar Article + FAQPage schema
+5. 🟢 Adicionar keyword nas primeiras 100 palavras
+6. 🟢 Adicionar 2 internal links adicionais
+```
+
+---
+
+## Output anti-patterns
+
+- Dar score E-E-A-T sem justificação por dimensão ("conteúdo com boa autoridade" sem evidência)
+- Tratar word count como ranking factor direto ("precisa de mais palavras para rankear melhor")
+- Recomendar "melhorar o SEO" ou "otimizar para AI" sem especificar o quê, onde e como
+- Usar placeholders `[KEYWORD]`, `[URL]`, `[NOME DO CLIENTE]` no output final
+- Misturar diagnóstico com recomendação sem separar o que existe hoje vs. o que deve ser feito
+- Não distinguir AI Overviews de AI Mode — são mecanismos distintos com implicações diferentes
+- Reportar Flesch Reading Ease como métrica SEO direta sem nota de contexto (não é ranking factor)
+- Auditar estrutura de headings sem listar os headings reais encontrados na página
+- Omitir o diagnóstico de AI-generated content markers em páginas sem autor atribuído
+- Dar recomendações GEO sem identificar se a página tem sequer um statement quotável com dado verificável

@@ -392,3 +392,176 @@ Match existing claude-seo output patterns:
 - Include specific, actionable recommendations
 - Show scores as XX/100 where applicable
 - Note data source as "DataForSEO (live)" to distinguish from static analysis
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — SERP data é live e atribuído a data/hora concreta
+- [ ] Resultados SERP incluem timestamp da fetch (ex: "dados recolhidos em 2025-01-23 14:32 UTC")
+- [ ] Rank positions são números reais, não estimativas ("posição #3" não "top results")
+- [ ] Featured snippets e AI Overviews identificados explicitamente se presentes
+- [ ] Search engine especificado (Google/Bing/Yahoo) e location_code declarado
+
+❌ NOT delivery-ready: "O site aparece bem posicionado no Google para este keyword."
+✅ Delivery-ready: "tributario.ai ocupa posição #4 no Google US (location_code 2840) para 'AI tax compliance Portugal' — fetch 2025-01-23 14:32 UTC. Featured snippet em #0: domínio concorrente taxjar.com."
+
+---
+
+### Gate 2 — Keyword metrics são numéricos e com fonte DataForSEO declarada
+- [ ] Volume de pesquisa é número exato ou range (ex: "2.400/mês"), nunca "alto/baixo"
+- [ ] Keyword difficulty score 0-100 presente com classificação (Easy/Medium/Hard/Very Hard)
+- [ ] CPC em USD declarado quando relevante para contexto comercial
+- [ ] Intent classificado (Informational/Navigational/Transactional/Commercial) com % de confiança se disponível
+
+❌ NOT delivery-ready: "'gestão financeira PME' tem bastante volume e dificuldade moderada."
+✅ Delivery-ready: "'gestão financeira PME' — volume: 1.900/mês, KD: 42/100 (Medium), CPC: $1.20, intent: Informational. Fonte: DataForSEO Labs Google, PT, 2025-01-23."
+
+---
+
+### Gate 3 — Backlink profile tem métricas de domínio concretas
+- [ ] Número total de backlinks e referring domains são valores absolutos
+- [ ] Domain Rating / authority score presente se tool o devolveu
+- [ ] Top 3 referring domains nomeados com anchor text real
+- [ ] Aviso de créditos API incluído se foi corrida análise de backlink completa (crawl intensivo)
+
+❌ NOT delivery-ready: "O perfil de backlinks do cuidai.pt é razoável com alguns links de qualidade."
+✅ Delivery-ready: "cuidai.pt — 847 backlinks totais, 134 referring domains. Top linkers: sapo.pt (anchor: 'cuidado sénior'), publico.pt (anchor: 'startup saúde'), dn.pt (anchor: 'cuidai'). Fonte: DataForSEO Backlinks, 2025-01-23."
+
+---
+
+### Gate 4 — Competitor analysis identifica domínios reais com gaps accionáveis
+- [ ] Mínimo 3 competitor domains nomeados explicitamente (não "os seus concorrentes")
+- [ ] Keyword intersection mostra keywords onde competitor rankeia e client não
+- [ ] Traffic estimation em visitas/mês declarado para cada domínio comparado
+- [ ] Gap keywords priorizadas por volume + KD, não apenas listadas
+
+❌ NOT delivery-ready: "A análise de concorrentes mostra que há oportunidades de keywords por explorar."
+✅ Delivery-ready: "LUSOconta.pt vs concorrentes: n26.com (est. 42.000 visitas/mês), revolut.com/pt (est. 78.000/mês). Gap keywords exclusivas dos concorrentes: 'conta bancária sem comissões' (vol 3.600, KD 38) — LUSOconta.pt não rankeia no top 100."
+
+---
+
+### Gate 5 — AI Visibility / GEO data distinguido de SEO tradicional
+- [ ] ai-scrape e ai-mentions resultados apresentados em secção própria "GEO / AI Visibility"
+- [ ] YouTube correlation (0.737) referenciada quando video data é incluído
+- [ ] LLM mentions tracking mostra plataformas específicas (ChatGPT, Perplexity, etc.) e contagem
+- [ ] Recomendações GEO separadas de recomendações SEO clássico
+
+❌ NOT delivery-ready: "A marca tem alguma presença em motores de IA."
+✅ Delivery-ready: "SAQUEI.pt — GEO check 2025-01-23: 0 menções LLM detetadas em ChatGPT scraper para 'adiantamento de salário Portugal'. YouTube: 2 vídeos relevantes no top-10 de concorrentes (Coverflex, 180K views combinadas). Ação prioritária: criar conteúdo YouTube antes de outreach editorial."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENT + dados reais, sem angle-brackets placeholder
+- [ ] Zero instâncias de `<client_name>`, `<domain>`, `<keyword>`, `<insert here>`
+- [ ] Nome da empresa/domínio real presente no título e em cada secção de dados
+- [ ] Data da recolha de dados DataForSEO declarada (não "dados recentes")
+- [ ] Se extensão DataForSEO não estava disponível, output diz isso explicitamente — não inventa dados
+
+❌ NOT delivery-ready: "Para `<client_domain>`, os resultados de `<target_keyword>` mostram `<ranking_position>`."
+✅ Delivery-ready: "Atrium.pt — SERP analysis para 'escritório de advogados Lisboa' (Google PT, 2025-01-23): posição #7, CTR estimado 3.2%. Acima: mlgts.pt (#1), plmj.pt (#2), cuatrecasas.com (#3)."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# SEO Report — Tributario.AI
+**DataForSEO live pull: 2025-01-23 15:04 UTC | Google PT (location_code 2616) | Desktop**
+
+---
+
+## 1. SERP Snapshot — "software fiscal Portugal"
+
+| Pos | Domínio | Título | Snippet |
+|-----|---------|--------|---------|
+| #1 | primavera-bss.com | "Software de Gestão Fiscal..." | Featured Snippet ✓ |
+| #2 | sage.com/pt | "Sage 50 — Contabilidade e Fiscal" | — |
+| #3 | totvs.com | "ERP Fiscal para Portugal" | — |
+| #7 | tributario.ai | "IA para Compliance Fiscal PT" | — |
+
+**AI Overview presente:** Sim — cita primavera-bss.com e sage.com/pt. tributario.ai não citado.
+**People Also Ask:** "Qual o melhor software de contabilidade em Portugal?", "O que é o SAF-T?"
+
+---
+
+## 2. Keyword Research — Seed: "compliance fiscal"
+
+| Keyword | Volume/mês | KD | Intent | CPC |
+|---------|-----------|-----|--------|-----|
+| compliance fiscal portugal | 880 | 31 (Easy) | Informational | $2.10 |
+| software fiscal pme | 590 | 44 (Medium) | Commercial | $3.80 |
+| saf-t portugal obrigações | 1.300 | 28 (Easy) | Informational | $1.40 |
+| automação fiscal ia | 210 | 22 (Easy) | Commercial | $4.20 |
+| declaração ies prazo 2025 | 2.900 | 19 (Easy) | Navigational | $0.90 |
+
+**Quick win identificado:** "automação fiscal ia" — volume baixo mas KD 22, intent Commercial, zero concorrência AI-native. tributario.ai pode rankear #1 em 60-90 dias com 1 artigo optimizado.
+
+---
+
+## 3. Backlink Profile — tributario.ai
+
+- **Total backlinks:** 312
+- **Referring domains:** 47
+- **Top 3 linkers:**
+  - jornal-negocios.pt — anchor: "inteligência artificial fiscal"
+  - contabilidade.pt — anchor: "tributario ai review"
+  - startupportugal.com — anchor: "startup fiscal portuguesa"
+- **Gap vs primavera-bss.com:** 4.200 RDs vs 47 RDs — oportunidade de link building significativa via press/PR
+
+---
+
+## 4. Competitor Traffic Estimation
+
+| Domínio | Visitas/mês (est.) | Top keyword |
+|---------|-------------------|-------------|
+| primavera-bss.com | 68.000 | "software contabilidade" (vol 8.100) |
+| sage.com/pt | 41.000 | "sage 50 portugal" (vol 3.600) |
+| totvs.com/pt | 12.000 | "erp fiscal" (vol 1.200) |
+| tributario.ai | 1.800 | "tributario ai" (branded) |
+
+**Gap keywords onde concorrentes rankeiam, tributario.ai não (top 100):**
+- "automação contabilidade pme" — vol 720, KD 35
+- "ia para contabilistas" — vol 480, KD 27
+- "relatório fiscal automático" — vol 390, KD 29
+
+---
+
+## 5. GEO / AI Visibility — tributario.ai
+
+**ChatGPT scraper (2025-01-23):** 0 menções para "software fiscal IA Portugal"
+**LLM mentions tracking:**
+- ChatGPT: 0 menções diretas | concorrentes citados: primavera-bss.com (3x), sage.com (2x)
+- Perplexity: 0 menções diretas
+
+**YouTube — "compliance fiscal portugal":**
+- #1: "SAF-T Explicado 2024" — Canal ContabilidadePT, 34.000 views (sem menção a tributario.ai)
+- #2: "Obrigações Fiscais PME" — Canal GestãoPT, 18.000 views
+
+**Correlação YouTube→LLM (0.737):** tributario.ai sem presença YouTube = baixíssima probabilidade de citação em LLMs.
+
+**Recomendação GEO prioritária:** Produzir 1 vídeo YouTube "IA para Compliance Fiscal Portugal 2025" antes de qualquer outreach editorial. Estimativa de impacto em citações LLM: +40-60% em 90 dias (benchmark DataForSEO GEO studies).
+
+---
+
+## 6. Próximos Passos (prioridade decrescente)
+
+1. **[Semana 1]** Publicar artigo "automação fiscal ia" (KD 22, commercial intent) — alvo posição #1-3
+2. **[Semana 2]** Produzir vídeo YouTube sobre SAF-T/compliance — GEO pipeline
+3. **[Mês 1]** Link building: pitch para 5 publishers PT onde primavera-bss.com tem links (jornal-negocios.pt, dinheiro-vivo.pt, economico.pt)
+4. **[Mês 2]** Optimizar on-page para "saf-t portugal obrigações" (vol 1.300, KD 28) — quick traffic win
+```
+
+---
+
+## Output anti-patterns
+
+- Usar "alto volume" / "boa dificuldade" / "forte presença" sem números — DataForSEO devolve valores exatos, usá-los é obrigatório
+- Misturar dados cached/estimados com dados live sem distinguir a fonte e data de cada um
+- Fazer recomendações SEO e GEO na mesma lista como se fossem equivalentes — são canais distintos com mécanismos diferentes
+- Inventar métricas quando a extensão DataForSEO não está instalada em vez de dizer explicitamente "extensão não disponível"
+- Listar gap keywords sem ordenar por accionabilidade (volume × KD × intent) — listas não priorizadas não têm valor estratégico
+- Reportar backlinks sem referir referring domains — link count sozinho é métrica enganosa
+- Omitir location_code e language_code do report — os mesmos dados variam drasticamente por mercado
+- Apresentar AI Visibility como extensão de SEO clássico em vez de canal autónomo com correlações próprias (YouTube 0.737, Reddit 0.681)
+- Usar angle-brackets `<domain>` ou `<keyword>` no output final entregue ao cliente

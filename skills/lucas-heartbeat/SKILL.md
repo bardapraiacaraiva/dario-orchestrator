@@ -749,3 +749,197 @@ python ~/.claude/orchestrator/scripts/budget_tracker.py remaining --project mar-
 - {ts: "2026-04-27T09:30:14Z", actor: lucas-heartbeat, action: pulse_end, next_in: "90s"}
 ```
 ```
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Estado do sistema foi avaliado antes de qualquer execução
+
+- [ ] `state_machine.py --evaluate --json` foi chamado no início do pulso
+- [ ] Output inclui `state`, `autonomy_level`, `max_parallel`, `system_health`
+- [ ] Se state = GUARDIAN → pulso parou imediatamente com log explícito
+- [ ] Se state = ACTIVE → `max_parallel` foi respeitado na formação das waves
+
+❌ NOT delivery-ready: "Saltei o state check porque não havia tasks urgentes"
+✅ Delivery-ready: `{ "state": "ACTIVE", "autonomy_level": 3, "max_parallel": 3, "system_health": "OK" }` — pulso prosseguiu normalmente
+
+---
+
+### Gate 2 — Budget foi verificado com valores reais antes de dispatch
+
+- [ ] Ficheiro `~/.claude/orchestrator/budgets/2025-06.yaml` foi lido (ou criado com `spent: 0`)
+- [ ] Percentagem calculada: `spent / limit * 100`
+- [ ] Se >80% → warning logged e user notificado no relatório
+- [ ] Se >95% → zero novas tasks executadas, alerta explícito no output
+
+❌ NOT delivery-ready: "Budget OK" sem valores
+✅ Delivery-ready: `Budget: 142.400 / 200.000 tokens (71.2%) — dentro do limite. Próximo threshold: 80% em ≈17.200 tokens`
+
+---
+
+### Gate 3 — Dispatch engine produziu assignees verificáveis (não placeholders)
+
+- [ ] `dispatch_engine.py --json` foi executado ou fallback inline documentado
+- [ ] Cada task tem `assignee` preenchido com worker real do `company.yaml`
+- [ ] `dispatch_reason` registado por task (keyword match, sibling fallback, ou director escalation)
+- [ ] Log escrito em `audit/dispatch_2025-06-XX.log`
+
+❌ NOT delivery-ready: `assignee: <worker>` ou assignee vazio
+✅ Delivery-ready: `assignee: lucas-copywriter, dispatch_reason: "keyword match: 'email campaign' → skill copywriting → worker lucas-copywriter (workload 1/3)"`
+
+---
+
+### Gate 4 — Wave executada com status transitions atómicas e tokens registados
+
+- [ ] Cada task transitou: `todo → in_progress (checked_out_at: timestamp) → done/in_review`
+- [ ] `actual_tokens` registado por task após conclusão do Agent
+- [ ] Tasks com `execution_policy: requires_review` ficaram em `in_review` (não saltaram para done)
+- [ ] Stale detection correu: tasks `in_progress >24h` têm nota "STALE — no progress in 24h"
+
+❌ NOT delivery-ready: Task marcada done sem `actual_tokens` ou sem `completion_comment`
+✅ Delivery-ready: `task-042: status=done, checked_out_at=2025-06-14T10:17:00Z, completed_at=2025-06-14T10:31:22Z, actual_tokens=3.847, completion_comment="Email sequence 3-part gerada e aprovada por policy"`
+
+---
+
+### Gate 5 — AutoDiag correu e exit code foi tratado explicitamente
+
+- [ ] `autodiag_runner.py --fix --json` executado durante o pulso
+- [ ] Exit 0 → "AutoDiag: OK" no relatório (sem mais ação)
+- [ ] Exit 2 → warnings listados no relatório com contagem
+- [ ] Exit 3 → user alertado com descrição do problema crítico, execução pausada
+
+❌ NOT delivery-ready: AutoDiag mencionado mas sem exit code ou resultado
+✅ Delivery-ready: `AutoDiag: Exit 2 — 2 warnings: [orphan_parent: task-039 parent não existe → removido] [stale_review: task-031 em in_review há 51h → escalado a CEO]`
+
+---
+
+### Gate 6 — Relatório de pulso completo com dados reais do cliente, sem angle-brackets
+
+- [ ] Relatório inclui todos os 7 campos: tasks executed, waiting, stale, budget %, AutoDiag status, Evolution gen/fitness, next wave IDs
+- [ ] IDs de tasks são reais (ex: `task-041`, `task-042`), não `[task IDs]`
+- [ ] Nome do cliente/projecto aparece no contexto (ex: Cuidai, SAQUEI, ARRECADA.GOV)
+- [ ] Nenhum campo contém `<placeholder>`, `N tokens`, `X%`, ou `{score}` por preencher
+
+❌ NOT delivery-ready: `Budget used: X% (N tokens / limit)` | `Evolution: Gen {N}, fitness {score}`
+✅ Delivery-ready: Output usa nome do cliente + dados reais — ver exemplo abaixo
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## 🫀 LUCAS Heartbeat — Pulso #14 | Cuidai | 2025-06-14 10:47:00
+
+### 0. State Check
+→ state_machine.py: { "state": "ACTIVE", "autonomy_level": 3, "max_parallel": 3, "system_health": "OK" }
+Prosseguindo com execução normal.
+
+### 1. Scan do Taskboard
+Activo: 11 tasks
+  backlog: 2 | todo: 4 | in_progress: 3 | in_review: 1 | done: 8 | blocked: 1
+⚠️  Stale detectado: task-038 (in_progress há 31h, última actualização 2025-06-13T03:12Z)
+✅  SLA OK: nenhuma task ultrapassou sla_deadline
+
+### 2. Budget Check — Junho 2025
+Ficheiro: ~/.claude/orchestrator/budgets/2025-06.yaml
+Gasto: 142.400 / 200.000 tokens (71.2%)
+Status: ✅ Dentro do limite
+Próximo threshold (80%): ~17.200 tokens restantes de margem
+
+### 3. Unblock Cascade
+task-031 (done) → desbloqueou task-044 (depends_on satisfeito)
+task-044: backlog → todo ✅
+Cascade log: audit/cascade_2025-06-14.log (+1 evento)
+
+### 4. Auto-Dispatch
+dispatch_engine.py --json → Exit 0
+
+task-044: assignee=lucas-copywriter
+  dispatch_reason: "keyword 'nurture sequence' → skill copywriting → lucas-copywriter (workload 1/3)"
+task-045: assignee=lucas-analytics
+  dispatch_reason: "keyword 'churn report' → skill analytics → lucas-analytics (workload 0/3)"
+task-046: assignee=lucas-copywriter
+  dispatch_reason: "sibling fallback — lucas-content-ops sobrecarregado (3/3), próximo: lucas-copywriter"
+
+Log: audit/dispatch_2025-06-14.log (+3 entradas)
+
+### 5. Wave Planning
+Wave 1 (independentes, sem depends_on mútuo):
+  → task-044, task-045, task-046 (max_parallel=3 ✅)
+Wave 2 (aguarda Wave 1): task-047, task-048
+
+### 6. Execução — Wave 1
+
+**task-044** | Nurture sequence 3-part para leads Cuidai (cuidadores informais)
+  checked_out_at: 2025-06-14T10:47:03Z
+  Agent: lucas-copywriter → subagent_type: claude-opus-4
+  completed_at: 2025-06-14T11:02:41Z
+  actual_tokens: 4.231
+  execution_policy: requires_review → status: in_review
+  completion_comment: "3 emails gerados: Dia 0 (boas-vindas), Dia 3 (funcionalidades), Dia 7 (caso de sucesso Cuidai Pro)"
+
+**task-045** | Churn report semanal — semana 23/2025
+  checked_out_at: 2025-06-14T10:47:04Z
+  Agent: lucas-analytics → subagent_type: claude-sonnet-4
+  completed_at: 2025-06-14T11:01:09Z
+  actual_tokens: 2.847
+  execution_policy: auto_approve → status: done
+  completion_comment: "Churn W23: 3.2% (▼0.4pp vs W22). Top reason: onboarding incompleto (41% dos churns). Recomendação: activar task-049 (onboarding fix)."
+
+**task-046** | Copy para campanha reactivação — segmento 60d inactive
+  checked_out_at: 2025-06-14T10:47:05Z
+  Agent: lucas-copywriter → subagent_type: claude-opus-4
+  completed_at: 2025-06-14T11:09:17Z
+  actual_tokens: 3.614
+  execution_policy: requires_review → status: in_review
+  completion_comment: "Subject + body gerados para 2 variantes A/B. Variante A: urgência ('O seu plano está a dormir'). Variante B: benefício ('Veja o que mudou no Cuidai')."
+
+Budget pós-wave: 153.092 / 200.000 tokens (76.5%) ↑+5.2pp
+
+### 7. Stale Detection
+⚠️  task-038 (in_progress há 31h): nota adicionada "STALE — no progress in 24h"
+   Threshold 48h: 2025-06-15T03:12Z — escalação automática ao CEO se sem progresso
+
+### 8. AutoDiag
+autodiag_runner.py --fix --json → Exit 2 (1 warning)
+  ⚠️  stale_review: task-031 em in_review há 52h → escalado ao CEO (status: blocked, reason: "review timeout 52h")
+  Restantes 6 checks: OK
+  Log: audit/autodiag.log (+1 entrada)
+
+### 9. Micro Evolution
+Sessão: 3 tasks completadas neste pulso (total sessão: 7)
+  synaptic_weights.yaml actualizado: lucas-copywriter +0.02 (nurture sequence), lucas-analytics +0.01 (churn report)
+  Nenhuma correcção de dispatch manual → sem novos padrões para cristalização
+  Próximo SESSION EVOLUTION: em 3 tasks (threshold: 10)
+
+### 10. Relatório de Pulso
+
+| Métrica              | Valor                                      |
+|----------------------|--------------------------------------------|
+| Tasks executadas     | 3 (task-044, task-045, task-046)           |
+| Tasks waiting        | 5 (backlog: 2, todo: 1, in_review: 2)     |
+| Tasks stale          | 1 (task-038 — 31h sem progresso)           |
+| Budget usado         | 76.5% (153.092 / 200.000 tokens)           |
+| AutoDiag             | ⚠️ 1 warning (stale_review task-031)       |
+| Evolution            | Gen 2, 4 mutations, fitness 0.84           |
+| Next wave ready      | task-047, task-048                         |
+
+Próximo pulso automático: 2025-06-14T11:17:00Z
+Pulse timestamp → ~/.claude/orchestrator/last_pulse.yaml ✅
+```
+
+---
+
+## Output anti-patterns
+
+- **Executar Wave sem verificar state machine** — lançar tasks em GUARDIAN ou REFLECTIVE_PAUSE ignora regras de segurança do sistema
+- **Budget reportado como "X% (N tokens)"** — placeholders não preenchidos no relatório final indicam pulso incompleto
+- **Assignee = `<worker>` ou campo vazio** — dispatch sem worker real bloqueia execução e não gera audit trail
+- **Task marcada `done` sem `actual_tokens` e `completion_comment`** — impossível auditar custo ou qualidade da execução
+- **AutoDiag mencionado sem exit code** — "AutoDiag: OK" sem evidência do script correu é afirmação não verificável
+- **Wave com tasks dependentes entre si** — viola a definição de wave (independentes), cria deadlocks silenciosos
+- **Stale detection descrita mas não executada** — mencionar o step sem verificar timestamps reais de `updated_at` é cosmético
+- **Relatório com `[task IDs]` no campo "Next wave ready"** — IDs reais são obrigatórios; placeholder indica pulso cortado antes da wave planning

@@ -816,3 +816,160 @@ To run weekly digest every Friday at end of day:
 
 Or manual: /lucas-analytics weekly
 ```
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1: Dados reais de projetos (não placeholders)
+- [ ] Todos os clientes referenciados têm `start_date` real e `monthly_retainer` confirmado
+- [ ] `skills_used` lista apenas skills que existem no sistema LUCAS (sem nomes inventados)
+- [ ] `total_tokens_invested` calculado a partir de tarefas reais em `tasks/done/`, não estimado
+- [ ] `satisfaction` tem evidência (mensagem, NPS, renovação) — não assumido
+- ❌ NOT delivery-ready: `client: cliente_x`, `monthly_retainer: ???`, `roi_multiplier: TBD`
+- ✅ Delivery-ready: `client: atrium`, `monthly_retainer: 2500`, `start_date: "2025-11"`, `roi_multiplier: 600x`
+
+### Gate 2: Skill Performance Dashboard com scores verificáveis
+- [ ] Cada skill no dashboard tem ≥3 projetos analisados (não score de 1 único output)
+- [ ] Revision rate calculado a partir de tasks que voltaram ao worker (não estimado)
+- [ ] Tier C skills têm `root_cause` específico + `action` com owner e prazo
+- [ ] Tendência (improving/stable/declining) tem pelo menos 2 pontos temporais comparados
+- ❌ NOT delivery-ready: `| dario-offer | ~72 | high% | generic | fix somehow |`
+- ✅ Delivery-ready: `| dario-offer | 72.0 | 40% | Generic value equations — sem pricing data PT | Ingest DataForSEO PT benchmarks até 2026-05-15 |`
+
+### Gate 3: Domain Playbook com lógica causal (não só ordem)
+- [ ] `optimal_skill_chain` explica *porquê* cada skill está naquela posição (dependências, não só sequência)
+- [ ] `avoid` tem pelo menos 1 exemplo real de projeto que falhou por violar a regra
+- [ ] `rag_context_needed` especifica fonte concreta (ex: "Google Maps reviews do restaurante + 3 competidores Cascais")
+- [ ] `estimated_time` validado contra projetos reais — não teórico
+- ❌ NOT delivery-ready: `avoid: "bad order"`, `rag_context_needed: "context"`, `projects_analyzed: 1`
+- ✅ Delivery-ready: `avoid: "dario-offer antes de dario-brand — Mar & Brasa Q1 produziu value equation genérica, score 68"`, `projects_analyzed: 3`
+
+### Gate 4: Revenue Attribution com ROI auditável
+- [ ] `token_cost_estimate` usa taxa real do modelo (ex: Claude 3.5 Sonnet: $3/MTok input, $15/MTok output)
+- [ ] `revenue_to_date` reflecte apenas pagamentos recebidos, não contratos assinados
+- [ ] ROI multiplier formula documentada: `(revenue_to_date / token_cost_estimate)` — não inventada
+- [ ] Skills sem revenue attribution têm flag explícito `revenue_impact: indirect` ou `not_yet_measured`
+- ❌ NOT delivery-ready: `roi_multiplier: muito alto`, `revenue_to_date: estimado ~5000`
+- ✅ Delivery-ready: `revenue_to_date: 15000`, `token_cost_estimate: 25.00`, `roi_multiplier: 600x  # 15000/25`
+
+### Gate 5: Knowledge Graph — queries retornam dados, não templates
+- [ ] Cada query de exemplo tem resposta real com nomes/datas/números do sistema actual
+- [ ] "Stale projects" query usa data actual como referência (não `>30 days` abstracto)
+- [ ] "Best approach for [domain]" cita projetos reais como evidência, não só skill chain
+- [ ] Queries de "declining quality" têm dois timestamps concretos comparados
+- ❌ NOT delivery-ready: `Q: "All restaurant clients" A: [client_1], [client_2]`
+- ✅ Delivery-ready: `Q: "All restaurant clients" A: Mar & Brasa (Cascais, desde 2026-04), próximo cliente pendente onboarding`
+
+### Gate 6: Output usa CLIENT NAME + dados REAIS, sem angle-brackets
+- [ ] Zero ocorrências de `<client_name>`, `[CLIENT]`, `{{placeholder}}`, `TBD`, `???`
+- [ ] Todos os `domain: "restaurant"` têm pelo menos 1 projeto real como âncora
+- [ ] Competitive Intelligence alerts referem keywords reais do cliente (ex: "restaurante cascais vista mar"), não `[keyword]`
+- [ ] Módulo 5 tem pelo menos 1 alerta real ou "sem alertas activos desde YYYY-MM-DD" — não template vazio
+- ❌ NOT delivery-ready: `competitor: [competitor_name]`, `keyword: [client_target_keyword]`
+- ✅ Delivery-ready: `keyword: "restaurante cascais vista mar"`, `alert: "A Taberna do Mar subiu para #1 em 2026-04-12 — era posição #3"`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# LUCAS Analytics Report — Semana 2026-04-14
+
+## Module 2: Skill Performance Dashboard — Abril 2026
+
+### Tier A (Avg ≥ 85, Revision < 10%)
+| Skill            | Score | Rev% | Best Domain | Tokens |
+|------------------|-------|------|-------------|--------|
+| seo-local        | 91.5  | 0%   | restaurant  | 3 100  |
+| dario-brand      | 87.3  | 8%   | any         | 2 200  |
+| seo-technical    | 86.8  | 5%   | any         | 2 800  |
+
+### Tier B (Avg 70–84, Revision 10–25%)
+| Skill              | Score | Rev% | Issue                         | Fix                                      |
+|--------------------|-------|------|-------------------------------|------------------------------------------|
+| seo-plan           | 84.5  | 12%  | Keywords thin sem DataForSEO  | Enriquecer RAG com export DataForSEO PT  |
+| dario-story-circle | 82.0  | 15%  | Genérico sem contexto cliente | Exigir brand doc antes de activar        |
+
+### Tier C — NEEDS ATTENTION
+| Skill                  | Score | Rev% | Root Cause                    | Action                              | Prazo      |
+|------------------------|-------|------|-------------------------------|-------------------------------------|------------|
+| dario-offer            | 72.0  | 40%  | Sem pricing data PT           | Ingest benchmarks DataForSEO PT     | 2026-05-01 |
+| dario-financial-model  | 74.5  | 30%  | Sem benchmarks mercado PT     | Ingest INE + Banco Portugal datasets| 2026-05-15 |
+
+---
+
+## Module 1: Domain Playbook — Restaurant (3 projetos analisados)
+
+```yaml
+domain: "restaurant"
+projects_analyzed: 3  # Mar & Brasa, [onboarding Q2-A], [onboarding Q2-B]
+avg_quality: 87.5
+anchor_project: "mar-brasa (2026-04, Cascais)"
+
+optimal_skill_chain:
+  - dario-brand     # Sempre primeiro — define tom p/ todos os outros. Mar & Brasa: 92
+  - dario-naming    # Paralelo com seo-local — naming precisa do brand doc
+  - seo-local       # Crítico para restaurantes, depende de GBP e morada real. 91 avg
+  - seo-plan        # Depois do brand — keywords alinhadas com posicionamento. 84 avg
+  - dario-story-circle  # Depois de brand+naming — hero/conflict já definido. 85 avg
+
+avoid:
+  - "dario-offer antes de dario-brand — Mar & Brasa Q1-2026 produziu value equation
+     genérica ('comida boa, preço justo'). Score: 68. Corrigido após brand doc."
+
+rag_context_needed:
+  - "Google Maps reviews do restaurante (min 50 reviews)"
+  - "3 competidores directos com distância <2 km + respectivos menus"
+  - "Preços médios da área (fonte: The Fork / Zomato scrape)"
+  - "GBP listing completo do cliente"
+
+estimated_tokens: 35 000
+estimated_time: "15–20 min (validado em Mar & Brasa: 17 min)"
+```
+
+---
+
+## Module 3: Revenue Attribution — Abril 2026
+
+### Por Cliente
+| Cliente          | Retainer/mês | Início     | Tokens     | Custo Token | Revenue Acum. | ROI    |
+|------------------|-------------|------------|------------|-------------|---------------|--------|
+| Atrium           | 2 500 EUR   | 2025-11    | 250 000    | 25,00 EUR   | 15 000 EUR    | 600x   |
+| Mar & Brasa      | 1 500 EUR   | 2026-04    | 34 000     | 3,40 EUR    | 1 500 EUR     | 441x   |
+
+*ROI = revenue_acumulado / custo_tokens. Custo: Claude 3.5 Sonnet $3/MTok input.*
+
+### Por Skill
+| Skill        | Projectos | Revenue Médio/Proj | Custo Token | ROI   |
+|--------------|-----------|-------------------|-------------|-------|
+| seo-audit    | 5         | 2 000 EUR         | 3,50 EUR    | 571x  |
+| dario-brand  | 4         | 1 500 EUR         | 2,20 EUR    | 681x  |
+| dario-wp-audit | 3       | 1 800 EUR         | 4,00 EUR    | 450x  |
+
+---
+
+## Module 5: Competitive Intelligence — Alertas Activos
+
+**Cliente: Mar & Brasa (Cascais)**
+- ⚠️ `2026-04-12` — "A Taberna do Mar" subiu para posição #1 em "restaurante cascais vista mar"
+  (Mar & Brasa desceu de #2 para #3). Acção recomendada: publicar 2 posts GBP esta semana.
+- ✅ Sem novos competidores detectados no raio 2 km desde 2026-03-01.
+
+**Cliente: Atrium (Lisboa)**
+- ✅ Sem movimentos relevantes. Última verificação: 2026-04-13.
+- Próxima verificação programada: 2026-04-21.
+```
+
+---
+
+## Output anti-patterns
+
+- Dashboard gerado sem dados reais: scores inventados, revision rates a zero porque "ainda não há histórico" — se não há dados suficientes, diz explicitamente `insufficient_data: true` em vez de fingir métricas
+- ROI calculado com revenue futuro/contratual em vez de pagamentos recebidos — infla artificialmente o ROI e perde credibilidade quando confrontado
+- Domain Playbook com `projects_analyzed: 1` — um único projecto não é padrão, é anedota; exige mínimo 2
+- Knowledge Graph queries com respostas template em vez de dados do sistema: `A: [client_name]` em vez de `A: Mar & Brasa (Cascais)`
+- Competitive Intelligence vazia com texto genérico "sem alertas" sem data de verificação — cliente não sabe se foi verificado hoje ou há 3 meses
+- Token cost calculado sem especificar modelo e taxa usada — impossível auditar ou replicar o ROI
+- Tier C skills sem prazo e owner para a acção correctiva — lista de problemas sem accountability não resolve nada
+- Módulo 5 truncado (o SKILL.md original corta em "Industry tren") — entregar output com conteúdo incompleto do template sem flag explícita ao cliente
