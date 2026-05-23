@@ -236,6 +236,38 @@ def job_integrity_gate() -> dict:
     }
 
 
+def job_compute_client_stats() -> dict:
+    """Per-client stats aggregator (FASE 3, 2026-05-23).
+
+    Reads .captured_outputs.yaml + scans OBS_OUTPUTS folder, groups by
+    inferred client (filename pattern), writes quality/client-stats.yaml.
+
+    Zero API cost. Just YAML parsing + aggregation.
+    """
+    try:
+        import subprocess
+        script = ORCH_DIR / "scripts" / "compute_client_stats.py"
+        if not script.exists():
+            return {"error": "compute_client_stats.py not found"}
+
+        proc = subprocess.run(
+            [sys.executable, str(script), "--check"],
+            capture_output=True, text=True, timeout=30,
+            cwd=str(ORCH_DIR),
+        )
+        # Count clients with scored data
+        lines = proc.stdout.strip().split("\n")
+        client_count = sum(1 for line in lines if " obs " in line)
+        return {
+            "clients_tracked": client_count,
+            "returncode": proc.returncode,
+        }
+    except subprocess.TimeoutExpired:
+        return {"error": "timeout"}
+    except Exception as e:
+        return {"error": str(e)[:300]}
+
+
 def job_auto_capture_obsidian() -> dict:
     """Auto-capture new Obsidian outputs into the scoring pipeline.
 
@@ -469,6 +501,7 @@ def run_all(dry_run: bool = False) -> dict:
     report["jobs"].append(_run_job("prompt_hints_promote", job_prompt_hints_promote))
     report["jobs"].append(_run_job("delivery_rate_recompute", job_delivery_rate_recompute))
     report["jobs"].append(_run_job("auto_capture_obsidian", job_auto_capture_obsidian))
+    report["jobs"].append(_run_job("compute_client_stats", job_compute_client_stats))
 
     report["duration_seconds"] = (_now() - start).total_seconds()
 

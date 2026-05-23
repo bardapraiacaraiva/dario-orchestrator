@@ -166,6 +166,24 @@ def generate():
         if ttrs:
             queue_avg_ttr_min = sum(ttrs) / len(ttrs)
 
+    # Per-client stats (FASE 3, 2026-05-23)
+    client_stats_path = ORCH / "quality" / "client-stats.yaml"
+    top_clients = []
+    if client_stats_path.exists():
+        try:
+            cs = load_yaml_safe(client_stats_path)
+            clients = cs.get("clients", {})
+            # Top by total_outputs_obsidian, excluding internal/archived
+            ranked = [
+                (cid, c) for cid, c in clients.items()
+                if c.get("status") not in ("internal", "archived")
+                and c.get("total_outputs_obsidian", 0) > 0
+            ]
+            ranked.sort(key=lambda x: -(x[1].get("total_outputs_obsidian") or 0))
+            top_clients = ranked[:6]
+        except Exception:
+            top_clients = []
+
     # Task rows
     task_rows = ""
     for t in tasks[:10]:
@@ -328,6 +346,7 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
     <div class="health-row"><span class="dot dot-green"></span> Budget Tracker — {budget.get('month','?')}, {pct:.1f}% usado</div>
     <div class="health-row"><span class="dot dot-green"></span> Quality — {len(q_skills)} skills scored, avg {avg_quality:.1f}, delivery-ready {delivery_rate_pct:.0f}% ({delivery_yes}/{delivery_total})</div>
     <div class="health-row"><span class="dot {'dot-amber' if queue_pending > 0 else 'dot-green'}"></span> Review Queue — {queue_pending} pending, {queue_resolved} resolved {'(avg TTR ' + f'{queue_avg_ttr_min:.0f}min)' if queue_resolved else ''}</div>
+    <div class="health-row"><span class="dot dot-green"></span> Top clients (by outputs): {' · '.join(f"{c.get('name', cid)[:18]} ({c.get('total_outputs_obsidian', 0)})" for cid, c in top_clients[:5])}</div>
     <div class="health-row"><span class="dot dot-green"></span> Tasks — {len(tasks)} activas, {done_count} done</div>
     <div class="health-row"><span class="dot {'dot-green' if pulse_time != 'nunca' else 'dot-red'}"></span> Last Pulse — {pulse_time}</div>
   </div>
