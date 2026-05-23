@@ -51,6 +51,7 @@
 !orchestrator/quality/
 !orchestrator/quality/domain-playbooks.yaml
 !orchestrator/quality/eval-baseline.yaml
+!orchestrator/quality/client-revenue.yaml.example
 
 # --- Allow test suite + pytest config ---
 !orchestrator/tests/

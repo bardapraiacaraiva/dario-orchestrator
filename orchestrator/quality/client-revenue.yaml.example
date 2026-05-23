@@ -1,0 +1,46 @@
+# DARIO Client Revenue — TEMPLATE
+#
+# 1. Copy this file to client-revenue.yaml (sem .example)
+# 2. Edit com os teus clientes e valores reais
+# 3. client-revenue.yaml está gitignored — fica local-only (dados financeiros privados)
+# 4. Re-run: python scripts/compute_client_stats.py
+#
+# Schema por cliente (todos os campos opcionais):
+#   monthly_value:  número (sem currency symbol, sem milhares-separator)
+#   currency:       EUR | BRL | USD
+#   billing_status: active | paused | success-fee | pre-revenue | one-shot | trial | archived
+#   billing_model:  retainer | hourly | project-based | success-fee | equity | advisory
+#   contract_start: YYYY-MM-DD
+#   contract_end:   YYYY-MM-DD (null = open-ended)
+#   last_invoice:   YYYY-MM-DD
+#   notes:          texto livre
+#
+# IDs devem corresponder a CLIENT_ALIASES em scripts/compute_client_stats.py.
+
+clients:
+
+  # Example client #1 — active monthly retainer
+  example-client-a:
+    monthly_value: 2500
+    currency: EUR
+    billing_status: active
+    billing_model: retainer
+    contract_start: 2026-01-15
+    last_invoice: 2026-05-01
+    notes: "Site live + monthly SEO retainer"
+
+  # Example client #2 — pre-revenue project
+  example-client-b:
+    monthly_value: 0
+    currency: BRL
+    billing_status: pre-revenue
+    billing_model: project-based
+    notes: "MVP em construção, aguarda decisão founder"
+
+  # Example client #3 — success-fee model (não recorrente)
+  example-client-c:
+    monthly_value: 0
+    currency: BRL
+    billing_status: success-fee
+    billing_model: success-fee
+    notes: "12% sobre recuperações. Não tracking aqui — ver dashboard separado."
