@@ -369,6 +369,43 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no case study gerado deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado pelo cliente via raw data collection (Step 1) ou testimonial gravado
+- 🟡 **assumed** — plausível com base no contexto fornecido, mas precisa confirmação antes de publicar
+- 🟢 **projection** — resultado estimado/forecast por design (ex: ROI projectado, não ainda realizado)
+
+O checklist aparece **antes do output final** para o reader saber exactamente o que é confiável vs. o que precisa validar. **Honest transparency > case study inflado.**
+
+---
+
+❌ **NOT delivery-ready:**
+```
+Revenue grew from $8k/mo para $24k/mo em 6 semanas. Leads aumentaram 3x.
+ROI de 400% projectado para Q4.
+```
+*(Sem labels — reader não sabe se métricas são reais, assumidas ou forecast. Risco legal e reputacional.)*
+
+✅ **Delivery-ready:**
+```
+- Revenue: $8k/mo → $24k/mo em 6 semanas 🔵 verified (cliente confirmou via invoice data)
+- Leads: "aumentaram significativamente" 🟡 assumed (cliente disse "triplicaram" verbalmente — aguarda dados CRM)
+- ROI Q4: +400% 🟢 projection (modelo baseado em trajectory actual — não garantido)
+- Testimonial quote: "Mudou completamente o meu negócio" 🔵 verified (gravação em arquivo)
+- Industry: SaaS B2B, 12 funcionários 🟡 assumed (inferido do contexto — confirmar antes de publicar)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions com dados reais do cliente
+- [ ] Todas as métricas 🔵 têm fonte citada (invoice, screenshot, CRM export, gravação)
+- [ ] Todos os itens 🟢 estão labelled como "resultados projectados" no output final ao cliente
+- [ ] Testimonial quotes aprovadas por escrito pelo cliente antes de publicar
+- [ ] Nenhuma métrica de revenue/ROI publicada sem sign-off explícito do cliente
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

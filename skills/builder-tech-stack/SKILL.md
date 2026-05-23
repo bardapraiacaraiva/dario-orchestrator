@@ -99,6 +99,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast by design (não verificável agora)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+Stack: Next.js + Neon PostgreSQL. Custo: EUR 20/mês. A 10x escala para Hetzner VPS.
+```
+*(Reader assume que tudo é verified — mas budget, tráfego esperado e equipa técnica são assumptions não declaradas.)*
+
+✅ Delivery-ready:
+```
+- Stack: Next.js + Neon PostgreSQL 🔵 (confirmado: cliente usa Next.js em projecto anterior)
+- Budget mensal: EUR 0–25 🟡 (assumed: cliente mencionou "low-cost" — confirmar tecto exacto)
+- Tráfego estimado inicial: <10K visits/mês 🟡 (assumed: sem dados reais de lançamento)
+- Custo a 10x (100K visits/mês): EUR 19/mês Neon paid tier 🟢 (projecção — depende de crescimento real)
+- Equipa de manutenção: founder solo sem DevOps 🔵 (confirmado em briefing)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (budget real, tráfego real, provider preferido)
+- [ ] All 🔵 sources citadas — sessão/doc onde stack anterior ou equipa técnica foi confirmada
+- [ ] All 🟢 projections labeled como tal ao cliente — scaling path e custos futuros apresentados como estimativas, não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

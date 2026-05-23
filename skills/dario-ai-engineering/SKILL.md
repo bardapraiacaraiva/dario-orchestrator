@@ -453,6 +453,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memoria / dados do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast por design (não verificável à priori)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Recommended chunking: 512 tokens with 20% overlap. Hybrid search (vector + BM25) expected to lift retrieval recall from 71% to 85%. Voyage-3 selected as embedding model."
+> — Reader assume que os números são factuais, que o benchmark foi feito nos dados deles, e que o modelo foi validado no contexto deles. Nada foi confirmado.
+
+✅ Delivery-ready:
+> - 🟡 **assumed** — Chunk size 512 tokens (padrão razoável para docs técnicos, mas não benchmarkado nos teus dados específicos — confirmar com retrieval eval)
+> - 🟡 **assumed** — Volume estimado: ~40k chunks no corpus (baseado no que descreveste; confirmar após ingestão real)
+> - 🔵 **verified** — Hybrid search (vector + BM25) validado como padrão superior a pure-vector na documentação do teu stack (Weaviate 1.18+)
+> - 🟢 **projection** — Reranker (Cohere Rerank) projectado para +8–12 pts de recall@5 vs baseline sem rerank — número é benchmark da literatura, não do teu dataset
+> - 🟡 **assumed** — Latência P95 < 800ms estimada para pipeline RAG; depende do teu infra e load real
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — chunk size, volume real do corpus, latência SLA e modelo de embedding validados nos dados do cliente
+- [ ] All 🔵 citations added — versão do stack, source docs ou session notes que sustentam os factos verificados
+- [ ] All 🟢 projections labeled as such ao cliente — deixar claro que recall lifts e cost estimates são benchmarks externos até os evals internos correrem
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

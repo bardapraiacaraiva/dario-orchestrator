@@ -124,6 +124,27 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via registry.json inspeccionado, package.json do projecto, ou teste de install real
+- 🟡 **assumed** — plausível com base no padrão shadcn mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — comportamento esperado by design (não verificável sem deploy activo)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs o que precisa de verify antes de usar o componente em produção. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready: entregar `registry.json` com lista de componentes, dependencies, e URL de install sem labels — cliente assume que tudo foi testado, que o registry está live, e que as deps estão correctas
+✅ Delivery-ready:
+- 🔵 **verified** — `"dependencies": ["@tanstack/react-table", "zod"]` confirmados via `package.json` do projecto consumidor
+- 🟡 **assumed** — `https://registry.dario.pt/r/auth-form` presumido acessível; CORS headers não verificados nesta sessão — confirmar com `curl -I` antes de share com equipa
+- 🟢 **projection** — `npx shadcn@latest add` vai auto-instalar peer deps e gerar ficheiro em `components/auth/auth-form.tsx` (comportamento esperado do CLI; validar após primeiro deploy)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — registry URLs testadas com `curl`, CORS validado, versões de componentes confirmadas com cliente
+- [ ] All 🔵 sources citadas — package.json path documentado, sessão/commit onde install foi testado referenciado
+- [ ] All 🟢 projections comunicadas ao cliente como "comportamento esperado do shadcn CLI, não testado neste ambiente" — expectativas claras antes de integrar noutros projectos
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

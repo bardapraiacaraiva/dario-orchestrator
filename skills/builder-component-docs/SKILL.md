@@ -125,6 +125,28 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via leitura do ficheiro fonte do componente (Read tool executado)
+- 🟡 **assumed** — plausível com base no padrão do projeto, mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — comportamento esperado/documentado por design (não verificável sem runtime)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verificação. **Honest transparency > documentação inflada.**
+
+❌ NOT delivery-ready: Props table com `default: 'md'`, `variant: 'default'` e import path `@/components/ui/button` sem indicar se foram lidos do source — reader assume tudo verified quando pode ser tudo assumed.
+
+✅ Delivery-ready:
+- 🔵 `onClick: (event: React.MouseEvent) => void` — extraído do `interface ButtonProps` via Read
+- 🟡 Import path `@/components/ui/button` — segue convenção observada no projeto, confirmar estrutura real de pastas
+- 🟢 `isLoading` bloqueia interação enquanto spinner está visível — comportamento documentado, não testado em runtime
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumed import paths, variant names e defaultProps por actuals lidos do source
+- [ ] All 🔵 citations added — cada prop documentada com referência ao ficheiro e linha de onde foi extraída (`button.tsx:L14`)
+- [ ] All 🟢 projections labeled ao cliente — deixar claro que comportamentos de loading/disabled/error são documentação de intenção, não output de teste automatizado
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

@@ -148,6 +148,35 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do DARIO Dashboard deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do sistema instalado / sessão actual / ficheiros reais
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa por design (não verificável sem acesso ao ambiente)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa verify antes de usar o dashboard em produção. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "A sidebar tem 93 skills organizadas em 11 categorias. O budget do projecto Cuidai está em €340/€500. Health indicator verde. Servidor corre na porta 8766."
+> *(reader assume que tudo foi verificado — pode estar a ver dados estáticos desactualizados ou contagens erradas)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Servidor porta `8766`, path `~/.claude/orchestrator/dashboard.html`, ficheiro `29KB single file zero dependencies`
+> - 🟡 **assumed** — Contagem "93 skills" e categorias (ex: `SEO (16)`, `DIVA (20)`) — precisa confirmar com `ls ~/.claude/orchestrator/*.md | wc -l` no ambiente do cliente
+> - 🟡 **assumed** — Valores de budget nos widgets (ex: `Cuidai — €340/€500`) — dados estáticos no HTML, podem estar desactualizados desde último sync
+> - 🟢 **projection** — Health indicator "verde" reflecte estado no momento do último pulse; não garante estado actual sem `/dario-status`
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os 🟡 items confirmados — contagem real de skills verificada com `ls` command; valores de budget validados contra fonte actual
+- [ ] Todas as citations 🔵 adicionadas — path do ficheiro confirmado, porta 8766 testada e livre no ambiente do cliente
+- [ ] Todos os 🟢 projections comunicados claramente ao cliente — dashboard mostra snapshot estático, não live feed; expectativa definida antes de entregar
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

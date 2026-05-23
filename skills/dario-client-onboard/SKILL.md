@@ -274,6 +274,43 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de onboarding deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior, agent-memory existente, ou dados fornecidos directamente pelo cliente
+- 🟡 **assumed** — plausível com base no brief inicial, mas precisa confirmação do cliente antes de delivery
+- 🟢 **projection** — forecast por design do diagnóstico (não verificável até execução)
+
+Output checklist upfront mostra ao utilizador exactamente o que é trust-as-is vs. o que precisa de sync antes de avançar. **Honest transparency > onboard incompleto entregue como completo.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Score global: 4.2/10 | Stack: WordPress + WooCommerce | TIER 0: SSL expirado | Budget: €1.500/mês
+```
+*Reader assume que tudo foi verificado — score pode ser baseado em stack assumido, budget nunca confirmado, SSL inferido sem acesso real.*
+
+---
+
+✅ Delivery-ready:
+```
+- Score global: 4.2/10 🟢 projection — baseado em diagnóstico DARIO sobre dados parciais
+- Stack: WordPress + WooCommerce 🟡 assumed — declarado no brief, não verificado via WP admin ainda
+- TIER 0: SSL expirado 🔵 verified — confirmado via GTmetrix report partilhado pelo cliente em 2024-11-03
+- Budget mensal: €1.500 🟡 assumed — mencionado em call, não formalizado em contrato
+- Tráfego orgânico: +18% em 90 dias 🟢 projection — forecast do roadmap M1→M2, não actuals
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmados — substituir assumptions (stack, budget, contactos, acessos) com actuals do cliente
+- [ ] All 🔵 sources citadas no `project_<slug>.md` com data e origem (call, doc, tool output)
+- [ ] All 🟢 projections claramente marcadas como forecast ao cliente no report final — gestão de expectativas activa
+- [ ] Campos "Pending data from cliente" no agent-memory file zerados ou explicitamente delegados com owner + deadline
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

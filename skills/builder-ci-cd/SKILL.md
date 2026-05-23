@@ -149,6 +149,35 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do projecto real (package.json, lockfile, repo inspeccionado)
+- 🟡 **assumed** — plausível para a stack mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — comportamento esperado do pipeline em runtime (não verificável até correr)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa verify antes de fazer merge.  **Honest transparency > workflow que parece completo mas quebra no primeiro push.**
+
+❌ NOT delivery-ready: workflow entregue com `node-version: 18`, `cache: npm`, e `VERCEL_PROJECT_ID` sem labels — cliente assume que foi tudo confirmado do repo real, faz merge, pipeline falha porque projecto usa Node 22 + pnpm
+
+✅ Delivery-ready:
+- 🔵 **verified** — `actions/checkout@v4` e `actions/setup-node@v4` (versões pinadas confirmadas no repo)
+- 🟡 **assumed** — `node-version: 22` (sem `.nvmrc` inspeccionado — confirmar com cliente antes de push)
+- 🟡 **assumed** — `cache: npm` (package manager inferido — confirmar se projecto usa pnpm ou yarn)
+- 🟡 **assumed** — `VERCEL_PROJECT_ID` (ID não fornecido — cliente deve extrair de Settings → Vercel Project)
+- 🟢 **projection** — deploy-preview gerará URL única por PR após secrets configurados
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] 🟡 `node-version` confirmado contra `.nvmrc` ou campo `engines` do `package.json`
+- [ ] 🟡 Package manager confirmado (`npm` / `yarn` / `pnpm`) — cache e install command alinhados
+- [ ] 🟡 Todos os secrets (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`) copiados para GitHub Settings → Secrets pelo cliente
+- [ ] 🟡 Plataforma de deploy confirmada (Vercel action vs `docker build` vs outro) — não assumir por nome do projecto
+- [ ] 🔵 Todas as versões de actions (`@v4`, `@v25`) citadas com fonte (GitHub Marketplace consultado)
+- [ ] 🟢 Projecções de comportamento (zero-downtime, rollback automático, URL de preview) marcadas como tal ao cliente — não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

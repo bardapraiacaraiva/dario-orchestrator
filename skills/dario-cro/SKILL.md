@@ -478,6 +478,35 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via analytics, heatmap, ou dados do cliente já recebidos
+- 🟡 **assumed** — plausível com base em benchmarks de indústria, mas precisa confirm do cliente pré-entrega
+- 🟢 **projection** — forecast de impacto por design (não verificável até teste correr)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. o que precisa verify antes de agir. **Honest transparency > inflated CRO delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "A taxa de conversão está abaixo da média, o botão CTA não está a receber clicks suficientes e o teste A/B deve gerar +18% lift."
+*(reader assume que tudo é verified — nenhum label, nenhuma fonte, projeção vendida como fact)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Taxa de conversão atual: 1,4% (GA4 export do cliente, sessão anterior)
+> - 🟡 **assumed** — Benchmark de indústria para SaaS B2B lead gen: 2–5% (Unbounce 2023 report — confirmar se vertical do cliente é comparável)
+> - 🟡 **assumed** — CTA acima do fold não está visível em mobile (inferido da resolução 375px do Figma; confirmar com Hotjar scroll map real)
+> - 🟢 **projection** — Variante com headline reescrita + CTA repositionado estimada em +12–18% lift (baseado em LIFT scoring; validar só após teste atingir significância estatística ≥ 95%)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — benchmarks validados para o vertical correto; heatmaps / Clarity / Hotjar reais recebidos e analisados
+- [ ] All 🔵 citations added — GA4 export, sessão/data, segmento de tráfego especificado (device, source, geo)
+- [ ] All 🟢 projections labeled as such ao cliente — lift estimates apresentados como hipóteses de teste, não garantias de resultado
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

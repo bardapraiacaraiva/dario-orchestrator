@@ -125,6 +125,28 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via next-forge repo / stack oficial / versão fixada no lock file
+- 🟡 **assumed** — plausível para o projecto mas precisa de confirm do cliente antes de delivery
+- 🟢 **projection** — estimativa de comportamento em runtime/deploy (não verificável no scaffold)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready: scaffold entregue com `"next-forge (9K stars, Clerk, Drizzle, Stripe pré-configurados"` sem distinguir o que foi realmente gerado no projecto vs o que é feature do template base vs o que depende de env vars do cliente — reader assume tudo como production-ready.
+
+✅ Delivery-ready:
+- 🔵 **verified** — `turbo.json` com `"build": { "dependsOn": ["^build"], "outputs": [".next/**"] }` gerado e validado localmente
+- 🟡 **assumed** — `DATABASE_URL` aponta para Neon (plausível para stack recomendada, mas cliente pode usar Supabase ou self-hosted Postgres)
+- 🟢 **projection** — cold start < 200 ms no Vercel Edge com Clerk middleware activo (estimativa baseada em benchmarks next-forge, não medido neste projecto)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir `DATABASE_URL` provider, `CLERK_*` keys e `STRIPE_WEBHOOK_SECRET` com actuals do cliente
+- [ ] All 🔵 citations added — versões de `next`, `drizzle-orm`, `@clerk/nextjs`, `stripe` fixadas no `package.json` raiz com hash do commit next-forge base
+- [ ] All 🟢 projections labeled ao cliente — performance estimates e cache hit rates de Turborepo comunicados como projecções, não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

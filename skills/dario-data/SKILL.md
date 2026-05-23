@@ -418,6 +418,28 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmed from prior session/memory/cliente data
+- 🟡 **assumed** — plausible but needs cliente confirm pre-delivery
+- 🟢 **projection** — forecast by design (not verifiable)
+
+Output checklist upfront mostra reader exactly o que é trust-as-is vs precisa verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready: análise CLV entregue sem labels — "o teu CAC payback é 8 meses, NRR está em 104%, os top 20% de clientes geram 68% da receita" — reader assume que todos os números são verified quando podem ser assumptions baseadas em benchmarks de sector, não nos dados reais do cliente.
+
+✅ Delivery-ready:
+- 🔵 **verified** — CAC payback = 8 meses (calculado a partir dos dados Stripe + spend Google Ads fornecidos)
+- 🟡 **assumed** — NRR ~104% (estimado via churn rate declarado; confirmar com MRR expansion real)
+- 🟢 **projection** — top 20% clientes → 68% receita em 12 meses (modelo Pareto/NBD aplicado à cohort actual; não é histórico)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir benchmarks/sector assumptions com actuals do cliente (ex: churn rate real, ARPU por segmento, histórico de cohorts disponível)
+- [ ] All 🔵 citations added — fonte explícita por cada métrica verified (ex: "Stripe export 2024-Q1", "GA4 funnel report", "Mixpanel retention dashboard")
+- [ ] All 🟢 projections labeled as such ao cliente — CLV forecasts, North Star Metric targets e ICE score outcomes comunicados como modelos/projecções, não como resultados garantidos
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

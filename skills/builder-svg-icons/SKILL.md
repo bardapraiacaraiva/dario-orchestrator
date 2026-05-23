@@ -117,6 +117,28 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via projecto/contexto actual (brand identity, ficheiros existentes, specs do cliente)
+- 🟡 **assumed** — plausível dado o domínio SVG, mas precisa de confirmação antes de entregar
+- 🟢 **projection** — decisão de design por defeito (não verificável sem feedback visual do cliente)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready: set de 12 ícones gerado com `strokeWidth={2}`, `viewBox="0 0 24 24"`, paleta `currentColor` — sem labels; cliente assume que tudo foi validado contra a brand identity existente quando nenhum desses valores foi confirmado.
+
+✅ Delivery-ready:
+- 🔵 **verified** — `viewBox="0 0 24 24"` confirmado: projecto usa Lucide como base (package.json presente)
+- 🟡 **assumed** — `strokeWidth={1.5}` escolhido para match visual com UI existente; confirmar se brand guide especifica valor diferente
+- 🟢 **projection** — `strokeLinejoin="round"` aplicado a todo o set por consistência; aprovação visual final necessária do cliente
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions (strokeWidth, cornerRadius, viewBox size) com valores do brand guide ou decisão explícita do cliente
+- [ ] All 🔵 citations added — referenciar ficheiros fonte (ex: `lucide.config`, `tailwind.config`, `brand-identity.md`) usados para verificar specs
+- [ ] All 🟢 projections labeled as such ao cliente — deixar claro que decisões de estilo (roundness, weight visual) são propostas de design, não specs locked, e requerem sign-off visual
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

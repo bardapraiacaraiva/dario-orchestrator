@@ -380,6 +380,35 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados reais do cliente / fonte citada
+- 🟡 **assumed** — plausível para o stage mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — forecast por design (não verificável — expectativa futura, não facto presente)
+
+Output checklist upfront mostra ao leitor exactamente o que é trust-as-is vs. o que precisa de verify antes de executar. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Precisas contratar um VA quando atingires $15K/mês, o teu custo de aquisição é $120 e deves escalar para $50K em 4 meses."
+> *(reader assume que todos os números são reais — nenhum é labeled, pode estar a tomar decisões de hiring e cash flow com dados inventados)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Revenue actual: $12.400/mês (confirmado pelo cliente na sessão)
+> - 🟡 **assumed** — Hiring trigger VA: founder a fazer >10h/semana de admin (precisa confirmar horas reais)
+> - 🟡 **assumed** — CAC estimado de $90–$130 (baseado em benchmarks do sector; confirmar com dados reais de ad spend vs. clientes fechados)
+> - 🟢 **projection** — Trajectória $10K → $50K/mês em 5–7 meses se pipeline e sales process implementados conforme Stage 2 playbook
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: horas reais do founder IN vs. ON the business, CAC real, team size actual)
+- [ ] All 🔵 citations added — revenue, milestones e hiring triggers referenciados com fonte/sessão (ex: "confirmado call 2025-07-10")
+- [ ] All 🟢 projections labeled como tal ao cliente — trajectórias de receita e timelines apresentados como forecast, não como garantia de resultado
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

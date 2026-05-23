@@ -180,6 +180,36 @@ gtag('consent', 'update', { analytics_storage: 'granted' })
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/facto no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — forecast por design (não verificável agora)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+Measurement ID: G-4K9MR27TQV
+Conversion rate funnel: Visit 100% → Trial 12% → Paid 4%
+Activation rate target: 40%
+```
+*(reader assume que tudo é real — IDs podem ser placeholders, percentagens podem ser benchmarks genéricos)*
+
+✅ Delivery-ready:
+```
+🔵 verified  — Measurement ID: G-4K9MR27TQV (criado cliente em 2024-11-03, confirmado em session anterior)
+🟡 assumed   — Trial→Paid target: 12% (benchmark SaaS B2C; cliente não partilhou histórico de conversões)
+🟢 projection — Activation rate mês 3: 40% (modelo baseado em funnel design proposto; depende de onboarding impl.)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmados — substituir benchmarks/assumptions com actuals do cliente (ex: Measurement ID real, targets internos, baseline de churn)
+- [ ] All 🔵 items com fonte citada — session date, doc de referência, ou screenshot GA4
+- [ ] All 🟢 projections comunicadas ao cliente como forecast, não como métricas actuais — expectativas claras antes de entregar dashboard
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

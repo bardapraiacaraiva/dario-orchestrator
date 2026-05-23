@@ -342,6 +342,37 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no dashboard deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados reais do cliente (ex: extracto bancário, CRM, ad account)
+- 🟡 **assumed** — plausível com base no contexto, mas precisa de confirmação do cliente antes de entrega
+- 🟢 **projection** — forecast por design (não verificável hoje — benchmark ou modelo calculado)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > dashboard inflado.**
+
+---
+
+❌ NOT delivery-ready:
+> "CAC: $42 | LTV: $310 | LTV:CAC: 7.4:1 | Runway: 8 meses"
+> *(reader assume que todos os números são factuais — nenhum label, nenhuma fonte, CAC pode incluir ou não salários)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — MRR: R$28.400 (exportado do Stripe, Março 2025)
+> - 🔵 **verified** — Churn mensal: 3,2% (calculado de 94 clientes início → 91 fim do mês)
+> - 🟡 **assumed** — CAC blended: ~R$190 (baseado em spend declarado de R$4.800; excluí salário do SDR — confirmar se deve entrar)
+> - 🟡 **assumed** — Gross margin: ~68% (cliente mencionou "produto digital, custo baixo" — sem P&L formal partilhado)
+> - 🟢 **projection** — Runway: 11 meses (burn rate médio dos últimos 3 meses × saldo declarado; assume burn estável)
+> - 🟢 **projection** — Break-even timeline: Mês 7 (modelo linear sobre crescimento MoM actual de 9%)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — CAC recalculado com custos de headcount incluídos; gross margin validada contra COGS real
+- [ ] All 🔵 citations added — fonte de cada número (Stripe export, CRM report, ad account screenshot, data range)
+- [ ] All 🟢 projections labeled como tal ao cliente — expectativas claras: "este runway assume burn constante; qualquer contratação altera o número"
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

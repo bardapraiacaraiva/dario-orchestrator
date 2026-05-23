@@ -132,6 +132,28 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado da imagem/mockup recebido ou sessão anterior
+- 🟡 **assumed** — plausível dado o visual, mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa de design por inferência (não verificável sem spec original)
+
+Output checklist upfront mostra ao cliente exatamente o que é trust-as-is vs. o que precisa verificar antes de mergear. **Honest transparency > código que parece completo mas parte de suposições.**
+
+❌ NOT delivery-ready: entregar `primary: #1E3A8A`, `font-size: 48px`, `grid-cols-3` sem labels — cliente assume que tudo foi extraído fielmente da imagem quando metade são estimativas visuais
+
+✅ Delivery-ready:
+- 🔵 **verified** — Layout: `sidebar 280px fixo + content flex-1` (confirmado pela imagem recebida)
+- 🟡 **assumed** — Cor primária `#1E40AF`: azul extraído visualmente, tom exato não confirmado pelo design system do projeto
+- 🟢 **projection** — Breakpoint mobile `md:grid-cols-1`: responsive inferido por boas práticas, mockup só mostrava desktop
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmados — substituir cores/tokens assumidos pelos valores reais do design system
+- [ ] All 🔵 sources anotados — referência à imagem/frame exato de onde cada valor foi extraído
+- [ ] All 🟢 projections comunicadas ao cliente — deixar claro quais decisões responsive/tipográficas são inferência, não spec
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```tsx

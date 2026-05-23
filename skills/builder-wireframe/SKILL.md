@@ -195,6 +195,36 @@ LUSOconta — Hero Section — Content Inventory
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no wireframe output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do briefing/sessão anterior/dados reais do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — decisão de arquitectura por design (não verificável até testar com utilizadores)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs o que precisa verify antes de avançar para visual design. **Honest transparency > wireframe que parece completo mas está cheio de suposições.**
+
+❌ NOT delivery-ready: Wireframe com `"Trusted by 500+ companies"`, nav com 4 items, e flow de 6 steps — sem labels, o cliente assume que tudo foi validado e aprova.
+
+✅ Delivery-ready:
+```
+Checklist — Landing Page Tributario.AI
+
+🔵 verified  — Logo posicionado top-left (confirmado brand guide v2)
+🔵 verified  — CTA primário "Começar grátis" (confirmado copy do cliente)
+🟡 assumed   — "Trusted by 500+ empresas" — número a confirmar com cliente
+🟡 assumed   — 3 items no nav (Produto / Preços / Entrar) — estrutura não aprovada
+🟡 assumed   — Secção de depoimentos na landing — existe conteúdo real?
+🟢 projection — Flow de onboarding em 4 steps (hipótese UX; validar com teste A/B)
+🟢 projection — Mobile-first layout assume tráfego >60% mobile (analytics não partilhados)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmados — substituir copy/números assumed com actuals do cliente
+- [ ] All 🔵 sources citadas — ex: "nav structure from sitemap v1.2 aprovado em [data]"
+- [ ] All 🟢 projections comunicadas ao cliente como hipóteses de arquitectura a validar com utilizadores reais (não como decisões finais)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

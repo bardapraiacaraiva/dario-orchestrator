@@ -330,6 +330,41 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do funil deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados reais do cliente / benchmark publicado (fonte citável)
+- 🟡 **assumed** — plausível para o nicho, mas precisa de confirmação do cliente antes da entrega
+- 🟢 **projection** — forecast por design (não verificável até campanha live)
+
+Output checklist upfront mostra ao leitor exatamente o que é trust-as-is vs. o que precisa de validação. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Tripwire price: $27 | Lead magnet opt-in rate: 35% | Core offer: €997 programa
+→ Reader assume tudo verified — pode entregar funil com preços errados ao mercado
+```
+
+✅ Delivery-ready:
+```
+- 🔵 Lead magnet type: Checklist (cliente confirmou em sessão 14/05)
+- 🟡 Tripwire price: $27 (assumed — benchmark SaaS/info PT; cliente precisa confirmar margem)
+- 🟡 Core offer price: €997 (assumed — alinhado com value ladder Brunson; confirmar com cliente)
+- 🟢 Opt-in rate: 30-40% (projection — benchmark industry cold traffic; real depende de copy/targeting)
+- 🟢 Tripwire conversion: 5-15% (projection — baseline DigitalMarketer; validar após 200 visitas)
+- 🔵 Funnel type: Application Funnel (cliente indicou high-ticket consultoria, sessão anterior)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — preços de tripwire, core offer e profit maximizer substituídos por actuals do cliente
+- [ ] All 🔵 citations added — fontes Brunson/Hormozi/Deiss linkadas onde benchmarks são referenciados
+- [ ] All 🟢 projections labeled as such ao cliente — expectativas de conversion rate comunicadas como forecast, não garantia
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

@@ -290,6 +290,33 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via fontes reais (Google Trends, Crunchbase, SEO tools, Amazon BSR, Ad Library)
+- 🟡 **assumed** — plausível com base em proxies disponíveis, precisa de confirmação do cliente pré-entrega
+- 🟢 **projection** — forecast calculado por design (SOM, penetration rate, revenue potential) — não verificável, comunicar como tal
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa de sync antes de decidir entrar num mercado. **Honest transparency > inflated market research.**
+
+❌ NOT delivery-ready:
+> "TAM €2.3B, SOM €46M em 24 meses, mercado a crescer 18% YoY, 3 concorrentes fracos, Hormozi score 34/40."
+> *(Sem labels — o cliente não sabe se o TAM veio de um relatório pago, de um cálculo bottom-up estimado, ou de uma projecção otimista. Decisões de investimento tomadas sobre dados sem proveniência.)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — TAM €2.3B (fonte: Statista 2024, European EdTech Report)
+> - 🔵 **verified** — 3 concorrentes diretos identificados (Udemy PT, Aprender.pt, CourseHero) — tráfego via SimilarWeb
+> - 🟡 **assumed** — ARPC €297/ano (baseado em pricing público dos concorrentes; cliente deve confirmar se o seu modelo difere)
+> - 🟡 **assumed** — Hormozi "Can Afford to Pay" score 7/10 (proxy: rendimento médio do segmento 25-45 anos PT — INE 2023; validar se B2B ou B2C muda este número)
+> - 🟢 **projection** — SOM €46M em 24 meses (bottom-up: 12.400 clientes × €297 × 1.25 freq × 1% penetration rate — modelo por design, comunicar ao cliente como cenário base)
+> - 🟢 **projection** — Hormozi total score 34/40 (crescimento e dor validados 🔵; targeting e poder de compra são 🟡 — score final pode descer se assumptions não confirmados)
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir ARPC estimado, segmentação e poder de compra com dados reais do cliente ou pesquisa primária
+- [ ] Todas as citações 🔵 linkadas no entregável final (relatório/fonte/data de acesso)
+- [ ] Todos os itens 🟢 (SOM, Hormozi score composto, revenue projections) comunicados explicitamente ao cliente como modelos de forecast — não como factos de mercado
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

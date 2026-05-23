@@ -324,6 +324,38 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de oferta deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados reais do cliente / histórico validado
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast por design (valor percebido, ratio, resultado esperado — não verificável agora)
+
+Output checklist upfront mostra ao reader exactly o que é trust-as-is vs o que precisa verify antes de publicar a oferta.  
+**Honest transparency > oferta inflada que não converte.**
+
+---
+
+❌ **NOT delivery-ready:**
+- "Standalone value do Bonus 1: $500" — sem label (reader assume que é real; é estimativa)
+- "Value-to-Price Ratio: 12:1" — sem label (calculado com valores atribuídos, não mercado validado)
+- "Clientes conseguem resultado em 30 dias" — sem label (pode ser aspiração, não dado histórico)
+
+✅ **Delivery-ready:**
+- 🔵 **verified** — Preço do core offer: R$2.997 (confirmado pelo cliente em sessão anterior)
+- 🟡 **assumed** — Standalone value do Bonus "Vault de Templates": R$497 (estimativa razoável de mercado — cliente deve confirmar antes de publicar)
+- 🟢 **projection** — Dream outcome headline: "Fechar os primeiros 3 clientes em 60 dias" (resultado projetado pelo framework; depende de execução do cliente)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — standalone values dos bonuses substituídos por valores aprovados pelo cliente
+- [ ] All 🟡 items confirmed — pricing tiers (DIY / DWY / DFY) validados contra posicionamento real do mercado-alvo
+- [ ] All 🔵 sources citadas — preço, proof points, resultados de clientes anteriores com referência ou screenshot
+- [ ] All 🟢 projections labeled como tal ao cliente — dream outcome e time-to-result apresentados como meta do framework, não garantia histórica
+- [ ] Guarantee type escolhido com termos legais revistos (condicional vs incondicional) antes de publicar copy
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

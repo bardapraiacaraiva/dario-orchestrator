@@ -116,6 +116,38 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/facto no output de arquitectura deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via codebase (Read/Grep), session anterior, ou cliente data
+- 🟡 **assumed** — plausível dado o stack visível, mas precisa confirmação antes de entregar
+- 🟢 **projection** — decisão de design futura ou componente ainda não implementado
+
+Output checklist upfront mostra ao leitor exactamente o que é trust-as-is vs o que precisa de verificar. **Honest transparency > arquitectura que parece completa mas tem gaps.**
+
+❌ NOT delivery-ready:
+```
+API[Next.js 14 API] --> DB[(PostgreSQL 15)]
+JWT (HS256, 24h access + 7d refresh). RLS activo por user_id.
+Rate limit: 100 req/min.
+```
+*(reader assume tudo verified — mas versões, RLS e rate limits podem ser assumptions não confirmadas)*
+
+✅ Delivery-ready:
+```
+🔵 verified  — Next.js 14 (confirmado via package.json)
+🔵 verified  — PostgreSQL em Supabase (confirmado via supabase/config.toml)
+🟡 assumed   — JWT refresh token 7d (padrão Supabase — confirmar se customizado)
+🟡 assumed   — Rate limit 100 req/min (não encontrado em codebase — confirmar infra)
+🟢 projection — Redis cache layer (proposto no ADR-003, não implementado ainda)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: token TTL real, rate limits configurados, versões exactas de infra)
+- [ ] All 🔵 citations adicionadas — path do ficheiro ou sessão fonte por cada facto verificado (ex: `package.json:L4`, `supabase/config.toml:L12`)
+- [ ] All 🟢 projections labeled explicitamente ao cliente — deixar claro o que é arquitectura futura vs estado actual do sistema
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

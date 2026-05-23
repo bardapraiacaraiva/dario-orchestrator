@@ -104,6 +104,27 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados reais do projecto
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast por design (não verificável até runtime)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready: scores listados sem labels — reader assume que `tailwind.config.ts → 0.95` é valor real medido, quando pode ser estimativa da sessão
+✅ Delivery-ready:
+- 🔵 `tailwind.config.ts → 0.95` — score confirmado via import chain real do projecto `lusocontas/`
+- 🟡 `Token budget: 4 000 tokens` — default assumido; cliente pode ter override `SMART_CONTEXT_BUDGET` activo
+- 🟢 `Savings: ~70%` — projecção baseada no padrão Dyad; valor real varia por projecto e task
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — validar se `SMART_CONTEXT_BUDGET` está overridden no ambiente do cliente
+- [ ] All 🔵 citations added — confirmar que scores reflectem ficheiros reais do projecto (não projecto-exemplo)
+- [ ] All 🟢 projections labeled as such ao cliente — deixar claro que savings % é estimativa de design, não garantia medida
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

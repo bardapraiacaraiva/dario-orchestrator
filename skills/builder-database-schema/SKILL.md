@@ -160,6 +160,28 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado dos requisitos do cliente / sessão actual (ex: tabelas, colunas, PKs definidas explicitamente)
+- 🟡 **assumed** — plausível para o domínio mas precisa de confirmação antes de entregar ao cliente
+- 🟢 **projection** — decisão de design/forecast (correcto por princípio, não verificável sem contexto do cliente)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify antes de ir a produção. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready: schema entregue sem labels — cliente assume que `ON DELETE CASCADE` em `invoices`, retenção de `paid_date` e índice parcial em `due_date` foram todos confirmados por ele, quando na verdade são assumptions de design
+
+✅ Delivery-ready:
+- 🔵 **verified** — tabela `invoices` com colunas `net_total DECIMAL(12,2)`, `atcud VARCHAR(20)`, `UNIQUE(org_id, invoice_number)` — definidas nos requisitos do cliente
+- 🟡 **assumed** — `plan IN ('starter', 'pro', 'enterprise')` em `organizations` — planos inferidos do contexto SaaS; confirmar com cliente se existem outros tiers ou nomes diferentes
+- 🟢 **projection** — `idx_invoices_due WHERE status = 'sent'` (índice parcial) — decisão de performance por design; volume de dados real do cliente pode não justificar; monitorizar com `EXPLAIN ANALYSE` em produção
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: planos reais, políticas ON DELETE por tabela, campos opcionais vs obrigatórios)
+- [ ] All 🔵 sources citadas — referência à sessão/documento de requisitos onde cada tabela/coluna foi especificada
+- [ ] All 🟢 projections comunicadas ao cliente como decisões de design abertas a revisão (ex: indexes parciais, generated columns, seed volumes)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

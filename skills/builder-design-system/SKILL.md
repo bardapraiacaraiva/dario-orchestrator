@@ -300,6 +300,43 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada token/valor/escolha no output do design system deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via brand doc, briefing do cliente, ou session anterior
+- 🟡 **assumed** — plausível pelo archetype/industry inferido, precisa de confirmação pre-entrega
+- 🟢 **projection** — decisão de design por princípio (ex: escala tipográfica, grid), não verificável externamente
+
+Output checklist upfront mostra ao cliente exatamente o que é trust-as-is vs. o que precisa de sign-off. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+primary-500: #3b82f6
+fontFamily: Inter
+spacing grid: 4pt
+```
+*Reader assume que tudo foi validado contra a marca — mas nada foi confirmado.*
+
+✅ Delivery-ready:
+```
+🔵 primary-500: #E63946 — confirmado do brand doc enviado em sessão anterior
+🟡 fontFamily: "Playfair Display" — assumido por archetype "luxury/premium"; confirmar se licença já existe
+🟡 borderRadius DEFAULT: 8px — assumido por mood "clean/modern"; ajustar se preferência for sharp (0px) ou pill
+🟢 fluid type scale (clamp()) — projeção de design para responsividade; não há breakpoints do cliente para validar
+🟢 WCAG AA contrast ratio — calculado sobre palette gerada; re-verificar se primary mudar
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os 🟡 items confirmados — substituir cores, fontes e radii assumidos pelos actuals do cliente
+- [ ] Todas as 🔵 referências citadas — indicar o ficheiro/sessão de origem para cada token verificado
+- [ ] Todos os 🟢 itens comunicados ao cliente como escolhas de design (não como mandatos da marca)
+- [ ] WCAG AA re-checado se qualquer 🟡 color token for alterado pós-confirmação
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

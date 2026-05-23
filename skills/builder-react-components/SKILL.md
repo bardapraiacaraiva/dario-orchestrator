@@ -146,6 +146,38 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente (ex: design system existente, versão do pacote)
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — decisão de design por padrão da stack (não verificável sem contexto do projeto)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+Button usa `h-10 px-4 py-2` como size default, tema de cores `bg-primary/90` no hover,
+e o projeto tem shadcn/ui ^1.0 instalado.
+```
+*(Reader assume que tudo foi confirmado — versão, tokens, sizing — quando podem ser assumptions.)*
+
+✅ Delivery-ready:
+```
+- 🔵 verified   — forwardRef + displayName aplicados (padrão CVA/shadcn validado)
+- 🟡 assumed    — `bg-primary` mapeia para a cor de brand do cliente (confirmar CSS vars em globals.css)
+- 🟡 assumed    — shadcn/ui ≥ 2.0 instalado (compoundVariants usa API v2); confirmar package.json
+- 🟢 projection — size `icon: h-10 w-10` incluído por default; remover se não há uso de icon-only buttons
+- 🟢 projection — focus ring usa `focus-visible:ring-ring` — assume token `--ring` definido no tema
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — CSS vars (`--primary`, `--ring`, `--radius`) existem no tema do cliente
+- [ ] Versão do `class-variance-authority` e `shadcn/ui` verificadas contra `package.json` real do projeto
+- [ ] Todos os 🟢 projections comunicados ao cliente como decisões de design (não factos fixos)
+- [ ] Se `cn()` de `@/lib/utils` não existir no projeto, alternativa documentada antes de entregar
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```tsx

@@ -99,6 +99,41 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados reais do cliente
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast by design (não verificável até execução)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify antes de agir no scope. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+Auth — Impact 10, Confidence 10, Ease 8 → ICE 800 → MVP
+Timeline: 4 semanas. Tech debt budget: 8h.
+Sucesso = 60% conversão no onboarding.
+```
+*(reader assume que todos os ICE scores, a timeline e a métrica são factos validados — podem ser suposições do builder)*
+
+✅ Delivery-ready:
+```
+🔵 Auth — Impact 10, Confidence 10, Ease 8 → ICE 800 → MVP
+   (confirmado: blocker técnico, sem auth o core flow não funciona)
+🟡 Onboarding flow — Impact 9, Confidence 7, Ease 6 → ICE 378 → MVP
+   (ease estimado pelo builder; confirmar com dev lead antes de fechar scope)
+🟢 Timeline total: 5 semanas (4 base + 1 buffer)
+   (projection baseada em velocity estimada; ajustar após sprint 1)
+🟡 Métrica de sucesso: 60% utilizadores completam core flow sem suporte
+   (threshold proposto pelo builder; cliente precisa de validar o que define "sucesso" para este MVP)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — ICE scores de ease/confidence validados com dev lead e PO; substituir estimativas com actuals
+- [ ] All 🔵 citations added — fontes dos dados confirmados referenciadas (sessão de discovery, backlog existente, entrevistas de utilizador)
+- [ ] All 🟢 projections labeled as such ao cliente — timeline e métricas de sucesso apresentadas como forecast, não como compromisso fixo
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

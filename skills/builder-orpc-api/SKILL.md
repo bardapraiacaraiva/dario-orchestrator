@@ -110,6 +110,40 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output oRPC deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do projecto/sessão/dados do cliente (ex: nome da app, stack confirmada)
+- 🟡 **assumed** — plausível mas precisa de confirm do cliente antes de entregar
+- 🟢 **projection** — forecast by design — spec gerada automaticamente, não verificável até runtime
+
+Output checklist upfront mostra o reader exactamente o que é trust-as-is vs o que precisa verificar antes de fazer deploy. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+// router.ts — SaqueiApp API v1.0
+baseURL: "https://api.saquei.pt"
+limit: 20  
+ORPCError code: 'NOT_FOUND'
+```
+*(zero labels — reader assume tudo verified, mas baseURL pode não existir ainda, limit é arbitrário)*
+
+✅ Delivery-ready:
+```
+// 🔵 verified: cliente confirmou stack oRPC + Drizzle em sessão anterior
+// 🟡 assumed: baseURL "https://api.saquei.pt" — aguarda infra confirm
+// 🟡 assumed: limit default 20 — presumido razoável, cliente pode querer 10 ou 50  
+// 🟢 projection: OpenAPI spec em /api/spec gerada automaticamente pelo oRPC — válida após primeiro boot
+// 🟢 projection: type inference `client.emprestimo.criar.$output` resolve correctamente em runtime
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir `baseURL` assumed com URL real de produção/staging
+- [ ] All 🟡 defaults confirmados — `limit`, paginação, timeouts alinhados com requisitos do cliente
+- [ ] All 🔵 citations adicionadas — versão oRPC (`v1.0`), schema Zod, DB table names validados contra migration real
+- [ ] All 🟢 projections comunicadas ao cliente — deixar claro que spec OpenAPI e tipos só são verificáveis após `npm run dev` / primeiro deploy
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

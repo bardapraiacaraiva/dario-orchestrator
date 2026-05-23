@@ -147,6 +147,28 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados do cliente / infra existente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa por design (não verificável até deploy real)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs o que precisa verify antes de ir a produção. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready: `"Coolify instalado em 194.233.81.42, domínio app.cliente.pt com SSL ativo, custo ~€15/mês, deploy em ~3 min"` — reader assume tudo verificado, mas IP pode ser placeholder, SSL pode não ter propagado, custo é estimativa.
+
+✅ Delivery-ready:
+- 🔵 **verified** — `github.com/cliente-pt/app-backend`, branch `main`, Nixpacks Node 20 auto-detetado (confirmado em sessão anterior)
+- 🟡 **assumed** — Hetzner CX22 a €4.15/mês (plano atual do cliente não confirmado); porta 8000 aberta no firewall (não testado)
+- 🟢 **projection** — SSL Let's Encrypt emitido em ~2 min após DNS propagar; custo VPS fixo vs Vercel break-even estimado em ~3 apps simultâneas
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — specs do VPS, firewall rules e provider validados com cliente antes de correr install script
+- [ ] All 🔵 citations added — repo URL, branch, webhook URL e admin email documentados com fonte (sessão / painel Coolify)
+- [ ] All 🟢 projections labeled as such ao cliente — deixar claro que tempo de SSL e estimativas de custo são forecasts, não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

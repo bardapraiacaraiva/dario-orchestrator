@@ -392,6 +392,37 @@ Aprovação: CEO (Rodrigo) via Slack #finance-approvals
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do D.A.R.I.O. CFO deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via ficheiros lidos (tax_calendar.yaml, receivables.yaml, token_meter.py, budgets/YYYY-MM.yaml)
+- 🟡 **assumed** — plausível com base em padrões fiscais PT / histórico agência, mas precisa confirmação do cliente antes de delivery
+- 🟢 **projection** — forecast calculado por design (cash flow, runway, ROI futuro — não verificável até ocorrer)
+
+Output checklist upfront mostra ao leitor exatamente o que é trust-as-is vs. o que precisa verify antes de agir. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Prazo IVA: 20 Maio. Saldo em caixa: €12.400. Runway: 4,2 meses. Margem cliente X: 38%."
+> — leitor assume que tudo foi lido de fontes reais; nenhum label indica o que é ficheiro vs. estimativa vs. projecção.
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Próxima obrigação IVA: 20 Mai 2025 (fonte: `tax_calendar.yaml`, lido 2025-05-07)
+> - 🔵 **verified** — Contas a receber em aberto: €8.750 (fonte: `receivables.yaml`, aging 31-60d — 2 clientes)
+> - 🟡 **assumed** — Taxa horária freelancer Lucas: €45/h (último contrato registado; confirmar se renovado)
+> - 🟡 **assumed** — Margem cliente ACME: ~34% (baseada em horas estimadas; sem timesheets finais de Abril)
+> - 🟢 **projection** — Cash flow forecast Junho: +€6.200 (modelo linear baseado em MRR actual + pipeline confirmado)
+> - 🟢 **projection** — Token ROI Q2: 8,3× (extrapolado do burn rate actual; sujeito a variação de volume)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir taxas/margens/horas assumed com actuals (contratos, timesheets, extractos)
+- [ ] All 🔵 citations validadas — confirmar que ficheiros `.yaml` / `token_meter.py` foram lidos na sessão actual (não cache desactualizada)
+- [ ] All 🟢 projections explicitamente sinalizadas ao cliente como forecast, não como saldo real ou obrigação fiscal confirmada
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

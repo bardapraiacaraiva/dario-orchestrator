@@ -279,6 +279,42 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas precisa confirm do cliente antes de delivery
+- 🟢 **projection** — forecast por design (não verificável até estar live)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Hero headline: "Aumenta as tuas conversões em 47%"
+Pricing tier Starter: €29/mês
+Testimonial: "João Silva, CEO da TechCorp — adorei o produto"
+CTA copy: "Começa grátis hoje"
+```
+*Problema: reader não sabe se os 47%, o preço, o testimonial são reais ou placeholder. Assume tudo verified. Entrega queimada.*
+
+✅ Delivery-ready:
+```
+🟡 Hero headline: "Aumenta as tuas conversões em 47%" — número placeholder; cliente confirma métrica real
+🔵 Pricing tier Starter: €29/mês — confirmado via briefing sessão anterior
+🟡 Testimonial: "João Silva, CEO da TechCorp" — nome/empresa placeholder; cliente fornece depoimentos reais
+🟢 CTA copy: "Começa grátis hoje" — copy gerado por design; valida A/B pós-launch
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — headlines com métricas reais, nomes de testimonials, preços actuais, features descritas correctamente
+- [ ] All 🔵 citations added — brand tokens, paleta de cores, copy de sessão anterior referenciados no componente
+- [ ] All 🟢 projections labeled ao cliente — CTAs, copy de features e estrutura de secções são ponto de partida; performance só validada após `npm run dev` + user testing
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```tsx

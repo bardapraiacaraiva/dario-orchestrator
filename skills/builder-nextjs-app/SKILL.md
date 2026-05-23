@@ -238,6 +238,39 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_keep_secret
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/facto no output do scaffold deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado da sessão/memória/dados do cliente (ex: nome do projecto já definido)
+- 🟡 **assumed** — plausível mas precisa confirmação antes de entregar ao cliente
+- 🟢 **projection** — decisão de arquitectura por design (não verificável até runtime)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs o que precisa de verify antes de fazer `npm install`.
+
+❌ NOT delivery-ready:
+```
+"next": "^15.0.0"         ← versão sem label — cliente assume que é a correcta para o projecto
+lang="pt"                 ← locale hardcoded sem confirmar com cliente
+NEXT_PUBLIC_API_URL=      ← .env.example gerado sem saber se cliente tem backend pronto
+```
+
+✅ Delivery-ready:
+```
+"next": "^15.0.0"              🟡 assumed — confirmar se projecto tem constraint de versão
+"react": "^19.0.0"             🟡 assumed — React 19 pode ter breaking changes com libs do cliente
+lang="pt"                      🟡 assumed — confirmar locale (pt-PT vs pt-BR vs en)
+title: 'Project Name'          🔵 verified — nome confirmado pelo cliente na sessão
+tailwind.config.ts             🔵 verified — importado de builder-design-system conforme acordado
+loading.tsx gerado             🟢 projection — comportamento visual depende de Suspense boundaries reais
+og-image.png placeholder       🟢 projection — SEO score estimado; imagem final muda resultado
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — versões de deps validadas, locale definido, vars de `.env.example` mapeadas a serviços reais
+- [ ] All 🔵 citations added — nome do projecto, design tokens e copy confirmados de `dario-brand` / sessão anterior
+- [ ] All 🟢 projections labeled ao cliente — deixar claro que `loading.tsx` e OG metadata são base funcional, não estado final
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

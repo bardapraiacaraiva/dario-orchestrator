@@ -301,6 +301,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — forecast por design (não verificável até execução)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "A sequência de 5 emails tem open rate médio de 42%, o avatar é mulher 35-45 anos empreendedora, e esperamos 180 vendas no lançamento."
+*(Nenhum label — reader assume que tudo é verified. Open rate pode ser benchmark genérico, avatar pode ser suposição, vendas são projeção. Sem distinção = risco de decisão errada.)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Sequência SOS de 5 emails (Chaperon framework, confirmado em sessão anterior com cliente)
+> - 🟡 **assumed** — Avatar: mulher 35-45 anos, empreendedora digital (baseado no lead magnet descrito — aguarda validação com pesquisa de lista real)
+> - 🟡 **assumed** — Delivery tool: ActiveCampaign (mencionado informalmente — confirmar automações disponíveis no plano actual)
+> - 🟢 **projection** — Open rate estimado 38-44% nos primeiros 5 dias (benchmark de lista quente pós opt-in; depende de aquecimento de domínio e segmentação)
+> - 🟢 **projection** — Email 5 (pitch) gera 2-4% conversão sobre lista activa (projeção por design — não verificável pré-envio)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados (substituir assumptions com actuals: avatar validado, tool confirmada, tom de voz alinhado com `dario-brand`)
+- [ ] Todos os 🔵 sources citados (RAG retrieval de Chaperon / Settle / Makepeace / Walker referenciado na entrega)
+- [ ] Todos os 🟢 projections comunicados ao cliente como estimativas — não como garantias de performance
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

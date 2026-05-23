@@ -385,6 +385,35 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no pitch output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados reais do cliente / fonte citada
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de delivery
+- 🟢 **projection** — forecast por design (não verificável hoje — expectativa declarada)
+
+Output checklist upfront mostra ao investor/leitor exatamente o que é trust-as-is vs. o que ainda está a ser validado. **Honest transparency > inflated pitch.**
+
+---
+
+❌ **NOT delivery-ready:**
+> "Mercado endereçável de $2.4B, crescimento 18% YoY. MRR atual de €12k. Equipa com 15 anos de experiência no sector."
+> *(zero labels — investor assume tudo verified; se algum número estiver errado, destrói credibilidade)*
+
+✅ **Delivery-ready:**
+> - 🔵 **verified** — MRR €12.400 (Stripe dashboard, Março 2025)
+> - 🟡 **assumed** — TAM $2.4B (baseado em relatório IBISWorld 2023 — confirmar se dataset mais recente disponível)
+> - 🟡 **assumed** — "15 anos de experiência combinada da equipa" (aguardar CVs confirmados dos co-founders)
+> - 🟢 **projection** — ARR €480k no Ano 2 (modelo financeiro com premissa de churn 5%/mês — labeled como forecast)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: TAM source atualizado, bio da equipa validada)
+- [ ] All 🔵 citations adicionadas — screenshots/exportações de revenue, links de fontes de mercado, LOIs assinados
+- [ ] All 🟢 projections labeled explicitamente ao investor — slide de financial projections inclui disclaimer "forward-looking assumptions" com premissas visíveis
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

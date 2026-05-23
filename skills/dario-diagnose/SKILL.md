@@ -184,6 +184,35 @@ Cada dimensão tem AT LEAST 2 findings concretos. "Brand: ok" não conta — diz
 - [ ] URLs, números, stack technologies — todos reais do briefing
 - [ ] Confidence level explícito (🟢/🟡/🔴) na Resumo Executivo
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no diagnóstico output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via RAG, sessão anterior, dados reais do cliente (URL crawlada, métrica fornecida, contrato visto)
+- 🟡 **assumed** — plausível dado o sector/stack, mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast por design (crescimento estimado, impacto esperado, timeline projetado)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. o que precisa de verificação. **Honest transparency > diagnóstico inflado.**
+
+---
+
+❌ NOT delivery-ready:
+- "Taxa de conversão atual: 1,2%" — sem label, reader assume que foi medido
+- "Stack: WordPress + WooCommerce" — sem label, pode ser inferência de uma menção casual
+- "Impacto esperado: +35% tráfego orgânico em 90 dias" — parece garantia, não projeção
+
+✅ Delivery-ready:
+- 🔵 **verified** — "Core Web Vitals: LCP 4,8s" (extraído do PageSpeed report partilhado)
+- 🟡 **assumed** — "Stack assumed: WordPress 6.x + Yoast SEO" (baseado no HTML visível; confirmar versões exactas + plugins activos)
+- 🟢 **projection** — "Impacto estimado: +30-40% tráfego orgânico em 90 dias post-M2" (benchmark sectorial; resultado real depende de execução)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (stack real, métricas medidas, constraints validados)
+- [ ] All 🔵 citations added — RAG source, URL crawlada, ou documento cliente referenciado
+- [ ] All 🟢 projections labeled as forecasts ao cliente — expectations claras antes de assinar roadmap
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 Esta é a estrutura de um diagnóstico 92+/100. Usar como anchor.

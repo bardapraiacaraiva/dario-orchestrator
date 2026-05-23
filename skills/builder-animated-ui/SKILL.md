@@ -114,6 +114,38 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/componente/claim no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via Magic UI docs, repo, ou dados reais do cliente (codebase, brand guide)
+- 🟡 **assumed** — plausível dado o contexto mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa de impacto visual/performance por design (não verificável antes de produção)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify.  
+**Honest transparency > inflated delivery.**
+
+❌ **NOT delivery-ready:**
+```
+"Adicionámos AnimatedGradientText com as cores da vossa brand, NumberTicker a contar até 500,
+e ShimmerButton no CTA — performance garantida em mobile."
+```
+*(zero labels — reader assume tudo verified, mas cores podem estar erradas, número pode ser fictício, performance não foi testada)*
+
+✅ **Delivery-ready:**
+```
+- 🔵 AnimatedGradientText — install command verificado: `npx shadcn@latest add "https://magicui.design/r/animated-gradient-text"`
+- 🟡 Gradient colours (#7C3AED → #3B82F6) — assumed da palette do site actual; confirmar com brand guide antes de ship
+- 🟡 NumberTicker value "500+ clientes" — assumed do briefing verbal; confirmar número real com cliente
+- 🔵 `prefers-reduced-motion` guard — presente na versão Magic UI 0.x via useReducedMotion() hook
+- 🟢 +15-25% engagement no CTA estimado com ShimmerButton vs botão estático — projection baseada em padrões de animação, não em dados do cliente
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — cores do gradiente substituídas pelos hex reais da brand, números validados pelo cliente
+- [ ] All 🔵 citations added — versão exacta do Magic UI e Framer Motion usada documentada no PR/README
+- [ ] All 🟢 projections labeled as such ao cliente — "estimativa de impacto visual, não garantia mensurável"
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

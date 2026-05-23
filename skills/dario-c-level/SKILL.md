@@ -347,6 +347,40 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output estratégico deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados reais do cliente
+- 🟡 **assumed** — plausível dado o contexto partilhado, mas precisa de confirmação antes de delivery
+- 🟢 **projection** — forecast por design (não verificável — é cenário, não facto)
+
+O checklist aparece **no topo de qualquer deliverable executivo** (OKR framework, GTM plan, tech roadmap, AI strategy brief) para que o founder/board saiba exactamente o que é sólido vs o que precisa de sync.
+
+**Honest transparency > inflated boardroom confidence.**
+
+---
+
+❌ **NOT delivery-ready:**
+> "A empresa está em fase PMF com ARR de €800K, equipa de 12, e deverá atingir €2M até Q4."
+> *(Leitor assume que tudo é verified — ARR pode ser estimativa, team size desactualizado, projecção apresentada como facto)*
+
+✅ **Delivery-ready:**
+> - 🔵 **verified** — Empresa em fase PMF (confirmado em sessão anterior)
+> - 🟡 **assumed** — ARR ~€800K (range partilhado pelo founder; confirmar com actuals pre-board)
+> - 🟡 **assumed** — Equipa de 12 FTEs (último dado disponível; validar headcount actual)
+> - 🟢 **projection** — €2M ARR até Q4 (modelo de crescimento 15% MoM; não é garantia)
+> - 🔵 **verified** — Mercado-alvo: PMEs SaaS B2B (definido na sessão de visão estratégica)
+> - 🟡 **assumed** — Budget disponível para GTM: €50-80K (estimativa do founder; confirmar antes de alocar agentes CMO/COO)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions com actuals (ARR, headcount, budget, stage)
+- [ ] Todos os 🔵 sources citados no deliverable — sessão de origem, data, ou documento do cliente
+- [ ] Todas as 🟢 projecções claramente sinalizadas ao founder/board como cenários, não compromissos
+- [ ] Routing de agentes validado com contexto real (ex: CIO activado só se compliance gap for 🔵 confirmed, não 🟡 assumed)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

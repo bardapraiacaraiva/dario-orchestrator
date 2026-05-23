@@ -297,6 +297,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de Launch Sequence deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do cliente (lista existente, plataforma, produto real)
+- 🟡 **assumed** — plausível pelo framework mas precisa de confirmação pré-entrega
+- 🟢 **projection** — forecast de resultado por design (não verificável no momento)
+
+O checklist aparece **no topo de qualquer entrega de sequência de lançamento**, para que o cliente saiba exatamente o que é facto vs. estimativa vs. projeção antes de agir.
+
+---
+
+❌ **NOT delivery-ready:**
+> "Lança o PLC 1 no dia -14, escreve para a tua lista de 800 pessoas, espera 120 inscrições na waitlist e 40 vendas na semana de lançamento."
+→ Leitor assume que todos os números são reais. Nenhum label. Perigoso.
+
+✅ **Delivery-ready:**
+> - 🔵 **verified** — Produto: Curso "Método X", preço €497, plataforma Hotmart
+> - 🟡 **assumed** — Lista actual: ~800 subscribers (cliente mencionou "perto de mil" — confirmar número exacto antes de dimensionar sequência)
+> - 🟡 **assumed** — Budget ads: €300-500 (baseado em lançamentos similares — confirmar disponibilidade real)
+> - 🟢 **projection** — Waitlist target: 150 inscrições em 14 dias (benchmark Walker Seed Launch para lista <1k)
+> - 🟢 **projection** — Conversão estimada: 3-5% da lista = 24-40 vendas na launch week (PLF benchmark, não garantido)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — tamanho real da lista, budget ads, datas de disponibilidade, tech stack (ESP, checkout, página de vendas)
+- [ ] All 🔵 sources cited — nome do produto, preço final, plataforma, afiliados confirmados (se JV Launch)
+- [ ] All 🟢 projections labeled explicitamente ao cliente — "estes números são benchmarks de framework, não garantias de resultado"
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

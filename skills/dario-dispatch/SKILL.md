@@ -813,6 +813,41 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de routing deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmed from `company.yaml`, `skill_chains.yaml`, or active task files
+- 🟡 **assumed** — plausible based on dispatch logic but needs cliente/operator confirm pre-delivery
+- 🟢 **projection** — estimated routing outcome by design (não verificável até execução real)
+
+Output checklist upfront mostra ao operator exatamente o que é trust-as-is vs. precisa de validação antes de despachar.  
+**Honest transparency > inflated dispatch confidence.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Task atribuída a LUCAS-worker-02 (carga: 1 tarefa ativa). Fallback: DARIO-worker-05. Chain: seo_full_pipeline activada.
+```
+*Sem labels — operator assume tudo verified; pode despachar para worker errado ou chain inexistente.*
+
+✅ Delivery-ready:
+```
+- 🔵 Worker primário: LUCAS-worker-02 — lido de company.yaml, status "in_progress" confirmado em tasks/active/
+- 🟡 Fallback: DARIO-worker-05 — capabilities com overlap assumido; confirmar se cobre domínio contabilístico antes de activar
+- 🟢 Estimativa de conclusão: ~2 pulses — projecção por design, depende de workload em runtime
+- 🔵 Chain match: seo_full_pipeline — trigger keyword "SEO audit" confirmado em skill_chains.yaml
+- 🟡 Division match: DARIO preferred — assumido por keyword "digital"; validar se task tem componente DIVA antes de despachar
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed (worker capabilities e division scope validados com operator antes do dispatch)
+- [ ] All 🔵 sources cited (company.yaml path, task file IDs, skill_chains.yaml version)
+- [ ] All 🟢 projections labeled como tal ao cliente — expectativas de timing são estimates, não SLAs
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

@@ -110,6 +110,38 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output SST deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados reais do cliente / repo inspeccionado
+- 🟡 **assumed** — plausível para o projecto mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa por design (custo, scaling, performance — não verificável a priori)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify antes de `sst deploy --stage production`.  **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+name: "tributario-ai"          # verificado? assumido? ninguém sabe
+region: "eu-west-1"            # porquê esta região? compliance? preferência?
+scaling: { min: "0.5 ACU", max: "8 ACU" }   # baseado em quê?
+custo estimado: ~€35/mês       # número sem fonte
+```
+
+✅ Delivery-ready:
+```
+🔵 name: "tributario-ai"           — confirmado do package.json do repo cliente
+🟡 region: "eu-west-1"             — assumed: compliance PT/Gov; confirmar se há restrição contratual
+🟡 scaling max: "8 ACU"            — assumed: estimativa para pico fiscal; confirmar load esperado
+🟢 custo estimado: ~€35/mês idle   — projecção Aurora Serverless 0.5 ACU + Lambda; validar pós-deploy real
+🔵 removal: "retain" em production — verificado: Gate 4 passa, stage check presente no config
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os 🟡 items confirmados — substituir `region`, `scaling.max`, secrets names com actuals do cliente
+- [ ] Todos os 🔵 items com fonte citada — package.json, repo URL, conversa de sessão (não "eu lembro")
+- [ ] Todos os 🟢 projections comunicados explicitamente ao cliente como estimativas — nunca apresentar custo AWS como garantido antes de load real
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

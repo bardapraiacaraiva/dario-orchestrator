@@ -258,6 +258,37 @@ Financial model é **delivery-ready (90+/100)** se TODAS estas check passam.
 - [ ] Date format YYYY-MM consistent
 - [ ] Sem placeholder angle-brackets <valor>/<projecto>
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — forecast by design (não verificável — é estimativa)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verificação. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Revenue Jan: €15.000 | EBITDA Jun: €8.600 | Break-even: mês 4 | IRC estimado: 21% | Runway: 8 meses"
+> *(reader assume que tudo é dado real — sem labels, sem distinção entre actuals e assumptions)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Taxa SS patronal 23,75% (legislação PT vigente)
+> - 🟡 **assumed** — Revenue Jan €15.000 (baseado em histórico verbal do cliente — confirmar com facturação real)
+> - 🟡 **assumed** — PMR 45 dias (média agências PT — confirmar prazo real de recebimento do cliente)
+> - 🟢 **projection** — EBITDA Jun €8.600 (forecast base-case, inputs não auditados)
+> - 🟢 **projection** — Break-even mês 4 (calculado sobre assumptions de crescimento 8%/mês — não garantido)
+> - 🟡 **assumed** — Derrama municipal 1,5% (varia por município — confirmar sede fiscal)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (revenue histórico real, PMR contratual, município sede)
+- [ ] All 🔵 citations added — referenciar fonte per linha (DL SS, portaria IRC, extracto bancário)
+- [ ] All 🟢 projections labeled ao cliente — deixar explícito no header do modelo: *"Valores marcados como projection são estimativas baseadas em assumptions — não constituem garantia financeira"*
+
 ## Fully-worked A-tier example
 
 Tributario.AI 36-month model: capital R$ 500K (110K bootstrap + 390K seed @ Q3 2026), burn ramp R$ 20K→R$ 111K, MRR 0→R$ 450K M24, BE M9, sensitivity preço é driver dominante (+20% → BE -2 meses), LTV R$ 540K + CAC R$ 12K = 45x ratio, gross margin 78%. Includes 3 scenarios with probability + monthly P&L 36-month + risks/mitigations table + recommendations sequenced.

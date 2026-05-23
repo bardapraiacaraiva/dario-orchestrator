@@ -213,6 +213,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do **A360-Director** deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória semântica / dados reais de cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar routing
+- 🟢 **projection** — forecast por design no chain recomendado (não verificável agora)
+
+Output checklist upfront mostra ao utilizador exactamente o que é trust-as-is vs. o que precisa validar antes de executar o chain.  
+**Honest routing > diagnóstico inflado.**
+
+---
+
+❌ **NOT delivery-ready:**
+> "Detectei chain `a360_offer_pack` — vais ter oferta clara em 2 semanas e fechar R$ 50K no primeiro mês."
+> *(estado do cliente, bloqueio e horizonte assumidos sem perguntar; projecção financeira apresentada como facto)*
+
+✅ **Delivery-ready:**
+> - 🔵 **verified** — Cliente mencionou "tenho algumas vendas mas não sei precificar" → estado 2-3 confirmado no contexto desta sessão
+> - 🟡 **assumed** — Bloqueio principal = Pricing/Conversão (inferido da frase; cliente não respondeu Q2 explicitamente — confirmar antes de executar chain)
+> - 🟡 **assumed** — Horizonte = 90 dias (padrão aplicado; cliente não especificou — pode ser 30 dias smoke test)
+> - 🟢 **projection** — Chain `a360_offer_pack` estimado em 2 skills sequenciais (`a360-oferta` → `a360-funil`); duração e output volume dependem de inputs do cliente em cada skill
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — estado actual (Q1), bloqueio principal (Q2) e horizonte (Q3) respondidos explicitamente pelo cliente, substituindo assumptions com actuals
+- [ ] All 🔵 citations added — referências a sessões anteriores ou dados de cliente (ex: SAQUEI, Cuidaí) linkadas à fonte de memória semântica correcta
+- [ ] All 🟢 projections labeled — cliente informado que outputs dos skills do chain são forecasts/frameworks, não garantias de resultado (ex: TAM/SAM/SOM são cenários, não factos de mercado)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

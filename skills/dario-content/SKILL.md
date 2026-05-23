@@ -251,6 +251,35 @@ Output dario-content é **delivery-ready (90+/100)** se TODAS estas check passam
 - [ ] Authors named (não <writer>)
 - [ ] Deadlines em calendar dates (não <date>)
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de content production deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via briefing do cliente, brand doc, ou keyword map entregue
+- 🟡 **assumed** — plausível com base no sector/nicho, mas precisa confirmação antes de publicar
+- 🟢 **projection** — estimativa editorial por design (volume de tráfego, resultados esperados, datas futuras)
+
+Output checklist upfront mostra ao cliente exatamente o que é trust-as-is vs. o que precisa de validação. **Honest transparency > entregar calendário "completo" com dados inventados.**
+
+---
+
+❌ NOT delivery-ready:
+> "Artigo para keyword 'marketing digital para pequenas empresas' — 2.400 palavras, volume 8.100/mês, dificuldade KD 42, publicar semana 2 de Março, autor João Silva."
+> *(reader assume que tudo está verificado — volume, KD, autor, data — quando pode estar desatualizado ou nunca confirmado)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — keyword "marketing digital para pequenas empresas" confirmada no keyword map entregue (Ahrefs export, Jan 2025)
+> - 🟡 **assumed** — volume 8.100/mês e KD 42 baseados em tool data — confirmar se houve re-pull recente antes de usar no brief
+> - 🟡 **assumed** — autor "João Silva" alocado com base na equipa atual — confirmar disponibilidade semana 2
+> - 🟢 **projection** — estimativa de +340 sessões orgânicas no mês 3 pós-publicação (baseada em CTR médio para KD <45)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — volumes de keyword re-validados, autores e datas de publicação confirmados pelo cliente
+- [ ] All 🔵 citations added — keyword map, brand voice doc e fontes de dados referenciadas no brief/post
+- [ ] All 🟢 projections labeled as such ao cliente — estimativas de tráfego e engagement apresentadas como forecast, não garantia
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 Editorial calendar 92+/100 para SAQUEI BR:

@@ -131,6 +131,37 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados reais do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — forecast by design (não verificável no momento)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+- [x] Core Web Vitals passaram — LCP 1.8s, CLS 0.04
+- [x] GA4 activo com eventos signup e cta_click
+- [x] Uptime monitor activo, alertas configurados
+```
+*(reader assume que tudo é verified — pode ser assumption ou test environment)*
+
+✅ Delivery-ready:
+```
+- [x] 🔵 LCP 1.8s, CLS 0.04 — medido PageSpeed URL producao 2024-11-15
+- [x] 🟡 GA4 G-XXXXXXX eventos signup/cta_click — visíveis em dev, assumido igual em prod (confirmar DebugView pós-deploy)
+- [x] 🟢 Error rate < 0.5% na primeira semana — projecção baseada em load test, não tráfego real
+- [x] 🟡 Privacy Policy RGPD-compliant — template aplicado, DPO contact assume-se correcto (cliente deve validar)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: GA4 Measurement ID real, dispositivos reais testados, DPO contact validado)
+- [ ] All 🔵 items têm data + fonte citada (ex: Lighthouse URL, securityheaders.com grade, Sentry test event)
+- [ ] All 🟢 projections comunicadas explicitamente ao cliente como forecast — não como resultados garantidos
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

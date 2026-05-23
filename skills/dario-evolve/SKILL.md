@@ -307,6 +307,34 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/métrica/estado no output do DARIO Evolution Engine deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / ficheiros YAML existentes / journal entries reais
+- 🟡 **assumed** — plausível com base no design, mas precisa de confirmação antes de reportar ao utilizador
+- 🟢 **projection** — forecast gerado pelo motor evolutivo (não verificável até N tasks futuras)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Aprendi 4 padrões, apliquei 3 mutações, fitness subiu 12%, geração actual: 7."
+> *(reader assume que tudo é verified — mas fitness e padrões podem ser projecções ou assumptions não confirmadas)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — `total_mutations_applied: 3` (lido de `synaptic_weights.yaml`, session log confirmado)
+> - 🟡 **assumed** — `avg_quality: 82` (calculado do session buffer; nenhum score foi override manual pelo utilizador nesta sessão)
+> - 🟢 **projection** — `fitness delta: +12%` (forecast baseado em trend das últimas 4 semanas; só confirmável após próximo weekly checkpoint)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir `avg_quality`, `pairs_activated`, e `fallback_count` com actuals dos ficheiros de journal lidos em runtime
+- [ ] All 🔵 citations added — path explícito do YAML/log que sourced cada valor (`~/.claude/orchestrator/evolution/journal/`, `checkpoints/ckpt_{date}`)
+- [ ] All 🟢 projections labeled como tal ao utilizador — `fitness`, `evolutionary_delta`, e survival outcomes marcados como "projecção até review após 10 tasks"
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

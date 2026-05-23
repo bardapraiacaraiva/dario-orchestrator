@@ -219,6 +219,43 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via projecto actual (ficheiros lidos, CLI output, logs)
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa por design (deploy ainda não executado, não verificável)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs o que precisa validar antes de ir a produção. **Honest transparency > deploy com surpresas.**
+
+---
+
+❌ NOT delivery-ready:
+```
+- Region: cdg1
+- DATABASE_URL configurada
+- Build time: ~2min
+- Uptime esperado: 99.9%
+```
+*(reader assume que tudo está verificado — região pode ser errada, var pode estar em scope errado, uptime é só estimativa)*
+
+✅ Delivery-ready:
+```
+- 🔵 verified   — vercel.json presente com região cdg1 e 4 security headers (lido via Read)
+- 🟡 assumed    — DATABASE_URL aponta para DB de produção (não para staging) — confirmar string antes de `vercel --prod`
+- 🟡 assumed    — Domínio yourdomain.com já tem DNS apontado para Vercel (nameservers não verificados)
+- 🟢 projection — Build time estimado ~90s baseado em projecto similar; primeiro deploy pode demorar mais
+- 🟢 projection — Core Web Vitals aceitáveis pós-deploy (baseado em Lighthouse local, prod pode diferir)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions com actuals (ex: connection string real, DNS propagado)
+- [ ] Todos os 🔵 sources citados com evidência (ex: output do `vercel env ls`, screenshot do dashboard)
+- [ ] Todos os 🟢 projections comunicados ao cliente como estimativas — não como garantias de uptime ou performance
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

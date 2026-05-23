@@ -154,6 +154,28 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/score/violação/referência no accessibility report deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via análise estática do código (ficheiro + linha inspecionada)
+- 🟡 **assumed** — plausível com base em padrões comuns, mas requer confirmação do cliente antes da entrega
+- 🟢 **projection** — estimativa por design (ex: score projectado após aplicar fixes sugeridos)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated accessibility score.**
+
+❌ NOT delivery-ready: `Score: 85/100 — contrast ratio OK, touch targets OK` — sem labels; reader assume que tudo foi verificado no código real, mas alguns valores podem ser estimados ou baseados em defaults do Tailwind.
+
+✅ Delivery-ready:
+- 🔵 **verified** — `Button sem aria-label — Header.tsx:87` (ficheiro inspeccionado, linha confirmada)
+- 🟡 **assumed** — `Contrast ratio estimado em 4.8:1` (baseado em classe `text-gray-600 / bg-white`; validar com ferramenta se tema customizado override as cores)
+- 🟢 **projection** — `Score projectado: 92/100 após aplicar os 2 fixes sugeridos` (não verificado; requer re-run do check)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmados — contrast ratios validados com valores reais do tema (não só classes CSS)
+- [ ] All 🔵 citations presentes — cada violação lista ficheiro + linha exacta como fonte
+- [ ] All 🟢 projections comunicadas ao cliente como estimativas — re-run obrigatório após fixes para score final
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

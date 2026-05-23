@@ -383,6 +383,31 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados reais do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast por design (não verificável agora)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+> "O K-factor actual é 0.7, o ciclo viral demora 14 dias e o referral program vai gerar 30% do novo MRR no Q2."
+> *(Nenhum label — o cliente não sabe se 0.7 é medido, estimado ou projecção. Decisões de budget podem ser feitas sobre dados incorrectos.)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — North Star Metric definida como "transacções por semana" (confirmado em sessão anterior)
+> - 🟡 **assumed** — K-factor estimado em 0.7 (baseado em benchmarks de marketplace; precisa validação com dados reais de convites/conversão)
+> - 🟡 **assumed** — ciclo do viral loop estimado em 14 dias (assumido com base no onboarding actual; confirmar com analytics)
+> - 🟢 **projection** — referral program projectado para contribuir 25-30% do novo MRR no Q3 (modelo ICE score aplicado; resultado contingente à implementação)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir K-factor estimado e cycle time por actuals (extrair de analytics / CRM)
+- [ ] All 🔵 citations added — NSM, AARRR scores e benchmarks com fonte/data de recolha documentada
+- [ ] All 🟢 projections labeled as such ao cliente — growth loop output e referral MRR apresentados como forecast, não garantia
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

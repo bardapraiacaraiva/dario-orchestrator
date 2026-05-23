@@ -131,6 +131,40 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de auth deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do codebase/sessão do cliente (ex: algoritmo JWT já em uso, versão da lib)
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — decisão de design/security default (não verificável até deploy)
+
+Output checklist upfront mostra o reader exactamente o que é trust-as-is vs o que precisa ser validado. **Honest transparency > auth system que parece completo mas tem assumptions enterradas.**
+
+❌ NOT delivery-ready:
+```
+bcrypt cost factor: 12
+JWT secret: process.env.JWT_SECRET
+Roles: admin / member / viewer
+Refresh token expiry: 7 dias
+Rate limit: 5 tentativas / 15 min
+```
+*(reader assume que tudo é real — mas as roles são genéricas, o secret pode não existir no .env do cliente, e o cost factor foi escolhido arbitrariamente)*
+
+✅ Delivery-ready:
+```
+🟡 bcrypt cost factor: 12 — assumed (validar se infra do cliente aguenta; reduzir p/ 10 em edge functions)
+🔵 JWT secret: process.env.JWT_SECRET — verified (confirmado no .env.example do repo do cliente)
+🟡 Roles: admin / member / viewer — assumed (cliente usa estes nomes? confirmar antes de hardcodar middleware)
+🟢 Refresh token expiry: 7 dias — projection by design (OWASP default; ajustável por política do cliente)
+🟡 Rate limit store: memory (dev) — assumed (produção precisa Redis; confirmar se cliente tem instância)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — roles reais substituídas nos enums, env vars existem no ambiente target, rate limit store validada
+- [ ] Todos os itens 🔵 têm fonte citada — versão da lib (`bcryptjs@^2.4.3`), algoritmo JWT (`HS256`/`RS256`), nome real das env vars
+- [ ] Todos os itens 🟢 comunicados explicitamente ao cliente como defaults de design — não assumir que o cliente sabe que refresh expiry e cost factor são configuráveis
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

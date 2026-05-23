@@ -200,6 +200,43 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no Funnel Blueprint deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via sessão anterior, dados reais do cliente, ou RAG (ex: oferta já validada pelo `dario-offer`)
+- 🟡 **assumed** — plausível com base no mercado/nicho, mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — forecast por design (KPIs estimados, métricas de benchmark Brunson — não verificável até ao live)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa verify.
+**Honest transparency > funnel blueprint inflado com números fictícios.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Tripwire — €27 — Mini-curso "3 Passos para X"
+Opt-in rate esperado: 38%
+Upsell take rate: 22%
+```
+*(reader assume que preços, oferta e métricas são todos confirmed — podem ser 100% inventados)*
+
+✅ Delivery-ready:
+```
+Tripwire — €27 🟡 (preço sugerido; cliente confirmar range aceitável para avatar)
+Mini-curso "3 Passos para X" 🟡 (formato assumido; validar se já existe conteúdo base)
+Opt-in rate esperado: 30–40% 🟢 (benchmark Brunson / DotCom Secrets; real depende de tráfego + copy)
+Core Offer — €497 Consultoria 90min + Plano Fiscal 🔵 (confirmado via dario-offer sessão 2024-11-14)
+Upsell take rate: 15–25% 🟢 (projecção industria; monitorar pós-launch via lucas-analytics)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — preços reais, formatos de produto e nome das ofertas substituídos com actuals do cliente
+- [ ] All 🔵 sources citadas — sessão/output de `dario-offer` referenciado; oferta base documentada antes de buildar o funnel
+- [ ] All 🟢 projections comunicadas ao cliente como benchmarks estimados (não garantias) — expectativas alinhadas pré-launch
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

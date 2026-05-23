@@ -113,6 +113,38 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do briefing do cliente / sessão anterior / schema existente
+- 🟡 **assumed** — plausível dado o domínio, mas precisa confirmação antes de entregar
+- 🟢 **projection** — decisão de design por boas práticas (não verificável sem dados de produção)
+
+Output checklist upfront mostra ao reader exactly o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+Invoice tem status ENUM('draft','sent','paid','void')
+Index em invoices(client_id, issue_date DESC) cobre as queries principais
+Relação Client → Project é 1-para-muitos
+```
+*(reader não sabe se estes valores vieram do cliente, foram assumidos, ou são estimativas de performance — não pode validar antes de deploy)*
+
+✅ Delivery-ready:
+```
+🔵 verified   — Entidades Client, Project, Invoice, Payment extraídas do briefing ("gerir clientes, projectos, facturas e pagamentos")
+🟡 assumed    — status ENUM('draft','sent','paid','void') — confirmar se cliente precisa de 'void' ou 'cancelled' como estado separado
+🟡 assumed    — Relação Invoice → Payment é 1-para-muitos (assume pagamentos parciais permitidos) — confirmar regra de negócio
+🟢 projection — idx_invoice_client_date estimado para reduzir seq scan em >10k facturas; validar com EXPLAIN ANALYZE em dados reais
+🟢 projection — UUID como PK escolhido por portabilidade; se volume < 100k rows, SERIAL pode ser suficiente
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir ENUMs e cardinalidades assumidas com valores reais do cliente
+- [ ] All 🔵 items citam a fonte exacta (briefing, linha do requisito, schema existente partilhado)
+- [ ] All 🟢 projections comunicadas ao cliente como decisões de design sujeitas a benchmark em produção
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

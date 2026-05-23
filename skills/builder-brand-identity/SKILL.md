@@ -93,6 +93,30 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de brand identity deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados do cliente / briefing recebido
+- 🟡 **assumed** — plausível pelo archetype/sector mas precisa de confirm do cliente antes de delivery
+- 🟢 **projection** — decisão de design por construção (não verificável — é proposta criativa)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. o que precisa de validação antes de avançar para produção. **Honest transparency > identidade visual que parece completa mas assenta em suposições.**
+
+❌ NOT delivery-ready: `Primary: #1A2E4A | H1: Playfair Display 700 | Tom: confiança e inovação` — reader assume que tudo foi validado com o cliente; na prática são escolhas sem origem declarada.
+
+✅ Delivery-ready:
+- 🔵 **verified** — Nome da marca: "Vaultix" (confirmado em briefing 2024-11-03)
+- 🟡 **assumed** — Sector: fintech B2B (inferido do briefing; confirmar se também serve consumidor final antes de fixar color system)
+- 🟢 **projection** — Color palette: Primary #1A2E4A + Accent #2D6BE4 (proposta criativa baseada em archetype "Guardião Técnico" — cliente aprova ou rejeita em revisão)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os 🟡 items confirmados — substituir assumptions por actuals (ex: sector, público-alvo, restrições de cor já usadas na marca-mãe)
+- [ ] Todos os 🔵 items com fonte citada (ex: briefing doc, sessão de discovery, SKILL `dario-brand` output)
+- [ ] Todos os 🟢 projections comunicados ao cliente como **propostas sujeitas a aprovação** — nunca entregar como decisões finais sem sign-off explícito
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

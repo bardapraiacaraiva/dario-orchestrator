@@ -178,6 +178,54 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no PRD output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via entrevistas, dados reais do cliente, ou sessão anterior
+- 🟡 **assumed** — plausível dado o contexto, mas precisa de confirmação antes de entregar
+- 🟢 **projection** — forecast por design (métrica-alvo, timeline estimada — não verificável hoje)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. precisa de validação. **Honest transparency > PRD inflado com números inventados.**
+
+---
+
+❌ NOT delivery-ready:
+```
+## 8. Success Metrics
+- Activation: 30% of signups complete onboarding
+- Retention: 60% WAU after 4 weeks
+- Conversion: 5% free → paid in 30 days
+
+## 10. Timeline
+| Build MVP | 3 weeks | Working product |
+```
+*Reader assume que os 30%, 60%, 5% e "3 semanas" são baseados em dados reais — podem ser benchmarks genéricos ou chutes.*
+
+---
+
+✅ Delivery-ready:
+```
+## 8. Success Metrics
+- 🟢 Activation: 30% de signups completam onboarding (benchmark SaaS B2B — ajustar após semana 1)
+- 🟡 Retention: 60% WAU após 4 semanas (assumido com base no segmento freelancer — confirmar com histórico de produto similar)
+- 🔵 Conversion: 5% free → paid em 30 dias (validado em entrevista com founder, 12 Mar)
+
+## 3. Target User
+- 🔵 Persona primária: freelancers de contabilidade, 30–50 clientes/mês (10 entrevistas, Fev 2025)
+- 🟡 Pain score: 8/10 (estimado — não quantificado com dados de suporte ainda)
+
+## 10. Timeline
+- 🟢 Build MVP: 3 semanas (estimativa baseline — dependente de stack escolhida e disponibilidade da equipa)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir pain scores assumidos, benchmarks de retenção e personas não validadas com dados reais do cliente
+- [ ] Todos os itens 🔵 têm fonte citada no PRD (entrevista, data, documento de referência)
+- [ ] Todos os itens 🟢 estão explicitamente comunicados ao cliente como projecções — não como compromissos de delivery ou métricas garantidas
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

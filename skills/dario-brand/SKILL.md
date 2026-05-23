@@ -252,6 +252,47 @@ A brand strategy output is **delivery-ready (90+/100)** only if ALL of these are
 - Generic differentiator without a specific mechanism, integration, or measurable bound
 - Output contains placeholder angle-brackets (<target>, <brand>) instead of real names
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de brand strategy deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via inputs do cliente (briefing, sessão, dados reais)
+- 🟡 **assumed** — plausível dado o sector/arquétipo, mas precisa confirmação pré-entrega
+- 🟢 **projection** — forecast estratégico by design (aspiracional, não verificável agora)
+
+Output checklist upfront mostra ao cliente exatamente o que é trust-as-is vs. o que precisa de validação. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> Archetype: Magician. Competitors: Notion, Linear, Figma. Tagline: "Build what others can't." Target: founders 25-40.
+
+Nenhum label → reader assume tudo verified. Archetype pode estar errado. Competitors podem ser irrelevantes. Tagline pode estar colidindo com concorrente existente.
+
+---
+
+✅ Delivery-ready:
+
+| Item | Label | Status |
+|---|---|---|
+| Archetype primário: **Magician** | 🟡 assumed | Derivado do sector SaaS + valores do founder — confirmar fit emocional com founder |
+| Competitor set: Notion, Linear, Figma | 🟡 assumed | Sugeridos por contexto; cliente deve validar os 3-5 que considera ameaça real |
+| Tagline: *"Build what others can't"* | 🟢 projection | Proposta criativa — testar recall com 3-5 pessoas do target antes de fixar |
+| Founder story (origem 2019, Lisboa) | 🔵 verified | Confirmado em briefing sessão 14/06 |
+| Onlyness statement — slot "category" | 🟡 assumed | "design-ops platform" é hipótese; cliente pode preferir categoria diferente |
+| Proof points (3 casos de cliente) | 🔵 verified | Fornecidos pelo cliente via doc partilhado |
+| Positioning target: "scale-ups B2B SaaS" | 🟡 assumed | Inferido do portfolio; confirmar se exclui consciente o mercado B2C |
+| Kapferer — faceta Reflection | 🟢 projection | "Visto como líder técnico visionário" — aspiracional, não validado com audience real |
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (archetype, competitors, category slot, target)
+- [ ] All 🔵 citations referenciadas com fonte/sessão/doc no deliverable final
+- [ ] All 🟢 projections comunicadas explicitamente ao cliente como aspiracionais ("isto é onde queremos chegar, não onde estamos")
+- [ ] Onlyness statement revisto com slots todos únicos — nenhum borrowed de competitor
+- [ ] Differentiation test (5 checks) passado para cada claim 🔵 ou 🟡 antes de fixar copy
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 This is what a 92+/100 dario-brand output looks like. Use as anchor for self-check.

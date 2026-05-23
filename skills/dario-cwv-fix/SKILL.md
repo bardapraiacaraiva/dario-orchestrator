@@ -162,6 +162,36 @@ add_action('wp_head', function() {
 - [ ] Stack detectado (WordPress version, theme, page builder)
 - [ ] Sem placeholder angle-brackets
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/métrica/diagnóstico no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via Lighthouse run, CrUX data, ou client-provided baseline
+- 🟡 **assumed** — plausível com base no stack declarado, mas precisa confirm antes de entrega
+- 🟢 **projection** — ganho estimado por design (não verificável até re-medição pós-fix)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "LCP está em 4.2s causado por hero image sem preload. Após fix esperado LCP <2.5s. CLS a 0.24 por imagens sem dimensões."
+> *(reader assume que todos os valores são medidos, que o fix já foi aplicado, e que o ganho é garantido — nada está labelled)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — LCP baseline: 4.2s (Lighthouse mobile, run 2024-01-15, 3G throttled)
+> - 🔵 **verified** — CLS: 0.24 causado por 3 imagens sem `width`/`height` (DevTools confirmed)
+> - 🟡 **assumed** — hero image servida via `/wp-content/uploads/hero.webp` (path não confirmado — verificar antes de aplicar preload snippet)
+> - 🟡 **assumed** — LiteSpeed Cache instalado e activo (declarado pelo cliente; config não auditada directamente)
+> - 🟢 **projection** — LCP esperado <2.5s após preload + WebP conversion (estimativa baseada em fixes similares; confirmar com Lighthouse pós-fix)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — paths de imagens, plugins activos e versões de stack validados com acesso real ao site
+- [ ] All 🔵 citations added — screenshots de Lighthouse + CrUX 28-day anexados ao relatório antes de entrega
+- [ ] All 🟢 projections labeled como tal ao cliente — ganhos de LCP/INP/CLS apresentados como estimativas, não garantias, até re-medição pós-fix confirmada
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

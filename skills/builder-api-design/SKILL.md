@@ -175,6 +175,30 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de API design deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do contexto do cliente/sessão anterior/codebase existente
+- 🟡 **assumed** — plausível para o domínio mas precisa de confirmação antes de entregar
+- 🟢 **projection** — decisão de design por boas práticas (não verificável sem runtime)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs o que precisa de validação antes de integrar. **Honest transparency > código que parece production-ready mas parte de pressupostos errados.**
+
+❌ NOT delivery-ready: endpoint `POST /api/v1/bookings` entregue com `status: z.enum(['pending','active','completed'])` sem label — o cliente assume que os estados reflectem o negócio real, mas foram gerados como placeholder.
+
+✅ Delivery-ready:
+- 🔵 **verified** — stack confirmado: Node.js + Express, autenticação via JWT (mencionado na sessão anterior)
+- 🟡 **assumed** — `status: z.enum(['pending_match','active','on_hold','completed','cancelled'])` — estados inferidos do domínio; confirmar se `'on_hold'` existe no fluxo real
+- 🟢 **projection** — rate limit de `100 req/15min` por IP aplicado por padrão REST; ajustar conforme load esperado em produção
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir enums, field constraints e nested routes assumidas com os actuals do domínio
+- [ ] All 🔵 citations added — stack, auth method e versão da API referenciados com fonte (PRD, conversa, codebase)
+- [ ] All 🟢 projections labeled ao cliente — rate limits, cursor strategy e pagination defaults apresentados como decisões de design ajustáveis, não como requisitos fixos
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

@@ -308,6 +308,34 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados do cliente / fonte citada
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de delivery
+- 🟢 **projection** — forecast por design (não verificável até execução)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ **NOT delivery-ready:**
+Scorecard entregue com "taxa de conversão esperada: 12%, budget recomendado: $300, 15 entrevistas suficientes" — sem labels. Reader assume que tudo é validado; decisão de go/no-go baseada em dados que são na verdade assumptions não confirmadas.
+
+✅ **Delivery-ready:**
+- 🔵 **verified** — Fitzpatrick (Mom Test): mínimo 15-20 entrevistas para sinal confiável; 10+ pessoas descrevendo a mesma dor = evidência forte
+- 🟡 **assumed** — Budget de teste estimado em $200-400 (Facebook Ads + landing page); aguarda confirmação do cliente sobre disponibilidade real de spend
+- 🟡 **assumed** — Avatar definido como "solopreneurs 30-45 que vendem serviços" — baseado no briefing inicial; precisa validação antes de construir copy da landing page
+- 🟢 **projection** — Waitlist de 100+ emails em 7 dias indica market pull suficiente para go-decision; resultado real depende de execução e oferta final
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — budget real de testes verificado; avatar final locked antes de copy
+- [ ] All 🔵 citations added — fontes Ries / Fitzpatrick / Hormozi referenciadas no scorecard entregue
+- [ ] All 🟢 projections labeled como tal ao cliente — benchmarks de conversão e waitlist apresentados como targets, não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

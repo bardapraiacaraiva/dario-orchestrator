@@ -157,6 +157,37 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do form gerado deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do codebase do cliente / sessão anterior / stack real instalada
+- 🟡 **assumed** — plausível para o contexto mas precisa de confirm antes de entregar
+- 🟢 **projection** — comportamento esperado por design (não verificável sem runtime/teste real)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. o que precisa de verify antes de fazer merge.  **Honest transparency > form que parece completo mas rebenta em prod.**
+
+❌ NOT delivery-ready:
+```
+- Schema com nif: z.string().regex(/^\d{9}$/)   ← assumido que NIF é PT, nunca confirmado
+- Endpoint /api/leads                            ← assumido que existe, nunca lido no codebase
+- Rate limit de 3 submits/min                   ← inventado, sem evidência de implementação
+```
+
+✅ Delivery-ready:
+```
+- 🔵 verified   — react-hook-form@7.51 + zod@3.22 presentes em package.json (lido via Read)
+- 🟡 assumed    — campo `company` é opcional; cliente não especificou — confirmar antes de deploy
+- 🟡 assumed    — endpoint de submissão é /api/contact; não encontrado no codebase — criar ou ajustar path
+- 🟢 projection — após submit bem-sucedido, toast "Mensagem enviada!" aparece 3s; comportamento esperado, validar em browser
+- 🟢 projection — botão disabled bloqueia double-submit; verificar em condições de rede lenta (throttle DevTools)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir campos assumed (opcionais/obrigatórios, endpoints reais, regras de negócio específicas) com actuals do cliente
+- [ ] All 🔵 citations added — versões de dependências, nomes de campos e rotas referenciados apontam para ficheiros reais lidos
+- [ ] All 🟢 projections labeled ao cliente — deixar claro que comportamento de UX (toasts, redirects, loading states) precisa de QA em browser antes de considerar done
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```tsx

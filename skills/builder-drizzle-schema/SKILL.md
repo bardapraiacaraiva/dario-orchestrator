@@ -136,6 +136,39 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de schema Drizzle deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado da codebase do cliente (inspeccionado via Read/Grep/Glob)
+- 🟡 **assumed** — plausível pelo contexto mas precisa de confirmação antes de entregar
+- 🟢 **projection** — decisão de design/forecast (não verificável sem runtime)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify antes de correr migrations.  **Honest transparency > schema que parece completo mas quebra em prod.**
+
+❌ NOT delivery-ready:
+```
+users.role default: 'member'        ← sem label
+projects.budget precision: 12,2     ← sem label
+Drizzle version: 0.29+              ← sem label
+```
+Reader assume que tudo foi verificado — não foi.
+
+✅ Delivery-ready:
+```
+🔵 verified   — dialect: postgresql (lido de drizzle.config.ts existente no repo)
+🔵 verified   — Drizzle ORM version: 0.30.1 (lido de package.json)
+🟡 assumed    — users.role enum values: ['member','admin'] — confirmar com cliente se existem mais roles
+🟡 assumed    — onDelete: 'cascade' em projects.ownerId — confirmar política de negócio (pode ser 'restrict')
+🟢 projection — budget precision(12,2) — escolha de design; ajustar se moeda não-decimal (e.g. crypto)
+🟢 projection — uuid como PK strategy — adequado para edge/distributed; trocar por serial se preferência do cliente
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os 🟡 items confirmados — substituir enum values e FK policies com actuals do cliente
+- [ ] Todos os 🔵 sources citados — path do ficheiro + linha onde dialect/version foi lido
+- [ ] Todos os 🟢 projections comunicados ao cliente como decisões de design abertas a revisão antes de `drizzle-kit push`
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```typescript

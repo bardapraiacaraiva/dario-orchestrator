@@ -326,6 +326,34 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do Avatar deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via sessão anterior / dados reais do cliente / pesquisa citada
+- 🟡 **assumed** — plausível para o nicho mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — extrapolação por design (dor futura, transformação esperada, comportamento projetado)
+
+Output checklist upfront mostra ao leitor exactamente o que é trust-as-is vs. o que precisa de verify antes de usar em copy, ads ou funil.  
+**Honest transparency > avatar que parece completo mas está cheio de suposições disfarçadas de factos.**
+
+---
+
+❌ **NOT delivery-ready:**
+Avatar entregue sem labels — o cliente assume que "Idade: 32-45, renda €4.000–6.000/mês, maior dor: falta de tempo para prospectar" são dados confirmados, quando na verdade foram inferidos do nicho sem qualquer validação.
+
+✅ **Delivery-ready:**
+- 🔵 **verified** — "Faixa etária 35-50" — confirmado via briefing do cliente (sessão 14 Jan)
+- 🟡 **assumed** — "Renda mensal €4.000–6.000" — estimativa plausível para PME B2B Portugal; cliente deve validar com base na sua carteira real
+- 🟢 **projection** — "Após solução, o avatar recupera 8h/semana em prospecção" — transformação projetada pelo Value Equation; não verificável até implementação
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions demográficas e psicográficas com dados reais (CRM, entrevistas, surveys)
+- [ ] Todas as citações adicionadas para itens 🔵 (sessão, fonte, data)
+- [ ] Todos os itens 🟢 claramente apresentados ao cliente como projeções de transformação — não prometer como garantido em copy
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

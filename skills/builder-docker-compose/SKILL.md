@@ -169,6 +169,31 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do projecto do cliente (package.json, código existente, infra actual)
+- 🟡 **assumed** — plausível para o stack gerado, mas precisa confirmação antes de entregar
+- 🟢 **projection** — decisão de design/defaults razoáveis (não verificável sem deploy real)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. o que precisa de verify antes de fazer `docker compose up --build` em produção. **Honest transparency > stack que parte no primeiro deploy.**
+
+❌ NOT delivery-ready: `postgres:16-alpine`, porta `5432`, `POSTGRES_USER=app`, `NODE_ENV=production` — todos sem labels, cliente assume que foram extraídos do projecto real quando são defaults assumidos.
+
+✅ Delivery-ready:
+- 🔵 **verified** — `node:22-alpine` (confirmado via `package.json` → `"engines": { "node": "22" }` no repo do cliente)
+- 🟡 **assumed** — `POSTGRES_DB=app` (nome da base de dados não especificado — confirmar antes de deploy; substituir em `.env.example`)
+- 🟡 **assumed** — healthcheck endpoint `/api/health` (rota assumida como existente — confirmar que está implementada na app)
+- 🟡 **assumed** — porta `3000` exposta (confirmar que a app não usa `PORT` env var diferente)
+- 🟢 **projection** — `restart: unless-stopped` em todos os serviços (best-practice por design; comportamento real depende do orquestrador/hosting)
+- 🟢 **projection** — imagem final ~150 MB com multi-stage build (estimativa típica para Next.js standalone; valor real após primeiro `docker build`)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — `DB_NAME`, `DB_USER`, endpoint de healthcheck e porta da app actualizados com valores reais antes de `docker compose up`
+- [ ] All 🔵 citations added — versão Node, versão Postgres e variáveis de ambiente extraídas do repo/infra do cliente documentadas no PR/handoff
+- [ ] All 🟢 projections labeled as such ao cliente — deixar claro que `restart` policy e tamanho de imagem são defaults/estimativas, validar após primeiro build em staging
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

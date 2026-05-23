@@ -333,6 +333,34 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados reais do cliente / fonte citada
+- 🟡 **assumed** — plausível dado o contexto, mas precisa de confirmação do cliente antes de entrega
+- 🟢 **projection** — forecast by design (não verificável — é simulação ou estimativa deliberada)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ **NOT delivery-ready:**
+> "CAC estimado: $45. Margem bruta: 68%. Subscription pricing recomendado: $97/mês."
+→ Nenhum label. Reader assume que tudo é dado real. CAC pode ser benchmark genérico, margem pode ser hipótese, pricing não foi testado. Sem distinção = decisão de negócio baseada em areia.
+
+✅ **Delivery-ready:**
+> - 🔵 **verified** — Estrutura de custos fixos ($2.800/mês): confirmada pelo cliente na sessão anterior
+> - 🟡 **assumed** — CAC estimado ($55): baseado em benchmark SaaS B2C da região; cliente não forneceu dados de campanha reais
+> - 🟢 **projection** — LTV a 12 meses ($1.140): calculado com churn hipotético de 5%/mês; válido apenas se retenção for alcançada
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions com actuals (ex: CAC real de campanhas, pricing já testado)
+- [ ] Todos os itens 🔵 com fonte citada — sessão, documento ou dado fornecido pelo cliente documentado
+- [ ] Todos os itens 🟢 claramente apresentados ao cliente como projeção — expectativas alinhadas antes de decisão de pricing ou investimento
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

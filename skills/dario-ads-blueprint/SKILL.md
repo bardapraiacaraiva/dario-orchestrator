@@ -323,6 +323,32 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via RAG (Pittman / Burns / Kasim / Breeze / Sobral), sessão anterior, ou dados reais da conta do cliente
+- 🟡 **assumed** — plausível dado o contexto, mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast por design (ROAS, CPA estimado, CPL alvo) — não verificável até a campanha rodar
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+> "Budget mensal: R$5.000 | CPA alvo: R$47 | Audiência: interesses + LAL 1% | Split: 70/20/10"
+> *(sem labels — o cliente não sabe o que é dado real vs suposição vs projeção)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Split cold/warm/hot 70/20/10 (fonte: Pittman BPM method, RAG confirmado)
+> - 🟡 **assumed** — Budget mensal R$5.000 (cliente mencionou "algo em torno disso" — confirmar valor exato e se é por campanha ou conta total)
+> - 🟡 **assumed** — Avatar: mulheres 28-45, interesse em emagrecimento (baseado no briefing inicial — validar com dados de compradores actuais se existirem)
+> - 🟢 **projection** — CPA alvo R$47 estimado com base em ticket R$297 e margem ~60% (projeção de benchmark; ajustar após 7 dias de learning phase)
+> - 🟢 **projection** — ROAS 3.2x esperado no mês 2 (forecast por design; não garantido)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — budget exato, avatar validado com dados reais, plataformas priorizadas confirmadas, URL de destino aprovada
+- [ ] All 🔵 citations added — fontes RAG (Pittman / Burns / Kasim) referenciadas no blueprint entregue
+- [ ] All 🟢 projections labeled as such ao cliente — CPA alvo e ROAS apresentados como benchmarks iniciais, não como garantias; revisão após learning phase (dia 7)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown
