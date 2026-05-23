@@ -483,6 +483,35 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas requer confirmação do cliente antes de entrega
+- 🟢 **projection** — previsão por design (não verificável agora)
+
+Output checklist upfront mostra ao leitor exatamente o que é trust-as-is vs. precisa verificar. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Proposta inclui 12 oleandros para privacy screening, rega gota-a-gota com ciclos de 20min, piscina integrada na zona sul com deck em ipê de 45m²."
+> *(Reader assume que tudo é verified — solo, zona climática, espécies, dimensões, restrições municipais de rega.)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Zona climática: Algarve (Mediterranean South); restrições municipais de rega em vigor (confirmado sessão anterior)
+> - 🟡 **assumed** — Solo arenoso com boa drenagem; espécies propostas (lavanda, rosmaninho, cistus) adequadas ao perfil — *aguarda análise de solo ou confirmação do cliente*
+> - 🟡 **assumed** — Área total do jardim ~320m² baseada em planta PDF fornecida — *confirmar levantamento topográfico*
+> - 🟢 **projection** — Cobertura de privacy screening estimada em 80% ao fim de 3 anos com crescimento normal das espécies selecionadas
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (tipo de solo, dimensões reais, fonte de água: furo vs. municipal)
+- [ ] All 🔵 citations added — restrições de rega municipais, espécies protegidas (sobreiro/azinheira) validadas contra legislação vigente
+- [ ] All 🟢 projections labeled como tal ao cliente — growth timelines, estimativas de consumo de água, custos de manutenção Year 1 vs. Year 3
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

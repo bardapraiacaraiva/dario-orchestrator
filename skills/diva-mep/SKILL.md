@@ -536,6 +536,34 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output MEP deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via SKILL.md, regulamentação PT vigente, ou dados de projecto fornecidos pelo cliente
+- 🟡 **assumed** — plausível para tipologia indicada, mas requer confirmação antes de entrega
+- 🟢 **projection** — dimensionamento/estimativa por design (não verificável sem projecto executivo)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Quadro eléctrico trifásico 20.7kVA, 3x30A, com 12 circuitos, AVAC tipo split 9000BTU por divisão, coluna de água DN25."
+> *(reader assume tudo verificado — potência contratada, número de circuitos e dimensão da tubagem não têm fonte nem status)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Fornecimento trifásico 20.7kVA (3x30A) compatível com moradia >200m² + bomba de calor, per RTIEBT tabela de níveis de potência
+> - 🟡 **assumed** — 14 circuitos no quadro (estimativa para tipologia T4 + carregador EV); confirmar com cliente se existe pré-instalação solar ou jacuzzi
+> - 🟢 **projection** — Carga total instalada estimada em 18.4kW em regime simultâneo; validação final requer cálculo por Engenheiro responsável
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — potência contratada actual, equipamentos previstos (EV, piscina, AC zonas), traçado de prumadas existentes
+- [ ] All 🔵 citations added — artigos RTIEBT, ITED 4.ª edição, RGSPPDADAR e RJSCIE referenciados por número de artigo/tabela
+- [ ] All 🟢 projections labeled ao cliente — deixar claro que dimensionamentos (AVAC, caudais, cargas) são estimativas de coordenação, não cálculos de projecto de execução com assinatura de técnico responsável
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

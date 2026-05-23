@@ -386,6 +386,30 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmed from prior session/memory/cliente data
+- 🟡 **assumed** — plausible but needs cliente confirm pre-delivery
+- 🟢 **projection** — forecast by design (not verifiable)
+
+Output checklist upfront mostra reader exactly o que é trust-as-is vs precisa verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+> "Recobrimento mínimo: 4cm. Betão classe C25/30. Teste de estanquidade: 48h. Membrana com sobreposições de 10cm."
+> *(Reader assume que todos os valores são do projecto real do cliente — podem ser defaults normativos, não os especificados no caderno de encargos)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Recobrimento mínimo 4cm (EN 1992-1-1, confirmado em sessão anterior com eng. estruturas)
+> - 🟡 **assumed** — Classe de betão C25/30 (típico para fundações residenciais PT; confirmar caderno de encargos antes da betonagem)
+> - 🟢 **projection** — Ensaios de betão aos 28 dias aprovados (resultado esperado se execução conforme; verificar quando disponíveis)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir defaults normativos pelos valores reais do caderno de encargos / projecto de execução do cliente
+- [ ] All 🔵 citations added — referenciar norma (EN, LNEC, REH, RRAE) ou documento de projecto fonte para cada tolerância indicada
+- [ ] All 🟢 projections labeled as such ao cliente — deixar claro que resultados de ensaios, testes de estanquidade e conformidade final são projecções até execução e medição real em obra
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

@@ -327,6 +327,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via RAG/KB dario, legislação RJUE/RGEU publicada, ou dados do cliente já fornecidos
+- 🟡 **assumed** — plausível com base no tipo de obra/localização, mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — prazo/custo estimado por design (variável por município, não verificável sem consulta direta à câmara)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. precisa verificar. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Procedimento: Comunicação Prévia. Prazo: 20 dias. Taxa: €850. Documentos: projecto de arquitectura + especialidades."
+> *(Reader assume que tudo está verificado — município, isenções RERU, taxa real e prazo não foram confirmados.)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Comunicação Prévia aplicável: renovação estrutural sem alteração de fachada (art.34 RJUE)
+> - 🟡 **assumed** — Projeto não está em Zona de Protecção (ZP); cliente confirmou "sem monumento próximo" mas DGPC não consultado
+> - 🟡 **assumed** — Isenção RERU aplicável: edifício pré-1951 conforme declarado, mas certidão predial ainda não vista
+> - 🟢 **projection** — Prazo tácito: 20 dias úteis (art.36 RJUE); câmaras como Lisboa/Porto frequentemente excedem — contar 30-45 dias reais
+> - 🟢 **projection** — Taxa estimada: €600–€1.200 (base tabela municipal média); valor exacto depende do regulamento municipal vigente
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — ZP/DGPC verificado, certidão predial revista, legitimidade do requerente confirmada
+- [ ] Todas as citações 🔵 adicionadas com referência ao artigo RJUE/RGEU ou resultado RAG correspondente
+- [ ] Todos os prazos e taxas 🟢 comunicados ao cliente como estimativas — substituir com tabela de taxas do município específico antes de submissão
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

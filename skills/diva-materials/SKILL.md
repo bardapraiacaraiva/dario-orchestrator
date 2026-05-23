@@ -348,6 +348,37 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de especificação de materiais deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do briefing, floor plan, ou dados do cliente já recebidos
+- 🟡 **assumed** — plausível pelo contexto mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — estimativa por design (preço de mercado, prazo de entrega, disponibilidade)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. o que precisa de verificação. **Honest transparency > paleta entregue com dados fabricados.**
+
+---
+
+❌ NOT delivery-ready:
+> "Porcelanato Marazzi Mystone Limestone 60×60 — 38€/m² — disponível na Cerames Lisboa"
+*(reader assume que o preço, o fornecedor e a disponibilidade estão todos confirmados — podem estar desactualizados ou errados)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Estilo direction: "contemporâneo minimalista, sem padrões" (briefing Secção C, sessão 14-Jan)
+> - 🔵 **verified** — Zona húmida: WC principal + cozinha requerem R10 mínimo (briefing Secção E)
+> - 🟡 **assumed** — Porcelanato Marazzi Mystone Limestone 60×60 disponível na Cerames Lisboa (confirmar stock e prazo)
+> - 🟡 **assumed** — Orçamento €35–45/m² para pavimentos aceitável (budget tier "recomendado" inferido, cliente não confirmou tecto)
+> - 🟢 **projection** — Preço estimado bancada Silestone Iconic White 20mm: €280–340/m² instalado (cotação de mercado Jun 2024, sujeito a actualização)
+> - 🟢 **projection** — Prazo de fornecimento caixilharia Cortizo: 6–8 semanas (estimativa standard, não confirmado com fornecedor)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — preços, disponibilidade e fornecedores validados com cotação real
+- [ ] All 🔵 sources cited — referências ao briefing, floor plan, e sessão de origem documentadas na spec
+- [ ] All 🟢 projections labeled ao cliente — estimativas de preço e prazo identificadas como tal no documento final
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown
