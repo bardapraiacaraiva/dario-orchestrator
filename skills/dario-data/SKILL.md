@@ -339,3 +339,180 @@ framework: <kaushik|fader|ellis|combined>
 - **Cohort analysis without segmentation** — aggregate retention curves hide segment-level insights. A flat retention curve might be the average of one segment with 80% retention and another with 10%. Always segment.
 - **North Star Metric that the team can't influence** — an NSM that depends on external factors (market growth, competitor actions) rather than product/team actions is useless for decision-making. The team must be able to move the NSM through their work.
 - **Attribution certainty** — no attribution model is perfect. Last-click, first-click, linear, and data-driven all have biases. Acknowledge the limitations, use directional guidance, and never make absolute claims about channel ROI.
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Metric Framework tem North Star + métricas de apoio definidas
+
+- [ ] North Star Metric nomeada com fórmula explícita (não só "engagement")
+- [ ] 3–5 supporting metrics mapeadas ao funil AARRR correto
+- [ ] Vanity metrics excluídas ou explicitamente marcadas como tal
+- [ ] Cada métrica tem owner, frequência de reporte, e threshold de alerta
+
+❌ NOT delivery-ready: "Deves medir engagement e retenção para perceber o crescimento."
+✅ Delivery-ready: "North Star da LUSOconta: Transações conciliadas por utilizador ativo/mês (meta: ≥8 até Q3-2025). Supporting: DAU/MAU ratio (target 0.35), % utilizadores que conciliam no D3 pós-onboarding (target 62%), involuntary churn rate (target <1.2%/mês)."
+
+---
+
+### Gate 2 — CLV/Segmentação com dados reais do cliente
+
+- [ ] CLV calculado com fórmula explícita e valores preenchidos (ARPU, margem, lifetime)
+- [ ] Pelo menos 3 segmentos Fader (Champions / At Risk / New High-Potential) com critérios mensuráveis
+- [ ] Estratégia diferenciada por segmento (não genérica)
+- [ ] Pareto validado ou estimado: % clientes top → % receita
+
+❌ NOT delivery-ready: "Os teus melhores clientes merecem atenção especial e campanhas de retenção."
+✅ Delivery-ready: "Atelier AI — CLV médio: €47/mês × 11 meses × 72% margem = €372. Top 18% dos clientes (planos Team+) geram 71% da MRR. Champions (recência <30 dias + ≥3 projetos ativos): estratégia de upsell para API credits. At Risk (recência 61–90 dias, plano Solo): win-back sequence 3 emails com oferta de onboarding 1:1."
+
+---
+
+### Gate 3 — See-Think-Do-Care mapeado ao modelo de negócio específico
+
+- [ ] Cada estágio tem métricas concretas, não placeholder
+- [ ] Conteúdo recomendado por estágio é específico ao produto/mercado
+- [ ] Budget/esforço alocado reflete 10/90 rule (não propor 5 ferramentas sem analista)
+- [ ] "Care" stage não está vazio — tem métricas de expansão e NPS definidos
+
+❌ NOT delivery-ready: "No estágio See deves focar em awareness. No Do foca em conversão."
+✅ Delivery-ready: "SAQUEI — See: impressões LinkedIn Posts sobre 'crédito para empresas' (baseline 12k/mês); Think: tempo médio em /como-funciona ≥2m30s, taxa de download do guia PDF >4%; Do: submissões de pedido de crédito (target 38/semana, atual 21); Care: NPS pós-desembolso (target 52), taxa de segundo empréstimo em 6 meses (target 29%)."
+
+---
+
+### Gate 4 — PMF Assessment com score e próximos passos
+
+- [ ] Sean Ellis test aplicado (% "muito desapontado" calculada ou estimada com método)
+- [ ] Threshold 40% explicado e contextualizado para o estágio do produto
+- [ ] Se pré-PMF: recomendações de retenção qualitativas + quantitativas
+- [ ] Se pós-PMF: North Star e experimentos ICE priorizados, não só "escalar"
+
+❌ NOT delivery-ready: "Ainda não tens product-market fit. Fala com os utilizadores e itera."
+✅ Delivery-ready: "Pupli — Survey a 87 utilizadores ativos: 34% 'muito desapontado' (abaixo dos 40%). Segmento que passa o threshold: treinadores independentes com carteira ≥8 cães (52% neste sub-grupo). Próximo passo: redesenhar onboarding para este ICP, parar growth spend até D30-retention ≥35% neste segmento."
+
+---
+
+### Gate 5 — ICE Scoring com experimentos ranqueados
+
+- [ ] Mínimo 4 experimentos propostos com ICE (Impact 1–10, Confidence 1–10, Ease 1–10)
+- [ ] ICE Score = média das 3 dimensões, não apenas soma
+- [ ] Hipótese de cada experimento formulada como "Se X então Y porque Z"
+- [ ] Quick win (ICE ≥7, tempo <2 semanas) identificado explicitamente
+
+❌ NOT delivery-ready: "Testa diferentes CTAs e melhora o onboarding. Prioriza o que for mais fácil."
+✅ Delivery-ready: "Cuidai — Experimento #1 (ICE 8.3): 'Se adicionarmos progress bar no onboarding (4 passos visíveis), a taxa de activação D1 sobe de 41% para 55%, porque utilizadores sabem quanto falta.' Impact 9, Confidence 8, Ease 8. Quick win — implementar em 5 dias. Experimento #2 (ICE 6.7): email de re-activação ao D7 para utilizadores sem 1ª consulta agendada. Impact 8, Confidence 7, Ease 5."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, zero angle-brackets
+
+- [ ] Nenhum `<client_name>`, `<insert metric>`, `<your product>` no output final
+- [ ] Todos os números são reais (fornecidos pelo cliente) ou estimativas explicitamente marcadas como `[estimativa — validar]`
+- [ ] Nome do produto/empresa aparece pelo menos 3x no output
+- [ ] Datas e períodos concretos (ex: "Q2-2025", "últimos 90 dias") em vez de "recentemente" ou "em breve"
+
+❌ NOT delivery-ready: "A <empresa> deve focar em melhorar o <metric principal> no próximo trimestre."
+✅ Delivery-ready: "A LUSOconta deve focar em aumentar a taxa de conciliação D3 de 38% para 55% até 30-Jun-2025, através dos 3 experimentos ICE priorizados abaixo."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Data Squad Report — Atelier AI
+**Data:** 14-Mai-2025 | **Modelo:** SaaS B2B | **Estágio:** Post-PMF inicial
+
+---
+
+## North Star Metric
+
+**Projetos AI publicados por workspace ativo/mês**
+- Fórmula: (Projetos publicados totais) ÷ (Workspaces com ≥1 login nos últimos 30 dias)
+- Baseline atual: 2.1 projetos/workspace/mês
+- Target Q3-2025: 4.0 projetos/workspace/mês
+- Porquê: correlaciona 0.81 com expansão de receita a 90 dias (dado de coorte Jan–Mar 2025)
+
+---
+
+## AARRR — Atelier AI
+
+| Estágio | Métrica | Atual | Target | Owner |
+|---------|---------|-------|--------|-------|
+| Acquisition | Signups orgânicos/semana | 47 | 80 | Marketing |
+| Activation | % workspaces com 1º projeto publicado em D7 | 38% | 58% | Product |
+| Retention | D30 retention (workspaces ativos) | 44% | 60% | Product |
+| Revenue | MRR expansion rate (upsell/cross-sell) | 6%/mês | 11%/mês | CS |
+| Referral | % novos signups via link de referral | 9% | 18% | Growth |
+
+---
+
+## CLV Segmentação — Fader Model
+
+**CLV médio calculado:** €41/mês ARPU × 13.2 meses lifetime × 69% margem = **€374**
+
+| Segmento | Critério | N Clientes | % MRR | Estratégia |
+|----------|----------|------------|-------|------------|
+| Champions | Recência ≤21 dias + ≥5 projetos/mês | 89 | 58% | Upsell API credits; programa beta features |
+| Loyals | Recência ≤45 dias + 2–4 projetos/mês | 143 | 27% | Nurture com templates; webinar mensal |
+| At Risk | Recência 46–75 dias, plano pago | 61 | 11% | Win-back: email pessoal do founder + oferta 1 mês |
+| Churned High-Value | Recência >75 dias, ex-plano Team | 29 | 0% | Outreach manual; entender motivo; produto roadmap |
+
+**Pareto observado:** 18% dos clientes (Champions + topo dos Loyals) → 72% do MRR.
+
+---
+
+## PMF Assessment — Sean Ellis
+
+**Survey enviado:** 12-Mai-2025, n=134 respostas (utilizadores ativos últimos 60 dias)
+
+- "Muito desapontado" se Atelier AI desaparecesse: **46%** ✅ Acima do threshold 40%
+- Segmento mais forte: Product Managers em equipas 5–20 pessoas (61% "muito desapontado")
+- Segmento fraco: Freelancers solo (28% — abaixo do threshold)
+
+**Conclusão:** PMF confirmado para ICP B2B mid-market. Não escalar aquisição freelancer até reengenharia do onboarding para este segmento.
+
+---
+
+## See-Think-Do-Care — Atelier AI
+
+| Estágio | Audiência | Métricas-Chave | Ação Prioritária |
+|---------|-----------|----------------|-----------------|
+| See | PMs e tech leads em empresas 10–200 pessoas PT/BR | LinkedIn impressions (atual 28k/mês), brand search "atelier AI" (atual 340/mês) | 2 posts/semana sobre "AI workflows para produto" |
+| Think | Visitantes /features e /pricing com >1m30s | Páginas/sessão (atual 2.1, target 3.2), demo request rate (atual 1.8%) | Caso de estudo Cuidai publicado em blog |
+| Do | Trial signups | Conversão trial→pago (atual 22%, target 31%), TTV 1º projeto <D3 | Redesign onboarding: 4 passos com progress bar |
+| Care | Clientes ativos (Champions + Loyals) | NPS (atual 51), expansion MRR (atual 6%/mês) | Programa "AI Builder" — templates exclusivos mensais |
+
+---
+
+## ICE Experiments — Sprint Mai–Jun 2025
+
+| # | Hipótese | I | C | E | ICE | Prazo |
+|---|----------|---|---|---|-----|-------|
+| 1 | Progress bar onboarding → activação D7 38%→55% | 9 | 8 | 8 | **8.3** | 1 semana |
+| 2 | Email D7 para workspaces sem projeto publicado → reactivação +18% | 8 | 7 | 6 | **7.0** | 10 dias |
+| 3 | Caso de estudo Cuidai em /pricing → trial CVR +4pp | 7 | 6 | 7 | **6.7** | 2 semanas |
+| 4 | Referral program (créditos por convite aceite) → referral 9%→16% | 8 | 5 | 5 | **6.0** | 3 semanas |
+
+**Quick win imediato:** Experimento #1 — impacto alto, 5 dias de eng., zero risco de regressão.
+
+---
+
+**Próxima revisão de métricas:** 11-Jun-2025 | **Owner:** Diogo (Product) + Ana (Growth)
+```
+
+---
+
+## Output anti-patterns
+
+- Listar "métricas importantes" sem fórmulas, owners, ou baselines reais — transforma dashboards em decoração
+- Recomendar ferramentas (Mixpanel, Amplitude, Looker) sem verificar se o cliente tem o analista para as operar — viola a 10/90 rule de Kaushik
+- Apresentar CLV sem segmentar: um CLV médio único esconde os Champions e deixa a estratégia cega
+- Fazer ICE scoring com todos os experimentos no mesmo intervalo (6.5–7.2) — não prioriza nada, é lista de desejos com números
+- Concluir "tens PMF" ou "não tens PMF" sem mostrar a percentagem "muito desapontado" e o n amostral do survey
+- Colocar "Care" no See-Think-Do-Care como afterthought ou vazio — é onde está 70%+ do CLV incremental
+- Usar "churn está alto" sem definir a taxa, o tipo (voluntário vs. involuntário), e o segmento afetado
+- Propor North Star Metric sem validar correlação com receita — um NSM desalinhado otimiza a métrica errada
+- Entregar coortes de retenção sem explicar o eixo X (semanas? meses?) nem o denominador (instalações? primeiros pagamentos?)
+- Misturar métricas See e Do no mesmo "dashboard principal" — cria ruído para o CEO e paralisa decisões de produto

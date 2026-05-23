@@ -399,3 +399,170 @@ primary-model: <model name>
 - **Logging nothing** — if you don't log prompts, responses, latency, and token usage, you cannot debug, optimize, or improve. Observability is not optional.
 - **Prompt injection ignorance** — every user-facing LLM system is vulnerable to prompt injection. Validate inputs, separate system/user prompts, and test adversarial inputs before launch.
 - **Building multi-agent when single-agent suffices** — complexity is cost. Only add agents when a single agent demonstrably cannot handle the task. Start simple, add complexity only when measured need arises.
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Architecture pattern is explicitly chosen and justified
+- [ ] Um dos 5 padrões (Simple Chain / RAG / Agentic Loop / Multi-Agent / Human-in-the-Loop) foi selecionado explicitamente
+- [ ] Justificação inclui pelo menos 2 critérios do cliente (volume, latência, budget, equipa)
+- [ ] Alternativas descartadas estão nomeadas com razão ("Pattern D descartado porque equipa é 1 dev full-stack sem infra MLOps")
+- ❌ NOT delivery-ready: "Recomendamos uma arquitetura RAG com agentes para o vosso caso de uso."
+- ✅ Delivery-ready: "Pattern B (RAG Pipeline) para a Cuidai: 2.000 queries/dia de cuidadores a perguntar sobre protocolos clínicos, latência tolerada 3s, budget €150/mês API — RAG com `text-embedding-3-small` + Cohere Rerank fica dentro de €0.06/1k queries."
+
+### Gate 2 — RAG configuration is numerically specified (if RAG is in scope)
+- [ ] Chunk size em tokens está definido (ex: 512 tokens, overlap 10%)
+- [ ] Modelo de embedding escolhido com justificação (custo ou qualidade)
+- [ ] Estratégia de retrieval especificada: hybrid search? reranking? HyDE?
+- [ ] Pelo menos 1 failure mode endereçado com mitigação concreta
+- ❌ NOT delivery-ready: "Vamos usar chunking semântico com um bom modelo de embeddings."
+- ✅ Delivery-ready: "SAQUEI — chunks de 768 tokens (overlap 15%) sobre regulamentação Banco de Portugal; `voyage-3` para conteúdo técnico-legal; hybrid BM25 + vector, Cohere Rerank top-5; failure mode crítico: LLM ignora chunks relevantes → instrução explícita 'ONLY use retrieved context, cite source' no system prompt."
+
+### Gate 3 — Cost model is calculated, not estimated vaguely
+- [ ] Custo por 1.000 requests estimado com modelo + token counts reais
+- [ ] Custo mensal projetado baseado em volume do cliente
+- [ ] Pelo menos 1 otimização de custo proposta (caching, batching, model routing, prompt compression)
+- [ ] Budget ceiling do cliente é respeitado ou trade-off está explícito
+- ❌ NOT delivery-ready: "GPT-4o é mais caro mas dá melhor qualidade. Depende do budget."
+- ✅ Delivery-ready: "Tributario.AI — 5.000 queries/dia × 800 tokens input + 300 tokens output × $0.0025/1k tokens (GPT-4o-mini) = ~€95/mês. Cache semântico em queries frequentes (estimado 30% cache hit) reduz para ~€67/mês. Budget declarado €120/mês — aprovado."
+
+### Gate 4 — Eval strategy is defined with specific metrics and thresholds
+- [ ] Métricas de avaliação estão nomeadas (ex: faithfulness, answer relevance, context recall — RAGAS; accuracy, latência p95)
+- [ ] Thresholds de aceitação definidos (ex: "faithfulness > 0.85 antes de ir a produção")
+- [ ] Plano de eval offline (dataset de teste) E online (monitoring em produção) mencionados
+- [ ] Regression test trigger está definido (ex: "corre evals a cada deploy ou mudança de prompt")
+- ❌ NOT delivery-ready: "Vamos testar o sistema antes de lançar e monitorizar a qualidade."
+- ✅ Delivery-ready: "Atrium — eval offline com RAGAS: faithfulness > 0.87, context recall > 0.80, dataset de 200 Q&A pairs da equipa jurídica. Online: LangSmith tracing, alerta se latência p95 > 4s ou se score de thumbs-down > 5% em janela de 24h. Evals correm em CI a cada PR que toca prompt ou chunking."
+
+### Gate 5 — Observability stack is named and instrumented
+- [ ] Ferramenta de tracing nomeada (LangSmith, Langfuse, Helicone, Arize, custom OpenTelemetry)
+- [ ] O que é tracado está especificado: cada LLM call, latência por step, tokens consumidos, retrieval score
+- [ ] Alertas definidos com thresholds concretos
+- [ ] Plano de debug para comportamento não-determinístico (seed, temperatura, logging de prompt+completion)
+- ❌ NOT delivery-ready: "Adicionamos logs e monitorização ao pipeline."
+- ✅ Delivery-ready: "Lisbon Dog Care — Langfuse self-hosted (custo €0): tracing de embed → retrieve → rerank → generate, cada step com latência ms e token count. Alerta Slack se p95 > 5s ou se retrieval top-1 score < 0.70. Debug: temperatura 0, seed fixo em staging, cada prompt+completion guardado 30 dias."
+
+### Gate 6 — Output uses CLIENT NAME + REAL data, no placeholder angle-brackets
+- [ ] Nome do cliente aparece pelo menos 1× em cada secção técnica relevante
+- [ ] Nenhum `<client_name>`, `<your_model>`, `<insert_metric>`, `[YOUR DATA HERE]` no output final
+- [ ] Números são do cliente (requests/dia, budget, equipa, tipo de dados) — não genéricos de tutorial
+- [ ] Se dados do cliente não foram fornecidos, output inclui pergunta explícita antes de avançar
+- ❌ NOT delivery-ready: "Para o vosso caso de uso, com `<volume>` requests/dia e budget de `<€X>`/mês..."
+- ✅ Delivery-ready: "Para a Pupli com 800 tutores ativos e ~1.200 queries/dia sobre saúde canina, com budget €80/mês: GPT-4o-mini + RAG sobre base de artigos veterinários (1.400 docs, 2.1M tokens indexados) fica em ~€52/mês."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# AI Engineering — Plano de Produção: Tributario.AI
+
+**Cliente:** Tributario.AI (plataforma de consultoria fiscal automatizada, Portugal)
+**Estado atual:** POC funcional, LangChain + GPT-4o, sem evals, sem tracing, €600/mês API
+**Objetivo:** Produção estável, custo < €200/mês, faithfulness > 0.88 (requisito regulatório)
+**Volume alvo:** 3.000 queries/dia de contabilistas e PMEs; pico 08h–10h
+
+---
+
+## Arquitetura escolhida: Pattern B + Pattern E hybrid
+
+**RAG Pipeline com Human-in-the-Loop para outputs de alto risco**
+
+Justificação:
+- Conteúdo fiscal português: IRS, IRC, IVA, CIRS, CIRC — atualizações frequentes (OE 2024/2025)
+- Erros têm consequências legais → respostas sobre deduções > €10.000 passam por revisão humana
+- Pattern D (multi-agent) descartado: equipa de 2 devs, sem bandwidth para manter 4+ agents
+
+---
+
+## RAG Configuration
+
+| Componente | Escolha | Razão |
+|---|---|---|
+| Chunking | 512 tokens, overlap 12% | Artigos do CIRS têm parágrafos curtos e densos |
+| Embedding | `text-embedding-3-large` | Terminologia fiscal PT-specific, qualidade > custo aqui |
+| Vector DB | Qdrant self-hosted (VPS €12/mês) | Filtros por metadata: ano_fiscal, codigo_artigo, diploma |
+| Retrieval | Hybrid BM25 + vector, top-20 → Cohere Rerank top-5 | BM25 apanha artigo exacto ("artigo 71.º CIRS"); rerank ordena por relevância semântica |
+| Metadata | `{source: "CIRS_2024", artigo: "71", data_vigencia: "2024-01-01", revogado: false}` | Filter `revogado: false` antes de qualquer vector search |
+
+**Failure modes mitigados:**
+- LLM cita legislação revogada → metadata filter `revogado: false` + instrução "NUNCA cites legislação fora dos documentos recuperados"
+- Chunks de artigos com remissões internas (ex: "nos termos do artigo 25.º") → query expansion: gera versão da query com artigo explicitado
+
+---
+
+## Cost Model
+
+**Baseline atual:** GPT-4o, avg 1.200 tokens input + 600 tokens output, sem cache
+→ 3.000 × 1.800 tokens × $0.005/1k = **$27/dia → ~€750/mês** ❌ acima do target
+
+**Plano otimizado:**
+
+| Otimização | Impacto |
+|---|---|
+| GPT-4o → GPT-4o-mini para classificação de intent e rerank scoring | -€180/mês |
+| Semantic cache (GPThash) — hit rate estimado 28% nas queries repetidas de IRS | -€140/mês |
+| Prompt compression: remover contexto de chunking redundante (-200 tokens/query) | -€60/mês |
+| GPT-4o apenas para output final (não para retrieval scoring) | -€90/mês |
+
+**Total projetado: €280/mês** → dentro do budget de €300/mês com margem de segurança.
+
+---
+
+## Eval Strategy
+
+**Offline (pré-deploy):**
+- Dataset: 350 pares Q&A validados por 2 contabilistas certificados (TOC)
+- Framework: RAGAS
+  - `faithfulness > 0.88` (threshold regulatório, zero tolerância para alucinação de valores)
+  - `context_recall > 0.82`
+  - `answer_relevance > 0.85`
+- Trigger: corre em CI a cada PR que toca prompt, chunking config, ou modelo
+
+**Online (produção):**
+- LangSmith tracing: cada call com latência por step, token count, retrieval scores top-5
+- Alerta PagerDuty se:
+  - Latência p95 > 4s (SLA declarado ao cliente)
+  - Feedback negativo > 4% em janela 24h (botão "Resposta incorreta" na UI)
+  - Retrieval top-1 score < 0.68 (indica query fora da base de conhecimento)
+- Dashboard semanal: drift de faithfulness score ao longo do tempo
+
+---
+
+## Observability Stack
+
+- **Tracing:** LangSmith (plano gratuito suficiente para 3.000 queries/dia)
+- **Steps tracados:** intent_classification → embed_query → retrieve(BM25+vector) → rerank → augment_prompt → generate → parse_output
+- **Cada step:** latência ms, tokens in/out, model_id, retrieval_scores[1-5]
+- **Debug não-determinismo:** temperatura 0.0 em produção, seed=42 em staging, prompt+completion guardados 60 dias (compliance fiscal)
+
+---
+
+## Roadmap (8 semanas)
+
+| Semana | Milestone |
+|---|---|
+| 1-2 | Migração chunking + metadata pipeline; indexar 4.200 docs (CIRS, CIRC, CIVA + OE 2024) |
+| 3 | Implementar hybrid search + Cohere Rerank; baseline RAGAS |
+| 4 | Semantic cache + model routing (mini para intent, 4o para output) |
+| 5 | LangSmith tracing + alertas |
+| 6 | Human-in-the-Loop para queries classificadas como "alto risco fiscal" (deduções > €5k) |
+| 7 | Eval dataset com TOCs; validação faithfulness > 0.88 |
+| 8 | Go-live produção + monitoring dashboard |
+```
+
+---
+
+## Output anti-patterns
+
+- **Pattern sem critérios de seleção** — recomendar RAG ou multi-agent sem dizer *por que não* os outros padrões para este cliente específico
+- **Custo vago** — "GPT-4o é caro, considere modelos mais baratos" sem calcular €/mês com volume real
+- **Evals abstratas** — "vamos avaliar a qualidade das respostas" sem métricas, thresholds, ou dataset
+- **Stack de observability genérica** — "adicionar logging e monitorização" sem nomear ferramenta, steps tracados, ou thresholds de alerta
+- **Chunking sem números** — "chunking semântico adaptado ao conteúdo" sem chunk size, overlap, ou metadados definidos
+- **Fine-tuning reflexo** — recomendar fine-tuning sem primeiro provar que RAG + prompt engineering falharam
+- **Model selection por benchmark** — escolher modelo por leaderboard MMLU sem referenciar que deve ser benchmarkado nos dados e queries reais do cliente
+- **Placeholder leakage** — entregar output com `<client_name>`, `<insert_volume>`, ou `[YOUR_MODEL]` visíveis
+- **Arquitetura sem failure modes** — descrever o happy path do pipeline sem mencionar o que falha e como mitigar
+- **Output sem equipa em conta** — recomendar arquitetura multi-agent para equipa de 1 founder sem MLOps, ou Kubernetes para startup em fase de validação

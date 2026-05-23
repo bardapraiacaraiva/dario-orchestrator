@@ -742,3 +742,189 @@ python ~/.claude/orchestrator/dispatch_engine.py --json
 - Squad boost is optional — don't activate squads for simple tasks (cost waste)
 - **Never assign to a busy worker** — check workload first (Step 2.5)
 - **Always write back to taskboard** — dispatch without persistence is lost work
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Skill chain detection é executado ANTES de qualquer routing individual
+- [ ] Keywords extraídas do pedido são comparadas contra `trigger_keywords` em `skill_chains.yaml` antes do Step 1
+- [ ] Se chain match encontrado, output indica explicitamente qual chain foi ativada (ex: `brand_to_market`, `seo_full_pipeline`)
+- [ ] Se sem match, output confirma "no chain match → routing individual" antes de prosseguir
+- [ ] Priority order documentada: Chain > Composite Mode > Individual Skill
+
+❌ NOT delivery-ready: "Atribuí a task ao worker disponível."
+✅ Delivery-ready: "Sem match em skill_chains.yaml (keywords: 'copy landing page' — sem trigger keyword de chain). Routing individual iniciado → Step 1."
+
+---
+
+### Gate 2 — Capability matching usa dados reais de `company.yaml`
+- [ ] Worker encontrado é referenciado pelo `id` exacto de `company.yaml` (ex: `ux-01`, `seo-02`), não por nome genérico
+- [ ] `required_capabilities` da task intersectam com `capabilities[]` do worker atribuído, listadas explicitamente
+- [ ] Workload check executado: número de tasks `in_progress` do worker indicado no output
+- [ ] Sort criteria documentado quando há múltiplos candidatos (overlap count → workload → division match)
+
+❌ NOT delivery-ready: "O melhor worker para SEO foi selecionado com base nas suas capacidades."
+✅ Delivery-ready: "Candidatos: `seo-02` (overlap: 3/3, load: 0 tasks), `content-01` (overlap: 2/3, load: 1 task). Atribuído: `seo-02` (max overlap + disponível)."
+
+---
+
+### Gate 3 — Workload awareness aplicado com limites correctos por role
+- [ ] Worker com status `in_progress` NÃO é atribuído sem fallback logic explícita
+- [ ] Fallback hierarchy documentada quando primary busy: sibling → director → queue
+- [ ] Limites respeitados e declarados: Worker max 1 `in_progress`, Director max 2, VP/CEO sem limite de execução
+- [ ] Tarefas em queue têm log format correcto: `QUEUED: {task.id} — {worker.id} busy, no fallback available`
+
+❌ NOT delivery-ready: "Worker estava ocupado por isso foi para outro."
+✅ Delivery-ready: "`copy-01` tem 1 task `in_progress` (task-047). Fallback: `copy-02` (mesmo director `dir-content`, overlap 2/3, load: 0). LOG: FALLBACK: task-051 → copy-02 (primary copy-01 busy)."
+
+---
+
+### Gate 4 — Division routing correcto e adapter identificado
+- [ ] Domain da task mapeado à division correcta (DARIO/DIVA/LUCAS) segundo tabela Step 3
+- [ ] Adapter explícito indicado no output (ex: `dario-v2-digital-ceo`, `diva-v1-design-architect`)
+- [ ] Tasks cross-division identificadas e modo multi-agent parallel declarado
+- [ ] Para LUCAS tasks, contexto LUCAS explicitamente passado ao adapter `dario-v2-digital-ceo`
+
+❌ NOT delivery-ready: "Task de SEO atribuída ao departamento digital."
+✅ Delivery-ready: "Domain: SEO/web → Division: DARIO → Adapter: `dario-v2-digital-ceo`. Worker: `seo-02`. Task cross-division? Não."
+
+---
+
+### Gate 5 — Escalation chain seguida e documentada quando necessário
+- [ ] Quando nenhum worker match, escalation chain documentada passo-a-passo: Worker → Director → VP → CEO
+- [ ] Cada nível com decisão explícita (accept/delegate/escalate) registada
+- [ ] Output final indica qual nível aceitou a task e porquê (capacidade + disponibilidade)
+- [ ] Tasks sem executor possível terminam em queue com log, não em silêncio
+
+❌ NOT delivery-ready: "Nenhum worker disponível, escalado para cima."
+✅ Delivery-ready: "Escalation: `seo-02` busy → `dir-growth` (director, capability overlap: sim, load: 1/2 — aceita). LOG: ESCALATE: task-053 → dir-growth (all workers busy)."
+
+---
+
+### Gate 6 — Output usa CLIENT NAME + dados REAIS, sem angle-brackets placeholder
+- [ ] Nenhum `<worker_id>`, `<task_name>`, `<division>`, `<client>` no output entregue
+- [ ] Task ID real (ex: `task-051`) e worker ID real (ex: `seo-02`) presentes
+- [ ] Client context identificável (ex: Cuidai, Atrium, LUSOconta) associado à task se relevante
+- [ ] Routing decision é rastreável: dados de input → lógica aplicada → output concreto
+
+❌ NOT delivery-ready: "Task `<task_id>` atribuída a `<worker>` da divisão `<division>`."
+✅ Delivery-ready: "Task `task-058` (Cuidai — landing page copy) → `copy-01` (DARIO, overlap: copywriting, conversion-copy; load: 0; adapter: `dario-v2-digital-ceo`)."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## DARIO Dispatch — Routing Report
+
+**Request recebido:** "Preciso de um audit de SEO completo para o Tributario.AI e depois optimizar as páginas"
+**Timestamp:** 2025-01-15T09:42Z
+**Invoked by:** dario-orchestrator (Phase 3 — Dispatch)
+
+---
+
+### Step 0 — Skill Chain Check
+
+Keywords extraídas: `audit`, `SEO`, `optimizar`, `páginas`
+Match check vs skill_chains.yaml:
+- `brand_to_market` → trigger: brand, identity, launch → ❌
+- `audit_to_fix` → trigger: audit, fix, optimizar, SEO → ✅ MATCH
+
+**→ CHAIN ACTIVATED: `audit_to_fix`**
+Sequência auto-executada:
+  1. `dario-seo-audit` → 2. `dario-seo-optimizer` → 3. `dario-content-writer`
+Routing individual: não necessário. Chain gestiona sequência.
+
+---
+
+### Step 0b — Override request (task manual sem chain)
+
+Request paralelo do mesmo cliente: "Cria copy para anúncio Google Ads para o Tributario.AI"
+Keywords: `copy`, `anúncio`, `Google Ads`
+Chain check: `brand_to_ads` → trigger: brand, ads, copy, campanha → ❌ (sem 'brand' keyword)
+→ Sem chain match. Routing individual iniciado.
+
+---
+
+### Step 1 — Parse Task Requirements
+
+- **Domain keywords:** copywriting, paid ads, Google Ads, PPC
+- **Skill reference:** `dario-ads-copy` (inferido)
+- **Division:** DARIO (digital marketing)
+- **Complexity:** Single skill
+- **Policy:** standard execution
+
+---
+
+### Step 2 — Capability Matching
+
+Workers carregados de company.yaml (secção `workers:`):
+
+| Worker ID   | Capabilities                          | Load (active tasks) |
+|-------------|---------------------------------------|---------------------|
+| copy-01     | copywriting, conversion-copy, ads-copy| 0 in_progress       |
+| copy-02     | copywriting, content, blog            | 1 in_progress       |
+| ads-01      | google-ads, meta-ads, ppc             | 0 in_progress       |
+
+Task required_capabilities: `copywriting`, `ads-copy`
+
+Candidates:
+- `copy-01`: overlap 2/2 (copywriting ✅, ads-copy ✅), load: 0 → **score: A**
+- `ads-01`: overlap 1/2 (ads-copy ✅, copywriting ❌), load: 0 → score: B
+- `copy-02`: overlap 1/2 (copywriting ✅, ads-copy ❌), load: 1 → score: C
+
+Sort: overlap > load > division match
+→ **Best match: `copy-01`**
+
+---
+
+### Step 2.5 — Workload Check: copy-01
+
+Active tasks para copy-01:
+- task-044: status `done` ✅
+- task-049: status `in_review` (não bloqueia — não é `in_progress`)
+
+`is_available(copy-01)` → **TRUE** (0 tasks `in_progress`)
+
+---
+
+### Step 3 — Division Routing
+
+Domain: copywriting / paid ads → **DARIO**
+Adapter: `dario-v2-digital-ceo`
+Cross-division? Não (Tributario.AI é cliente DARIO puro — SaaS contabilidade PT, web presence)
+
+---
+
+### Final Dispatch Decision
+
+```
+DISPATCH: task-061
+  Client:   Tributario.AI
+  Task:     Google Ads copy — campanha awareness Q1 2025
+  Assignee: copy-01
+  Division: DARIO
+  Adapter:  dario-v2-digital-ceo
+  Skill:    dario-ads-copy
+  Reason:   Max capability overlap (2/2), load 0, division match
+  Status:   → in_progress
+```
+
+LOG: ASSIGNED: task-061 → copy-01 (capabilities: copywriting, ads-copy; load before: 0)
+```
+
+---
+
+## Output anti-patterns
+
+- Routing decision sem indicar o `worker.id` exacto de `company.yaml` — nomes genéricos como "o worker de SEO" não são rastreáveis
+- Skip do Step 0 (skill chain check) e ir directo para routing individual — viola priority order obrigatória
+- Workload check omitido ou assumido disponível sem verificar tasks `in_progress` no directório `active/`
+- Escalation documentada como "escalei para o manager" sem indicar qual nível aceitou, com que capacidade, e com que load
+- Cross-division tasks atribuídas a uma só divisão sem declarar modo multi-agent parallel e adapters de ambas
+- Output com `<placeholders>` de angle-bracket entregue ao cliente — especialmente `<task_id>`, `<worker>`, `<client_name>`
+- LOG entries ausentes para FALLBACK e QUEUED — sem log não há rastreabilidade de decisões de routing
+- Capability intersection declarada sem listar quais capabilities específicas fazem overlap (ex: apenas "match encontrado")
+- Division LUCAS tratada sem passar contexto LUCAS ao adapter `dario-v2-digital-ceo` — resulta em output fora de contexto
+- Chain activada mas sub-skills da sequência não listadas explicitamente — cliente não sabe o que vai ser executado

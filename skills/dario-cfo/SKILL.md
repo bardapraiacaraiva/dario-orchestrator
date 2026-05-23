@@ -310,3 +310,194 @@ Todas as tasks financeiras usam a policy `financial`:
 | 10 | Dados financeiros em canal nao seguro | RGPD breach | Tier isolation pattern |
 | 11 | Hardcoded values em calculos fiscais | Erros quando rates mudam | Formulas-over-hardcodes pattern |
 | 12 | Aprovacao automatica em financial tasks | Risco de erro nao detectado | auto_approve = null always |
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Calendário fiscal com semáforo real
+- [ ] Todas as obrigações têm data exacta (DD/MM/AAAA), não "Q2" ou "próximo mês"
+- [ ] Semáforo atribuído por dias-restantes: ≤7d 🔴, ≤30d 🟡, >30d 🟢
+- [ ] Cada item tem owner (dir-accounting + worker específico) e penalidade por incumprimento
+- [ ] Status actual incluído: "pendente / submetido / pago"
+
+❌ NOT delivery-ready: `IVA do trimestre — prazo a aproximar-se`  
+✅ Delivery-ready: `IVA Q2 2025 — submissão AT até 15/08/2025 🟡 (23 dias) — worker-conta-iva — coima mínima €75 se atrasado`
+
+---
+
+### Gate 2 — Receivables com aging real e acção associada
+- [ ] Cada factura tem número, cliente, valor EUR e data de emissão
+- [ ] Aging calculado em dias concretos (não "overdue" genérico)
+- [ ] Faixa 61-90d tem acção definida (email de reminder agendado / chamada)
+- [ ] Faixa 90+d tem decisão: write-off, contencioso ou acordo de pagamento
+
+❌ NOT delivery-ready: `Cliente X deve dinheiro há algum tempo — acção recomendada: seguimento`  
+✅ Delivery-ready: `FAT-2025-031 / Cuidai / €3.400 / emitida 12/04/2025 — 94 dias — 🔴 CRÍTICO — enviar carta de interpelação até 15/07/2025 ou escalar para contencioso`
+
+---
+
+### Gate 3 — P&L e margem por cliente com números verificáveis
+- [ ] Revenue, custo directo (horas × rate + token_cost) e margem % calculados por projecto
+- [ ] Token cost extraído de token_meter.py com modelo e período (não estimado)
+- [ ] Margem alvo da agência referenciada (ex: target 65%) para comparação
+- [ ] Projectos abaixo do break-even assinalados com causa provável
+
+❌ NOT delivery-ready: `Projecto Atrium tem boa margem — custos de tokens razoáveis`  
+✅ Delivery-ready: `Atrium / Rev €8.200 / Custo directo €2.940 (horas €2.600 + tokens €340 claude-opus-4.5) / Margem 64,1% — ligeiramente abaixo do target 65% — recomendar repricing no renewal de Setembro`
+
+---
+
+### Gate 4 — Token ROI com fórmula explícita e decisão de routing
+- [ ] ROI calculado: revenue_from_tasks ÷ cost_of_tokens = multiplicador real
+- [ ] Budget burn rate: tokens_used ÷ days_elapsed × days_remaining vs limit mensal
+- [ ] Se ROI < 10×: worker-lucas-model-router chamado com proposta de downgrade
+- [ ] Alertas de custo têm threshold concreto (€ ou % do budget) não só "alto"
+
+❌ NOT delivery-ready: `Custo de tokens este mês está elevado — considerar optimização`  
+✅ Delivery-ready: `Token ROI Junho: €47.200 revenue ÷ €312 tokens = 151× / Burn rate: €312 usado em 18d → projecto €520/mês vs limit €400 🟡 — worker-lucas-model-router: migrar dario-research de opus para sonnet (-42% custo estimado)`
+
+---
+
+### Gate 5 — Human checkpoints explícitos e não saltáveis
+- [ ] Cada acção irreversível (submissão AT, emissão factura, pagamento) tem bloco STOP formatado
+- [ ] Bloco inclui: o que vai acontecer, valor/entidade envolvida, quem aprova
+- [ ] Output não avança além do checkpoint sem confirmação registada
+- [ ] Checklist de fecho mensal tem itens tick-box com responsável e prazo
+
+❌ NOT delivery-ready: `[Aguardar aprovação antes de submeter IVA]`  
+✅ Delivery-ready:  
+```
+⛔ HUMAN CHECKPOINT OBRIGATÓRIO  
+Acção: Submissão Declaração IVA Q1 2025 — AT  
+Valor apurado: €4.380 a pagar  
+Prazo AT: 15/05/2025 (6 dias úteis)  
+Aprovação: CEO (Rodrigo) via Slack #finance-approvals  
+▶ Só prosseguir após confirmação escrita
+```
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+
+- [ ] Zero ocorrências de `[Cliente]`, `<NIF>`, `[Mes/Ano]`, `EUR X`, `<valor>`
+- [ ] NIF no formato correcto (9 dígitos, check-digit válido) se presente
+- [ ] ATCUD no formato `XXXXXXXX-N` se factura gerada
+- [ ] Datas no formato DD/MM/AAAA, nunca YYYY-MM ou relativo sem âncora
+
+❌ NOT delivery-ready: `Factura emitida a [Cliente] no valor de EUR X — ATCUD: <código>`  
+✅ Delivery-ready: `FAT-2025-047 emitida a SAQUEI Lda (NIF 514 233 891) em 01/07/2025 — €6.500 + IVA 23% = €7.995 — ATCUD: A3F8K291-47`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## CFO Dashboard — Julho 2025
+**BARDA Digital Agency** | Gerado: 01/07/2025 | dario-cfo v1.0
+
+---
+
+### 🏦 Saúde Financeira
+
+| Métrica | Valor | Status |
+|---------|-------|--------|
+| Revenue mensal (Jun) | €47.200 | 🟢 +8% vs Maio |
+| Custos directos (Jun) | €16.020 | 🟢 34% da receita |
+| Margem bruta (Jun) | €31.180 | 🟢 66,1% |
+| Cash disponível | €38.400 | 🟢 runway 4,2 meses |
+| Receivables em aberto | €21.600 | 🟡 ver aging abaixo |
+| Token spend (Jun) | €312 | 🟢 ROI 151× |
+
+---
+
+### 📅 Calendário Fiscal — Próximas Obrigações
+
+| Obrigação | Prazo | Dias | Status | Worker |
+|-----------|-------|------|--------|--------|
+| IVA Q2 2025 (submissão AT) | 15/08/2025 | 45d | 🟢 Pendente | worker-conta-iva |
+| DMR Julho 2025 (SS + IRS ret.) | 10/08/2025 | 40d | 🟢 Pendente | worker-conta-payroll |
+| Pagamento por conta IRC | 31/07/2025 | **30d** | 🟡 Preparar | worker-conta-irc |
+| Recibo verde Freelancer — Lucas M. | 25/07/2025 | **24d** | 🟡 Aguardar docs | worker-conta-recibos |
+
+> ⚠️ Pagamento por conta IRC estimado: **€2.100** (base Modelo 22/2024 — lucro €84.000 × 21% × 1/3 × 36%). Confirmar com TOC antes de 25/07.
+
+---
+
+### 📬 Receivables Aging
+
+| Factura | Cliente | Valor | Emissão | Dias | Faixa | Acção |
+|---------|---------|-------|---------|------|-------|-------|
+| FAT-2025-031 | Cuidai Lda | €3.400 | 12/04/2025 | 80d | 🟡 61-90d | Email reminder enviado 28/06 — aguardar 5d |
+| FAT-2025-038 | Atrium RE | €8.200 | 02/05/2025 | 60d | 🟡 61-90d | Contacto telefónico agendado 03/07 (Rodrigo → Ana Costa) |
+| FAT-2025-041 | LUSOconta | €5.600 | 20/05/2025 | 42d | 🟡 31-60d | 2º aviso email — prazo 10/07 |
+| FAT-2025-044 | SAQUEI Lda | €4.400 | 10/06/2025 | 21d | 🟢 0-30d | Normal |
+
+**Total em aberto: €21.600** | Crítico (90+d): €0 🟢 | Em risco (61-90d): €11.600 🟡
+
+---
+
+### 💰 Margem por Cliente — Junho 2025
+
+| Cliente | Revenue | Horas×Rate | Token Cost | Margem € | Margem % | vs Target |
+|---------|---------|-----------|-----------|----------|----------|-----------|
+| Atrium RE | €8.200 | €2.600 | €340 | €5.260 | **64,1%** | 🟡 -0,9pp |
+| Cuidai | €12.400 | €3.800 | €180 | €8.420 | **67,9%** | 🟢 +2,9pp |
+| LUSOconta | €9.600 | €3.200 | €220 | €6.180 | **64,4%** | 🟡 -0,6pp |
+| SAQUEI | €11.200 | €3.100 | €290 | €7.810 | **69,7%** | 🟢 +4,7pp |
+| Tributario.AI | €5.800 | €2.400 | €95 | €3.305 | **57,0%** | 🔴 -8pp |
+
+> 🔴 **Tributario.AI abaixo do break-even de agência (65%)**: causa — scope creep em feature fiscal (+18h não facturadas). Acção: repricing proposal para contrato Agosto (+€800/mês) — worker-pricing-calculator a preparar proposta.
+
+---
+
+### 🤖 Token ROI — Junho 2025
+
+| Modelo | Uso (tokens) | Custo | Revenue atribuído | ROI |
+|--------|-------------|-------|-------------------|-----|
+| claude-opus-4.5 | 2,1M | €189 | €31.400 | 166× |
+| claude-sonnet-4.5 | 4,8M | €96 | €12.200 | 127× |
+| claude-haiku-3.5 | 6,2M | €27 | €3.600 | 133× |
+| **Total** | **13,1M** | **€312** | **€47.200** | **151×** |
+
+**Budget mensal: €400 / Usado: €312 (78%) / Dias decorridos: 30/30 ✅ Dentro do budget**
+
+---
+
+### ⛔ HUMAN CHECKPOINT — Pagamento por Conta IRC
+
+**Acção:** Pagamento por conta IRC 3ª prestação 2025  
+**Valor estimado:** €2.100 (confirmar com TOC até 25/07/2025)  
+**Prazo AT:** 31/07/2025  
+**Aprovação requerida:** CEO Rodrigo via Slack #finance-approvals  
+**Worker responsável:** worker-conta-irc  
+▶ **Não processar transferência sem confirmação escrita + validação TOC**
+
+---
+
+### 📋 Checklist Fecho Mensal — Junho 2025
+
+- [x] Extracto bancário Activobank reconciliado (worker-conta-conciliacao — 30/06)
+- [x] Facturas emitidas validadas com ATCUD (18 facturas — worker-conta-facturacao)
+- [x] Token costs importados de token_meter.py (worker-lucas-budget-tracker)
+- [ ] Balancete SNC enviado ao TOC (prazo: 05/07 — worker-conta-relatorios)
+- [ ] P&L definitivo Junho aprovado por CEO (prazo: 07/07)
+- [ ] Mapa de riscos actualizado (worker-risco-matrix — prazo: 10/07)
+```
+
+---
+
+## Output anti-patterns
+
+- Datas relativas sem âncora ("próximo trimestre", "em breve") em vez de DD/MM/AAAA
+- Valores com placeholder `EUR X` ou `€[valor]` em qualquer secção do output
+- Semáforo sem critério numérico (dias ou %) — "status: atenção" não é accionável
+- ROI de tokens calculado sem separar por modelo — agrega e perde decisão de routing
+- Human checkpoint formulado como comentário inline em vez de bloco STOP formatado e destacado
+- Margem por cliente sem decomposição (horas × rate) + (token cost) — número final inauditável
+- Aging de receivables sem acção concreta e owner — tabela decorativa, não operacional
+- Calendário fiscal sem penalidade associada — remove urgência de obrigações amarelas
+- NIF, ATCUD ou número de factura invented/placeholder — risco de compliance real
+- Dispatch a worker sem confirmar que o pedido foi delegado e qual o output esperado

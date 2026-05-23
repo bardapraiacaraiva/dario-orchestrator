@@ -228,3 +228,186 @@ Excellent: >= 0.85
 - Never revert a mutation without logging the reason
 - If fitness drops >15% over 4 weeks, FULL ROLLBACK — no exceptions
 - Evolution is SILENT by default — only reports when asked or when significant
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Fitness Metric Populated com Dados Reais
+
+- [ ] `avg_quality_last_10` tem valor numérico concreto (não "N/A" ou placeholder)
+- [ ] `budget_usage_pct` referencia mês real (ex: "Junho 2025: 34%")
+- [ ] `task_velocity` calculado com numerador/denominador visíveis (ex: "12/15 = 0.80")
+- [ ] Score final fitness declarado explicitamente (ex: "fitness = 0.612")
+
+❌ NOT delivery-ready: `fitness = avg_quality * (1 - budget_ratio) * velocity → pendente`
+✅ Delivery-ready: `fitness = 0.78 * (1 - 0.34) * 0.80 = 0.412 — abaixo de 0.70, trigger survival check`
+
+---
+
+### Gate 2 — Learning Journal Entry Completo
+
+- [ ] `skills_used` lista os skills por nome real (ex: `dario-write`, `dario-strategy`)
+- [ ] `pairs_activated` inclui contagem e pares específicos
+- [ ] `evolutionary_delta` expresso em % com sinal (ex: `+3.2%` ou `-1.1%`)
+- [ ] `fallbacks_triggered` tem número inteiro (0 é válido, "—" não é)
+
+❌ NOT delivery-ready: "evolutionary_delta: positivo — sistema melhorou esta sessão"
+✅ Delivery-ready: "evolutionary_delta: +4.7% | fallbacks: 2 | pairs_activated: dario-write↔dario-strategy (x3)"
+
+---
+
+### Gate 3 — Mutations Documentadas com Before/After
+
+- [ ] Cada mutation tem `target_file` + `target_field` explícitos
+- [ ] `old_value` e `new_value` presentes (não deduzidos)
+- [ ] `confidence` calculado como `pattern_count / threshold` (ex: `6/5 = 1.2`)
+- [ ] `review_after` task count definido (ex: `task #47`)
+- [ ] Mutations count ≤ 3 para a sessão, ou overflow justificado para queue
+
+❌ NOT delivery-ready: "Mutação aplicada: ajuste de peso no par escrita+análise"
+✅ Delivery-ready: "synaptic_weights.yaml → pair: dario-write+dario-data | 0.65 → 0.70 | confidence: 6/5 | review_after: task #31"
+
+---
+
+### Gate 4 — Safety Bounds Verificados Explicitamente
+
+- [ ] Output confirma que nenhum arquivo protegido foi tocado (lista os 7 invioláveis)
+- [ ] `max_parallel` nunca aparece com valor > 3 em nenhuma proposta
+- [ ] `quality_threshold` nunca aparece com valor < 50
+- [ ] Se mutation foi bloqueada: razão registada (não silenciada)
+
+❌ NOT delivery-ready: "Safety bounds: OK ✓" — sem evidência
+✅ Delivery-ready: "Protected check PASS — manifesto.yaml: untouched | ethical_pre_gate: untouched | mutations this session: 2/3"
+
+---
+
+### Gate 5 — Weekly/Generation Report com Métricas Comparativas
+
+- [ ] Geração atual numerada (ex: `Generation 7`)
+- [ ] Fitness comparada com checkpoint de 4 semanas atrás (dois valores visíveis)
+- [ ] Survival check lista cada mutation com veredicto (KEEP / REVERT / PENDING)
+- [ ] Prune log indica regras arquivadas ou "0 rules pruned this cycle"
+- [ ] CHANGELOG entry gerada com data e delta
+
+❌ NOT delivery-ready: "Fitness melhorou face à semana passada — geração incrementada"
+✅ Delivery-ready: "Gen 7 | fitness: 0.81 vs ckpt_2025-05-12: 0.74 (+9.5%) | KEEP: 3 mutations | REVERT: 0 | Pruned: 1 rule (dario-legal, 32 days silent)"
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENT + dados reais, sem angle-brackets
+
+- [ ] Nenhum `<client_name>`, `<skill_pair>`, `<date>` ou `<value>` no output final
+- [ ] Projeto/contexto real identificado (ex: Cuidai, SAQUEI, Tributario.AI)
+- [ ] Timestamps em formato concreto ISO ou PT (ex: `2025-06-18` ou `18 Jun 2025`)
+- [ ] IDs de mutation em formato real (ex: `DARIO_EVOLUTION_MUT_042_weight_boost`)
+
+❌ NOT delivery-ready: "Log: DARIO_EVOLUTION_GEN_{N}_{fitness}"
+✅ Delivery-ready: "Log: DARIO_EVOLUTION_GEN_7_0.81 — Atrium | 2025-06-18"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# DARIO Evolution Report — Atrium | Sessão #23 | 2025-06-18
+
+## SESSION EVOLUTION — Summary
+
+**Tasks completed:** 14
+**Skills used:** dario-write (x6), dario-strategy (x4), dario-data (x3), dario-legal (x1)
+**Pairs activated:** dario-write↔dario-strategy (x4), dario-data↔dario-write (x3)
+**Avg quality last 10:** 83.4/100
+**Fallbacks triggered:** 1 (dario-legal → dario-write fallback, task #19)
+**User corrections to dispatch:** 0
+**Evolutionary delta:** +5.1%
+
+---
+
+## PATTERNS CRYSTALLIZED
+
+Pattern: dario-write↔dario-strategy co-activation
+Occurrences this session: 4 | Cumulative: 6 | Threshold: 5
+Status: **CRYSTALLIZED → synaptic_weights.yaml update queued**
+
+---
+
+## MUTATIONS APPLIED (2/3 this session)
+
+### Mutation MUT_041
+- File: `synaptic_weights.yaml`
+- Field: `pairs.dario-write+dario-strategy.weight`
+- Old value: `0.65`
+- New value: `0.70`
+- Reason: pattern_write_strategy_coactivation (6/5 = confidence 1.20)
+- Review after: task #33
+- Revertable: true
+
+### Mutation MUT_042
+- File: `dispatch_rules.yaml`
+- Field: `rules.legal_fallback.priority`
+- Old value: `0.40`
+- New value: `0.35`
+- Reason: dispatch_correction_legal_x3 (3/5 = confidence 0.60 — partial)
+- Review after: task #33
+- Revertable: true
+
+**Queued (overflow):** 0
+
+---
+
+## SAFETY BOUNDS CHECK — PASS
+
+| Protected File         | Status     |
+|------------------------|------------|
+| manifesto.yaml         | ✅ Untouched |
+| blocklist              | ✅ Untouched |
+| ethical_pre_gate       | ✅ Untouched |
+| max_parallel           | ✅ Current: 2 (limit: 3) |
+| quality_threshold      | ✅ Current: 65 (floor: 50) |
+| mutations this session | ✅ 2/3      |
+| weekly checkpoint      | ✅ Scheduled: 2025-06-23 |
+
+---
+
+## FITNESS METRIC
+
+```
+avg_quality_last_10 = 83.4 / 100 = 0.834
+budget_usage_pct    = 41% (Junho 2025, Atrium workspace)
+task_velocity       = 14 / 15 = 0.933
+
+fitness = 0.834 × (1 - 0.41) × 0.933
+fitness = 0.834 × 0.59 × 0.933
+fitness = 0.459
+
+⚠️ Below 0.70 target — driver: budget_usage_pct elevated
+Recommendation: monitor budget burn rate, not quality-driven
+```
+
+---
+
+## GENERATION STATUS
+
+**Current generation:** Gen 6 (weekly cycle pending — next: 2025-06-23)
+**Last checkpoint:** ckpt_2025-05-26 | fitness: 0.71
+**Trend:** -0.251 vs checkpoint (budget spike, not quality regression)
+**Action:** NO rollback triggered (quality arm 0.834 healthy)
+
+**Log entry:** `DARIO_EVOLUTION_GEN_6_0.459 — Atrium | 2025-06-18 | budget-flag`
+```
+
+---
+
+## Output anti-patterns
+
+- Fitness score declarado como "positivo" ou "bom" sem valor numérico calculado
+- Mutations listadas com `<field>` ou `<old_value>` ainda por preencher
+- Safety bounds check como tick único sem verificação por arquivo protegido
+- Learning journal com `evolutionary_delta: TBD` entregue ao cliente
+- Generation number omitido ("geração incrementada" sem número concreto)
+- Survival check com veredicto "a avaliar" — deve ser KEEP, REVERT, ou PENDING com razão
+- Rollback report sem `mutation_id` específico — impossível de auditar
+- Fitness abaixo de 0.70 entregue sem diagnóstico do driver (qualidade vs. budget vs. velocity)
+- Timestamps como "hoje" ou "recente" em vez de data ISO
+- Prune log silenciado — "0 rules pruned" é output válido, omissão não é

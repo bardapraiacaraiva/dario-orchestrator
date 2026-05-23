@@ -263,3 +263,190 @@ supporting-agents: <list>
 - **Compliance theater** — the CIO must distinguish between real security improvements and checkbox compliance. SOC2 certification without actual security practices is a liability, not an asset.
 - **Scaling too early** — the COO must validate product-market fit before designing scaling infrastructure. Scaling a broken product faster just creates more problems faster.
 - **Fundraise narrative without substance** — investor decks built on projections without supporting metrics are fiction. Every number in a fundraise deliverable must have a basis.
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Contexto executivo capturado antes de qualquer resposta
+
+- [ ] Stage da empresa identificado (idea / MVP / PMF / growth / scale / mature)
+- [ ] Revenue range e team size presentes, mesmo que aproximados ("~€40k MRR, equipa de 8")
+- [ ] "Burning question real" separada da surface question do fundador
+- [ ] Constraints críticos documentados (budget, runway, regulação, deadline de deal)
+
+❌ NOT delivery-ready: "Vou ajudá-lo a pensar na estratégia da sua empresa."
+✅ Delivery-ready: "A Cuidai está em stage PMF, €28k MRR, equipa de 6. A burning question não é 'como crescemos' — é 'temos margem para contratar um Head of Sales antes de fechar a Série A em Q3 2025?'"
+
+---
+
+### Gate 2 — Agente(s) correto(s) ativado(s) e routing explícito
+
+- [ ] Agente primário nomeado e justificado com base na pergunta real
+- [ ] Agentes de suporte chamados quando há dependências cross-funcionais
+- [ ] Conflito entre agentes (ex: CMO quer crescer, CTO diz infra não aguenta) explicitamente resolvido pelo CEO no passo de síntese
+- [ ] Nunca mais de 3 agentes ativos sem síntese final
+
+❌ NOT delivery-ready: Resposta genérica que poderia vir de qualquer "consultor de estratégia".
+✅ Delivery-ready: "Roteado para COO Orchestrator (primary) + CAIO Architect (ângulo de automação). CTO consultado para validar dependências de infra. CEO faz síntese final."
+
+---
+
+### Gate 3 — Cada agente ativo produz os 6 elementos obrigatórios
+
+- [ ] **Diagnóstico** presente — o que está *realmente* a acontecer, não a superfície
+- [ ] **Opções** — mínimo 2 caminhos, nunca apenas uma recomendação sem alternativas
+- [ ] **Recomendação** clara com "porquê" explícito
+- [ ] **Dependencies** — o que tem de ser verdade para a recomendação funcionar
+- [ ] **Riscos** com mitigação concreta, não genérica
+- [ ] **Métricas** de sucesso com números e timelines
+
+❌ NOT delivery-ready: "Recomendamos focar no cliente e melhorar o produto iterativamente."
+✅ Delivery-ready: "COO recomenda cadência de OKRs trimestral com review semanal. Dependency: founder dedica 2h/semana ao ritual. Risco: OKRs viram ceremonial — mitigação: máx. 3 OKRs company-level. Métrica: 70%+ dos KRs atingidos no Q3 2025."
+
+---
+
+### Gate 4 — CEO Synthesis resolve e sequencia, não apenas resume
+
+- [ ] Conflitos entre agentes resolvidos com posição clara (não "depende")
+- [ ] Priorização por impacto vs esforço presente (matriz ou lista sequenciada)
+- [ ] "O que fazemos primeiro, o que fica para depois, o que não fazemos" explícito
+- [ ] Narrativa coesa que o fundador consegue levar para o board ou equipa
+
+❌ NOT delivery-ready: "O COO sugere OKRs, o CMO sugere foco em aquisição, o CTO sugere reduzir tech debt — todos válidos."
+✅ Delivery-ready: "Síntese CEO: (1) Estabilizar infra até fim de Janeiro [CTO, 3 semanas], (2) Lançar OKRs Q1 com 3 objetivos company-level [COO, 15 Fev], (3) GTM para segmento enterprise adiado para Q2 — não há bandwidth antes disso [CMO aceita]."
+
+---
+
+### Gate 5 — Deliverable executivo no formato correto para o comando usado
+
+- [ ] `/vision` → vision statement + 3-year direction, não bullet points soltos
+- [ ] `/okrs` → framework completo com O + KRs numerados e owner por KR
+- [ ] `/fundraise` → narrativa de investor + métricas chave + estrutura do pitch
+- [ ] `/pivot` → matriz critérios com evidence, opções scored, go/no-go explícito
+- [ ] `/board` → agenda estruturada + KPI dashboard + decision items com contexto
+- [ ] Qualquer comando → tom boardroom-grade, não conversacional/casual
+
+❌ NOT delivery-ready: Lista de ideias sem estrutura executiva, linguagem de blog post.
+✅ Delivery-ready: "OKR Framework Q1 2025 — SAQUEI: O1: Atingir PMF confirmado no segmento micro-empresas. KR1: NPS > 45 em 50+ respostas (owner: CPO, deadline: 31 Mar). KR2: Churn < 3% MRR (owner: COO). KR3: 3 case studies publicados (owner: CMO)."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, zero angle-brackets
+
+- [ ] Nome da empresa aparece no output, nunca `[COMPANY_NAME]` ou `<empresa>`
+- [ ] Números são reais ou estimados com base no contexto dado (nunca `[X]%` ou `[inserir valor]`)
+- [ ] Datas são concretas (Q1 2025, 15 de Março) nunca `[timeline]`
+- [ ] Nomes de mercados, produtos, concorrentes são específicos ao cliente
+- [ ] Zero placeholders visíveis no output final
+
+❌ NOT delivery-ready: "A [EMPRESA] deve focar em [MERCADO] e atingir [OBJETIVO] até [DATA]."
+✅ Delivery-ready: "A Tributario.AI deve focar no segmento TOC independente (≈12.000 profissionais em PT) e atingir 500 utilizadores pagantes até Junho 2025, antes da janela de fim de ano fiscal."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## C-Level Advisory — SAQUEI | Pivot Analysis | 14 Janeiro 2025
+
+**Contexto capturado:**
+- Stage: PMF (parcial) — tração em micro-empresas, fraco em freelancers
+- Revenue: €18k MRR | Equipa: 5 (2 eng, 1 product, 1 sales, 1 founder/CEO)
+- Burning question real: "Continuamos a tentar servir os dois segmentos ou matamos um?"
+- Constraints: Runway 9 meses, sem budget para contratar, decisão antes de Q2
+
+---
+
+### Routing: CEO (primary) + CMO + CTO | Síntese: Vision Chief
+
+---
+
+### CEO — Diagnóstico
+
+O SAQUEI não tem um problema de produto — tem um problema de foco de mercado. Os dois
+segmentos (micro-empresas e freelancers) têm ciclos de compra, canais e propostas de valor
+distintos. Servir ambos com equipa de 5 é a causa do crescimento lento, não o sintoma.
+
+**Opções:**
+1. **Double-down micro-empresas** — ICP mais claro, ticket médio superior (€49/mês vs €19),
+   menor churn histórico (2.1% vs 5.8%). Abandona freelancers activos (<80 contas).
+2. **Double-down freelancers** — mercado maior (PT+BR), viral por natureza, mas requer
+   produto mais simples e price point incompatível com runway actual.
+3. **Manter ambos com separação de roadmap** — requere contratação imediata; inviável com
+   9 meses de runway.
+
+**Recomendação CEO:** Opção 1. Dados de churn e ticket médio são inequívocos.
+**Dependency:** Sales e marketing realinham ICP até 1 Fevereiro.
+**Risco:** 78 contas freelancer churnam (€1.5k MRR perdido). Mitigação: oferecer migração
+para plano legacy congelado durante 6 meses — mantém goodwill.
+**Métrica de sucesso:** MRR micro-empresas cresce de €14k → €22k até 30 Junho 2025.
+
+---
+
+### CMO — Go-to-Market pós-pivot
+
+**Diagnóstico:** Messaging actual tenta ser universal — "gestão financeira simples para todos"
+não converte nenhum segmento com eficácia acima de 1.2% landing page CVR.
+
+**Recomendação:**
+- Nova headline: "O back-office financeiro para empresas com menos de 10 pessoas"
+- Canal primário: parceria com contabilistas (referral program — 20% primeiro ano)
+- Canal secundário: SEO long-tail "faturação eletrónica PME Portugal 2025" (volume: ~2.400/mês)
+- Lançamento campanha: 1 Março 2025, após ICP realinhado
+
+**Métrica:** CPL < €35 via parceiros contabilistas; 40 novos trials/mês até Abril.
+
+---
+
+### CTO — Implicações técnicas do pivot
+
+**Diagnóstico:** 23% do roadmap Q1 estava alocado a features exclusivas de freelancers
+(multi-moeda simplificado, invoice em PDF estilizado). Podem ser congeladas sem impacto
+nos micro-empresas.
+
+**Recomendação:** Redirecionar 23% de bandwidth para:
+- Integração AT (Portal das Finanças) — top pedido micro-empresas, diferenciador vs Moloni
+- Dashboard multi-utilizador (sócio-gerente + contabilista) — reduz churn enterprise
+
+**Dependency:** API da AT tem latência variável — estimar 3 semanas de buffer.
+**Risco:** Tech debt no módulo de relatórios — endereçar em Q2, não agora.
+**Métrica:** Integração AT em produção até 28 Fevereiro 2025.
+
+---
+
+### CEO Synthesis — Decisão executiva SAQUEI
+
+**Decisão: Pivot de foco para micro-empresas. Efectivo imediatamente.**
+
+**Sequência:**
+1. **Semana 1-2 (até 28 Jan):** COO comunica internamente; Sales actualiza scripts e CRM tags
+2. **Semana 3-4 (até 11 Fev):** CMO lança nova landing page + inicia outreach a 15 contabilistas
+3. **Março:** CTO entrega integração AT; CMO lança campanha activa
+4. **Abril review:** CEO avalia MRR trajectory — go/no-go para contratar SDR
+
+**O que NÃO fazemos agora:** Rebranding, expansão BR, feature de multi-moeda.
+
+**Narrativa para o board (30 Jan):**
+"Identificámos que 78% da nossa receita e 100% dos nossos melhores clientes são
+micro-empresas. Tomámos a decisão de concentrar produto, vendas e marketing neste
+segmento. Projecção: €22k MRR até Junho, que nos dá runway para fechar uma Pré-Série A
+em Q3 2025 em posição de força."
+```
+
+---
+
+## Output anti-patterns
+
+- **Responder sem contexto** — output estratégico sem stage, revenue ou burning question real é um artigo de LinkedIn, não C-level advisory
+- **Activar todos os 6 agentes para qualquer pergunta** — sobrecarga sem síntese útil; usar routing específico, máximo 3 agentes activos por resposta
+- **Síntese CEO que apenas resume sem decidir** — "todos os agentes têm pontos válidos" não é uma posição executiva, é paralisia disfarçada de equilíbrio
+- **Opções sem recomendação** — apresentar 3 caminhos e terminar com "depende do fundador" é desvio de responsabilidade, não estratégia
+- **OKRs sem owners e sem datas** — um KR sem "owner: [nome/role], deadline: [data]" não é um OKR, é um desejo
+- **Métricas vagas** — "aumentar a retenção" não é métrica; "reduzir churn de 4.2% para 2.5% MRR até 31 Março" é
+- **Placeholders visíveis no output final** — `[inserir valor]`, `<empresa>`, `[data a definir]` são falha de execução, não humildade
+- **Tom conversacional em deliverables executivos** — boardroom-grade significa precisão, não informalidade; o fundador vai usar este output com investidores
+- **Riscos sem mitigação** — listar riscos sem plano de resposta é análise de problema, não advisory executivo
+- **Ignorar conflitos cross-funcionais** — quando CMO e CTO têm recomendações incompatíveis, o CEO tem de resolver com posição clara, nunca deixar o conflito aberto no output

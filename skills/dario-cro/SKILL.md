@@ -399,3 +399,182 @@ Missing: ...
 - Always separate mobile and desktop analysis -- a page that converts at 5% on desktop and 0.5% on mobile is two different problems, not one
 - Never declare a test winner without 95% statistical confidence AND a minimum of 14 days runtime -- weekly and daily traffic patterns can create false patterns that reverse after a full cycle
 - Never test cosmetic changes (button color, font size) before structural changes (value proposition, offer, CTA copy) -- optimize the biggest levers first
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — ResearchXL 6 layers foram executados (não apenas mencionados)
+
+- [ ] Cada uma das 6 layers tem findings concretos documentados (não "análise pendente")
+- [ ] Layer 3 inclui métricas reais: CR atual, bounce rate, sessions/mês com números
+- [ ] Layer 5 inclui pelo menos uma fonte qualitativa citada (survey, entrevista, review mining)
+- [ ] Layer 6 inclui cálculo de sample size com poder estatístico definido
+
+❌ NOT delivery-ready: "Análise heurística sugere que o headline pode ser melhorado e o CTA não está visível."  
+✅ Delivery-ready: "Layer 1 — Heuristic: headline 'Gestão Financeira para PMEs' falha o teste dos 5 segundos (valor não está no headline, está no parágrafo 3). CTA 'Saiba Mais' abaixo do fold em 1280px. Layer 3 — Analytics: CR atual 1,2% (benchmark SaaS B2B PT: 3,1%). Bounce rate 74% mobile vs 48% desktop. Exit concentrada na página de pricing (67% dos non-converters)."
+
+---
+
+### Gate 2 — LIFT Score calculado com números reais, não estimativas vagas
+
+- [ ] Cada um dos 6 factores tem score numérico 1-10 com justificação de 1 linha
+- [ ] LIFT Score final calculado pela fórmula correta: (Value + Relevance + Clarity − Anxiety − Distraction + Urgency) / 6
+- [ ] Diagnóstico de tier (8-10 / 5-7 / 1-4) explicitado com implicação prática
+- [ ] Anxiety e Distraction têm exemplos concretos da página (não abstratos)
+
+❌ NOT delivery-ready: "Score de Ansiedade é médio porque faltam elementos de confiança."  
+✅ Delivery-ready: "Anxiety: 7/10 — formulário pede NIF + cartão antes de mostrar preço; 3 campos de segurança ausentes. Distraction: 6/10 — menu de navegação com 9 itens numa landing page, 4 links externos above the fold. LIFT Score = (6+7+5−7−6+4)/6 = **3,17 → tier 1-4: redesign antes de qualquer teste**."
+
+---
+
+### Gate 3 — PXL Backlog priorizado com ICE/PXL scores e hipóteses testáveis
+
+- [ ] Mínimo 5 hipóteses de teste formuladas no formato "Se [mudança], então [métrica] aumenta X% porque [razão baseada em evidência]"
+- [ ] Cada hipótese tem score PXL ou ICE (Impact × Confidence × Ease) numérico
+- [ ] Sequência de testes ordenada com justificação (quick wins primeiro ou highest impact?)
+- [ ] Cada teste tem página-alvo, variante clara, e métrica primária de sucesso definida
+
+❌ NOT delivery-ready: "Recomendamos testar o headline e simplificar o formulário. Prioridade: alta."  
+✅ Delivery-ready: "H1 — Reformular headline para incluir número concreto: 'Poupe 3h/semana em contabilidade'. ICE: I=9, C=8, E=9 → Score 72. Teste A/B: controlo vs variante, métrica primária: CTR para signup, secundária: time-on-page. Sample size necessário: 1.847 visitas por variante (poder 80%, α=0,05, MDE=15%)."
+
+---
+
+### Gate 4 — Plano de A/B test estatisticamente válido (não "vamos ver o que acontece")
+
+- [ ] Sample size calculado explicitamente para cada teste prioritário (ferramenta ou fórmula citada)
+- [ ] Duração mínima definida em semanas/ciclos de negócio (nunca "2-3 dias")
+- [ ] Threshold de significância estatística declarado (mín. 95% confidence)
+- [ ] Critérios de paragem antecipada (stopping rules) definidos para evitar peeking
+
+❌ NOT delivery-ready: "O teste deve correr até ter resultados significativos. Recomendamos pelo menos 100 conversões."  
+✅ Delivery-ready: "Sample size: 2.240 visitas/variante (baseline CR 1,2%, MDE 20%, α=0,05, poder 80% — calculado via Evan Miller). Com tráfego atual de 4.800 visitas/mês, duração mínima: 3,5 semanas = 2 ciclos de negócio completos. Stopping rules: não avaliar antes de 80% do sample size atingido; parar imediatamente se CR variante < 0,5% após 500 visitas/variante (dano activo)."
+
+---
+
+### Gate 5 — Trust audit com evidência específica, não checklist genérica
+
+- [ ] Trust signals presentes identificados por nome e posição na página (não "faltam depoimentos")
+- [ ] Trust signals em falta categorizados: social proof / authority / risk reversal / credibility markers
+- [ ] Anxiety triggers específicos da indústria/ticket identificados (ex: RGPD para SaaS, garantia para e-commerce, credenciais para serviços profissionais)
+- [ ] Quick wins de trust implementáveis sem A/B test identificados separadamente
+
+❌ NOT delivery-ready: "A página precisa de mais provas sociais e deve transmitir mais confiança ao utilizador."  
+✅ Delivery-ready: "Trust presente: logo 'Certificado pela CMVM' (posição: footer, invisível). Trust ausente: (1) zero depoimentos above the fold — sector fintech PT: benchmark 3+ reviews visíveis; (2) sem menção a RGPD no formulário — obrigatório para leads B2B PT; (3) preço ausente gera ansiedade de ticket (serviço €2.400/ano). Quick win sem teste: adicionar 'Sem compromisso. Cancelamento a qualquer momento.' sob o CTA → implementável em 30 min, impacto histórico: +8-12% CR em SaaS europeu."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets ou placeholders
+
+- [ ] Zero ocorrências de `[CLIENT NAME]`, `[URL]`, `[METRIC]`, `[INSERT HERE]` ou equivalentes
+- [ ] Nome da empresa aparece no título do audit e nas hipóteses de teste
+- [ ] Todas as métricas têm fonte declarada (GA4, Hotjar, dados fornecidos pelo cliente)
+- [ ] Recomendações referem páginas específicas por URL ou nome de secção real
+
+❌ NOT delivery-ready: "Para [Nome da Empresa], recomendamos testar [variante] na página [URL da landing page]."  
+✅ Delivery-ready: "Para LUSOconta — Audit CRO · landing page lusoconta.pt/abrir-conta (dados GA4 exportados 2024-11-01 a 2025-01-31): CR actual 1,2%, 4.800 sessões/mês, bounce 74% mobile. Hipótese H1: reformular headline para 'Abra a sua conta empresarial em 7 minutos — sem deslocações' aumenta CR ≥ 15% porque…"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# CRO Audit — LUSOconta · lusoconta.pt/abrir-conta
+**Data:** 2025-01-31 | **Analista:** DARIO CRO Squad | **Tráfego base:** Jan 2025 (GA4)
+
+---
+
+## ResearchXL — 6-Layer Findings
+
+**Layer 1 — Heuristic**
+- Headline: "A conta que trabalha para si" — falha teste dos 5 segundos (sem número, sem diferenciador)
+- CTA "Abrir Conta" visível above the fold em desktop, abaixo do fold em mobile (375px)
+- Visual hierarchy: 3 CTAs concorrentes no header (Login / Tarifas / Abrir Conta) — distração activa
+- Trust: selo "Banco de Portugal supervisionado" em footer cinzento, tamanho 10px — invisível
+
+**Layer 2 — Técnica**
+- LCP: 4,1s mobile (target < 2,5s) — imagem hero 1,8MB não comprimida
+- CLS: 0,18 (threshold: < 0,1) — banner de cookies empurra conteúdo ao carregar
+- Formulário: erro de validação NIF sem mensagem explicativa ("Campo inválido")
+
+**Layer 3 — Analytics (GA4, Jan 2025)**
+- Sessões: 4.847 | Conversões (conta aberta): 58 | **CR: 1,20%**
+- Benchmark fintech PT abertura de conta digital: 3,5–5% (fonte: Fintech Portugal 2024)
+- Mobile: 67% do tráfego, CR mobile 0,61% vs desktop 2,31%
+- Exit rate formulário step 2 (dados fiscais): 71%
+
+**Layer 4 — Heatmap (Hotjar, Jan 2025, n=1.240 sessões)**
+- Scroll: apenas 34% dos visitantes chegam à secção de benefícios (below the fold 800px)
+- Rage clicks: botão "Ver Tarifas" no header recebe 18% dos cliques — utilizadores procuram preço
+- Click map: "Supervisionado pelo Banco de Portugal" (footer) tem 0 cliques — não comunica
+
+**Layer 5 — Qualitativo**
+- Exit survey (n=47): 38% "Não percebi o que estava incluído na conta"; 29% "Fiquei preso no passo do NIF"
+- Review mining Trustpilot LUSOconta (n=312 reviews): objecção #1 "Não sabia se era grátis" (41 menções)
+
+**Layer 6 — Quantitativo**
+- MDE alvo: 20% uplift relativo (CR 1,20% → 1,44%)
+- Sample size: 2.240 visitas/variante (α=0,05, poder 80%)
+- Duração estimada: 3,7 semanas com tráfego actual
+
+---
+
+## LIFT Score — lusoconta.pt/abrir-conta
+
+| Factor | Score | Justificação |
+|---|---|---|
+| Value Proposition | 4/10 | Headline genérico, sem menção a "grátis", "sem mensalidade" ou tempo de abertura |
+| Relevance | 6/10 | Página alinhada com pesquisas "abrir conta empresa online" mas sem personalização por segmento |
+| Clarity | 4/10 | 3 CTAs concorrentes; passo 2 do formulário sem instrução para o NIF |
+| Anxiety | 7/10 | Preço não visível above the fold; NIF pedido antes de mostrar benefícios |
+| Distraction | 7/10 | Menu completo + 4 links de saída na landing page |
+| Urgency | 2/10 | Zero urgência — sem oferta limitada, sem "abertura hoje = X" |
+
+**LIFT Score = (4+6+4−7−7+2)/6 = 0,33 → Tier 1-4: resolver problemas fundamentais antes de A/B tests pontuais**
+
+---
+
+## PXL Backlog — Top 5 Hipóteses
+
+| # | Hipótese | ICE Score | Sample Size | Duração |
+|---|---|---|---|---|
+| H1 | Headline "Abra a sua conta em 7 min — sem custos de manutenção" aumenta CR ≥20% porque resolve objecção #1 (38% exit survey) | I=9 C=8 E=9 → **72** | 2.240/var | 3,7 sem |
+| H2 | Remover menu de navegação da landing aumenta CR ≥15% (attention ratio 1:1) | I=8 C=9 E=8 → **64** | 2.612/var | 4,3 sem |
+| H3 | Adicionar barra de progresso no formulário reduz abandono step 2 ≥25% | I=8 C=7 E=7 → **56** | 3.110/var | 5,2 sem |
+| H4 | Mover selo "Banco de Portugal" para junto do CTA aumenta CR ≥10% | I=6 C=8 E=9 → **54** | 4.490/var | 7,4 sem |
+| H5 | Adicionar urgência ("247 contas abertas hoje") aumenta CR ≥12% | I=7 C=6 E=7 → **42** | 3.640/var | 6,0 sem |
+
+**Quick wins sem A/B test (implementar imediatamente):**
+- Comprimir imagem hero: LCP 4,1s → ~2,1s (impacto estimado CR mobile: +0,3-0,5pp)
+- Adicionar "Sem custos de manutenção. Cancelamento a qualquer momento." sob CTA
+- Corrigir mensagem de erro NIF: "O NIF deve ter 9 dígitos — ex: 123456789"
+
+---
+
+## Plano A/B Test — H1 (Prioritário)
+
+**Teste:** Headline controlo vs variante  
+**Controlo (A):** "A conta que trabalha para si"  
+**Variante (B):** "Abra a sua conta empresarial em 7 minutos — sem custos de manutenção"  
+**Ferramenta:** VWO / Google Optimize  
+**Métrica primária:** CR (conta aberta) | **Métrica secundária:** CTR para step 1 do formulário  
+**Sample size:** 2.240 visitas/variante | **Duração mínima:** 3,7 semanas (2 ciclos completos)  
+**Threshold:** 95% confidence (p < 0,05) | **Stopping rules:** não avaliar antes de 80% do sample; parar se CR variante < 0,6% após 500 visitas
+```
+
+---
+
+## Output anti-patterns
+
+- **Audit sem números**: escrever "a taxa de conversão está baixa" sem o valor actual e benchmark do sector
+- **LIFT Score sem fórmula aplicada**: listar os 6 factores mas não calcular o score final nem determinar o tier de acção
+- **Hipóteses não falsificáveis**: "testar headline diferente" em vez de "Se headline X, então CR aumenta ≥Y% porque evidência Z"
+- **Sample size em falta ou inventado**: dizer "precisamos de 1.000 visitas" sem cálculo baseado em baseline CR, MDE e poder estatístico
+- **Trust audit genérico**: "adicionar depoimentos e selos de segurança" sem especificar posição na página, formato e urgência relativa
+- **Recomendações de redesign disfarçadas de A/B test**: propor redesign completo como "variante B" invalida o teste — uma variável de cada vez
+- **Ignorar mobile vs desktop split**: apresentar CR agregado quando split mobile/desktop revela problema isolado (e.g. 0,61% vs 2,31%)
+- **Ausência de stopping rules**: plano de teste sem critérios de paragem antecipada leva a peeking e falsos positivos
+- **Quick wins misturados com testes**: implementar quick wins como variante num A/B test contamina os resultados — separar sempre
+- **Placeholders no output final**: entregar documento com `[inserir URL]`, `[nome do cliente]` ou `[métrica a confirmar]`

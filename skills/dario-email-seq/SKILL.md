@@ -223,3 +223,300 @@ length: N emails
 - Depends on `dario-offer` (what's being sold)
 - Depends on `dario-brand` (voice)
 - Pair with `dario-sales-letter` for the main LP
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Sequence type & strategic fit
+
+- [ ] Sequence type está explicitamente nomeado (SOS / Indoc / Launch / Cart / Post-purchase / Re-engagement)
+- [ ] Avatar descrito com dor específica + nível de awareness (Schwartz 1-5)
+- [ ] Goal da sequência é mensurável ("converter 3% dos subs em compradores do plano €97")
+- [ ] Comprimento (N emails) justificado pela fase do funil — não arbitrário
+
+❌ NOT delivery-ready: "Sequência de boas-vindas para novos subscribers, objetivo: vender o produto."
+✅ Delivery-ready: "SOS 5 emails para subs vindos do lead magnet 'Guia Fiscal 2024' — avatar: freelancer PT 28-42 anos, awareness nível 2 (problema-aware) — objetivo: 1ª compra do plano Tributario.AI Starter €29/mês até D5."
+
+---
+
+### Gate 2 — Subject lines testáveis
+
+- [ ] Todas as subject lines têm <50 chars (ou desvio justificado)
+- [ ] Curiosity gap verificável — sem vague claims ("novidades", "update")
+- [ ] Capitalização intencional (lowercase vs Title Case — escolha feita explicitamente)
+- [ ] Preview text escrito para cada email (não deixado em branco)
+
+❌ NOT delivery-ready: `Subject: Newsletter de Maio — Novidades Importantes`
+✅ Delivery-ready: `Subject: o dia em que perdi €4.200 ao fisco` / `Preview: não era o que eu esperava de um contabilista`
+
+---
+
+### Gate 3 — Corpo dos emails (copy squad principles)
+
+- [ ] Primeiro parágrafo NÃO começa com "Olá [Nome]" ou saudação genérica
+- [ ] Cada email tem ONE dominant idea — sem agenda dupla
+- [ ] Parágrafos ≤3 linhas; espaçamento para escaneabilidade mobile
+- [ ] Pelo menos 1 elemento de prova por email (número, testemunho, caso real, dado)
+- [ ] P.S. presente em TODOS os emails com hook novo ou restate do benefício core
+
+❌ NOT delivery-ready: "Email 2: Fala sobre os benefícios do produto e inclui um CTA para comprar."
+✅ Delivery-ready: P.S. "P.S. — Amanhã conto-te como a Ana (contabilista, Porto) passou de 23 clientes manuais para 147 automatizados em 6 semanas. Vai direto ao assunto."
+
+---
+
+### Gate 4 — Arquitetura de sequência (tabela + automation rules)
+
+- [ ] Tabela Architecture preenchida: Day / Email # / Subject / Main beat / CTA type
+- [ ] Open loops assinalados entre emails (SOS: cada email fecha com cliffhanger)
+- [ ] Automation rules escritas: send time, timezone, exit condition (ex: "se comprar → sai da sequência")
+- [ ] Skip rules / tag rules definidas (ex: "tag 'abriu_E2' → segmento quente")
+
+❌ NOT delivery-ready: "Enviar os emails ao longo de 5 dias com CTAs para a página de vendas."
+✅ Delivery-ready: "E3 → send D2 10h00 WET; exit condition: tag 'compra_starter' ativa → remove de SOS, entra em Post-Purchase; tag 'abriu_E3' → score +10 em AC."
+
+---
+
+### Gate 5 — CTAs e P.S. estruturados
+
+- [ ] Exatamente 1 CTA primário por email — verbo de ação + outcome explícito
+- [ ] CTA repetido como texto link no P.S. (não só botão)
+- [ ] Urgência/escassez nos emails de pitch é REAL e verificável (data, quantidade, desconto concreto)
+- [ ] Emails de nurture/conteúdo têm CTA soft (reply, poll, "responde a este email") — não pitch forçado
+
+❌ NOT delivery-ready: `[Clica aqui para saber mais]`
+✅ Delivery-ready: `→ Reserva o teu lugar no Tributario.AI antes de domingo 23h59 — só 47 vagas no plano de fundadores`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets de placeholder
+
+- [ ] `<client>`, `<avatar>`, `<offer>` substituídos por dados concretos do briefing
+- [ ] Datas reais (ex: "D0 = 14 Jul 2025") — não `<YYYY-MM-DD>`
+- [ ] Nomes fictícios de provas sociais internamente consistentes (mesma Ana em E2 e E5)
+- [ ] Ferramenta de delivery nomeada (ActiveCampaign / ConvertKit / Mailchimp) com campo de merge correto (`{{first_name}}` vs `*|FNAME|*`)
+
+❌ NOT delivery-ready: `project: <client> | avatar: <descrever aqui>`
+✅ Delivery-ready: `project: Tributario.AI | date: 2025-07-14 | sequence_type: sos | tool: ActiveCampaign | merge: {{contact.first_name}}`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+---
+project: Tributario.AI
+date: 2025-07-14
+type: email-sequence
+sequence_type: sos
+length: 5 emails
+tool: ActiveCampaign
+merge_tag: {{contact.first_name}}
+---
+
+# Email Sequence — Tributario.AI / Plano Starter €29/mês
+
+## Strategic Context
+- Avatar: Freelancer português, 28-42 anos, fatura via recibos verdes,
+  perde ~3h/semana em IRS + IVA, awareness nível 2 (sabe que tem dor fiscal,
+  não conhece a solução)
+- Sequence type: Soap Opera Sequence (Chaperon) — 5 emails, D0→D4
+- Goal: 1ª compra Plano Starter €29/mês com conversão-alvo 4% dos subs
+- Voice: direto, inteligente, ligeiramente irreverente — sem jargão fiscal
+
+## Architecture
+
+| Day | Email | Subject | Main beat | CTA |
+|-----|-------|---------|-----------|-----|
+| D0  | E1    | o dia em que perdi €4.200 ao fisco | Origem da dor — open loop | Soft: "reply com 'aconteceu-me'" |
+| D1  | E2    | (continuação de ontem) | Escalada do conflito + erro que cometi | Curiosity: "amanhã conto o final" |
+| D2  | E3    | o que nenhum contabilista me disse | Epifania — mecanismo único | Soft: ver demo 90 seg |
+| D3  | E4    | 147 clientes. 6 semanas. sem CA. | Prova social + benefícios ocultos | Médio: página de vendas |
+| D4  | E5    | última hipótese (fecho domingo 23h59) | Urgência real + oferta completa | Hard: comprar Starter |
+
+---
+
+## EMAIL 1
+
+**Send:** D0 — imediatamente após opt-in
+**Subject:** o dia em que perdi €4.200 ao fisco
+**Preview text:** não era descuido. era o sistema.
+
+Em março de 2022 recebi uma carta dos Finanças.
+
+Devia €4.200 em retenções que "não foram comunicadas
+a tempo." Eu tinha os recibos. Tinha tudo guardado.
+Mas o prazo tinha passado há 11 dias.
+
+Onze dias.
+
+{{contact.first_name}}, isso não foi azar. Foi o
+resultado de gerir a minha situação fiscal com
+uma folha de Excel e boa vontade.
+
+Se emites recibos verdes — mesmo que só 2 por mês —
+provavelmente já sentiste qualquer coisa parecida.
+A sensação de que estás sempre a correr atrás.
+
+Amanhã conto-te o que descobri depois disso.
+(Não é o que eu esperava.)
+
+— Ricardo, fundador Tributario.AI
+
+**P.S.** Aconteceu-te algo parecido? Responde a
+este email com uma palavra. Leio tudo.
+
+---
+
+## EMAIL 2
+
+**Send:** D1 — 10h00 WET
+**Subject:** (continuação de ontem)
+**Preview text:** a parte que me custou admitir
+
+Ontem parei no momento em que abri a carta.
+
+Aqui está o resto.
+
+Fui a um contabilista — o quinto em três anos.
+Disse-me o mesmo que os outros: "precisa de
+organização." Cobrou €80 pela consulta.
+
+Continuei a perder tempo. Continuei a pagar multas.
+
+O problema não era eu. Era o modelo inteiro:
+reativo, manual, sempre atrasado face à AT.
+
+Amanhã conto-te o que mudou tudo.
+Dica: não foi contratar mais ninguém.
+
+— Ricardo
+
+**P.S.** Se ainda não abriste o e-mail de ontem,
+começa por lá — faz mais sentido por ordem.
+
+---
+
+## EMAIL 3
+
+**Send:** D2 — 10h00 WET
+**Subject:** o que nenhum contabilista me disse
+**Preview text:** porque não é do interesse deles dizer-te
+
+A AT disponibiliza uma API.
+
+Atualiza em tempo real. Tem todos os teus dados
+fiscais. Qualquer sistema pode ligá-la.
+
+Nenhum contabilista me disse isso em 6 anos.
+
+O Tributario.AI liga essa API à tua atividade,
+calcula as tuas obrigações antes dos prazos,
+e avisa-te com 15 dias de antecedência.
+
+Sem folha de Excel. Sem surpresas em março.
+
+Deixa-me mostrar-te como funciona em 90 segundos:
+→ [Ver demo — sem registo obrigatório]
+
+— Ricardo
+
+**P.S.** Amanhã mostro-te o caso da Ana —
+contabilista que automatizou 147 clientes
+com isto. Os números são ridículos.
+
+---
+
+## EMAIL 4
+
+**Send:** D3 — 10h00 WET
+**Subject:** 147 clientes. 6 semanas. sem CA.
+**Preview text:** ela própria não acreditou no primeiro mês
+
+A Ana Rodrigues tem 34 anos e uma carteira
+de 147 clientes de recibos verdes no Porto.
+
+Em janeiro de 2025 usou o Tributario.AI para
+automatizar os alertas fiscais de todos eles.
+
+Resultado em 6 semanas:
+— 3h de trabalho manual eliminadas por dia
+— 0 multas por atraso nos seus clientes
+— Net Promoter Score subiu de 6 para 9,1
+
+O plano dela custa €87/mês.
+O plano que serve a maioria dos freelancers
+começa em €29/mês.
+
+{{contact.first_name}}, o link está aqui:
+→ [Tributario.AI Plano Starter — €29/mês]
+
+— Ricardo
+
+**P.S.** Amanhã é o último dia a este preço.
+Domingo às 23h59 o Starter sobe para €47/mês.
+Não é urgência inventada — é o fim do beta.
+
+---
+
+## EMAIL 5
+
+**Send:** D4 — 09h00 WET
+**Subject:** última hipótese (fecho domingo 23h59)
+**Preview text:** depois disto o preço não volta
+
+{{contact.first_name}},
+
+Esta é a última vez que falo no preço de €29/mês.
+
+Hoje à meia-noite o Plano Starter passa a €47/mês.
+São mais €216/ano — pelo mesmo produto.
+
+O que incluis no Starter:
+✓ Ligação à AT em tempo real
+✓ Alertas 15 dias antes de cada prazo
+✓ Dashboard IRS + IVA + Seg. Social
+✓ Suporte por email em 24h
+
+→ [Garantir Plano Starter €29/mês — até 23h59]
+
+Se não for para ti, sem problema.
+Mas se saíste da lista sem experimentar,
+vais continuar a usar a folha de Excel.
+
+(Eu usei 6 anos. Não recomendo.)
+
+— Ricardo
+
+**P.S.** Garantia de 30 dias, devolução total.
+O risco é zero. O preço de €29 não volta.
+→ [Último link: Tributario.AI Starter]
+
+---
+
+## Automation Rules
+
+- **Send time:** 10h00 WET (E1 imediato pós opt-in)
+- **Timezone:** Europe/Lisbon (ActiveCampaign setting)
+- **Exit condition:** tag `compra_starter` ou `compra_pro` → remove
+  imediatamente da sequência SOS → entra em Post-Purchase (5 emails)
+- **Skip rule:** se `compra` ativa em D3 antes de E5 → cancel E5
+- **Tag on open E3:** `interesse_demo` → score +15
+- **Tag on click E4/E5:** `hot_lead` → notifica Ricardo via Slack
+- **Post-SOS (não comprou):** aguarda 14 dias → entra em Nurture 12 emails
+```
+
+---
+
+## Output anti-patterns
+
+- Escrever "Email 1: introdução à empresa, fala dos valores e da missão" — beat sem drama, sem open loop, nenhum leitor passa para E2
+- Usar placeholder literal `<avatar>` ou `<client>` no output final entregue ao cliente
+- Subject line em Title Case genérico: "Bem-vindo À Nossa Newsletter!" — invisível na inbox
+- CTA múltiplo num mesmo email ("vê o blog, segue-nos no Instagram, e compra aqui") — dilui a ação
+- P.S. ausente ou repetição literal do CTA do corpo sem novo hook — perde o elemento mais lido
+- Urgência fabricada sem data real ("só por tempo limitado!") — destrói credibilidade na sequência inteira
+- Sequência de launch sem email de "cart closed" para não-compradores — perde o seed para o próximo lançamento
+- Automation rules em branco ou "a preencher" — sequência não é implementável sem elas
+- Emails com parágrafos de 8+ linhas sem quebra — ilegíveis em mobile, bounce cognitivo imediato
+- Tom corporativo/formal em sequência Soap Opera — mata o storytelling e a ligação emocional
