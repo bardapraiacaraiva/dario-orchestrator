@@ -346,6 +346,34 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/valor/fórmula no output do DIVA Calc deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via ProNIC, tabelas BASE_COSTS validadas, ou dados fornecidos pelo utilizador na sessão
+- 🟡 **assumed** — plausível com base em defaults do skill, mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — cenário calculado por design (econômico/recomendado/premium); não verificável, é simulação intencional
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. precisa verificar. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Orçamento total: 87.500€ — inclui 2 WC, cozinha nova, AVAC splits, contingência 15%"
+> *(reader assume que tudo foi confirmado pelo cliente — nenhum dado foi validado)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — `area_m2: 75`, `localizacao: lisboa_porto`, `scope: completo` (fornecido pelo utilizador)
+> - 🟡 **assumed** — `n_wc: 2` (inferido da tipologia T2; cliente não confirmou), `caixilharia_nova: true` (default para scope completo), `ano_construcao: null` (sem factor de idade aplicado)
+> - 🟢 **projection** — Cenário Económico: 71.200€ / Recomendado: 87.500€ / Premium: 112.000€ (simulação por design; valores reais dependem de caderno de encargos e proposta de empreiteiro)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — `n_wc`, `caixilharia_nova`, `avac`, `ano_construcao` substituídos com actuals do cliente
+- [ ] All 🔵 sources citadas — BASE_COSTS referenciados a ProNIC chapter + localização validada
+- [ ] All 🟢 projections labeled como simulação ao cliente (expectativas claras: "estes valores não substituem proposta de empreiteiro")
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

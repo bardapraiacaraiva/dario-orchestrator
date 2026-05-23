@@ -309,6 +309,31 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via notas de reunião, documentos do cliente, ou sessão anterior
+- 🟡 **assumed** — plausível com base no contexto, mas requer confirmação do cliente antes de entregar o briefing final
+- 🟢 **projection** — estimativa de design por construção (não verificável até execução)
+
+Output checklist upfront mostra ao leitor exactly o que é trust-as-is vs o que precisa de verify. **Honest transparency > briefing inflado.**
+
+❌ NOT delivery-ready:
+> "Cliente tem orçamento de 80 000 €, quer cozinha aberta, obra começa em março."
+> *(sem labels — o projectista assume tudo como facto; pode avançar com premissas erradas)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Titular do imóvel: Ana Ferreira (CPCV assinado, confirmado doc)
+> - 🟡 **assumed** — Orçamento total: 80 000 € (cliente mencionou verbalmente; sem breakdown construção/honorários/mobiliário confirmado)
+> - 🟡 **assumed** — Prazo desejado: obra concluída antes de setembro (referência informal; hard deadline não confirmada)
+> - 🟢 **projection** — Custo estimado requalificação cozinha: 18 000–24 000 € (baseado em m² e nível de acabamento indicado; sujeito a medições e consulta empreiteiro)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: orçamento validado com breakdown, prazo com data firme)
+- [ ] All 🔵 citations added — documento de suporte referenciado por item (CPCV, planta, registo predial, notas assinadas)
+- [ ] All 🟢 projections labeled as such ao cliente — expectativas claras de que estimativas de custo/prazo são provisórias até medições e consultas técnicas
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

@@ -241,6 +241,49 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado da sessão/memória/dados do cliente (ex: NIF, alvará IMPIC, número de apólice)
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar contrato assinável
+- 🟢 **projection** — projeção por design (prazo, milestone, penalização calculada — não verificável até execução)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. o que precisa de verificar antes de assinar.  **Honest transparency > contrato que parece completo mas tem lacunas.**
+
+---
+
+❌ **NOT delivery-ready:**
+```
+Empreiteiro: Construções Silva Lda., NIF 512345678, Alvará IMPIC Classe 4
+Prazo total: 180 dias úteis
+Penalização por atraso: 0.5% por semana, máx. 10%
+Retenção de garantia: 5% libertada aos 12 meses
+```
+*(Reader assume que tudo está verificado — NIF pode estar errado, alvará pode estar caducado, prazo foi estimado sem projecto aprovado)*
+
+---
+
+✅ **Delivery-ready:**
+```
+🔵 verified   — NIF empreiteiro: 512345678 (confirmado NIF.pt sessão anterior)
+🔵 verified   — Alvará IMPIC nº 12345, Classe 4, válido até 31/12/2025 (doc fornecido cliente)
+🟡 assumed    — Apólice RC EUR 250.000 (cliente referiu "tenho seguro" — número não confirmado)
+🟡 assumed    — IVA taxa reduzida 6% (obra habitação própria permanente — precisa doc AT)
+🟡 assumed    — Prazo 180 dias úteis (estimativa sem consultar mapa de trabalhos aprovado)
+🟢 projection — Penalização semana 1 atraso: EUR 1.250 (0.5% × EUR 250.000 — calculado por fórmula)
+🟢 projection — Retenção libertada em Março 2027 (12 meses após receção provisória estimada)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions com actuals (NIF, alvará, apólices, regime IVA)
+- [ ] Todas as citações adicionadas por fontes 🔵 (docs fornecidos pelo cliente em sessão)
+- [ ] Todas as projeções 🟢 comunicadas ao cliente como estimativas (expectativas claras antes da assinatura)
+- [ ] Anexos referenciados no contrato (I–IV) preenchidos ou marcados como `[A FORNECER]`
+- [ ] Alvará IMPIC validado em portal IMPIC.pt antes de entrega final
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

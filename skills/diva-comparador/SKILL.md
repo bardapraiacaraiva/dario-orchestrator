@@ -205,6 +205,42 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de comparação deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado dos documentos de proposta recebidos / dados IMPIC consultados
+- 🟡 **assumed** — plausível dado o contexto mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa analítica por design (scoring, diferenças percentuais calculadas)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. o que precisa verificar antes de adjudicar. **Honest transparency > análise inflacionada.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Proposta B: €42.000 | Prazo: 8 semanas | Alvará: válido | Score: 7.2/10
+```
+*(reader assume que tudo foi verificado — preço pode ser do email informal, alvará não consultado, score sem critérios explícitos)*
+
+✅ Delivery-ready:
+```
+Proposta B — Empreiteiro Silva & Filhos
+- Valor sem IVA: €42.000 🔵 verified (PDF proposta 2024-01-15)
+- Prazo proposto: 8 semanas 🟡 assumed (mencionado verbalmente — não consta no documento)
+- Alvará IMPIC: nº 12345 🟡 assumed (número fornecido pelo empreiteiro — consulta impic.pt pendente)
+- Garantia geral: 5 anos 🔵 verified (cláusula 7.2 da proposta)
+- Score ponderado: 7.2/10 🟢 projection (calculado pelo modelo com pesos DIVA — sujeito a critérios do cliente)
+- Impermeabilização WC: EM FALTA 🟡 assumed (não mencionada — pode estar em "outros trabalhos")
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — valores orais substituídos por documentos assinados; alvarás consultados em impic.pt
+- [ ] All 🔵 sources citadas — referência ao documento (PDF, email, data) junto de cada valor verificado
+- [ ] All 🟢 projections comunicadas ao cliente como estimativas analíticas, não factos — scoring é orientativo, não determinístico
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

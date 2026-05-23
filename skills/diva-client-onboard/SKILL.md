@@ -241,6 +241,43 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do `diva-client-onboard` deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via RAG search, memory file existente, ou dados fornecidos pelo cliente nesta sessão
+- 🟡 **assumed** — plausível com base no tipo de projecto/zona, mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa por design (roadmap, timeline, quick wins) — não verificável até execução
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. o que precisa sync. **Honest transparency > inflated onboarding.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Orçamento: €120.000 | Timeline: 8 meses | Estilo: Minimalista Nórdico
+Licenciamento: Não necessário | Área: 95m²
+```
+*(reader assume tudo verificado — nada está labelled, cliente pode tomar decisões erradas)*
+
+✅ Delivery-ready:
+```
+- 🔵 verified   — Área: 95m² (certidão predial partilhada pelo cliente)
+- 🔵 verified   — Localização: Lisboa, Estrela (confirmado na sessão)
+- 🟡 assumed    — Orçamento: €100k–€130k (range inferido do tipo de obra + zona; confirmar com cliente)
+- 🟡 assumed    — Licenciamento: provavelmente comunicação prévia (PDM não consultado; verificar no portal municipal)
+- 🟡 assumed    — Estilo: Minimalista contemporâneo (inferido de referências verbais; confirmar com moodboard)
+- 🟢 projection — Timeline: 6–9 meses (estimativa para remodelação desta escala; depende de empreiteiro + licenças)
+- 🟢 projection — Milestone 3 (acabamentos): semana 18–22 (roadmap por design, não confirmado)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions com actuals (orçamento real, PDM consultado, estilo validado com moodboard)
+- [ ] Todos os itens 🔵 com fonte citada no memory file (`project_<slug>.md`) e ingeridos no RAG com tags correctas
+- [ ] Todos os itens 🟢 apresentados ao cliente como estimativas/projecções — expectativas alinhadas antes de avançar para `/diva-floor-plan` ou `/diva-budget`
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

@@ -271,6 +271,33 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas necessita confirmação do cliente antes da entrega
+- 🟢 **projection** — previsão por design (não verificável até certificação emitida)
+
+Output checklist upfront mostra ao leitor exactamente o que é trust-as-is vs. precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+> "Parede exterior U=0.38 W/m².K, classe B-, Ntc/Nt=0.82, payback ETICS 4 anos."
+> *(zero labels — cliente assume tudo verificado; se zona climática ou composição da parede estiver errada, toda a análise colapsa)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Município: Braga → zona climática I2/V2 (Despacho 15793-F/2013)
+> - 🟡 **assumed** — Espessura isolamento ETICS: 6 cm (não confirmada em telas finais; assumida com base na descrição verbal)
+> - 🟡 **assumed** — Sistema AQS: esquentador a gás η=0.87 (cliente mencionou "gás", modelo não confirmado)
+> - 🟢 **projection** — Classe energética estimada pós-melhoria: B (R_Ntc ≈ 0.68); sujeita a cálculo formal REH pelo perito qualificado
+> - 🟢 **projection** — Payback ETICS + janelas duplas: ~6 anos (baseado em preços médios mercado PT 2024; orçamento real pode variar ±30%)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — composição real da envolvente validada em telas/visita
+- [ ] All 🟡 items confirmed — equipamentos HVAC e AQS com fichas técnicas (COP/EER/η reais)
+- [ ] All 🔵 sources cited — zona climática, U-values de referência com portaria aplicável
+- [ ] All 🟢 projections labeled as such ao cliente — classe estimada ≠ classe certificada; apenas perito SCE emite certificado válido
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

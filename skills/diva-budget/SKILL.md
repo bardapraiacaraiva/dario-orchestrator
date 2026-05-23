@@ -377,6 +377,38 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via ProNIC/LNEC, RAG KB, ou dados reais do projecto
+- 🟡 **assumed** — plausível pelo contexto mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa por design (range calculado, não valor real verificável)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs o que precisa de verify antes de agir.  
+**Honest transparency > orçamento inflado ou falsa precisão.**
+
+---
+
+❌ NOT delivery-ready:
+> "Custo total estimado: €87.500. IVA a 6%. Demolições: €6.200. Caixilharia: €9.100."
+→ Sem labels: cliente não sabe se os valores são ProNIC verified, se a área foi assumida, ou se IVA 6% se aplica mesmo ao projecto deles.
+
+✅ Delivery-ready:
+> - 🟢 **Custo total estimado: €82.000–€96.000** — projection baseada em 110m2 × €750–€875/m2 (full gut, Lisboa)
+> - 🟡 **Área útil: 110m2** — assumed pela planta enviada; cliente deve confirmar com medição real
+> - 🔵 **IVA 6%** — verified: imóvel em ARU Lisboa segundo Portaria 277/2020; aplica-se a reabilitação urbana
+> - 🟡 **Acesso normal (sem agravamento)** — assumed; cliente deve confirmar se há restrições de rua ou sem elevador
+> - 🔵 **Range demolições: 5–10% do total** — verified via estrutura ProNIC Cap. 2
+> - 🟢 **Capítulo estrutura: €0** — projection assumindo sem alterações estruturais; reverter se diva-diagnose identificar reforços
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — área real medida, condições de acesso validadas, presença de amianto verificada
+- [ ] All 🔵 citations adicionadas — número ARU, referência ProNIC/LNEC, portaria IVA aplicável
+- [ ] All 🟢 projections comunicadas ao cliente como ranges (não valores fixos) com disclaimer de contingência 10–15%
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

@@ -394,6 +394,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no FF&E schedule deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmed from floor plan, moodboard aprovado, ou dados reais do cliente/fornecedor
+- 🟡 **assumed** — plausível para o projeto mas precisa de confirmação antes de procurement
+- 🟢 **projection** — estimativa de prazo/preço by design (não verificável até encomenda real)
+
+Output checklist upfront mostra ao cliente exatamente o que é trust-as-is vs. precisa validar antes de qualquer compra.
+**Honest transparency > schedule que parece completo mas tem gaps escondidos.**
+
+---
+
+❌ NOT delivery-ready:
+> "Sofa 3 lugares Gual, tecido bouclé creme, 220×90 cm — €2.400 — entrega 8 semanas"
+*(reader assume que preço, prazo e dimensão foram todos confirmados — podem estar desatualizados ou incompatíveis com o acesso ao apartamento)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Dimensões sofa 220×90 cm compatíveis com planta aprovada (corredor acesso 85 cm livre)
+> - 🟡 **assumed** — Preço €2.400 baseado em tabela Gual 2023; confirmar cotação atual antes de encomenda
+> - 🟡 **assumed** — Tecido bouclé creme disponível neste modelo; verificar stock de tecido com fornecedor
+> - 🟢 **projection** — Lead time 8 semanas (made-to-order); prazo real confirmado na ordem de compra
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — preços cotados, tecidos/acabamentos em stock, alternativas aprovadas
+- [ ] All 🔵 citations added — planta de referência, moodboard aprovado, medidas de acesso validadas
+- [ ] All 🟢 projections labeled as such ao cliente — lead times comunicados como estimativa, não garantia de data
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

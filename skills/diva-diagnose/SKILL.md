@@ -285,6 +285,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no diagnóstico deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado por documentos, plantas, fotos, ou dados fornecidos pelo cliente
+- 🟡 **assumed** — plausível com base no tipo/ano/localização, mas requer confirmação antes da entrega
+- 🟢 **projection** — estimativa por design (orçamento, prazo, faseamento) — não verificável até projeto avançar
+
+Output checklist upfront mostra ao cliente exatamente o que é trust-as-is vs. o que precisa de validação. **Honest transparency > diagnóstico inflado.**
+
+---
+
+❌ NOT delivery-ready:
+> "Paredes estruturais identificadas. Custo estimado €45.000. Licenciamento não necessário. Prazo 6 meses."
+*(reader assume tudo como verified — estrutura, orçamento e regime legal sem fonte)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Ano de construção 1963 (Caderneta Predial fornecida); sistema construtivo gaioleiro confirmado por fotos
+> - 🟡 **assumed** — Paredes interiores assumidas como não estruturais (pendente levantamento in situ por técnico)
+> - 🟡 **assumed** — Regime de Comunicação Prévia assumido (sem alteração de fachada declarada); confirmar com CML antes de submissão
+> - 🟢 **projection** — Orçamento estimado €38.000–€52.000 (fase de diagnóstico; margem ±25% até projeto de execução)
+> - 🟢 **projection** — Prazo M1→M4 estimado 9–14 meses (dependente de aprovação municipal e disponibilidade de estaleiro)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — ex: confirmação do regime de licenciamento com câmara municipal; validação estrutural por engenheiro in situ
+- [ ] All 🔵 sources cited — ex: Caderneta Predial, plantas existentes, relatório de vistoria, fotos datadas
+- [ ] All 🟢 projections labeled as such ao cliente — expectativas de orçamento e prazo comunicadas como estimativas de fase, não valores fechados
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

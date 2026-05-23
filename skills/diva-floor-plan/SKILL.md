@@ -329,6 +329,35 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/dimensão/compliance flag no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado do floor plan partilhado / dados do cliente / RGEU tabelado
+- 🟡 **assumed** — plausível com base em tipologia mas precisa confirm do cliente antes de entrega
+- 🟢 **projection** — estimativa de performance por design (não verificável sem obra/medição real)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa verificar antes de avançar. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Quarto casal: 11.2m² (cumpre RGEU). Corredor representa 14% da área. Alternativa B melhora luminosidade 30%."
+> — *reader assume que todas as dimensões foram medidas, que o corredor foi calculado e que o lift de luz é real. Nenhum está labelled.*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Quarto casal: 11.2m² (extraído da planta enviada pelo cliente, cumpre mínimo RGEU Art. 65 de 10.5m²)
+> - 🟡 **assumed** — Corredor representa ~14% da área útil (calculado com base nas dimensões descritas; confirmar se existe nicho de instalações não mencionado)
+> - 🟡 **assumed** — Paredes divisórias entre sala e quarto tratadas como não-estruturais (verificar memória descritiva ou projectista de estruturas)
+> - 🟢 **projection** — Alternativa B projecta melhoria de luminosidade natural estimada em 25-35% (baseado em orientação S e remoção de divisória opaca; não verificável sem simulação IES/daylight)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — dimensões validadas em planta rigorosa (dwg/pdf técnico), paredes estruturais confirmadas por engenheiro
+- [ ] All 🔵 sources cited — RGEU artigos referenciados por número, planta do cliente anexa ao registo
+- [ ] All 🟢 projections labeled as such ao cliente — deixar claro que performance de luz/circulação são estimativas de design, não garantias métricas sem simulação
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown
