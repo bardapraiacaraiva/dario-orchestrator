@@ -273,3 +273,209 @@ rooms_specified: <count>
 - Feeds into `diva-budget` for accurate cost calculation
 - May loop back to `diva-floor-plan` if material constraints affect layout
 - Save via `dario-obsidian-save` to vault
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
+
+### 1. GATE — Referências de produto verificáveis (não genéricas)
+- [ ] Cada material inclui: marca + modelo/coleção + referência de cor + acabamento específico
+- [ ] Preços por m² indicados com fonte e data (ex: "Leroy Merlin PT, jan 2025")
+- [ ] Fornecedores portugueses reais listados com morada ou URL (não "loja de materiais local")
+- [ ] Certificações técnicas presentes quando relevantes (R10/R11 para zonas húmidas, classe A1 fogo, etc.)
+
+❌ NOT delivery-ready: "Pavimento em porcelânico cinza, aprox. 25€/m², disponível em lojas de materiais"
+✅ Delivery-ready: "Pavimento: Porcelânico Marca Corona — coleção Ritual Grey 60×120cm, ref. RT6012GR, acabamento mate rectificado, 34€/m² (Leroy Merlin PT, jan 2025); alternativa Economica: Novabell Crossover Ash 60×60cm, 18€/m², Tiles & More Lisboa"
+
+---
+
+### 2. GATE — Três tiers completos por categoria (Económico / Recomendado / Premium)
+- [ ] Todas as categorias aplicáveis ao projeto têm os 3 tiers preenchidos (não apenas 1 opção)
+- [ ] Delta de preço entre tiers é explícito e justificado (ex: "+40% por espessura 30mm e acabamento polido")
+- [ ] Tier Recomendado alinha com o budget tier do briefing do cliente
+- [ ] Tier Económico não compromete requisitos técnicos mínimos (ex: R10 mantido em WC)
+
+❌ NOT delivery-ready: "Premium: mármore Carrara. Económico: cerâmica tipo mármore."
+✅ Delivery-ready: "Premium: Mármore Carrara Bianco polido 60×60cm, 185€/m² (Mármores Galrão, Lisboa) — Recomendado: Silestone Blanco Zeus 20mm, 95€/m² (Cosentino PT, Porto) — Económico: Porcelânico Ragno Marbled White 60×120cm, 28€/m² (AKI PT)"
+
+---
+
+### 3. GATE — Coerência visual da paleta entre divisões
+- [ ] Código HEX atribuído a cada cor da paleta (paredes, mobiliário, têxteis, apontamentos)
+- [ ] Fio condutor visual explícito: 1 material ou cor âncora repetido em ≥ 2 divisões
+- [ ] Contraste e equilíbrio documentado: proporção claro/escuro/neutro por divisão (ex: 70/20/10)
+- [ ] Materiais quentes e frios em balanço justificado (não mistura aleatória de acabamentos)
+- [ ] Se projeto multi-divisão: tabela de consistência pavimento → parede → teto por zona
+
+❌ NOT delivery-ready: "Paleta neutra com toques de cor quente."
+✅ Delivery-ready: "Âncora: carvalho natural #C8A96E em pavimento sala + prateleiras cozinha. Paredes: branco-quente Robbialac Marfim Suave #F5F0E8 (70%). Apontamento: verde-musgo #4A5E4A em painel cabeceira e cortinados (10%). Proporção por divisão: 70/20/10."
+
+---
+
+### 4. GATE — Compatibilidade técnica e regulatória
+- [ ] Materiais em zonas húmidas têm classificação antiderrapante ≥ R10 (WC) ou R11 (exterior)
+- [ ] Pavimentos compatíveis com piso radiante indicados (se aplicável ao projeto)
+- [ ] Caixilharia com classe de desempenho indicada (permeabilidade ar, estanquidade água — EN 12207/12208)
+- [ ] Vidros com especificação completa (ex: 4+16Ar+4 baixo emissivo Ug=1.1 W/m²K)
+- [ ] Revestimentos exteriores com resistência gelo indicada se projeto em zona de altitude ≥ 500m
+
+❌ NOT delivery-ready: "Pedra natural no WC, bonita e resistente."
+✅ Delivery-ready: "WC: Limestone Moca Creme 40×40cm tratado com hidrofugante Fila MP90, R10 certificado, 65€/m² (Margraço, Sintra) — NÃO usar pedra polida (R9, não cumpre requisito antiderrapante WC)."
+
+---
+
+### 5. GATE — Estimativa de custo total estruturada
+- [ ] Custo por m² × área de cada divisão calculado explicitamente
+- [ ] Subtotal por categoria (pavimentos, revestimentos, bancadas, etc.)
+- [ ] Total de materiais separado de mão-de-obra (nota: MO não incluída ou estimada separadamente)
+- [ ] Variação de custo entre cenário Económico e Premium expressa em € totais (ex: "delta €4.200")
+- [ ] IVA (23%) indicado: valores com e sem IVA
+
+❌ NOT delivery-ready: "Estimativa total: €15.000–€25.000 consoante escolhas."
+✅ Delivery-ready: "Pavimentos sala 28m²: Recomendado 34€/m² = €952 s/IVA (€1.171 c/IVA). Revestimento WC 12m²: Recomendado 65€/m² = €780 s/IVA. Total materiais cenário Recomendado: €8.340 s/IVA / €10.258 c/IVA. Delta vs. Premium: +€3.960."
+
+---
+
+### 6. GATE — Output usa NOME DO CLIENTE + dados REAIS em todo o documento — sem angle-brackets placeholder
+- [ ] Nome do cliente (ou projeto) aparece no título e cabeçalho do material board
+- [ ] Divisões referenciadas pelo nome real do projeto (ex: "Sala de Estar — Apt. Príncipe Real" não "Sala Principal")
+- [ ] Nenhum campo contém `<nome>`, `<material>`, `<preço>`, `<fornecedor>` ou similar
+- [ ] Todos os preços são de fornecedores PT reais e verificáveis (não valores placeholder)
+- [ ] Links ou contactos de fornecedores presentes onde possível
+
+❌ NOT delivery-ready: "Bancada cozinha: `<material premium>` de `<fornecedor>`, aprox. `<preço>`€/m²."
+✅ Delivery-ready: "Bancada cozinha — Projeto Ferreira / Apt. Príncipe Real: Dekton Kreta 12mm, ref. DK-KRT-12, 210€/m² (Cosentino PT, Rua Alfredo da Silva 4, Amadora, tel. 214 946 400)."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Especificação de Materiais — Projeto Cuidai HQ
+## Remodelação Escritórios + Sala de Reuniões | Lisboa, Príncipe Real
+**Data:** Janeiro 2025 | **Budget tier:** Recomendado (com apontamentos Premium)
+**Área total:** 145m² | **Preparado por:** DIVA Materials
+
+---
+
+## PALETA ÂNCORA
+
+| Papel | Cor | HEX | Material âncora |
+|---|---|---|---|
+| Base neutra | Branco quente | #F2EDE6 | Paredes gerais |
+| Estrutura | Carvalho natural | #C9A96E | Pavimento + estantes |
+| Apontamento | Verde-floresta | #3B5249 | Mobiliário accent + têxteis |
+| Contraste | Grafite mate | #2E2E2E | Caixilharia + ferragens |
+
+Proporção por divisão: 70% base / 20% estrutura / 10% apontamento
+
+---
+
+## 1. PAVIMENTOS
+
+### 1.1 Escritório Open Space (62m²) — Zonas Secas
+
+| Tier | Produto | Referência | Preço/m² s/IVA | Fornecedor PT |
+|---|---|---|---|---|
+| Económico | Pavimento SPC Classen NEO 2.0 Carvalho Báltico | CLN2-0847 | 18€ | Leroy Merlin PT (leroymerlin.pt) |
+| **Recomendado ✓** | **Pavimento Engenharia Bauwerk Parquet Chêne Naturel 14mm** | **BW-CHN-14-NAT** | **52€** | **Soartes, R. Luciano Cordeiro 60, Lisboa** |
+| Premium | Soalho Maciço Carvalho Europeu Boleado 20mm, Jular | JUL-CAR-20-BO | 98€ | Jular Madeiras, Alverca (jular.pt) |
+
+**Escolha Recomendado:** 62m² × 52€ = **€3.224 s/IVA (€3.965 c/IVA)**
+Nota técnica: Bauwerk compatível com piso radiante (certificado Δ T ≤ 12°C). Assentamento colado sobre betonilha nivelada.
+
+---
+
+### 1.2 WCs (2×) (18m² total) — Zonas Húmidas
+
+| Tier | Produto | Referência | Preço/m² s/IVA | Fornecedor PT |
+|---|---|---|---|---|
+| Económico | Porcelânico Argenta Klen White 33×66cm R10 | ARG-KLW-3366 | 22€ | AKI Portugal (aki.pt) |
+| **Recomendado ✓** | **Porcelânico Mutina Pico Bianco 10×10cm R10, pavimento** | **MT-PC-BIA-1010** | **68€** | **Mosa Tiles Lisboa, Av. 5 Outubro 12** |
+| Premium | Mosaico Hidráulico Cimentício Cor Verde #3B5249, Cimenterie de la Tour | CDT-V3B52-20 | 145€ | Cimenterie FR, entrega PT 3 sem. |
+
+**Paredes WC:** Tinta Robbialac Aqua Acetinado Branco Nata ref. 0001, 12€/L (2 dem.), lavabilidade classe 2.
+**Escolha Recomendado:** 18m² × 68€ = **€1.224 s/IVA**. Certificação R10 confirmada (EN 13036-4).
+
+---
+
+## 2. REVESTIMENTOS PAREDES
+
+### 2.1 Sala de Reuniões (28m²)
+
+**Parede Focal (feature wall) — 1 parede, 14m²:**
+
+| Tier | Produto | Referência | Preço/m² s/IVA | Fornecedor PT |
+|---|---|---|---|---|
+| Económico | Painel Ripado MDF Lacado Grafite, Leroy Merlin | LM-RIP-GRF-240 | 35€ | Leroy Merlin PT |
+| **Recomendado ✓** | **Ripado Carvalho Natural 30×3000mm, Rehau Brilliant Wood** | **RH-BW-CAR-30** | **85€** | **Madertec, R. Particular à Fábrica dos Pentes 8, Lisboa** |
+| Premium | Painel Nogueira Maciço Escovado, Dinesen | DIN-WAL-NOG-ESC | 210€ | Dinesen DK, entrega PT 4 sem. |
+
+**Paredes restantes:** Robbialac Aqua Base Mate Branco Quente #F2EDE6, ref. RB-AQ-01, 8,50€/L (Leroy Merlin PT). Cobertura: 12m²/L, 2 demãos → 5L/parede. Total paredes gerais HQ: €340 s/IVA.
+
+---
+
+## 3. BANCADAS
+
+### 3.1 Copa/Kitchenette (6 m.l. bancada)
+
+| Tier | Produto | Referência | Esp. | Preço/m.l. s/IVA | Fornecedor PT |
+|---|---|---|---|---|---|
+| Económico | Silestone Blanco Norte 20mm | SIL-BNO-20 | 20mm | 180€ | Cosentino PT, Porto |
+| **Recomendado ✓** | **Dekton Kreta Velvet 12mm** | **DK-KRT-VLV-12** | **12mm** | **245€** | **Cosentino PT, Amadora (214 946 400)** |
+| Premium | Quartzito Taj Mahal Amaciado 30mm | MAR-TJM-30-AM | 30mm | 420€ | Margraço Pedras, Sintra (219 249 810) |
+
+**Escolha Recomendado:** 6 m.l. × 245€ = **€1.470 s/IVA (€1.808 c/IVA)**
+Acabamento: Velvet (mate suave, anti-impressão digital). Ponto de água: +€120 corte encastre cuba.
+
+---
+
+## 4. CAIXILHARIA
+
+### Janelas Escritório (8 vãos, 2,0×1,2m cada)
+
+| Tier | Sistema | Vidro | U vão | Preço/vão s/IVA | Fornecedor PT |
+|---|---|---|---|---|---|
+| Económico | PVC Deceuninck Elegant 76, branco | Duplo 4+16+4 Ug=1,4 | 1,8 W/m²K | 680€ | Janelux, Lisboa |
+| **Recomendado ✓** | **Alumínio Cortizo COR-70 Thermal Break, grafite #2E2E2E** | **4+16Ar+4 BE Ug=1,1** | **1,4 W/m²K** | **1.100€** | **Extrusal, Porto (extrusal.com)** |
+| Premium | Alumínio Schüco AWS 90.SI+ | Triplo 4+12Ar+4+12Ar+4 Ug=0,7 | 0,9 W/m²K | 2.200€ | Cortizo Ibérica PT |
+
+**Escolha Recomendado:** 8 vãos × 1.100€ = **€8.800 s/IVA**
+Classe desempenho: Permeabilidade ar Classe 4 (EN 12207), Estanquidade água Classe E900 (EN 12208).
+
+---
+
+## 5. RESUMO DE CUSTOS — CENÁRIO RECOMENDADO
+
+| Categoria | Área/Qtd | Preço unit. | Subtotal s/IVA |
+|---|---|---|---|
+| Pavimento Open Space | 62 m² | 52€/m² | €3.224 |
+| Pavimento WCs | 18 m² | 68€/m² | €1.224 |
+| Revestimento feature wall | 14 m² | 85€/m² | €1.190 |
+| Tintas paredes gerais | — | — | €340 |
+| Bancada copa | 6 m.l. | 245€/m.l. | €1.470 |
+| Caixilharia (8 vãos) | 8 un. | 1.100€/un. | €8.800 |
+| **TOTAL s/IVA** | | | **€16.248** |
+| **TOTAL c/IVA (23%)** | | | **€19.985** |
+
+**Delta vs. Económico:** −€6.840 | **Delta vs. Premium:** +€14.320
+
+---
+
+*Preços verificados janeiro 2025. Sujeitos a confirmação de encomenda. Mão-de-obra não incluída.*
+```
+
+---
+
+## Output anti-patterns
+
+- **Materiais sem referência de produto real:** escrever "cerâmica cinza tipo cimento" sem marca/coleção/referência é inaceitável — o cliente não consegue encomendar
+- **Preços "a partir de" ou "aproximadamente":** intervalos vagos sem fonte datada criam desconfiança; usar sempre valor específico + fornecedor + data
+- **Apenas um tier por categoria:** omitir Económico ou Premium impede o cliente de tomar decisões informadas dentro do budget real
+- **Cores descritas em palavras sem HEX:** "verde-água", "bege quente" sem código HEX não permite reprodução fiel na paleta
+- **Ignorar compatibilidade técnica com piso radiante:** especificar soalho maciço espesso sem verificar compatibilidade térmico é um erro de projeto grave
+- **Fornecedores genéricos ou inexistentes em PT:** citar "grandes superfícies" ou marcas sem presença verificável em Portugal obriga o cliente a pesquisa adicional
+- **Custo total sem separação s/IVA vs. c/IVA:** em Portugal, IVA 23% é substancial — omiti-lo cria surpresas no orçamento final
+- **Feature wall sem fio condutor à paleta âncora:** materiais de destaque desconexos da paleta geral criam incoerência visual que compromete o projeto
+- **Certificações de segurança omitidas em zonas húmidas:** não indicar classe R10/R11 em pavimentos de WC ou exterior é uma falha técnica e de responsabilidade profissional
+- **Angle-brackets no output final:** entregar documento com `<nome do cliente>`, `<referência>` ou `<a confirmar>` não é um documento de trabalho — é um rascunho incompleto

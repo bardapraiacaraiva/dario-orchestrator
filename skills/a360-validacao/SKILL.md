@@ -232,3 +232,214 @@ After validation:
 - **PIVOT**: Route back to `a360-nicho` or `a360-avatar` with new hypotheses
 - **NO-GO**: Route to `a360-nicho` for a new market
 - Save output to Obsidian: `05 - Claude - IA/Outputs/YYYY-MM-DD - A360 - Validation - [IdeaName].md`
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### 1. HYPOTHESIS GATE — core assumption está cirúrgica e testável
+- [ ] Hipótese segue exatamente o formato: "[CLIENTE ALVO] vai pagar [€X] por [OFERTA] porque resolve [DOR ESPECÍFICA]"
+- [ ] A hipótese identifica **um** assumption central (não múltiplos)
+- [ ] Hipótese é falsificável — existe um threshold numérico que a mata
+- [ ] Nenhuma palavra vaga como "talvez", "poderá", "pode ajudar"
+
+❌ NOT delivery-ready: "Vamos ver se as mães gostam da ideia de uma app de saúde infantil"
+✅ Delivery-ready: "Mães portuguesas com filhos 0-6 anos vão pagar €29/mês por acompanhamento pediátrico remoto via Cuidai porque eliminam 2+ consultas urgentes/mês no privado (€80-120 cada)"
+
+---
+
+### 2. MOM TEST SCRIPT GATE — perguntas não contaminam respostas
+- [ ] Zero perguntas do tipo "Gostarias de X?" / "Comprarias isto?" / "Achas que seria útil?"
+- [ ] Todas as perguntas ancoram em **comportamento passado**, não intenção futura
+- [ ] Script tem 6-8 perguntas + 2-3 follow-ups de aprofundamento
+- [ ] Inclui pergunta sobre o que o entrevistado **já gastou** (tempo + dinheiro) no problema
+- [ ] Inclui "kill question": o que os impediria de usar a solução
+
+❌ NOT delivery-ready: "Usarias uma plataforma de contabilidade online se fosse fácil de usar?"
+✅ Delivery-ready: "Da última vez que fechaste o IRS, quanto tempo levou e o que correu pior? Quanto pagaste ao contabilista? Já tentaste fazer sozinho — o que aconteceu?"
+
+---
+
+### 3. RECRUITMENT GATE — 15 entrevistados são do avatar certo, não conveniência
+- [ ] Lista os **3 canais concretos** onde o avatar específico deste cliente está (não genérico "redes sociais")
+- [ ] Template de mensagem de recrutamento tem <60 palavras, sem pitch do produto
+- [ ] Critérios de qualificação definidos (ex: "tem filho <6 anos E já pagou consulta privada nos últimos 3 meses")
+- [ ] Plano de incentivo definido se necessário (€10 voucher, acesso beta, etc.)
+- [ ] Calendário realista: X entrevistas/semana durante Y semanas = 15 total
+
+❌ NOT delivery-ready: "Fala com amigos e família para testar a ideia"
+✅ Delivery-ready: "Recrutar via grupo Facebook 'Mães Lisboa' (18k membros) + DM a seguidores do @cuidai_pt + post no r/portugal — mensagem: 'Tens filhos pequenos e já foste a urgências? Posso oferecer-te 20 min de conversa + €10 voucher Zara'"
+
+---
+
+### 4. SCORECARD GATE — go/no-go tem thresholds numéricos não negociáveis
+- [ ] Cada dimensão do scorecard tem threshold mínimo em número (não "suficiente" ou "bom")
+- [ ] Thresholds são **calibrados ao modelo de negócio** (ex: high-ticket ≠ low-ticket)
+- [ ] Scorecard separa "signal fraco → pivot" de "signal nulo → kill"
+- [ ] Inclui critério de STOP automático (ex: "se <3 de 15 descrevem a dor espontaneamente → stop antes das 15 entrevistas")
+- [ ] Decisão final é binária com condições: GO / GO WITH PIVOT / NO-GO
+
+❌ NOT delivery-ready: "Se as entrevistas correrem bem e houver interesse, podes avançar"
+✅ Delivery-ready: "GO: ≥10/15 descrevem dor espontânea + ≥3 pré-vendas a €X. PIVOT: 6-9/15 com dor mas resistência ao preço → testar €X-30%. NO-GO: <6/15 ou zero pré-vendas após 2 semanas outreach"
+
+---
+
+### 5. MÉTODO GATE — validação escolhida é a mais rápida para este tipo de ideia
+- [ ] Método justificado com base em: budget disponível + tipo de produto (físico/digital/serviço) + prazo
+- [ ] Se landing page: estrutura dos 7 elementos está completa com copy real (não placeholders)
+- [ ] Se pré-venda: oferta founding member tem preço, prazo de entrega, e garantia de reembolso explícita
+- [ ] Métricas de sucesso são específicas ao método escolhido (não lista genérica copiada)
+- [ ] "Plano B" definido se método primário falha ao fim de 7 dias
+
+❌ NOT delivery-ready: "Faz uma landing page e vê o que acontece"
+✅ Delivery-ready: "Landing page + €150 FB Ads (€10/dia × 15 dias) target: mulheres 28-42 Lisboa/Porto. KPIs: CVR >10%, CPC <€1.80, waitlist >80 em 15 dias. Se CVR <5% ao dia 7 → pausa e testa headline alternativa"
+
+---
+
+### 6. CLIENT DATA GATE — output usa NOME DO CLIENTE + dados reais, zero angle-brackets
+- [ ] Nome do cliente/produto aparece em **todos** os exemplos (hipótese, script, scorecard, landing page headline)
+- [ ] Preços, targets e prazos são específicos ao contexto do cliente (não "€X" ou "[PREÇO]")
+- [ ] Canais de recrutamento são reais e verificáveis (links/grupos/comunidades existentes)
+- [ ] Nenhum `<placeholder>`, `[INSERIR]`, `[TARGET]`, ou equivalente no output final
+- [ ] Critérios go/no-go reflectem o modelo de negócio real (ticket, volume, margem) do cliente
+
+❌ NOT delivery-ready: "Entrevista [TARGET CUSTOMER] sobre [PAIN POINT] e oferece [INCENTIVO]"
+✅ Delivery-ready: "Entrevista proprietários de clínicas veterinárias Lisboa/Porto sobre gestão de faltas — oferta: acesso beta gratuito 60 dias ao Tributario.AI módulo clínicas"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Validação de Ideia — Cuidai: Acompanhamento Pediátrico Remoto
+**Cliente:** Cuidai | **Fase:** Validação Pré-Build | **Data:** Janeiro 2025
+
+---
+
+## Hipótese Central
+"Mães portuguesas com filhos 0-6 anos em Lisboa/Porto vão pagar €29/mês
+por teleconsulta pediátrica no próprio dia (Cuidai) porque eliminam
+2+ idas a urgências privadas/mês — poupando €80-120 por episódio."
+
+---
+
+## Método Escolhido: Mom Test (15 entrevistas) + Pré-venda Founding Members
+**Porquê:** Serviço recorrente high-trust — comportamento e disposição a pagar
+valem mais do que CVR de landing page a frio.
+**Prazo:** 3 semanas | **Budget:** €50 (incentivos) + tempo
+
+---
+
+## Script Mom Test — Cuidai (8 perguntas)
+
+> Objetivo: perceber o padrão real de comportamento, NÃO validar a ideia.
+
+1. "Conta-me sobre a última vez que o teu filho ficou doente fora de horas.
+   O que fizeste primeiro?"
+
+2. "Foste a urgências? Quanto tempo esperaste? Quanto custou?"
+
+3. "Já tentaste ligar para o médico de família — o que aconteceu?"
+
+4. "Das últimas 3 vezes que precisaste de ajuda médica para o teu filho,
+   quanto gastaste no total (consultas, urgências, deslocações)?"
+
+5. "O que é que te causa mais ansiedade quando o teu filho está doente
+   à noite ou ao fim de semana?"
+
+6. "Já usaste algum serviço de saúde online ou app? O que funcionou
+   ou não funcionou?"
+
+7. "Se pudesses falar com um pediatra em 2 horas, em vez de ir a urgências,
+   o que te impediria de usar isso regularmente?"
+   *(kill question — ouvir objeções reais: privacidade, confiança, custo)*
+
+8. "Quanto pagas agora por mês em saúde infantil (seguro, consultas,
+   urgências)? É um valor que aceitas ou que te incomoda?"
+
+**Follow-ups se necessário:**
+- "Quando dizes que foi stressante — podes dar-me um exemplo concreto?"
+- "O que fizeste depois disso? Mudaste alguma coisa?"
+- "Quanto vales isso em €/mês para não voltares a passar por isso?"
+
+---
+
+## Plano de Recrutamento — 15 Mães em 3 Semanas
+
+| Semana | Canal | Target | Mensagem |
+|--------|-------|--------|---------|
+| 1 | Grupo FB "Mães de Lisboa" (22k) | 6 entrevistas | Ver abaixo |
+| 2 | DM seguidoras @cuidai_pt (Instagram) | 5 entrevistas | Ver abaixo |
+| 3 | Rede pessoal + pediatras parceiros | 4 entrevistas | Referência direta |
+
+**Critérios de qualificação:**
+- Filho(s) entre 0 e 6 anos ✓
+- Residente Lisboa ou Porto ✓
+- Pelo menos 1 ida a urgências privadas nos últimos 6 meses ✓
+
+**Mensagem de recrutamento (53 palavras):**
+> "Olá! Sou a [Nome], estou a fazer uma pesquisa sobre saúde infantil em
+> Portugal. Podes dar-me 20 minutos para falares sobre as tuas experiências
+> com o médico do teu filho? Sem vendas, só conversa. Ofereço um voucher
+> El Corte Inglés de €10. Chama-te a isso?"
+
+**Incentivo:** Voucher €10 × 15 = €150 budget (ou acesso beta Cuidai grátis 3 meses)
+
+---
+
+## Scorecard Go/No-Go — Cuidai
+
+| Dimensão | Threshold GO | Threshold PIVOT | Threshold NO-GO |
+|----------|-------------|-----------------|-----------------|
+| Dor espontânea | ≥10/15 descrevem urgências como stressante sem ser perguntadas | 6-9/15 | <6/15 |
+| Gasto confirmado | ≥8/15 gastaram >€60/mês em saúde infantil | 5-7/15 | <5/15 |
+| Objeção ao preço | <5/15 dizem €29 é caro | 6-10 dizem caro → testar €19 | >10/15 dizem caro |
+| Intenção comportamental | ≥5 pedem para ser avisadas quando lançar | 2-4 | 0-1 |
+| Pré-vendas founding | ≥5 pagam €19/mês (founding price) | 2-4 | 0-1 |
+
+**STOP automático:** Se nas primeiras 8 entrevistas <3 mencionam urgências
+espontaneamente → parar, revisar hipótese antes de continuar.
+
+---
+
+## Decisão Final
+
+**✅ GO** — se ≥4 de 5 thresholds GO atingidos
+→ Avançar para landing page + lista de espera com 200 target
+
+**🔄 GO WITH PIVOT** — se 2-3 thresholds GO + restantes PIVOT
+→ Rever preço (€19 founding), rever promessa (foco em noites/fins-de-semana)
+
+**❌ NO-GO** — se ≥3 thresholds NO-GO
+→ Não construir. Explorar: seguro saúde infantil parceiro? B2B (empresas)?
+
+---
+
+## Oferta Founding Members (pós-entrevistas, se GO)
+
+"Estou a criar o Cuidai — teleconsulta pediátrica em <2 horas, 7 dias/semana.
+Procuro 20 famílias founding members em Lisboa/Porto.
+
+**Founding member:** €19/mês (vs €29 preço futuro) — bloqueado para sempre
+**Inclui:** Acesso direto para moldar o produto + 1 consulta grátis/mês extra
+**Garantia:** Reembolso total se não entregares em 90 dias
+
+Interessada? Responde aqui — são só 20 vagas."
+
+**Critério de validação pré-venda:** 5 pagamentos recebidos = GO definitivo
+```
+
+---
+
+## Output anti-patterns
+
+- **Hipótese vaga sem preço**: escrever "testar se há mercado para saúde infantil" em vez de quantificar o valor percebido e o preço de disposição a pagar
+- **Perguntas Mom Test com leading bias**: incluir "Achas que seria útil se..." ou "Comprarias se fosse barato?" — invalidam toda a entrevista
+- **Recrutar por conveniência**: sugerir "fala com amigos e família" quando o avatar é específico — contamina o sinal com viés de confirmação social
+- **Scorecard sem números**: usar "interesse suficiente" ou "reação positiva" como critério — impossível decidir com rigor
+- **Threshold único sem gradação**: definir só GO/NO-GO sem pivot conditions — ignora o sinal parcial que é o caso mais comum na prática
+- **Copy da landing page com placeholders**: entregar `[Headline para Cuidai]` em vez da headline real — é trabalho por terminar, não entrega
+- **Método escolhido sem justificação**: recomendar paid ads a um cliente com €0 budget, ou entrevistas para um produto físico commoditizado onde pré-venda é 10× mais eficiente
+- **Pré-venda sem garantia de reembolso**: oferta founding member sem data de entrega comprometida e cláusula de reembolso — cria risco legal e destrói confiança
+- **Métricas genéricas desconectadas do modelo**: usar "CVR >10%" para um serviço B2B high-ticket onde 3 leads qualificados valem mais que 100 emails capturados
+- **Ausência de STOP automático**: plano que força completar 15 entrevistas mesmo quando o sinal negativo é claro nas primeiras 5 — desperdício de tempo e dinheiro do cliente
