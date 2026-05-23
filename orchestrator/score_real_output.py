@@ -230,6 +230,8 @@ def main() -> int:
     p.add_argument("--human-verdict", choices=["yes", "needs-review", "no"],
                    help="Skip LLM-judge and use this verdict (also requires --human-score)")
     p.add_argument("--human-score", type=int, help="Score 0-100, only used with --human-verdict")
+    p.add_argument("--no-queue", action="store_true",
+                   help="Skip auto-routing to human review queue when score < 90")
     p.add_argument("--json", action="store_true", help="Output JSON instead of text")
     args = p.parse_args()
 
@@ -271,9 +273,41 @@ def main() -> int:
     # Record
     result = record_score(args.skill, score, verdict, dims, args.context, output_text)
 
+    # Auto-route to human review queue if score < 90 (and not human-verdict)
+    queue_id = None
+    if score < 90 and not args.human_verdict and not args.no_queue:
+        try:
+            import subprocess
+            queue_script = ORCH / "human_review_queue.py"
+            if queue_script.exists():
+                # Write output to a temp file for the queue tool
+                import tempfile
+                with tempfile.NamedTemporaryFile(mode="w", suffix=".md",
+                                                  delete=False, encoding="utf-8") as tmp:
+                    tmp.write(output_text)
+                    tmp_path = tmp.name
+                queue_proc = subprocess.run(
+                    [sys.executable, str(queue_script), "--add",
+                     "--skill", args.skill,
+                     "--output", tmp_path,
+                     "--context", args.context,
+                     "--ai-score", str(score),
+                     "--ai-verdict", verdict,
+                     "--ai-reasoning", sd.get("reasoning", "")[:200]],
+                    capture_output=True, text=True, timeout=15,
+                )
+                # Parse id from output
+                m = re.search(r"id=(\w+)", queue_proc.stdout)
+                if m:
+                    queue_id = m.group(1)
+                Path(tmp_path).unlink(missing_ok=True)
+        except Exception:
+            pass  # fail-soft: queue is bonus, not blocking
+
     # Report
     if args.json:
-        print(json.dumps({**result, "dims": dims, "reasoning": sd.get("reasoning", "")}, indent=2))
+        print(json.dumps({**result, "dims": dims, "reasoning": sd.get("reasoning", ""),
+                          "queue_id": queue_id}, indent=2))
     else:
         emoji = "OK" if verdict == "yes" else "REVIEW" if verdict == "needs-review" else "REWORK"
         print(f"[{emoji}] {args.skill}: {score}/100 — {verdict}")
@@ -282,6 +316,9 @@ def main() -> int:
         print(f"  Delivery-ready rate:  {result['delivery_ready_rate_pct']:.1f}% ({result['delivery_ready_yes']}/{result['delivery_ready_total']})")
         if sd.get("reasoning"):
             print(f"  Reasoning: {sd['reasoning']}")
+        if queue_id:
+            print(f"  Queued for review: id={queue_id}")
+            print(f"  After editing: python human_review_queue.py --resolved {queue_id} --polished-score N")
 
     # Exit codes mapped to verdict
     return 0 if verdict == "yes" else 2 if verdict == "needs-review" else 3
