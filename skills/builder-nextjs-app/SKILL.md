@@ -156,3 +156,209 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 - Sem error.tsx — crashes visiveis ao user
 - Pages router em vez de App Router — arquitectura legacy
 - Sem .env.example — devs nao sabem que vars configurar
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Estrutura de directórios completa e coerente
+
+- [ ] Todos os ficheiros core presentes: `app/layout.tsx`, `app/page.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`
+- [ ] Route groups usados correctamente (`(marketing)/`, `(app)/`) com layouts nested onde necessário
+- [ ] Nenhum ficheiro com nome genérico como `page.tsx` sem estar dentro da pasta de rota correcta
+- [ ] `components/` dividido em `ui/`, `sections/`, `layout/` — sem mistura de responsabilidades
+
+❌ NOT delivery-ready: Estrutura plana com `components/Hero.tsx`, `components/Navbar.tsx` sem subdirectórios  
+✅ Delivery-ready: `components/sections/hero.tsx`, `components/layout/navbar.tsx`, `components/ui/button.tsx` — cada um na sua camada
+
+---
+
+### Gate 2 — TypeScript strict + tipagem sem lacunas
+
+- [ ] `tsconfig.json` inclui `"strict": true` e `"noUncheckedIndexedAccess": true`
+- [ ] Props de todos os componentes têm interface ou type explícito (sem `any` implícito)
+- [ ] `Metadata` importado de `'next'` e preenchido com dados reais do projecto
+- [ ] `children: React.ReactNode` tipado em layouts e providers
+
+❌ NOT delivery-ready: `export default function Hero(props: any)` ou props sem tipo  
+✅ Delivery-ready: `interface HeroProps { title: string; cta: string; badge?: string }` em `components/sections/hero.tsx`
+
+---
+
+### Gate 3 — Metadata + SEO base configurados com dados do projecto
+
+- [ ] `title.default` e `title.template` preenchidos com nome real do projecto (não `"Project Name"`)
+- [ ] `description` com copy real — não placeholder genérico
+- [ ] `openGraph` com `title`, `description`, `url`, `type` preenchidos
+- [ ] `lang` do `<html>` correcto para o mercado (`"pt"` para PT/BR, não `"en"`)
+
+❌ NOT delivery-ready: `title: 'Project Name'`, `description: 'Project description for SEO'`  
+✅ Delivery-ready: `title: { default: 'SAQUEI', template: '%s | SAQUEI' }`, `description: 'Antecipa o teu salário em minutos. Sem burocracia.'`
+
+---
+
+### Gate 4 — package.json com versões reais e dependências do projecto
+
+- [ ] `"name"` no package.json é o slug do projecto real (não `"project-name"`)
+- [ ] Versões de `next`, `react`, `typescript` pinadas com `^` às major actuais (Next 15, React 19, TS 5.5+)
+- [ ] Dependências adicionais do projecto incluídas (ex: `@supabase/ssr` se SaaS, `next-mdx-remote` se blog)
+- [ ] `"dev"` script usa `--turbopack` e scripts de lint/build presentes
+
+❌ NOT delivery-ready: `"next": "latest"` ou dependências de projecto SaaS sem `auth` library  
+✅ Delivery-ready: `"next": "^15.0.0"`, `"@supabase/ssr": "^0.5.0"`, `"@supabase/supabase-js": "^2.45.0"` para LUSOconta SaaS
+
+---
+
+### Gate 5 — .env.example reflecte todas as vars necessárias
+
+- [ ] Todas as vars de ambiente usadas no código têm entrada em `.env.example`
+- [ ] Vars com prefixo `NEXT_PUBLIC_` separadas das server-only
+- [ ] Comentários em cada var explicando de onde obter o valor
+- [ ] Nenhuma secret real no `.env.example` — apenas `your_value_here` ou descrição
+
+❌ NOT delivery-ready: `.env.example` vazio ou ausente; `SUPABASE_URL=https://real-project.supabase.co` com URL real  
+✅ Delivery-ready:
+```
+# Supabase — obter em app.supabase.com > Project Settings > API
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_keep_secret
+```
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+
+- [ ] Zero ocorrências de `[project-name]`, `[nome]`, `<ProjectName>`, `<description>` no output final
+- [ ] Nome do projecto real aplicado em: `package.json name`, `metadata.title`, `html lang`, `og:title`, nomes de pastas
+- [ ] Copy de SEO (`description`, OG) reflecte proposta de valor real do cliente — não boilerplate
+- [ ] Comandos de exemplo usam nome real: `/builder-nextjs-app saas lusoconta` não `/builder-nextjs-app saas [nome]`
+
+❌ NOT delivery-ready: `title: 'Project Name'`, `name: "project-name"` no package.json  
+✅ Delivery-ready: `title: 'Cuidai'`, `name: "cuidai-app"`, `description: 'Plataforma de gestão de cuidadores ao domicílio'`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Scaffold — Cuidai App (Next.js 15, App Router, SaaS)
+
+## Estrutura gerada
+
+cuidai-app/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── loading.tsx
+│   ├── error.tsx
+│   ├── not-found.tsx
+│   ├── globals.css
+│   ├── (marketing)/
+│   │   ├── page.tsx          ← Landing homepage
+│   │   ├── pricing/page.tsx
+│   │   └── sobre/page.tsx
+│   ├── (app)/
+│   │   ├── layout.tsx        ← Dashboard com sidebar
+│   │   ├── dashboard/page.tsx
+│   │   ├── cuidadores/page.tsx
+│   │   └── relatorios/page.tsx
+│   └── api/
+│       ├── health/route.ts
+│       └── cuidadores/route.ts
+├── components/
+│   ├── ui/button.tsx
+│   ├── ui/card.tsx
+│   ├── ui/badge.tsx
+│   ├── sections/hero.tsx
+│   ├── sections/features.tsx
+│   └── layout/sidebar.tsx
+├── lib/
+│   ├── utils.ts
+│   └── constants.ts
+└── .env.example
+
+## app/layout.tsx
+
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
+
+export const metadata: Metadata = {
+  title: { default: 'Cuidai', template: '%s | Cuidai' },
+  description: 'Gestão simplificada de cuidadores ao domicílio. Escalas, relatórios e pagamentos numa só plataforma.',
+  openGraph: {
+    title: 'Cuidai — Plataforma de Gestão de Cuidadores',
+    description: 'Gestão simplificada de cuidadores ao domicílio.',
+    url: 'https://cuidai.pt',
+    type: 'website',
+  },
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="pt" className={inter.variable} suppressHydrationWarning>
+      <body className="min-h-screen bg-background font-sans antialiased">
+        {children}
+      </body>
+    </html>
+  )
+}
+
+## package.json
+
+{
+  "name": "cuidai-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@supabase/ssr": "^0.5.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.2.0",
+    "lucide-react": "^0.400.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "tailwindcss": "^4.0.0"
+  }
+}
+
+## .env.example
+
+# Supabase — obter em app.supabase.com > Cuidai project > Settings > API
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_never_expose_client
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+---
+
+## Output anti-patterns
+
+- Gerar estrutura genérica sem substituir `[project-name]` pelo nome real do cliente — scaffold inútil sem contexto
+- Usar `Pages Router` (`pages/index.tsx`) em vez de `App Router` (`app/page.tsx`) — arquitectura deprecated
+- `metadata` com `title: 'Project Name'` e `description: 'Project description'` — SEO zerado desde o deploy
+- Omitir `loading.tsx` e `error.tsx` — UX degradada em produção sem feedback de estado
+- `package.json` com `"next": "latest"` — builds não-determinísticos que quebram sem aviso
+- `.env.example` vazio ou ausente — devs em onboarding não sabem que variáveis configurar
+- Misturar componentes em `components/` sem subdirectórios `ui/`, `sections/`, `layout/` — codebase desorganizada desde o dia 1
+- TypeScript sem `"strict": true` no `tsconfig.json` — bugs de tipo silenciosos que só aparecem em produção
+- Scaffoldar variant `saas` sem incluir dependências de auth (`@supabase/ssr` ou equivalente) — funcionalidade core em falta
+- Copy de OG/metadata copiado do boilerplate sem adaptar ao produto — zero impacto em partilhas sociais
