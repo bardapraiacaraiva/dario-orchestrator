@@ -21,18 +21,16 @@ from pathlib import Path
 ORCH = Path.home() / ".claude" / "orchestrator"
 OBS = Path.home() / "OneDrive" / "Documents" / "D.A.R.I.O" / "05 - Claude - IA" / "Outputs"
 
-# Curated list — 20 real outputs with clear skill mapping
+# Curated list — real outputs with clear skill mapping
 # Format: (filename, skill, context)
 BATCH = [
-    # SEO outputs
+    # === Batch 1 (already scored 2026-05-23) ===
     ("2026-03-30 - Atrium - CTA Fix + SEO Audit Homepage.md", "seo-audit",
      "Audit SEO + CTA fix Atrium Golden Visa homepage. Target HNW US investors."),
     ("2026-03-30 - Atrium - Mapa Completo URLs.md", "seo-sitemap",
      "Mapa de URLs Atrium Golden Visa site herbalifeportugal.com"),
     ("2026-04-03 - Vivenda Creative Home - SEO Completo SERP Top 10.md", "seo-audit",
      "SEO completo Vivenda Creative Home, target SERP top 10"),
-
-    # WordPress / tech audits
     ("2026-03-31 - Vivenda Creative Home - Auditoria e Correcoes WordPress.md", "dario-wp-audit",
      "Auditoria + correções WordPress Vivenda Creative Home (design interiores Lisboa)"),
     ("2026-04-01 - Vivenda Creative Home - Auditoria Mobile Performance e SEO.md", "dario-cwv-fix",
@@ -41,8 +39,6 @@ BATCH = [
      "Diagnose holístico Lisbon Dog Care WordPress, target dog parents PT/expat"),
     ("2026-04-04 - Lisbon Dog Care - Auditoria Lighthouse e Correcoes Performance.md", "dario-cwv-fix",
      "Lighthouse + performance fixes Lisbon Dog Care"),
-
-    # LUCAS / LUSOconta strategy
     ("2026-04-01 - LUSOconta - Auditoria Tecnica e Parecer Completo DARIO.md", "dario-diagnose",
      "Auditoria técnica completa LUSOconta SaaS contabilidade PT"),
     ("2026-04-02 - Benchmark Competitivo - LUCAS vs Mercado PT e EU com Faturacao.md", "dario-pipeline",
@@ -57,6 +53,45 @@ BATCH = [
      "Benchmark técnico profissional LUCAS v2"),
     ("2026-04-02 - LUSOconta - Compendio Completo de Capacidades.md", "dario-content",
      "Compendio completo capacidades LUSOconta para apresentação cliente"),
+
+    # === Batch 2 (2026-05-23 continue) — Cuidai + ARRECADA + others ===
+    # Cuidai (caregiver platform BR — Wave 0 production work, real deliverables)
+    ("2026-05-18 - Cuidai - CUI-014 Brand Identity Workshop.md", "dario-brand",
+     "Brand identity workshop Cuidaí BR (caregiver multigeracional). Capital R$ 100K split. Wave 0 complete 2026-05-17."),
+    ("2026-05-18 - Cuidai - CUI-015 Design Tokens Tailwind.md", "diva-materials",
+     "Design tokens Tailwind Cuidaí — paleta + tipografias + spacing scale para MVP fork SAQUEI"),
+    ("2026-05-18 - Cuidai - CUI-018 Bootstrap Kit Day 0.md", "dario-client-onboard",
+     "Bootstrap kit Day 0 Cuidaí — checklist completo registro.br + INPI + Meta + 2 emails legal"),
+    ("2026-05-18 - Cuidai - HANDOFF BRIEF Founder.md", "dario-proposal",
+     "Handoff brief founder Cuidaí — Wave 0 complete deliverable summary, 9 patterns + 12 decisions resolved"),
+    ("2026-05-19 - Cuidai - CUI-046 Burden Index Algorithm.md", "dario-produto",
+     "Burden Index algorithm Cuidaí — pontuação carga cuidador multigeracional, formula + thresholds"),
+    ("2026-05-19 - Cuidai - Design Partners Kit M3.md", "dario-pipeline",
+     "Design Partners kit Cuidaí M3 — outreach 5 prospects + ICP + handoff template"),
+
+    # ARRECADA.GOV (SaaS recuperação dívida ativa municipal)
+    ("2026-05-21 - ARRECADA.GOV - Analise POC Sorocaba + Roadmap Evolucao.md", "dario-diagnose",
+     "Análise POC Sorocaba ARRECADA.GOV + roadmap evolução. SaaS B2G recuperação dívida ativa municipal com IA."),
+    ("2026-05-21 - ARRECADA.GOV - Pitch Parceiros 9 Slides.md", "dario-pitch",
+     "Pitch parceiros ARRECADA.GOV 9 slides. Success fee 12%. MVP LIVE VPS:3333. Investigador + Chatbot + Dashboard."),
+    ("2026-05-21 - ARRECADA.GOV - Roadmap Aprovado (5 Features + 4 GAPs).md", "dario-produto",
+     "Roadmap aprovado ARRECADA.GOV — 5 features + 4 GAPs identificados, priorizado"),
+
+    # adgeniuspro (external audit work)
+    ("2026-05-20 - Auditoria Web - adgeniuspro Genius Search Big4 Audit.md", "dario-diagnose",
+     "Big4-grade audit adgeniuspro (Genius Search) — site audit completo multi-dimensão"),
+    ("2026-05-21 - adgeniuspro - Plano Executivo Sprint 1 (founder brief).md", "dario-pipeline",
+     "Plano executivo adgeniuspro Sprint 1 founder brief — ações priorizadas pós-audit"),
+
+    # DARIO docs (commercial deliverables)
+    ("2026-05-20 - DARIO v12.0 - Catalogo Comercial 9 Squads Roadmap.md", "dario-content",
+     "Catálogo comercial DARIO v12.0 — 9 squads + roadmap para venda VIP"),
+    ("2026-05-20 - DARIO v11.4 - Strategic Benchmark + Valuation + Roadmap.md", "dario-financial-model",
+     "Strategic benchmark + valuation DARIO v11.4 + roadmap. Valor estimado + comp set."),
+
+    # SAQUEI (SaaS B2C BR)
+    ("2026-05-19 - SAQUEI - Gate 1 Readiness Report.md", "a360-validacao",
+     "Gate 1 readiness report SAQUEI BR. LIVE saquei.vercel.app. 50+ features. CEO check pendente."),
 ]
 
 
