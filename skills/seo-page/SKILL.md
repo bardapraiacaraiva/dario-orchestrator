@@ -92,3 +92,186 @@ If DataForSEO MCP tools are available, use `serp_organic_live_advanced` for real
 | URL unreachable (DNS failure, connection refused) | Report the error clearly. Do not guess page content. Suggest the user verify the URL and try again. |
 | Page requires authentication (401/403) | Report that the page is behind authentication. Suggest the user provide the rendered HTML directly or a publicly accessible URL. |
 | JavaScript-rendered content (empty body in HTML) | Note that key content may be rendered client-side. Analyze the available HTML and flag that results may be incomplete. Suggest using a browser-rendered snapshot if available. |
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Page Score Card é real e justificado
+- [ ] Score Overall entre 0-100 com breakdown visível nas 5 dimensões
+- [ ] Cada sub-score tem pelo menos 1 finding que o justifica (não inventado)
+- [ ] Barras de progresso em bloco `code` com caracteres ██░ proporcionais ao score
+- [ ] Score não é "75/100 genérico" — varia por página real analisada
+- ❌ NOT delivery-ready: `Overall Score: 72/100` sem nenhum dado da página a suportar
+- ✅ Delivery-ready: `On-Page SEO: 58/100` porque title tag tem 73 chars e H1 ausente na homepage `/`
+
+### Gate 2 — Issues têm localização exata na página
+- [ ] Critical/High issues citam o elemento HTML exato (`<title>`, `<h1>`, `og:image`, etc.)
+- [ ] Cada issue inclui o valor atual encontrado (não "meta description em falta" — citar o que existe ou confirmar ausência)
+- [ ] Issues de imagem incluem nome do ficheiro e tamanho em KB quando disponível
+- [ ] Prioridades (Critical/High/Medium/Low) respeitam critérios do skill — Critical reservado para bloqueios de indexação
+- ❌ NOT delivery-ready: `A meta description está em falta ou é muito curta.`
+- ✅ Delivery-ready: `Meta description atual: "Cuidai — plataforma de cuidadores" (42 chars). Mínimo: 150 chars. Impacto: CTR orgânico reduzido.`
+
+### Gate 3 — Recomendações são accionáveis com texto pronto a usar
+- [ ] Title tag recomendada escrita por extenso com contagem de caracteres entre parêntesis
+- [ ] Meta description recomendada escrita por extenso
+- [ ] Alt text sugerido para imagens sem alt inclui keyword natural quando aplicável
+- [ ] Cada recomendação tem Expected Impact (ex: `+CTR estimado`, `resolve CLS`, `elegível para rich result`)
+- ❌ NOT delivery-ready: `Optimiza o title tag para incluir a keyword principal.`
+- ✅ Delivery-ready: `Title sugerido: "Cuidadores ao Domicílio em Lisboa | Cuidai" (48 chars) — inclui keyword primária + brand`
+
+### Gate 4 — Schema é válido e nunca inclui tipos proibidos
+- [ ] JSON-LD gerado é sintacticamente válido (chaves fechadas, vírgulas correctas)
+- [ ] NUNCA inclui `HowTo` nem `FAQPage` (excepto gov/saúde confirmado)
+- [ ] `@context` e `@type` presentes em todos os blocos
+- [ ] Schema sugerido é coerente com o tipo de página (Product numa página de produto, LocalBusiness na homepage, etc.)
+- ❌ NOT delivery-ready: Schema `FAQPage` sugerido para blog post de SaaS
+- ✅ Delivery-ready: Schema `Service` com `provider`, `areaServed`, `name` preenchidos com dados reais da página
+
+### Gate 5 — Flags técnicas de Core Web Vitals são específicas
+- [ ] LCP flag só disparado se há evidência real (imagem hero >200KB, `<link rel="preload">` ausente)
+- [ ] CLS flag só disparado se imagens sem `width`/`height` ou conteúdo injectado detectado
+- [ ] INP flag só disparado se scripts sem `async`/`defer` identificados no `<head>`
+- [ ] Flags marcadas como "referência — não mensurável só por HTML" (não confundir com dados reais de CrUX)
+- ❌ NOT delivery-ready: `Provável problema de LCP.` sem identificar o elemento suspeito
+- ✅ Delivery-ready: `LCP potencial: hero image \`banner-home.jpg\` sem \`loading="eager"\` + sem preload hint. Dimensões não definidas → CLS risk.`
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+- [ ] Zero ocorrências de `[URL]`, `[keyword]`, `[client name]`, `[inserir aqui]`
+- [ ] URL analisada aparece explicitamente no output
+- [ ] Nome do projecto/domínio identificado no cabeçalho do relatório
+- [ ] Todos os exemplos de título, meta, alt text usam conteúdo real da página ou proposta concreta
+- ❌ NOT delivery-ready: `Title sugerido: "[Keyword Principal] | [Nome da Empresa]"`
+- ✅ Delivery-ready: `Title sugerido: "Software de Gestão Tributária para PMEs | Tributario.AI" (52 chars)`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# SEO Analysis — cuidai.pt/cuidadores-lisboa
+
+**Analisado em:** 2025-06-10  
+**URL:** https://cuidai.pt/cuidadores-lisboa  
+**Tipo de página:** Landing page de serviço (cidade)
+
+---
+
+## Page Score Card
+
+Overall Score: 61/100
+
+On-Page SEO:     54/100  █████░░░░░
+Content Quality: 70/100  ███████░░░
+Technical:       65/100  ██████░░░░
+Schema:          20/100  ██░░░░░░░░
+Images:          75/100  ███████░░░
+```
+
+---
+
+## Issues Found
+
+### 🔴 Critical
+**C1 — Canonical ausente**  
+Nenhuma tag `<link rel="canonical">` encontrada. Risco de conteúdo duplicado se a página
+for acessível via `?utm_source=` ou `www.` variante.  
+→ Adicionar: `<link rel="canonical" href="https://cuidai.pt/cuidadores-lisboa" />`
+
+### 🟠 High
+**H1 — Title tag com 78 caracteres (acima do limite)**  
+Actual: `"Encontra os Melhores Cuidadores ao Domicílio em Lisboa e Região de Lisboa, Portugal"`  
+Limite: 50-60 chars para evitar truncagem no SERP.
+
+**H2 — Meta description ausente**  
+Nenhuma `<meta name="description">` encontrada. Google vai gerar snippet automático
+(normalmente sub-óptimo para CTR).
+
+**H3 — Schema inexistente**  
+Página sem nenhum JSON-LD. Oportunidade perdida para `LocalBusiness` + `Service`.
+
+### 🟡 Medium
+**M1 — og:image não definido**  
+Open Graph incompleto: `og:title` e `og:url` presentes, `og:image` ausente.
+Partilhas sociais vão usar imagem genérica ou nenhuma.
+
+**M2 — 3 imagens sem atributo width/height**  
+`cuidadora-ana.jpg`, `cuidadora-rute.jpg`, `equipa-cuidai.png` sem dimensões.
+CLS risk em mobile.
+
+### 🟢 Low
+**L1 — Keyword density abaixo do esperado**  
+"cuidadores Lisboa" aparece 4× em ~680 palavras (0.6%). Recomendado 1-2%.
+
+---
+
+## Recommendations
+
+| Prioridade | Acção | Impact esperado |
+|---|---|---|
+| Critical | Adicionar canonical self-referencing | Elimina risco duplicado |
+| High | Novo title: `"Cuidadores ao Domicílio em Lisboa \| Cuidai"` (45 chars) | +CTR SERP estimado |
+| High | Meta description (ver abaixo) | +CTR, controlo do snippet |
+| High | Implementar Schema (ver JSON-LD abaixo) | Elegível rich result |
+| Medium | Adicionar `og:image` 1200×630px | Melhora partilha social |
+| Medium | Definir `width`/`height` nas 3 imagens | Resolve CLS mobile |
+
+**Meta description sugerida** (155 chars):  
+`"Encontra cuidadores ao domicílio certificados em Lisboa. Matching personalizado, perfis verificados e suporte 24h. Começa hoje — é grátis."`
+
+---
+
+## Schema Suggestion — LocalBusiness + Service
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Cuidai",
+  "url": "https://cuidai.pt",
+  "description": "Plataforma de matching entre famílias e cuidadores ao domicílio em Portugal",
+  "areaServed": {
+    "@type": "City",
+    "name": "Lisboa"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Serviços de Cuidadores",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Cuidador ao Domicílio em Lisboa"
+        }
+      }
+    ]
+  }
+}
+```
+
+---
+
+## Core Web Vitals — Flags (referência, não dados CrUX reais)
+
+- ⚠️ **CLS potencial:** `cuidadora-ana.jpg`, `cuidadora-rute.jpg`, `equipa-cuidai.png`
+  sem dimensões declaradas — browser faz reflow ao carregar
+- ✅ **LCP OK aparente:** hero image tem `loading="eager"` e tamanho 187KB (abaixo de 200KB)
+- ✅ **INP OK aparente:** scripts principais têm `defer` no `<head>`
+```
+
+---
+
+## Output anti-patterns
+
+- Scores redondos sem evidência: `72/100` igual em todas as páginas analisadas, independentemente dos findings
+- Issues vagos sem citar o elemento HTML actual: "a meta description podia ser melhor"
+- Recomendar schema `FAQPage` ou `HowTo` em páginas que não são gov/saúde
+- Title/meta description sugeridos com placeholders: `"[Keyword] | [Empresa]"` em vez de texto real
+- Confundir flags de CWV (inferidas do HTML) com métricas reais de CrUX/PSI — não afirmar scores LCP/CLS concretos
+- Canonical "sugerida" sem fornecer a tag HTML pronta a copiar
+- JSON-LD com erros de sintaxe: vírgula a mais, propriedades sem aspas, `@context` ausente
+- Análise de imagens sem citar nome do ficheiro — "há imagens sem alt text" sem especificar quais
+- Omitir a secção de prioridades (Critical/High/Medium/Low) e listar tudo no mesmo nível
+- Relatório sem a URL real no cabeçalho — impossível o cliente saber qual página foi analisada

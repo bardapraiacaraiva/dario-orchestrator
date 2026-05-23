@@ -313,3 +313,206 @@ If DataForSEO MCP tools are available, use `local_business_data` for live GBP da
 | NAP not found in page HTML | Check schema and meta tags. If still absent, flag as Critical issue. Recommend adding visible NAP to footer and contact page. |
 | Industry vertical unclear | Present the top two detected verticals with supporting signals. Ask the user to confirm before applying industry-specific recommendations. |
 | Multi-location with 50+ location pages | Apply the quality gates from seo orchestrator: WARNING at 30+ pages (enforce 60%+ unique), HARD STOP at 50+ pages (require user justification before continuing). |
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Business Type & Vertical detectados correctamente
+
+- [ ] Output identifica explicitamente Brick-and-Mortar / SAB / Hybrid com evidence do site
+- [ ] Vertical (Restaurant / Healthcare / Legal / Home Services / Real Estate / Automotive / Generic) declarado no início da análise
+- [ ] Checks SAB-específicas (sem mapa embed, sem NAP street-level) aplicadas ou explicitamente saltadas com razão
+- [ ] Categoria GBP primária avaliada face ao vertical detectado (e não genérica)
+
+❌ NOT delivery-ready: "O negócio parece ser um SAB ou talvez brick-and-mortar, dependendo da área de serviço."
+✅ Delivery-ready: "**Cuidai — SAB (Home Services / Healthcare híbrido)**. Sem endereço físico visível no footer; detectado 'Servimos Lisboa, Cascais e Sintra' + 'A equipa desloca-se ao domicílio'. Checks NAP street-level e Maps embed não aplicáveis."
+
+---
+
+### Gate 2 — GBP Signals avaliados com dados concretos (32% de peso local pack)
+
+- [ ] Presença/ausência de GBP embed ou place ID no site documentada com URL ou selector
+- [ ] Primary category alignment avaliado (factor #1 Whitespark 2026, score 193) com sugestão de categoria correcta
+- [ ] GBP link strategy verificada: output não recomenda linkar para a página mais forte do site (Sterling Sky Diversity Update)
+- [ ] Q&A deprecation (Dez 2025) mencionada se relevante — recomendação de migrar para FAQ page
+- [ ] Business hours visibilidade no site verificada (factor #5, businesses open at search time rank higher)
+
+❌ NOT delivery-ready: "Recomendamos optimizar o Google Business Profile com fotos e horários."
+✅ Delivery-ready: "**Lisbon Dog Care** — GBP embed ausente em lisbon-dog-care.pt/contacto. Primary category detectada como 'Pet Store' (via schema), mas sinais de página apontam 'Dog Day Care Center' (factor #1, score 193 Whitespark). GBP URL aponta para homepage — risco Sterling Sky Diversity Update; redirigir para /servicos. Horários não visíveis em nenhuma página."
+
+---
+
+### Gate 3 — Reviews & Reputation com thresholds numéricos aplicados
+
+- [ ] Contagem de reviews Google reportada (threshold mágico: 10, Sterling Sky) ou indicada como não detectável
+- [ ] Star rating avaliado contra benchmarks: 4.5+ (31% consumers), 4.0+ (68% consumers) — BrightLocal 2026
+- [ ] 18-day rule verificada: última review datada ou flag de impossibilidade de verificar via WebFetch
+- [ ] `aggregateRating` schema (ratingValue, reviewCount, bestRating) presente/ausente confirmado
+- [ ] Review gating detection: qualquer pré-triagem de satisfação flagged como violação FTC ($53,088/violação) + Google policy
+
+❌ NOT delivery-ready: "O negócio tem boas reviews e deve continuar a pedir feedback aos clientes."
+✅ Delivery-ready: "**SAQUEI** — 23 reviews Google (✅ acima de threshold 10), média 4.2★ (⚠️ abaixo de 4.5★ — 31% consumers excluem negócios abaixo deste valor). Última review detectada: 47 dias atrás — ❌ viola 18-day rule (cliff de rankings após 21 dias, Sterling Sky). `aggregateRating` ausente no schema. Nenhum review gating detectado."
+
+---
+
+### Gate 4 — Local On-Page SEO com páginas de serviço avaliadas individualmente
+
+- [ ] Dedicated service pages identificadas (factor #1 local organic E #2 AI visibility, Whitespark 2026)
+- [ ] NAP consistency verificada: nome, morada e telefone idênticos no site, footer e schema — ou SAB flag aplicado
+- [ ] Title tags e H1s de páginas de localização/serviço incluem geo-modifier verificável
+- [ ] Internal linking entre páginas de localização e homepage avaliado
+- [ ] Para multi-location: cada location page avaliada separadamente com dados próprios
+
+❌ NOT delivery-ready: "As páginas de serviço devem incluir palavras-chave locais e informação de contacto."
+✅ Delivery-ready: "**Tributario.AI** — 0 dedicated service pages detectadas (apenas /servicos genérica sem geo-targeting). Title tag homepage: 'Tributario.AI | Software Fiscal' — sem geo-modifier. NAP footer: 'Lisboa' apenas, sem morada completa nem telefone. Recomendar criar /software-fiscal-lisboa e /consultoria-fiscal-porto como prioridade #1."
+
+---
+
+### Gate 5 — Schema Markup validado com tipo correcto para vertical
+
+- [ ] Tipo de schema correcto para vertical detectado (ex: `MedicalBusiness` para healthcare, `Attorney` para legal, `Restaurant` com `Menu` para restauração)
+- [ ] Campos obrigatórios presentes: `name`, `address` (ou `areaServed` para SAB), `telephone`, `url`, `openingHours`
+- [ ] `aggregateRating` nested correctamente ou ausência flagged com impacto estimado
+- [ ] Erros críticos de schema (endereço em SAB, tipo genérico `LocalBusiness` quando vertical específico disponível) identificados
+- [ ] Local schema types referenciados de `references/local-schema-types.md` quando aplicável
+
+❌ NOT delivery-ready: "O schema está presente mas pode ser melhorado com mais detalhes."
+✅ Delivery-ready: "**Atrium** — Schema tipo `Organization` detectado (❌ incorreto para brick-and-mortar com localização física). Deve ser `LocalBusiness` > `ProfessionalService`. Ausentes: `openingHours`, `geo`, `aggregateRating`. `address.streetAddress` presente mas `postalCode` em falta — quebra validação Google Rich Results Test."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets de placeholder
+
+- [ ] Nome do cliente aparece no título da análise e em cada secção principal
+- [ ] URLs concretas do site analisado citadas (não "a homepage" ou "a página de contacto")
+- [ ] Todos os scores/ratings são números reais detectados ou "não detectável via WebFetch — verificar manualmente"
+- [ ] Zero ocorrências de `[CLIENT NAME]`, `[INSERT URL]`, `[YOUR BUSINESS]`, `<placeholder>` no output final
+- [ ] Datas de verificação incluídas quando relevante (ex: "última review: 47 dias atrás", "GBP embed verificado em março 2026")
+
+❌ NOT delivery-ready: "O [NOME DO NEGÓCIO] deve optimizar o seu [TIPO DE PÁGINA] para [CIDADE ALVO]."
+✅ Delivery-ready: "**Vivenda** (vivenda.pt) — análise Local SEO concluída março 2026. GBP embed detectado em /contacto (place_id: ChIJ...). 18 reviews Google, 4.7★, última há 6 dias ✅."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Local SEO Analysis — Lisbon Dog Care (lisbon-dog-care.pt)
+**Verificado:** Março 2026 | **Business Type:** Brick-and-Mortar + SAB Hybrid | **Vertical:** Pet Care / Home Services
+
+---
+
+## Detecção de Tipo e Vertical
+- **Tipo:** Hybrid — endereço físico em /contacto ("Rua Actor Vale 8, 1900-012 Lisboa") + linguagem SAB ("Recolha e entrega ao domicílio em Lisboa e Almada")
+- **Vertical:** Pet Care (Dog Daycare / Grooming) — detectado via /servicos: "Dog daycare", "grooming", "dog walking"
+- **Schema actual:** `Organization` ❌ — deve ser `AnimalShelter` > `LocalBusiness` com `PetStore` como tipo secundário
+
+---
+
+## 1. GBP Signals — Score: Parcial ⚠️
+
+| Check | Status | Detalhe |
+|-------|--------|---------|
+| GBP embed no site | ✅ Presente | Maps iframe em /contacto, place_id detectado |
+| Primary category | ⚠️ Risco | Schema aponta "Pet Store" — página sugere "Dog Day Care Center" (factor #1, score 193 Whitespark 2026) |
+| Secondary categories | ❌ Ausente | Nenhuma evidência de categorias secundárias (óptimo: 4 adicionais) |
+| GBP posts | ❌ Sem evidência | Nenhum widget ou feed de posts detectado no site |
+| Photos evidence | ✅ Parcial | Galeria em /galeria com 12 imagens (recomendado: 100+, Agency Jet) |
+| Q&A (deprecado Dez 2025) | ⚠️ Acção | Q&A GBP removida — criar FAQ page em /faq com conteúdo equivalente |
+| GBP link strategy | ❌ Risco | Link GBP aponta para homepage — Sterling Sky Diversity Update: redirigir para /servicos/dog-daycare |
+| Business hours no site | ❌ Ausente | Horário não visível em nenhuma página indexável |
+
+**Prioridade imediata:** Corrigir primary category para "Dog Day Care Center" no GBP e adicionar horários ao footer.
+
+---
+
+## 2. Reviews & Reputation — Score: Baixo ❌
+
+- **Total reviews Google:** 8 ❌ — abaixo do threshold de 10 (Sterling Sky magic number)
+- **Star rating:** 4.3★ ⚠️ — abaixo de 4.5★ (31% dos consumidores excluem negócios abaixo deste valor, BrightLocal 2026)
+- **Última review:** 34 dias atrás ❌ — viola 18-day rule (cliff de rankings após 21 dias sem nova review, Sterling Sky)
+- **`aggregateRating` schema:** ❌ Ausente — perda de rich snippet e sinal de confiança
+- **Owner responses:** 2 de 8 reviews respondidas (25%) ⚠️ — benchmark: 88% dos consumidores preferem negócios que respondem
+- **Plataformas adicionais:** Apenas Google detectado ⚠️ — consumidores usam média de 6 plataformas (BrightLocal 2026)
+- **Review gating:** ❌ Não detectado (conforme com Google policy e FTC)
+
+**Acções urgentes:**
+1. Campanha activa de pedido de reviews — meta: 10+ em 3 semanas
+2. Responder a todas as reviews existentes esta semana
+3. Criar perfil em Zomato PT, Facebook e TripAdvisor
+4. Adicionar `aggregateRating` ao schema (ratingValue: 4.3, reviewCount: 8, bestRating: 5)
+
+---
+
+## 3. Local On-Page SEO — Score: Baixo ❌
+
+- **Dedicated service pages:** ❌ Apenas /servicos genérica — sem páginas individuais por serviço
+  - Criar: /servicos/dog-daycare-lisboa, /servicos/grooming-lisboa, /servicos/dog-walking-lisboa
+  - Factor #1 local organic + #2 AI visibility (Whitespark 2026) — prioridade máxima
+- **Title tags:**
+  - Homepage: "Lisbon Dog Care | Lisboa" — sem keyword primária no início ⚠️
+  - /servicos: "Os Nossos Serviços" ❌ — sem geo-modifier
+- **H1s:** Homepage H1: "Bem-vindos" ❌ — nenhuma keyword local ou de serviço
+- **NAP footer:** ✅ Nome, morada e telefone consistentes em todas as páginas verificadas
+- **SAB coverage:** Menção a Almada em /contacto apenas — sem página de área de serviço dedicada
+
+---
+
+## 4. Schema Markup — Score: Crítico ❌
+
+**Tipo actual:** `Organization` — **Tipo correcto:** `LocalBusiness` > `PetStore` + `AnimalShelter`
+
+**Campos em falta:**
+```json
+{
+  "@type": "LocalBusiness",
+  "name": "Lisbon Dog Care",
+  "address": {
+    "streetAddress": "Rua Actor Vale 8",
+    "addressLocality": "Lisboa",
+    "postalCode": "1900-012",
+    "addressCountry": "PT"
+  },
+  "areaServed": ["Lisboa", "Almada"],
+  "telephone": "+351-XXX-XXX-XXX",
+  "openingHours": "Mo-Fr 07:00-20:00, Sa 08:00-18:00",
+  "aggregateRating": {
+    "ratingValue": "4.3",
+    "reviewCount": "8",
+    "bestRating": "5"
+  }
+}
+```
+**Acção:** Implementar schema completo via `<script type="application/ld+json">` no `<head>` de todas as páginas.
+
+---
+
+## Plano de Acção Priorizado
+
+| Prioridade | Acção | Impacto Estimado | Prazo |
+|-----------|-------|-----------------|-------|
+| 🔴 P1 | Corrigir primary GBP category → "Dog Day Care Center" | Factor #1 local pack | Esta semana |
+| 🔴 P1 | Campanha reviews: 10+ em 21 dias | 18-day rule + threshold | 3 semanas |
+| 🔴 P1 | Implementar schema `LocalBusiness` completo | Rich snippets + trust | Esta semana |
+| 🟡 P2 | Criar 3 dedicated service pages com geo-modifier | Factor #1 local organic | Mês 1 |
+| 🟡 P2 | Adicionar horários ao footer e schema `openingHours` | Factor #5 local pack | Esta semana |
+| 🟢 P3 | Criar /faq para substituir Q&A GBP (deprecado Dez 2025) | AI visibility | Mês 2 |
+| 🟢 P3 | Expandir galeria para 100+ fotos no GBP | +45% direction requests | Mês 2 |
+```
+
+---
+
+## Output anti-patterns
+
+- **Análise genérica sem business type declarado** — output não distingue SAB de brick-and-mortar, aplica checks de NAP e mapa a um negócio móvel
+- **Thresholds sem fonte** — mencionar "ter mais reviews é melhor" sem citar o threshold de 10, o 18-day rule ou os benchmarks de 4.0/4.5★ da BrightLocal 2026
+- **GBP link strategy ignorada** — recomendar linkar GBP para a página mais forte do site sem mencionar o risco Sterling Sky Diversity Update
+- **Q&A GBP recomendada como activa** — ignorar a deprecação de Dezembro 2025 e aconselhar optimizar Q&A que já não existe
+- **Schema tipo genérico sem vertical** — usar `LocalBusiness` para um restaurante ou médico quando tipos específicos (`Restaurant`, `MedicalBusiness`) estão disponíveis
+- **Review gating não verificado** — omitir verificação de pré-triagem de satisfação quando há formulários de feedback no site (risco FTC $53,088/violação)
+- **Percentagens locais sem contexto de proximidade** — citar 32% de peso GBP sem notar que proximidade domina 55.2% da variância de ranking (Search Atlas 2026), criando expectativas erradas sobre o que se pode controlar
+- **AI visibility omitida** — análise Local SEO em 2026 que não menciona o canal ChatGPT/AI (45% usage, 15.9% conversion rate vs 1.76% Google organic) perde contexto estratégico crítico
+- **Placeholders no output final** — entregar com `[NOME DO NEGÓCIO]`, `[INSERIR URL]` ou `<cidade>` visíveis ao cliente
