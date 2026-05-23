@@ -919,3 +919,174 @@ The DARIO ecosystem grew to 70+ skills and 18 squads. Without structured orchest
 - Cross-division work (DARIO + DIVA) had no coordination protocol
 
 The Paperclip-inspired orchestrator fixes all of this while preserving everything that already works.
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Mission Brief está estruturado e não é vago
+
+- [ ] O Brief identifica o **end goal concreto** (não "melhorar processos")
+- [ ] Constraints explícitas: budget %, timeline, dependências nomeadas
+- [ ] RAG consult foi executado com keywords extraídas do pedido real
+- [ ] Scope delimitado: o que está IN vs OUT do orchestration run
+
+❌ NOT delivery-ready: "Objetivo: organizar o trabalho do cliente. Sem constraints identificadas."
+✅ Delivery-ready: "Mission: migrar infraestrutura LUSOconta para novo stack. Budget: 34% usado (Março 2026). Timeline: 14 dias. Blocker: dependência de PROJ-007 (compliance sign-off pendente Ana Ferreira)."
+
+---
+
+### Gate 2 — Decomposição produz tarefas verdadeiramente atómicas
+
+- [ ] Cada task mapeia a **exatamente 1 skill ou squad** (sem tarefas "multi-skill")
+- [ ] Todos os campos schema v2 presentes: `revision_max_loops`, `blocked_reason: null`, `watchers: []`, `sla_deadline`
+- [ ] `sla_deadline` calculado a partir de `execution_policy.sla_hours` (critical=1h, client_facing=4h, financial=2h, default=8h)
+- [ ] `depends_on` explícito — nenhuma tarefa com ordering implícito
+- [ ] `estimated_tokens` preenchido com valor numérico real (não `null`)
+
+❌ NOT delivery-ready: `{ id: "PROJ-003", title: "Fazer relatório e enviar ao cliente", depends_on: [] }`
+✅ Delivery-ready: `{ id: "CUIDAI-003", title: "Gerar relatório mensal cuidadores Abril 2026", assignee: "diva-reporting", execution_policy: "client_facing", sla_deadline: "2026-04-27T10:00Z", estimated_tokens: 4200, depends_on: ["CUIDAI-001", "CUIDAI-002"], revision_max_loops: 2, blocked_reason: null, watchers: ["ricardo@cuidai.pt"] }`
+
+---
+
+### Gate 3 — Phase 0 Validation foi executada e documentada
+
+- [ ] Circular dependency check concluído — resultado explícito ("nenhuma dependência circular detectada" ou ciclo reportado)
+- [ ] Worker availability verificado para cada assignee em `company.yaml`
+- [ ] Budget pre-check executado: ficheiro `~/.claude/orchestrator/budgets/YYYY-MM.yaml` lido ou criado
+- [ ] Stale task scan feito em `tasks/active/` — resultado reportado (mesmo que "0 tarefas stale")
+
+❌ NOT delivery-ready: Orchestration plan entregue sem mencionar validações de Phase 0.
+✅ Delivery-ready: "Phase 0 ✅ — Sem dependências circulares. Workers disponíveis: diva-reporting (0 tasks ativas), dario-fiscal (1 task ativa → SAQUEI-011 queued). Budget Abril 2026: 61% usado. Stale scan: 0 tarefas bloqueadas."
+
+---
+
+### Gate 4 — Execution Policies aplicadas corretamente
+
+- [ ] Itens CRITICOS têm `execution_policy: "critical"` **e** `sla_deadline` dentro de 1h
+- [ ] Deliverables de cliente têm `execution_policy: "client_facing"` (não `"default"`)
+- [ ] Tarefas financeiras têm `execution_policy: "financial"` com review gate explícito
+- [ ] Budget ≥80%: paralelismo limitado a 1 worker documentado no dispatch plan
+
+❌ NOT delivery-ready: Proposta de fee para Atrium com `execution_policy: "default"` e sem review gate.
+✅ Delivery-ready: `{ id: "ATRIUM-009", title: "Proposta fee Q3 2026", execution_policy: "financial", sla_deadline: "2026-04-26T21:44Z", revision_max_loops: 1, watchers: ["joao.silva@atrium.pt", "cfo@atrium.pt"] }` — aguarda approval gate antes de dispatch.
+
+---
+
+### Gate 5 — Audit trail e dispatch são rastreáveis
+
+- [ ] Cada delegação explica **porquê** aquele agent/skill foi escolhido (não apenas "foi assignado")
+- [ ] Paths de ficheiro concretos listados para tasks/active/, audit/, budgets/
+- [ ] Token spend estimado por task **e** total do run
+- [ ] Synthesis plan indica como os outputs parciais convergem no deliverable final
+
+❌ NOT delivery-ready: "Tarefa delegada a diva-content. Ver audit log."
+✅ Delivery-ready: "ARRECADA-005 → diva-content: escolhido por ser o único worker com skill `gov-copywriting` e 0 tasks ativas. Ficheiro: `~/.claude/orchestrator/tasks/active/ARRECADA-005.yaml`. Estimated tokens: 3 800. Audit: `~/.claude/orchestrator/audit/2026-04-26.jsonl` linha 47."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets
+
+- [ ] Zero ocorrências de `<client>`, `<project>`, `<assignee>`, `<date>`, `<skill>` no output final
+- [ ] IDs de task seguem convenção `CLIENTSLUG-NNN` com slug real
+- [ ] Datas em ISO-8601 com valores reais (não `YYYY-MM-DD`)
+- [ ] Nomes de workers/agents vindos do `company.yaml` real, não inventados
+
+❌ NOT delivery-ready: `{ id: "<PROJECT>-001", assignee: "<agent>", sla_deadline: "<date>" }`
+✅ Delivery-ready: `{ id: "PUPLI-012", assignee: "dario-growth", sla_deadline: "2026-04-27T14:00Z", project: "pupli-launch-maio" }`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Orchestration Plan — Tributario.AI | Sprint Lançamento Beta (Abril 2026)
+
+## Phase 0: Validation Report
+- Circular dependencies: ✅ Nenhuma detectada (grafo acíclico verificado)
+- Worker availability: dario-fiscal ✅ livre | diva-content ✅ livre | dario-growth ⚠️ 1 task ativa (TRIB-008 in_review) → TRIB-011 queued
+- Budget Abril 2026: 58% usado (€ 1 160 / € 2 000) — ✅ sem restrições de paralelismo
+- Stale scan: 1 tarefa stale → TRIB-006 (in_progress há 31h) → status atualizado para `blocked`, blocked_reason: "stale — no update for >24h"
+
+## Mission Brief
+**Goal:** Lançar beta fechado Tributario.AI para 50 contabilistas portugueses até 30 Abril 2026.
+**In scope:** Landing page, sequência email onboarding, guia fiscal Q2 2026, campanha LinkedIn.
+**Out of scope:** Integração AT (fase 2). Suporte pós-lançamento.
+**Constraints:** Budget 58% usado. Miguel Costa (CEO) aprova todos os client_facing antes de publicar.
+
+## Task Breakdown
+
+```yaml
+- id: TRIB-010
+  title: "Redigir guia fiscal IRS 2026 para contabilistas beta"
+  assignee: dario-fiscal
+  execution_policy: client_facing
+  estimated_tokens: 6500
+  sla_deadline: "2026-04-27T10:00Z"
+  depends_on: []
+  revision_max_loops: 2
+  blocked_reason: null
+  watchers: ["miguel.costa@tributario.ai"]
+
+- id: TRIB-011
+  title: "Escrever sequência 3 emails onboarding beta users"
+  assignee: diva-content
+  execution_policy: client_facing
+  estimated_tokens: 4200
+  sla_deadline: "2026-04-27T14:00Z"
+  depends_on: ["TRIB-010"]
+  revision_max_loops: 2
+  blocked_reason: null
+  watchers: ["miguel.costa@tributario.ai"]
+
+- id: TRIB-012
+  title: "Criar copy landing page beta + CTA principal"
+  assignee: diva-content
+  execution_policy: client_facing
+  estimated_tokens: 3800
+  sla_deadline: "2026-04-27T14:00Z"
+  depends_on: []
+  revision_max_loops: 1
+  blocked_reason: null
+  watchers: ["miguel.costa@tributario.ai", "design@tributario.ai"]
+
+- id: TRIB-013
+  title: "Gerar 5 posts LinkedIn campanha lançamento beta"
+  assignee: dario-growth
+  execution_policy: default
+  estimated_tokens: 3000
+  sla_deadline: "2026-04-27T22:00Z"
+  depends_on: ["TRIB-012"]
+  revision_max_loops: 2
+  blocked_reason: null
+  watchers: ["miguel.costa@tributario.ai"]
+```
+
+## Dispatch Log
+- TRIB-010 → dario-fiscal: único worker com `skill: fiscal-pt` e 0 tasks ativas. Iniciado 2026-04-26T19:44Z.
+- TRIB-012 → diva-content: worker livre, skill `copywriting-saas` confirmado. Iniciado em paralelo com TRIB-010.
+- TRIB-011 → diva-content: queued, aguarda TRIB-010 (depende do guia fiscal).
+- TRIB-013 → dario-growth: queued, aguarda TRIB-012.
+
+## Synthesis Plan
+TRIB-010 + TRIB-012 → review Miguel Costa → TRIB-011 gerado com referências ao guia → TRIB-013 alinhado com copy da landing → entrega bundle completo até 2026-04-28T09:00Z.
+
+**Total estimated tokens:** 17 500 | **Budget pós-run estimado:** 87 500 tokens ≈ 75% do mês.
+
+Audit: `~/.claude/orchestrator/audit/2026-04-26.jsonl`
+```
+
+---
+
+## Output anti-patterns
+
+- **Placeholders não substituídos** — entregar plano com `<client>`, `<project-id>` ou `<assignee>` visíveis
+- **Tarefas não-atómicas** — uma task com dois verbos ("escrever e publicar", "criar e rever") que deviam ser duas tasks separadas
+- **Phase 0 omitida** — saltar validações de circular dependency, stale tasks ou budget e ir direto à decomposição
+- **SLA deadlines inventados** — datas que não derivam de `execution_policy.sla_hours` + timestamp de criação real
+- **Dispatch sem justificação** — "TASK-X atribuída a dario-fiscal" sem explicar porquê aquele worker
+- **Schema v2 incompleto** — tasks sem `revision_max_loops`, `blocked_reason` ou `watchers`, inviabilizando review gates
+- **Budget ignorado** — orquestrar 3 workers em paralelo quando budget ≥80% (devia limitar a 1)
+- **Synthesis plan ausente** — listar tarefas mas não explicar como os outputs convergem no deliverable final

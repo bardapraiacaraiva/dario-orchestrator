@@ -159,3 +159,206 @@ Stop and flag to the user if any of these are detected:
 - Quoted price is more than 30% below the Project Pricing Guide range (undercharging risk)
 - Owner salary set to 0€ (unsustainable — the business must pay the owner)
 - No budget for annual training/tools (agency skills will decay, losing competitiveness)
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
+
+---
+
+### Gate 1 — Inputs recolhidos e explicitados
+
+- [ ] Todos os 7 inputs do Input Gathering estão declarados (ou confirmado que se usam defaults)
+- [ ] Se usados defaults, estão sinalizados explicitamente ("A usar valor padrão de 3.000€ para fixed costs")
+- [ ] Nenhum campo está vazio ou com `TBD`/`a confirmar` no output final
+- [ ] Utilization target está entre 50–85% (fora deste range → alertar o cliente)
+
+❌ NOT delivery-ready: "Custos mensais: a confirmar. Salário alvo: [inserir aqui]."
+✅ Delivery-ready: "Fixed costs: 4.200€ (confirmado); owner salary: 5.000€; utilization target: 70% (default aplicado, ajustar se diferente)."
+
+---
+
+### Gate 2 — Cálculos corretos e rastreáveis
+
+- [ ] Step 1–6 executados em ordem, com valores intermédios visíveis
+- [ ] Billable hours = Hours available × Utilization% (e.g. 160h × 65% = 104h)
+- [ ] Break-even rate = Total monthly cost / Billable hours
+- [ ] Minimum rate usa fórmula `break-even / (1 - margin%)`, NÃO `break-even × (1 + margin%)`
+- [ ] Revenue target mensal = Recommended rate × Billable hours
+
+❌ NOT delivery-ready: "A taxa mínima é cerca de 100€/h." (sem derivação)
+✅ Delivery-ready: "6.800€ / (160h × 0,70) = 60,71€ break-even → 60,71 / (1 – 0,30) = **86,73€/h mínimo**"
+
+---
+
+### Gate 3 — Três tiers de pricing apresentados e distinguíveis
+
+- [ ] Good / Better / Best (ou Mínimo / Recomendado / Premium) estão todos calculados
+- [ ] Cada tier tem: rate por hora, justificação/uso ideal, revenue mensal projetado
+- [ ] Premium rate ≥ 1,5× minimum rate
+- [ ] Os tiers são conectados ao posicionamento do cliente (não genéricos)
+
+❌ NOT delivery-ready: "Podes cobrar entre 80€ e 150€/h dependendo do projeto."
+✅ Delivery-ready: "**Mínimo:** 87€/h (break-even + 30% margem) · **Recomendado:** 113€/h (buffer para meses lentos) · **Premium:** 156€/h (projetos urgentes ou estratégicos) — Revenue alvo a 70% util.: 9.128€/mês"
+
+---
+
+### Gate 4 — Comparação de modelos de pricing incluída
+
+- [ ] Pelo menos 3 modelos comparados (hourly / project / retainer + value-based se aplicável)
+- [ ] Recomendação explícita de modelo para o contexto específico do cliente
+- [ ] Se retainer: calculado valor mínimo do retainer (horas alocadas × internal rate × markup)
+- [ ] Se project-based: sanity-check do Project Pricing Guide aplicado ao deliverable concreto
+
+❌ NOT delivery-ready: "Podes usar modelo de projeto ou retainer, ambos têm vantagens."
+✅ Delivery-ready: "Para a Cuidai, retainer de social media (20h/mês × 113€ × 1,4 markup) = **3.164€/mês**. Mínimo aceitável: 2.500€/mês. Recomendação: retainer para previsibilidade, com cláusula de scope-cap a 25h."
+
+---
+
+### Gate 5 — Sanity-checks e alertas de risco incluídos
+
+- [ ] Alertar se utilization target > 80% (burnout risk, não sustentável solo)
+- [ ] Alertar se recommended rate está 30%+ abaixo dos benchmarks do Project Pricing Guide
+- [ ] Indicar quantos projetos/mês o cliente precisa de fechar para atingir revenue target
+- [ ] Revenue target anual calculado e referenciado (×12)
+
+❌ NOT delivery-ready: "Com 90% de utilização, a taxa fica mais baixa e o negócio escala melhor."
+✅ Delivery-ready: "⚠️ Utilization a 85% num modelo solo é insustentável — reserva 0h para vendas, formação e imprevistos. Recalculado a 70%: **taxa mínima sobe para 96€/h**. Para atingir 14.800€/mês precisas de ~2 projetos web médios ou 4 retainers de social media."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, zero placeholders
+
+- [ ] Nome do cliente aparece no cabeçalho e na recomendação final
+- [ ] Nenhum `<inserir>`, `[cliente]`, `[valor]`, `TBD` no output entregue
+- [ ] Todos os euros são formatados consistentemente (1.200€, não "1200 euros" ou "€1,200")
+- [ ] Summary table preenchida com os valores reais calculados, não com os defaults do SKILL.md
+
+❌ NOT delivery-ready: "Calculadora de pricing para [Nome da Agência] — taxa recomendada: [X]€/h"
+✅ Delivery-ready: "Calculadora de pricing — **Atrium Studio** (Março 2025) — Taxa recomendada: **118€/h**"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Calculadora de Pricing — Atrium Studio
+**Data:** Março 2025 | **Modelo:** Solo founder + 1 designer part-time
+
+---
+
+## Inputs confirmados
+
+| Input | Valor |
+|---|---|
+| Fixed costs mensais | 4.200€ (renda 800€, software 400€, contabilidade 150€, seguros 200€, ferramentas 650€, outros 400€, + 1.600€ salário designer PT) |
+| Salário alvo fundador | 5.000€ |
+| Custos com colaboradores | 1.600€ (designer 20h/semana, custo total c/ SS) |
+| Horas disponíveis/mês | 160h (fundador) |
+| Utilization target | 70% |
+| Margem de lucro alvo | 30% |
+| One-offs anuais / 12 | 400€/mês (conferências + equipamento) |
+
+---
+
+## Step-by-step — Atrium Studio
+
+**Step 1: Total monthly cost**
+```
+Fixed costs:          4.200€
+Salário fundador:     5.000€
+Colaborador (design): 1.600€
+One-offs/12:            400€
+──────────────────────────────
+Total mensal:        11.200€
+```
+
+**Step 2: Cost per available hour**
+```
+11.200€ / 160h = 70,00€/hora (custo bruto)
+```
+
+**Step 3: Cost per billable hour (utilization-adjusted)**
+```
+160h × 70% = 112 horas faturáveis/mês
+11.200€ / 112h = 100,00€/hora (break-even real)
+```
+
+**Step 4: Minimum rate (30% margem)**
+```
+100€ / (1 – 0,30) = 142,86€/hora
+```
+
+**Step 5: Recommended rate**
+```
+142,86€ × 1,25 = 178,57€ ≈ 180€/hora
+```
+
+**Step 6: Premium rate**
+```
+142,86€ × 1,7 = 242,86€ ≈ 245€/hora
+```
+
+---
+
+## Summary — Atrium Studio
+
+| Métrica | Valor |
+|---|---|
+| Total mensal de custos | 11.200€ |
+| Horas faturáveis/mês | 112h |
+| Break-even rate | 100€/h |
+| Taxa mínima (30% margem) | 143€/h |
+| Taxa recomendada | 180€/h |
+| Taxa premium | 245€/h |
+| Revenue mensal alvo (recomendado) | 20.160€ |
+| Revenue anual alvo | 241.920€ |
+
+---
+
+## Tiers de pricing — Atrium Studio
+
+| Tier | Rate | Quando usar | Revenue mensal projetado |
+|---|---|---|---|
+| **Mínimo (Good)** | 143€/h | Clientes recorrentes, projetos longos, fidelização | 16.016€ |
+| **Recomendado (Better)** | 180€/h | Projetos de branding, websites, novos clientes | 20.160€ |
+| **Premium (Best)** | 245€/h | Projetos urgentes, estratégia, clientes enterprise | 27.440€ |
+
+---
+
+## Sanity-check de projetos típicos — Atrium Studio
+
+| Projeto | Horas estimadas | Preço mínimo | Preço recomendado |
+|---|---|---|---|
+| Branding completo | 35h | 5.005€ | 6.300€ |
+| Website 8 páginas (WordPress) | 60h | 8.580€ | 10.800€ |
+| Landing page | 15h | 2.145€ | 2.700€ |
+| Social media retainer/mês | 25h | 3.575€ | 4.500€ |
+
+> **Alvo de fecho mensal:** Para 20.160€ de revenue a 180€/h, o Atrium precisa de
+> ~1 website médio (10.800€) + 1 branding (6.300€) + 1 retainer ativo (4.500€) = 21.600€ ✅
+
+---
+
+## Recomendação de modelo — Atrium Studio
+
+**Fase atual (0–3 clientes recorrentes):** Híbrido project-based + 1–2 retainers.
+- Novo cliente → projeto de branding ou website a preço fixo (recomendado: 6.300–10.800€)
+- Pós-entrega → propor retainer de social ou SEO (3.500–4.500€/mês)
+- Evitar modelo só hourly: o designer part-time dilui a eficiência e o cliente questiona horas
+
+⚠️ **Alerta:** Utilization a 70% é saudável para solo+part-time. Não aceitar projetos que impliquem >85% — os 30% restantes são vendas, gestão, imprevistos e desenvolvimento do Atrium Studio.
+```
+
+---
+
+## Output anti-patterns
+
+- Apresentar apenas a taxa recomendada sem mostrar o cálculo step-by-step — o cliente não consegue ajustar se os inputs mudarem
+- Usar `break-even × 1,30` em vez de `break-even / (1 – 0,30)` — subestima a taxa mínima em ~4–6%
+- Omitir o número de projetos/mês necessários para atingir o revenue target — o pricing fica desligado da realidade comercial
+- Aplicar o mesmo markup a todos os deliverables — branding estratégico e manutenção WordPress têm perfis de risco e valor radicalmente diferentes
+- Deixar utilization target a 65% sem questionar o modelo (solo vs. equipa) — um founder com equipa pode sustentar 70–75%; solo raramente passa 60% de forma sustentável
+- Formatar o output como texto corrido sem summary table — impossível de rever, partilhar ou usar como referência em reunião com cliente
+- Calcular revenue target sem desagregar entre horas do founder e horas de colaboradores — mascara a rentabilidade real do negócio
+- Não sinalizar quando o preço recomendado está abaixo dos mínimos do Project Pricing Guide — o cliente acredita que o output valida underselling

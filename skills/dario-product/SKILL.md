@@ -260,3 +260,207 @@ Relations:
 - MVPs should be genuinely minimal — resist feature creep
 - RICE scores should be challenged, not just calculated
 - Technical specs need developer input, not just PM wishful thinking
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
+
+---
+
+### Gate 1 — Problem Statement tem evidência real, não suposição
+
+- [ ] O problema está ligado a uma persona concreta (não "utilizadores em geral")
+- [ ] Existe pelo menos uma métrica de impacto ("X horas perdidas por semana", "Y% churn atribuível")
+- [ ] A source da evidência está indicada (entrevistas, dados analytics, benchmark)
+- [ ] Não há frases tipo "acreditamos que" sem dados a suportar
+
+❌ NOT delivery-ready: `"Os utilizadores têm dificuldade em gerir os seus documentos."`
+✅ Delivery-ready: `"82% dos contabilistas da LUSOconta (n=17, entrevistas Jan 2025) perdem >3h/semana a reconciliar extratos — custo estimado €4.200/mês em tempo."`
+
+---
+
+### Gate 2 — Goals & Success Metrics são SMART e mensuráveis
+
+- [ ] Cada goal tem um metric owner (quem mede)
+- [ ] Targets têm baseline + prazo (não apenas "aumentar X%")
+- [ ] Método de medição está especificado (GA4, Mixpanel, query SQL, etc.)
+- [ ] Máximo 4 goals — se tiver mais, consolidar
+
+❌ NOT delivery-ready: `"Meta: aumentar engagement. Medição: ver analytics."`
+✅ Delivery-ready: `"Meta: activação D7. Metric: % users que criam 1ª guia ≤7 dias após registo. Baseline: 23%. Target: 45% até Q2. Owner: Ana Costa via Mixpanel cohort report."`
+
+---
+
+### Gate 3 — Scope tem "Out of scope" explícito e justificado
+
+- [ ] "Out of scope" lista ≥3 itens com motivo ("too complex / não validado / scope creep")
+- [ ] "Future consideration" está separado de "Out of scope"
+- [ ] User stories cobrem happy path + pelo menos 1 edge case
+- [ ] US-IDs estão numerados (US-001, US-002…) para rastreabilidade
+
+❌ NOT delivery-ready: `"Out of scope: funcionalidades avançadas."`
+✅ Delivery-ready: `"Out of scope: integração com ERP (Primavera) — dependência externa, fase 2. Exportação PDF multi-idioma — não validado com utilizadores. App mobile — equipa sem capacidade iOS em Q1."`
+
+---
+
+### Gate 4 — RICE/Prioritização tem números reais, não estimativas vagas
+
+- [ ] Reach está em utilizadores/quarter com fonte (não "muitos utilizadores")
+- [ ] Effort está em person-days (não "médio" ou "grande")
+- [ ] RICE score calculado e features ranked por score, não por opinião
+- [ ] Features com RICE < threshold definido estão explicitamente depriorizadas
+
+❌ NOT delivery-ready: `"Feature A — Reach: alto, Impact: 3, Confidence: alta, Effort: médio → Priority: 1"`
+✅ Delivery-ready: `"Notificações push — Reach: 340 users/Q, Impact: 2, Confidence: 70%, Effort: 0.5 PM → RICE: 952. Dashboard analytics — Reach: 120, Impact: 3, Confidence: 60%, Effort: 2 PM → RICE: 108. → Notificações prioritárias."`
+
+---
+
+### Gate 5 — Sprint Plan tem capacidade real e Definition of Done fechada
+
+- [ ] Cada story point está assignada a uma pessoa (não "team")
+- [ ] Capacidade calculada com dias reais (descontando férias, reuniões, buffer 20%)
+- [ ] Story points totais ≤ capacidade total da equipa
+- [ ] Definition of Done inclui critério de QA + deploy environment específico
+
+❌ NOT delivery-ready: `"Sprint 3 — backlog: 34 pontos. Equipa: 3 devs."`
+✅ Delivery-ready: `"Sprint 3 (20-31 Jan) — Rui: 8 dias úteis = 16pts. Marta: 6 dias (2 dias férias) = 12pts. Total capacity: 28pts. Backlog comprometido: 26pts. DoD: PR aprovado por 2 reviewers + testes Cypress passing + deploy em staging.cuidai.pt."`
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets por preencher
+
+- [ ] Zero instâncias de `[Product Name]`, `[PM name]`, `[metric]`, `[name]` no output final
+- [ ] Datas são concretas (não `[YYYY-MM-DD]`)
+- [ ] Stack tech mencionada é a stack real do cliente (não `[recommended tech stack]`)
+- [ ] Sign-off lista nomes reais dos stakeholders
+
+❌ NOT delivery-ready: `"Owner: [PM name] | Stack: [recommended tech stack] | Date: [YYYY-MM-DD]"`
+✅ Delivery-ready: `"Owner: Pedro Alves | Stack: Next.js 14 + Supabase + Vercel | Date: 2025-02-03"`
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## PRD — SAQUEI — Feature: Simulador de Crédito Instantâneo v1.0
+
+### Overview
+- **Produto:** SAQUEI (plataforma de crédito ao consumo Portugal)
+- **Feature:** Simulador de crédito no frontend público (pré-login)
+- **Owner:** Catarina Mendes (Product Lead)
+- **Date:** 2025-02-03
+- **Status:** approved — in-dev
+
+### Problem Statement
+**Quem:** Potenciais clientes SAQUEI na fase de consideração (visitam landing page mas não convertem).
+**Evidência:** Heatmaps Hotjar (Jan 2025, n=4.200 sessões): 67% dos visitantes saem na página de pricing
+sem interagir. Exit survey (n=89): 41% indicam "não percebi quanto ficaria a pagar."
+**Impacto:** Taxa de conversão visita→registo actual: 3,2%. Benchmark sector (Cofidis PT): ~6,8%.
+Gap de €18.000/mês em receita estimada assumindo ticket médio €850.
+
+### Goals & Success Metrics
+| Goal | Metric | Baseline | Target | Prazo | Owner |
+|---|---|---|---|---|---|
+| Aumentar conversão landing | Visita → registo | 3,2% | 5,5% | 30 dias pós-launch | Catarina (GA4) |
+| Reduzir abandono pricing | Exit rate pricing page | 67% | <45% | 30 dias pós-launch | Catarina (Hotjar) |
+| Engajamento simulador | % sessões com ≥1 simulação | 0% | 35% | 14 dias pós-launch | Dev (Mixpanel) |
+
+### User Stories
+- **US-001:** Como visitante não registado, quero inserir o montante e prazo desejados e ver a
+  prestação mensal imediatamente, para decidir se o crédito cabe no meu orçamento.
+- **US-002:** Como visitante, quero ver a TAE e TAEG calculadas automaticamente, para comparar
+  com outras ofertas de forma transparente (requisito legal DL 74-A/2017).
+- **US-003:** Como visitante que simulou, quero clicar "Pedir agora" e ter o valor pré-preenchido
+  no formulário de registo, para não repetir o que já introduzi.
+- **US-004 (edge case):** Como visitante que introduz montante fora do range (< €500 ou > €5.000),
+  quero ver uma mensagem clara do limite disponível, para não ficar confuso.
+
+### Scope
+**In scope:**
+- Slider interactivo: montante €500–€5.000 (step €100), prazo 6–48 meses (step 6)
+- Cálculo em tempo real: prestação, TAE, TAEG, custo total
+- CTA "Pedir agora" com pass de parâmetros para registo
+- Versão mobile-first (60% do tráfego SAQUEI é mobile)
+
+**Out of scope:**
+- Simulação pós-login (existente, não tocar) — risco de regressão alto, sprint separado
+- Comparador multi-produto — não validado, complexidade desnecessária para v1
+- Integração com motor de scoring (Experian) — dado pré-login, sem dados do utilizador
+
+**Future consideration (Q3 2025):**
+- A/B test slider vs. input directo
+- Simulação com seguro de proteção de pagamentos
+
+### Requirements
+#### Functional
+1. [FR-001] Slider de montante actualiza resultados em <150ms (debounce 100ms)
+2. [FR-002] Fórmula de cálculo de prestação: anuidade francesa com TAN 9,9% (fixo v1)
+3. [FR-003] Exibição obrigatória: prestação, TAN, TAE, TAEG, custo total crédito (DL 74-A/2017)
+4. [FR-004] CTA passa query params `?amount=XXXX&term=YY` para `/register`
+5. [FR-005] Validação: montante fora [500, 5000] mostra inline error, não bloqueia UI
+
+#### Non-Functional
+1. [NFR-001] Performance: First Contentful Paint <1,2s (Core Web Vitals — Lighthouse ≥90)
+2. [NFR-002] Acessibilidade: WCAG 2.1 AA — slider operável por teclado
+3. [NFR-003] Sem cookies ou recolha de dados PII no simulador pré-login (RGPD)
+
+### User Flow
+```
+Landing page → Ajusta slider (montante + prazo) → Vê prestação em real-time
+    → Clica "Pedir agora" → Registo com dados pré-preenchidos → Funil de crédito
+    ↓ (edge)
+Montante fora de range → Inline message "Disponível entre €500 e €5.000"
+```
+
+### Technical Considerations
+- **Stack:** React 18 + TypeScript (existente), styled-components, deploy Vercel
+- **Cálculo:** Pure JS (sem API call) — fórmula anuidade francesa, TAN hardcoded v1
+- **APIs:** Nenhuma nova em v1 — parâmetros passados via URL para `/register` (Next.js routing)
+- **Data model:** Sem persistência — state local apenas
+- **Dependências:** Design system SAQUEI v2.1 (slider component a criar ou adaptar de Radix UI)
+
+### Timeline
+| Phase | Duração | Deliverable | Responsável |
+|---|---|---|---|
+| Design | 3 dias (3–5 Fev) | Figma aprovado por Catarina | Rita Santos (Design) |
+| Dev | 5 dias (6–12 Fev) | Feature em staging.saquei.pt | João Ferreira (Dev) |
+| QA | 2 dias (13–14 Fev) | 0 bugs críticos, Lighthouse ≥90 | Mariana Cruz (QA) |
+| Launch | 17 Fev | Deploy prod + Mixpanel event live | João + Catarina |
+
+### RICE — Priorização contexto backlog Q1
+| Feature | Reach | Impact | Confidence | Effort | RICE |
+|---|---|---|---|---|---|
+| Simulador pré-login (esta) | 4.200 visits/Q | 3 | 80% | 0.5 PM | **20.160** |
+| Notificações push aprovação | 1.200 users/Q | 2 | 60% | 0.3 PM | **4.800** |
+| Dashboard analytics cliente | 800 users/Q | 2 | 70% | 1.5 PM | **747** |
+
+→ Simulador é prioridade #1 Q1 por margem larga.
+
+### Risks
+| Risco | Prob | Impact | Mitigação |
+|---|---|---|---|
+| Fórmula cálculo incorrecta (compliance) | M | H | Validação com advogado DL 74-A/2017 antes de dev (5 Fev) |
+| Slider performance em dispositivos low-end | L | M | Teste em Android 8 + Chrome 90 durante QA |
+| Design system sem slider → atraso | M | M | Fallback: Radix UI Slider com tema SAQUEI |
+
+### Sign-off
+- [x] PM: Catarina Mendes — 2025-02-03
+- [ ] Tech Lead: João Ferreira — pendente revisão FR-001
+- [ ] Design: Rita Santos — pendente Figma v2
+- [ ] CEO/Stakeholder: Miguel Pinto — aprovação final 6 Fev
+```
+
+---
+
+## Output anti-patterns
+
+- **Angle-brackets no output final:** entregar PRD com `[PM name]`, `[metric]`, `[YYYY-MM-DD]` por preencher — o cliente recebe um template, não um documento
+- **Problem Statement sem dados:** "os utilizadores querem X" sem entrevistas, analytics ou evidência quantificada
+- **RICE com inputs vagos:** Impact "alto", Effort "médio" — torna a priorização indistinguível de opinião
+- **Out of scope vazio ou genérico:** omitir o que NÃO se vai construir é a causa mais comum de scope creep em sprint
+- **Sprint sem capacidade calculada:** comprometer 40 story points com equipa de 2 devs sem verificar dias disponíveis
+- **Goals sem baseline:** "aumentar conversão 50%" sem saber o valor actual é impossível de validar
+- **User stories só happy path:** não documentar edge cases (inputs inválidos, estados de erro, utilizador sem permissão) garante bugs em produção
+- **Tech spec sem dependências:** não listar o que tem de existir antes de começar a feature atrasa sprints inteiros
+- **Launch checklist copiada genericamente:** itens como "testar funcionalidades" sem especificar environment, responsável e critério de pass/fail
+- **Sign-off sem nomes reais:** "Tech Lead: [name]" num documento aprovado é um risco de governance — quem assinou o quê?

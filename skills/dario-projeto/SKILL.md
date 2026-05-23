@@ -109,3 +109,131 @@ DARIO: lists all known projects with status summary
 - Always search RAG for project context before starting any work — skipping RAG means ignoring previous audits, decisions, and deliverables that directly affect the current task
 - Never proceed if the project memory file does not exist — working without loaded context means re-discovering everything from scratch, wasting time and risking contradicting past decisions
 - Always check Obsidian for recent outputs matching the project name — RAG may be incomplete but the vault often contains the latest deliverables that have not yet been ingested
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Projecto identificado sem ambiguidade
+
+- [ ] O nome do projecto foi matched contra um ficheiro `project_*.md` existente (não inventado)
+- [ ] Se houve ambiguidade, DARIO listou as opções e pediu confirmação antes de carregar
+- [ ] O path `~/.claude/agent-memory/dario-v2-digital-ceo/project_<name>.md` foi confirmado como existente
+
+❌ NOT delivery-ready: "Carregando contexto do projecto Atrium..." (sem confirmar que o ficheiro existe)
+✅ Delivery-ready: "Ficheiro encontrado: `project_wave74_atrium.md` — a carregar contexto."
+
+---
+
+### Gate 2 — Agent-memory carregada e validada
+
+- [ ] Todos os campos obrigatórios extraídos: Stack, Status, Last decisions, Pending, Baseline metrics, Working dir
+- [ ] Campo "Last updated" verificado — se `> 30 dias`, flag explícita apresentada ao utilizador
+- [ ] Nenhum campo mostrado como `<placeholder>` ou vazio sem explicação
+
+❌ NOT delivery-ready: "**Status:** \<current phase\> | **Stack:** \<stack\>"
+✅ Delivery-ready: "**Status:** Beta fechado, onboarding 3 clientes-piloto | **Stack:** Next.js 14, Supabase, Stripe | **Last updated:** 2025-06-01 (14 dias — contexto fresco)"
+
+---
+
+### Gate 3 — RAG consultado com queries relevantes
+
+- [ ] Pelo menos 2 queries RAG executadas: `"<project name>"` + `"<project name> audit"`
+- [ ] Número de sources e chunks retornados apresentado no sumário
+- [ ] Se RAG retorna 0 resultados, sugestão de ingestão de docs apresentada
+
+❌ NOT delivery-ready: "RAG context disponível — N sources, M chunks" (sem valores reais)
+✅ Delivery-ready: "RAG context disponível — 7 sources, 23 chunks relevantes (última ingestão: 2025-05-28)"
+
+---
+
+### Gate 4 — Outputs Obsidian listados com datas reais
+
+- [ ] Glob executado contra `**/05 - Claude - IA/Outputs/*<project>*`
+- [ ] Até 5 outputs mais recentes listados com data `YYYY-MM-DD` e título real
+- [ ] Se 0 outputs encontrados, dito explicitamente (não omitido em silêncio)
+
+❌ NOT delivery-ready: "Últimos outputs: 1. \<title\> 2. \<title\>"
+✅ Delivery-ready: "1. 2025-06-08 — LUSOconta_SaaS_Audit_P1_Criticals.md  2. 2025-05-31 — LUSOconta_Pricing_Revision_v2.md  3. 2025-05-20 — LUSOconta_Beta_Roadmap_Q3.md"
+
+---
+
+### Gate 5 — Context switch seguro (sessão anterior protegida)
+
+- [ ] Se havia um projecto activo na sessão, DARIO confirmou/alertou antes de fazer switch
+- [ ] Decisões pendentes ou work-in-progress da sessão anterior foram sinalizados
+- [ ] Sessão nova (sem projecto activo) não dispara aviso de switch desnecessariamente
+
+❌ NOT delivery-ready: Trocar de Atrium para Vivenda silenciosamente a meio de uma auditoria
+✅ Delivery-ready: "⚠️ Projecto activo: Atrium (auditoria em curso, score 87/100 não guardado). Confirmas switch para Vivenda? Dados actuais serão perdidos."
+
+---
+
+### Gate 6 — Output usa CLIENT NAME + dados REAIS, sem angle-brackets
+
+- [ ] Nenhum `<Name>`, `<stack>`, `<path>`, `<X/100>`, `<date>` no output final
+- [ ] Nome do cliente aparece no título do sumário (`## Projeto: LUSOconta`)
+- [ ] Last audit score inclui valor numérico real e data (`87/100 — 2025-05-14`)
+- [ ] Working dir é path real (`~/Dev/lusoconta-saas/`) não placeholder
+
+❌ NOT delivery-ready: "**Last audit score:** \<X/100\> (\<date\>)"
+✅ Delivery-ready: "**Last audit score:** 7.2/10 — 2025-05-14 | 4 P1 criticals activos"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+## Projeto: LUSOconta (SaaS Audit)
+
+**Stack:** Next.js 14, Supabase, Stripe Connect, Vercel
+**Status:** Beta fechado — onboarding 3 clientes-piloto (Jun 2025)
+**Working dir:** ~/Dev/lusoconta-saas/
+**Last audit score:** 7.2/10 — 2025-05-14 | ⚠️ 4 P1 criticals por resolver
+**Memory file:** project_lucas_saas_audit.md — Last updated: 2025-06-01 (13 dias — fresco ✅)
+
+---
+
+### Decisões activas
+- Pricing fixado: €29/mês Starter, €79/mês Pro (decidido 2025-05-20, não reverter)
+- Stripe Connect em modo "Express" — não mudar para Standard sem re-auditoria
+- Auth via Supabase Magic Link (OTP removido — decisão 2025-05-18)
+
+### Pendente
+- [ ] Resolver P1 #1: Row-level security em `invoices` table (assignado: Lucas)
+- [ ] Resolver P1 #2: Webhook Stripe sem validação de signature
+- [ ] Resolver P1 #3: API keys expostas em client-side bundle
+- [ ] Resolver P1 #4: Missing rate limiting em `/api/auth/login`
+- [ ] Definir data de lançamento público (blocker: P1s por fechar)
+
+### Últimos outputs (Obsidian)
+1. 2025-05-31 — LUSOconta_P1_Criticals_Remediation_Plan.md
+2. 2025-05-28 — LUSOconta_Stripe_Connect_Architecture_v2.md
+3. 2025-05-20 — LUSOconta_Pricing_Strategy_Final.md
+4. 2025-05-14 — LUSOconta_SaaS_Audit_Full_Report.md
+5. 2025-05-10 — LUSOconta_Auth_Flow_Redesign.md
+
+### RAG context disponível
+- 9 sources, 31 chunks relevantes
+- Última ingestão: 2025-05-31
+- Collections: obsidian (6), uploads (3)
+
+---
+
+Pronto para trabalhar. O que precisas?
+```
+
+---
+
+## Output anti-patterns
+
+- Apresentar o sumário com campos `<placeholder>` em vez de dados reais extraídos da memória
+- Fazer switch de projecto silenciosamente sem alertar sobre work-in-progress da sessão anterior
+- Omitir o aviso de memória stale quando `Last updated > 30 dias` — contexto desactualizado gera decisões erradas
+- Mostrar "RAG context disponível" sem indicar quantos sources/chunks foram encontrados de facto
+- Inventar outputs Obsidian com títulos plausíveis em vez de executar o Glob e listar ficheiros reais
+- Prosseguir com o carregamento quando o ficheiro `project_*.md` não existe — deve listar projectos disponíveis e perguntar
+- Listar outputs Obsidian sem datas `YYYY-MM-DD` — datas relativas ("esta semana") não são auditáveis
+- Não sugerir ingestão de docs quando RAG retorna 0 resultados para o projecto pedido

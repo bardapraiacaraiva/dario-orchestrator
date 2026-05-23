@@ -229,3 +229,159 @@ Alertar SEMPRE que qualquer destas situacoes for detectada:
 | Gross Margin < 60% | COGS a comer margens | Modelo nao escala — rever infraestrutura e support |
 | ARPU em queda 3+ meses | Clientes a fazer downgrade consistentemente | Pricing ou packaging desalinhado com valor percebido |
 | Top 3 clientes > 30% MRR | Concentracao perigosa | Risco de revenue cliff — diversificar base urgente |
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — MRR Waterfall está completo e fecha
+- [ ] MRR Inicial + Net New MRR = MRR Final (aritmética bate certo)
+- [ ] Todas as 5 componentes preenchidas (New, Expansion, Contraction, Churn, Reactivation)
+- [ ] Net New MRR explicitado como linha separada
+- [ ] Período de referência identificado (ex: "Abril 2025")
+
+❌ NOT delivery-ready: "MRR cresceu de €5K para €6K este mês"
+✅ Delivery-ready: "MRR Inicial Abr: €6.910 | +New €400 +Expansion €300 -Contraction €80 -Churn €30 +Reactivation €50 = Net New MRR €640 → MRR Final €7.550"
+
+---
+
+### Gate 2 — Métricas têm status 🟢🟡🔴 com benchmark do stage correcto
+- [ ] Stage da empresa identificado (Seed / Growth / Mature) antes de aplicar benchmarks
+- [ ] Cada métrica tem valor actual + benchmark do stage + símbolo de status
+- [ ] NRR calculado no período certo (mensal vs anual claramente indicado)
+- [ ] Métricas não calculáveis marcadas como N/D com razão (ex: "Burn Multiple: N/D — sem dados de burn")
+
+❌ NOT delivery-ready: "NRR está em 105% que é bom" (sem stage, sem benchmark, sem símbolo)
+✅ Delivery-ready: "NRR (anual) = 112% | Benchmark Growth (1-10M ARR): 105-125% | 🟢 Green"
+
+---
+
+### Gate 3 — LTV:CAC e CAC Payback usam dados reais, não estimativas vagas
+- [ ] CAC usa spend de S&M do período correctamente delimitado (ex: Q1 2025)
+- [ ] LTV usa churn rate real, não "churn estimado" ou "indústria"
+- [ ] Gross Margin % declarada explicitamente na fórmula do CAC Payback
+- [ ] Se LTV:CAC >8:1 — flag de under-investing mencionada (Janz/Tunguz reference)
+
+❌ NOT delivery-ready: "LTV/CAC ~4x, dentro do normal"
+✅ Delivery-ready: "LTV = €420 ARPU × (1/2.8% churn) = €15.000 | CAC = €4.200 (S&M Q1: €21.000 / 5 clientes) | LTV:CAC = 3.6:1 🟢 | CAC Payback = €4.200/(€420×72%) = 13.9 meses 🟡"
+
+---
+
+### Gate 4 — Rule of 40 e Magic Number calculados com dados do período fiscal correcto
+- [ ] Rule of 40 usa YoY growth (não MoM) e EBITDA margin do mesmo período
+- [ ] Magic Number usa ARR líquido novo / S&M do trimestre ANTERIOR (desfasamento correcto)
+- [ ] Quick Ratio calculado: (New MRR + Expansion) / (Contraction + Churn), sem misturar ARR/MRR
+- [ ] Burn Multiple só calculado se houver dados de cash burn reais
+
+❌ NOT delivery-ready: "Rule of 40 = 38%, ligeiramente abaixo"
+✅ Delivery-ready: "Rule of 40 = Revenue Growth YoY 31% (ARR €420K→€551K) + EBITDA Margin -3% = 28% 🔴 | Requer ação: margem operacional ou crescimento tem de melhorar 12pp para atingir 40"
+
+---
+
+### Gate 5 — Cohort analysis lida correctamente e diagonal interpretada
+- [ ] Tabela de retenção tem n= por cohort e datas reais
+- [ ] Diagonal comparada explicitamente: cohorts novos retêm melhor/pior que anteriores?
+- [ ] M12 retention ou curva de flattening identificada (quando curva estabiliza = LTV calculável)
+- [ ] Revenue retention cohort vs logo retention cohort distinguidos, se ambos disponíveis
+
+❌ NOT delivery-ready: "A retenção no M6 é 67%"
+✅ Delivery-ready: "Cohort Jan-2025 (n=30): M6=67% vs Cohort Mar-2025 (n=40): M6=71% — melhoria de +4pp em 2 meses, sinal de produto/onboarding a melhorar. Curva parece estabilizar M9-M12 (~58%), o que suporta LTV de 17 meses de ARPU"
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets de placeholder
+- [ ] Nome do cliente aparece no título do dashboard e no waterfall
+- [ ] Datas são reais (ex: "Jan–Abr 2025"), não "Mês X → Mês Y"
+- [ ] Todos os valores EUR são números concretos, não `___` ou `[inserir]`
+- [ ] Fonte dos dados declarada (ex: "Stripe export 30 Abr 2025" ou "CRM HubSpot Q1")
+
+❌ NOT delivery-ready: "MRR Inicial: ___ EUR | NRR: ___% | Stage: ___"
+✅ Delivery-ready: "Tributario.AI — Dashboard SaaS Metrics Maio 2025 | Fonte: Stripe + HubSpot 30 Abr 2025"
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Tributario.AI — SaaS Metrics Dashboard
+**Período:** Jan–Abr 2025 | **Stage:** Seed (ARR ~€90K) | **Fonte:** Stripe export 30 Abr 2025
+
+---
+
+## MRR Waterfall — Jan a Abr 2025
+
+| Componente        | Jan    | Fev    | Mar    | Abr    |
+|-------------------|--------|--------|--------|--------|
+| MRR Inicial       | €5.800 | €6.950 | €7.820 | €8.640 |
+| + New MRR         | €900   | €650   | €680   | €420   |
+| + Expansion MRR   | €410   | €380   | €320   | €260   |
+| - Contraction MRR | €-80   | €-60   | €-90   | €-70   |
+| - Churned MRR     | €-80   | €-100  | €-90   | €-50   |
+| + Reactivation    | €0     | €0     | €0     | €40    |
+| **Net New MRR**   | €1.150 | €870   | €820   | €600   |
+| **MRR Final**     | €6.950 | €7.820 | €8.640 | €9.240 |
+
+> ⚠️ Net New MRR desacelera de €1.150 → €600 em 4 meses (-48%). New MRR cai; Expansion segura.
+
+---
+
+## Metrics Dashboard — Abr 2025
+
+| Métrica           | Fórmula                          | Valor Actual | Benchmark Seed  | Status |
+|-------------------|----------------------------------|--------------|-----------------|--------|
+| MRR               | Soma receita recorrente          | €9.240       | >€10K           | 🟡     |
+| ARR               | MRR × 12                         | €110.880     | >€120K seed     | 🟡     |
+| MRR Growth (m/m)  | (9.240-8.640)/8.640              | 6,9%         | >15% seed       | 🔴     |
+| NRR (anual proxy) | (MRR+exp-cont-churn)/MRR_start   | 107%         | >100% mín       | 🟢     |
+| GRR (anual proxy) | (MRR-cont-churn)/MRR_start       | 93%          | >85% seed       | 🟢     |
+| Logo Churn (m/m)  | Clientes perdidos / inicial      | 2,1%         | <5% seed        | 🟢     |
+| Revenue Churn m/m | Churned MRR / MRR inicial        | 0,6%         | <3% seed        | 🟢     |
+| CAC               | S&M Q1 €18K / 23 clientes novos  | €782         | —               | —      |
+| ARPU              | €9.240 / 187 clientes            | €49,4        | Crescente       | 🟡     |
+| LTV               | €49,4 × (1/2,1%)                 | €2.352       | >3× CAC         | 🟢     |
+| LTV:CAC           | €2.352 / €782                    | 3,0:1        | 2-4:1 seed      | 🟢     |
+| CAC Payback       | €782 / (€49,4 × 72%)             | 22 meses     | <24 seed 🟡     | 🟡     |
+| Rule of 40        | Growth YoY 58% + Margem -18%     | 40           | N/A seed        | —      |
+| Magic Number      | Net new ARR Q1 / S&M Q4'24       | 0,61         | 0,3-0,7 seed    | 🟢     |
+| Quick Ratio       | (900+260)/(70+50)                | 9,7          | >4 seed         | 🟢     |
+
+---
+
+## Cohort Retention — Logo (% clientes activos)
+
+| Cohort          | M0   | M1   | M2   | M3   | M4   | M5   |
+|-----------------|------|------|------|------|------|------|
+| Jan 2025 (n=18) | 100% | 89%  | 83%  | 78%  | 72%  | 67%  |
+| Fev 2025 (n=13) | 100% | 92%  | 85%  | 81%  | 75%  |  —   |
+| Mar 2025 (n=14) | 100% | 93%  | 86%  | 83%  |  —   |  —   |
+| Abr 2025 (n=8)  | 100% | 88%  | 84%  |  —   |  —   |  —   |
+
+> ✅ Diagonal melhora: M3 retention Jan=78% → Mar=83% (+5pp). Onboarding revisto em Fev parece funcionar.
+
+---
+
+## Acções Prioritárias (CFO Squad — Tunguz/Janz)
+
+🔴 **MRR Growth desacelera para 6,9% (benchmark seed: >15%):** pipeline de New MRR caiu 53%
+   desde Jan. Investigar funil topo — leads qualificados ou taxa de conversão?
+
+🟡 **CAC Payback 22 meses:** aceitável seed mas pressionado. Aumentar gross margin de 72%→78%
+   reduziria payback para 18 meses. Avaliar ticket médio — ARPU €49 baixo para B2B fiscal.
+
+🟡 **ARPU estagnado €49 há 3 meses:** Expansion MRR cai (€410→€260). Rever pricing tiers
+   e trigger de upsell — clientes no tier base não estão a converter para Pro (€89/mês).
+```
+
+---
+
+## Output anti-patterns
+
+- Calcular Rule of 40 com MoM growth em vez de YoY — distorce completamente o resultado (MoM 6,9% × 12 ≠ YoY 58%)
+- Aplicar benchmarks de Mature (churn <1%) a uma empresa Seed — cria alarme falso e perde confiança do cliente
+- Deixar Magic Number sem especificar o desfasamento trimestral no S&M — Magic Number sem lag não é Magic Number
+- Reportar NRR como "acima de 100%, óptimo" sem decompor onde vem a expansão (upsell? cross-sell? seat growth?)
+- Misturar unidades: calcular Quick Ratio com ARR no numerador e MRR no denominador
+- Omitir n= nas cohort tables — sem saber se o cohort tem 5 ou 500 clientes, a retenção não tem significado estatístico
+- Calcular LTV com churn rate anual mas ARPU mensal (ou vice-versa) sem normalizar o período
+- Apresentar dashboard completo sem identificar o stage da empresa — todos os semáforos ficam sem referência
+- Ignorar Net Negative Churn quando Expansion > Churn + Contraction — é o insight mais valioso do waterfall e frequentemente omitido

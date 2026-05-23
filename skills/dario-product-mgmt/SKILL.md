@@ -401,3 +401,203 @@ Outcome: <metric>
 - **Vanity features** — features that look impressive in demos but don't move the NSM. Before building, ask: "Which metric does this move?" If the answer is unclear, the feature probably shouldn't be built.
 - **Confusing output with outcome** — "We shipped 47 features this quarter" is output. "We increased activation from 15% to 32%" is outcome. Empowered product teams are measured on outcomes. Feature factories are measured on output.
 - **Discovery without synthesis** — conducting 20 user interviews and then not synthesizing patterns into opportunities is research theater. Every interview must be synthesized within 48 hours and connected to the Opportunity Solution Tree.
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+---
+
+### Gate 1 — Contexto do produto mapeado (stage + métricas reais)
+
+- [ ] Stage do produto identificado: ideia / protótipo / MVP / PMF / crescimento / maduro
+- [ ] NSM (North Star Metric) ou proxy definido com valor actual, não hipotético
+- [ ] Utilizadores identificados com segmento concreto (não "utilizadores genéricos")
+- [ ] Pelo menos uma métrica de negócio citada (activation rate, churn, ARR, DAU…)
+
+❌ NOT delivery-ready: "O produto está numa fase inicial e tem alguns utilizadores."
+✅ Delivery-ready: "LUSOconta — MVP lançado Q1 2025, 340 contas criadas, activation rate 38 %, NSM = transações completadas por conta/mês (actual: 2.1)."
+
+---
+
+### Gate 2 — Os 4 Risks de Cagan abordados antes de recomendar build
+
+- [ ] Risco de Value: evidência de que utilizadores querem isto (interview quotes, demand test, waitlist)
+- [ ] Risco de Usability: testado com protótipo ou usability session (não assumido)
+- [ ] Risco de Feasibility: validado com tech lead ou spike (não "parece simples")
+- [ ] Risco de Business Viability: alinhamento com estratégia, legal, margens confirmado
+
+❌ NOT delivery-ready: "Vamos construir a feature de exportação PDF porque o cliente pediu."
+✅ Delivery-ready: "Exportação PDF — Value: 6/8 entrevistados mencionaram espontaneamente; Usability: protótipo testado com 3 utilizadores, 0 bloqueios; Feasibility: spike 4h — biblioteca pdfmake suporta caso; Viability: sem implicações RGPD adicionais."
+
+---
+
+### Gate 3 — Opportunity Solution Tree (OST) com outcome raiz real
+
+- [ ] Outcome raiz é uma métrica movível, não uma feature ou iniciativa
+- [ ] Mínimo 2 oportunidades mapeadas com framing em necessidade do utilizador
+- [ ] Cada oportunidade tem ≥ 2 soluções alternativas (não solução única pré-decidida)
+- [ ] Pelo menos 1 assumption test identificado por solução top-candidate
+
+❌ NOT delivery-ready: "Queremos melhorar a app. Oportunidade: adicionar notificações. Solução: push notifications."
+✅ Delivery-ready: "Outcome raiz: aumentar retention D30 de 22 % → 35 % (Atelier AI, Q2 2025). Oportunidade A: utilizadores esquecem de voltar à plataforma (n=5 entrevistas). Sol. A1: digest semanal por email — assumption test: envio manual a 50 users semana que vem. Sol. A2: in-app reminder no login — assumption test: interceptar 20 % dos logins com modal."
+
+---
+
+### Gate 4 — Roadmap orientado a outcomes, não lista de features com datas
+
+- [ ] Itens do roadmap formulados como problema/outcome a resolver, não como feature descrita
+- [ ] Priorização usa critério explícito (DHM score, ICE, RICE, LNO — não feeling ou HiPPO)
+- [ ] "Continue / Pivot / Kill" aplicado a itens com evidência associada
+- [ ] Horizonte temporal honesto: Now / Next / Later (não waterfall com datas precisas para tudo)
+
+❌ NOT delivery-ready: "Q2: Dashboard v2, Q3: Integrações, Q4: Mobile app, Q1 26: AI features."
+✅ Delivery-ready: "Now (Q2 2025): Reduzir time-to-first-value < 5 min — DHM score 8/10 (Delight: onboarding friction é o bloqueio #1; Hard-to-copy: 6/10; Margin: elimina suporte manual = €1.2k/mês). Next (Q3): Aumentar expansão de conta — hipótese a validar. Later: Integrações contabilísticas — dependente de PMF confirmado."
+
+---
+
+### Gate 5 — Build Trap diagnosticada (se aplicável) ou descartada com evidência
+
+- [ ] Avaliado se equipa está a ser medida por output (features) ou por outcome (métricas)
+- [ ] Identificado se PM está a funcionar como project manager vs product leader
+- [ ] Backlog tem critério de saída (o que justifica remover ou matar um item)
+- [ ] Product Kata aplicado: estado actual → estado desejado → obstáculo → próximo passo experimental
+
+❌ NOT delivery-ready: "Temos 87 itens no backlog e vamos priorizar por votação da equipa."
+✅ Delivery-ready: "SAQUEI — diagnóstico Build Trap: equipa reporta 12 features shipped em Q1, mas DAU manteve-se flat (1 240 → 1 255). Recomendação: congelar backlog, correr 3 discovery sprints. Obstáculo identificado: stakeholders pedem estimativas de entrega antes de validação. Próximo passo: instaurar weekly interview habit + OST partilhado com stakeholders."
+
+---
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+
+- [ ] Nome do cliente/produto aparece no output (não "\<company\>", "\<product\>", "\<metric\>")
+- [ ] Datas, números e nomes de agentes são verificáveis ou explicitamente marcados como hipótese
+- [ ] Nenhum bloco de exemplo contém `[INSERT X]`, `TBD`, ou `X%` sem valor atribuído
+- [ ] Se dados reais não existem, output marca explicitamente "hipótese a validar" com método de teste
+
+❌ NOT delivery-ready: "A \<empresa\> deve aumentar a sua \<métrica\> de \<valor atual\> para \<valor alvo\>."
+✅ Delivery-ready: "Cuidai deve aumentar retenção de cuidadores activos de 61 % (Março 2025) para 75 % até Junho 2025 — hipótese a validar via cohort analysis após onboarding redesign."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Product Review — LUSOconta | Q2 2025 Planning
+
+**Produto:** LUSOconta (SaaS contabilidade para freelancers PT)
+**Stage:** MVP → PMF (lançado Outubro 2024)
+**Data da review:** 15 Maio 2025
+**PM responsável:** Dario (via Atelier AI squad)
+
+---
+
+## North Star Metric
+**Transações categorizadas correctamente por conta/mês**
+Actual: 4.2 | Target Q2: 7.0 | Benchmark sector (Lenny 2024): 6–9 para SaaS fintech SMB
+
+---
+
+## Estado das métricas-chave (Abril 2025)
+| Métrica | Valor actual | Benchmark | Gap |
+|---|---|---|---|
+| Activation rate (D7) | 38 % | 45 % (P50 fintech) | −7 pp |
+| Retention D30 | 29 % | 35 % (P50 SaaS) | −6 pp |
+| Time-to-first-value | 11 min | < 5 min (best-in-class) | +6 min |
+| NPS | 34 | 40 (bom SaaS) | −6 |
+
+---
+
+## Diagnóstico: Build Trap Assessment
+- Últimos 90 dias: 9 features shipped, NSM moveu +0.3 (flat)
+- Equipa medida por "features entregues a tempo" → **feature team mode activo**
+- Backlog tem 94 itens, sem critério de saída, último grooming: 6 semanas atrás
+- **Veredito: Build Trap confirmado. Acção imediata necessária.**
+
+---
+
+## Opportunity Solution Tree — Q2 2025
+
+**Outcome raiz:** Aumentar time-to-first-value de 11 min → < 5 min
+(proxy de activation rate D7 de 38 % → 45 %)
+
+```
+Outcome: Time-to-first-value < 5 min
+    |
+    +-- Oportunidade A: Utilizadores bloqueiam na ligação bancária (n=7/10 entrevistas)
+    |       +-- Sol. A1: Open Banking pré-configurado para CGD/BPI/Novo Banco
+    |       |       Assumption: utilizadores têm conta nestes 3 bancos → validar via sign-up survey
+    |       +-- Sol. A2: Import manual CSV com template guiado
+    |               Assumption: utilizadores têm CSV disponível → testar com 20 users semana 1
+    |
+    +-- Oportunidade B: Categorização inicial confusa — utilizadores não sabem o que fazer (n=4/10)
+            +-- Sol. B1: Checklist de onboarding com 3 passos obrigatórios
+            +-- Sol. B2: Modo "guiado" com tooltips contextuais
+                    Assumption test: protótipo Figma → 5 usability sessions esta semana
+```
+
+---
+
+## Validação dos 4 Risks — Sol. A1 (Open Banking pré-configurado)
+
+| Risk | Status | Evidência |
+|---|---|---|
+| Value | ✅ Validado | 7/10 entrevistas mencionaram ligação bancária como bloqueio principal |
+| Usability | 🟡 Em teste | Protótipo v2 em usability test com 3 utilizadores (resultados: 22 Mai) |
+| Feasibility | ✅ Validado | Spike 6h com Nuno (CTO): Salt Edge API suporta CGD/BPI/NB, 3 semanas dev |
+| Viability | ✅ Validado | RGPD: consentimento explícito já no fluxo; custo Salt Edge: €0.08/conexão |
+
+---
+
+## Roadmap Q2–Q3 2025 (outcome-driven)
+
+### Now (Mai–Jun 2025)
+**Problema:** Time-to-first-value demasiado alto bloqueia activation
+- Iniciativa: Open Banking onboarding (Sol. A1)
+- DHM Score: Delight 9/10 · Hard-to-copy 7/10 · Margin 8/10 → **Total: 8.0**
+- Stage-gate: se activation D7 ≥ 43 % até 30 Jun → continuar para expansão bancária
+
+### Next (Jul–Set 2025)
+**Problema:** Retenção D30 abaixo de benchmark — utilizadores não constroem hábito
+- Hipótese a validar: digest semanal de "saúde fiscal" aumenta logins recorrentes
+- Método: A/B test email vs controlo, n=200 por grupo, 6 semanas
+- Critério de pivot: se D30 não move +3 pp → explorar Oportunidade B (onboarding guiado)
+
+### Later (Q4 2025+)
+- Integrações contabilísticas (TOC/ROC export): **dependente de PMF confirmado** (NPS ≥ 45)
+- Mobile app: **kill temporário** — 94 % acessos são desktop (dados Mixpanel Abril 2025)
+
+---
+
+## Continue / Pivot / Kill — Backlog Review (Top 5)
+
+| Item | Decisão | Justificação |
+|---|---|---|
+| Relatórios PDF personalizados | ✅ Continue | 6/8 entrevistas, DHM 7.5 |
+| Dark mode | ❌ Kill | 0 menções em 10 entrevistas, DHM 2.0 |
+| Multi-empresa por conta | 🔄 Pivot | Necessidade real mas scope errado — reduzir para "sub-perfis" |
+| Notificações push mobile | ⏸ Later | Mobile < 6 % tráfego; reavaliar Q4 |
+| Integração Sage | 🔄 Pivot | Pedido por 2 enterprise leads — criar waitlist, não build agora |
+
+---
+
+**Próximos passos imediatos (esta semana):**
+1. Dario agenda 3 usability sessions protótipo Open Banking (até 19 Mai)
+2. Nuno confirma estimativa final Salt Edge integration (até 16 Mai)
+3. Backlog freeze — 94 itens em revisão com novo critério DHM mínimo 5.0
+```
+
+---
+
+## Output anti-patterns
+
+- **Roadmap como lista de features com datas** — "Q3: Dashboard v2, Q4: Integrações" sem outcome associado nem critério de sucesso
+- **4 Risks ignorados** — recomendar build sem validar value, usability, feasibility e viability, mesmo que brevemente
+- **OST com solução única** — árvore com uma oportunidade e uma solução é decisão disfarçada de discovery
+- **Stage-gate sem critério de saída** — "vamos ver como corre" não é uma decisão de Continue/Pivot/Kill
+- **Métricas sem benchmark** — "retention de 29 %" sem contexto de sector/stage não permite decisão
+- **Build Trap não diagnosticada** — output foca em como priorizar features sem perguntar se a equipa está a ser medida por outcomes
+- **NSM inventada** — North Star Metric definida sem dados actuais nem método de medição identificado
+- **Backlog grooming sem critério de kill** — listar itens e ordenar por importância sem definir o que sai do backlog
+- **DHM score sem componentes** — dar um número final sem detalhar Delight / Hard-to-copy / Margin separadamente
+- **Placeholders no output** — "\<inserir métrica\>", "\<empresa\>", "X %" entregues ao cliente sem substituição por dados reais ou hipóteses explicitamente marcadas
