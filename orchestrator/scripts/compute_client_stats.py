@@ -22,6 +22,7 @@ from pathlib import Path
 ORCH = Path.home() / ".claude" / "orchestrator"
 REGISTRY_PATH = ORCH / ".captured_outputs.yaml"
 CLIENT_STATS_PATH = ORCH / "quality" / "client-stats.yaml"
+CLIENT_REVENUE_PATH = ORCH / "quality" / "client-revenue.yaml"
 OBS_OUTPUTS = Path.home() / "OneDrive" / "Documents" / "D.A.R.I.O" / "05 - Claude - IA" / "Outputs"
 
 try:
@@ -86,22 +87,35 @@ CLIENT_ALIASES = {
     "fix trio": "dario-internal",
 }
 
+# Client identity/status metadata. Revenue fields live em quality/client-revenue.yaml (editável).
 CLIENT_METADATA = {
-    "atrium-premium-re": {"name": "Atrium Premium Real Estate", "monthly_value": 5000, "currency": "EUR", "status": "active", "engagement_started": "2026-03-13", "note": "blocked by Thiago decisions"},
-    "atrium-golden-visa": {"name": "Atrium Golden Visa", "monthly_value": 3000, "currency": "EUR", "status": "live", "engagement_started": "2026-02-01", "deployment": "herbalifeportugal.com"},
-    "lucas-lusoconta": {"name": "LUCAS / LUSOconta", "monthly_value": 2500, "currency": "EUR", "status": "active", "engagement_started": "2026-01-15", "deployment": "flipperboys.com"},
-    "cuidai": {"name": "Cuidaí BR", "monthly_value": 0, "currency": "BRL", "status": "wave-0-complete", "engagement_started": "2026-05-01"},
-    "saquei": {"name": "SAQUEI BR", "monthly_value": 0, "currency": "BRL", "status": "gate-1-complete", "deployment": "saquei.vercel.app"},
-    "pupli": {"name": "PUPLI (ex-Patudos)", "monthly_value": 0, "currency": "EUR", "status": "live-vps"},
-    "vivenda": {"name": "Vivenda Creative Home", "monthly_value": 800, "currency": "EUR", "status": "active"},
-    "lisbon-dog-care": {"name": "Lisbon Dog Care", "monthly_value": 400, "currency": "EUR", "status": "active"},
-    "atelier-ai": {"name": "Atelier AI", "monthly_value": 0, "currency": "EUR", "status": "mvp-building"},
-    "tributario-ai": {"name": "Tributário.AI", "monthly_value": 0, "currency": "BRL", "status": "founder-day-0-pending"},
-    "arrecada-gov": {"name": "ARRECADA.GOV", "monthly_value": 0, "currency": "BRL", "status": "mvp-live", "note": "success-fee 12%"},
-    "clawcode": {"name": "Clawcode Agent", "monthly_value": 0, "status": "archived"},
-    "adgeniuspro": {"name": "adgeniuspro", "monthly_value": 0, "status": "advisory"},
-    "dario-internal": {"name": "DARIO Internal Work", "monthly_value": 0, "status": "internal"},
+    "atrium-premium-re": {"name": "Atrium Premium Real Estate", "status": "active", "engagement_started": "2026-03-13", "note": "blocked by Thiago decisions"},
+    "atrium-golden-visa": {"name": "Atrium Golden Visa", "status": "live", "engagement_started": "2026-02-01", "deployment": "herbalifeportugal.com"},
+    "lucas-lusoconta": {"name": "LUCAS / LUSOconta", "status": "active", "engagement_started": "2026-01-15", "deployment": "flipperboys.com"},
+    "cuidai": {"name": "Cuidaí BR", "status": "wave-0-complete", "engagement_started": "2026-05-01"},
+    "saquei": {"name": "SAQUEI BR", "status": "gate-1-complete", "deployment": "saquei.vercel.app"},
+    "pupli": {"name": "PUPLI (ex-Patudos)", "status": "live-vps"},
+    "vivenda": {"name": "Vivenda Creative Home", "status": "active"},
+    "lisbon-dog-care": {"name": "Lisbon Dog Care", "status": "active"},
+    "atelier-ai": {"name": "Atelier AI", "status": "mvp-building"},
+    "tributario-ai": {"name": "Tributário.AI", "status": "founder-day-0-pending"},
+    "arrecada-gov": {"name": "ARRECADA.GOV", "status": "mvp-live", "note": "success-fee 12%"},
+    "clawcode": {"name": "Clawcode Agent", "status": "archived"},
+    "adgeniuspro": {"name": "adgeniuspro", "status": "advisory"},
+    "dario-internal": {"name": "DARIO Internal Work", "status": "internal"},
 }
+
+
+def load_revenue() -> dict:
+    """Load user-editable revenue YAML. Returns {} if missing.
+
+    Schema per client: monthly_value, currency, billing_status, billing_model,
+    contract_start, contract_end, last_invoice, notes (all optional).
+    """
+    if not CLIENT_REVENUE_PATH.exists():
+        return {}
+    data = load_y(CLIENT_REVENUE_PATH)
+    return data.get("clients", {}) or {}
 
 
 def infer_client(filename: str) -> str | None:
@@ -119,6 +133,7 @@ def infer_client(filename: str) -> str | None:
 def compute() -> dict:
     registry = load_y(REGISTRY_PATH)
     captured = registry.get("captured", {})
+    revenue = load_revenue()
 
     by_client = defaultdict(lambda: {
         "deliverables": [], "scores": [],
@@ -159,11 +174,17 @@ def compute() -> dict:
         decided = data["yes_count"] + data["needs_review_count"] + data["no_count"]
         rate = round(100.0 * data["yes_count"] / decided, 1) if decided else None
 
+        rev = revenue.get(client_id, {}) or {}
         result[client_id] = {
             "name": meta.get("name", client_id),
             "status": meta.get("status"),
-            "monthly_value": meta.get("monthly_value"),
-            "currency": meta.get("currency"),
+            "monthly_value": rev.get("monthly_value"),
+            "currency": rev.get("currency"),
+            "billing_status": rev.get("billing_status"),
+            "billing_model": rev.get("billing_model"),
+            "contract_start": rev.get("contract_start"),
+            "last_invoice": rev.get("last_invoice"),
+            "revenue_notes": rev.get("notes"),
             "engagement_started": meta.get("engagement_started"),
             "deployment": meta.get("deployment"),
             "note": meta.get("note"),

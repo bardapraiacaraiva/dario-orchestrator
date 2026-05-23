@@ -184,6 +184,43 @@ def generate():
         except Exception:
             top_clients = []
 
+    # Build per-client rows (structured card, like Budget Por Projecto)
+    def _money_html(c):
+        v = c.get("monthly_value")
+        cur = c.get("currency") or ""
+        if not v:
+            return '<span style="color:var(--dim);font-size:11px;">—</span>'
+        sym = {"EUR": "€", "BRL": "R$", "USD": "$"}.get(cur, cur)
+        return f'<span style="color:var(--green);font-size:11px;font-weight:600;">{sym}{v:,}/mo</span>'
+
+    def _status_dot(c):
+        s = (c.get("status") or "").lower()
+        if "blocked" in s or "pending" in s: return "dot-amber"
+        return "dot-green"
+
+    clients_html = ""
+    for cid, c in top_clients[:6]:
+        name = (c.get("name") or cid)[:28]
+        outputs = c.get("total_outputs_obsidian", 0)
+        status = (c.get("status") or "?")[:16]
+        dr = c.get("delivery_ready_rate_pct")
+        dr_html = f'<span style="color:var(--dim);font-size:10px;margin-left:6px;">{dr}% yes</span>' if dr is not None else ""
+        clients_html += (
+            f'<div style="display:flex;justify-content:space-between;align-items:center;'
+            f'margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">'
+            f'<div style="flex:1;min-width:0;">'
+            f'<div style="font-size:12px;font-weight:600;color:var(--text);">'
+            f'<span class="dot {_status_dot(c)}" style="display:inline-block;margin-right:6px;"></span>{name}{dr_html}</div>'
+            f'<div style="font-size:10px;color:var(--dim);margin-top:2px;">{status}</div>'
+            f'</div>'
+            f'<div style="text-align:right;margin-left:12px;">'
+            f'<div style="font-size:14px;font-weight:700;color:#43a0ff;">{outputs}</div>'
+            f'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;">outputs</div>'
+            f'</div>'
+            f'<div style="text-align:right;margin-left:12px;min-width:75px;">{_money_html(c)}</div>'
+            f'</div>'
+        )
+
     # Task rows
     task_rows = ""
     for t in tasks[:10]:
@@ -338,6 +375,15 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
     {q_html or '<div style="color:var(--dim);font-size:12px;text-align:center;">Sem scores registados</div>'}
   </div>
 
+  <!-- TOP CLIENTS (FASE 3) -->
+  <div class="card">
+    <h3>Top Clientes — por outputs entregues</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Ranking por nº de deliverables no vault Obsidian · exclui internal/archived
+    </div>
+    {clients_html or '<div style="color:var(--dim);font-size:12px;text-align:center;padding:20px;">Sem clientes registados<br><span style="font-size:10px;">Correr: python scripts/compute_client_stats.py</span></div>'}
+  </div>
+
   <!-- SYSTEM HEALTH -->
   <div class="card">
     <h3>Saude do Sistema</h3>
@@ -346,7 +392,7 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
     <div class="health-row"><span class="dot dot-green"></span> Budget Tracker — {budget.get('month','?')}, {pct:.1f}% usado</div>
     <div class="health-row"><span class="dot dot-green"></span> Quality — {len(q_skills)} skills scored, avg {avg_quality:.1f}, delivery-ready {delivery_rate_pct:.0f}% ({delivery_yes}/{delivery_total})</div>
     <div class="health-row"><span class="dot {'dot-amber' if queue_pending > 0 else 'dot-green'}"></span> Review Queue — {queue_pending} pending, {queue_resolved} resolved {'(avg TTR ' + f'{queue_avg_ttr_min:.0f}min)' if queue_resolved else ''}</div>
-    <div class="health-row"><span class="dot dot-green"></span> Top clients (by outputs): {' · '.join(f"{c.get('name', cid)[:18]} ({c.get('total_outputs_obsidian', 0)})" for cid, c in top_clients[:5])}</div>
+    <div class="health-row"><span class="dot dot-green"></span> Top clients — {len(top_clients)} ativos (ver card dedicado)</div>
     <div class="health-row"><span class="dot dot-green"></span> Tasks — {len(tasks)} activas, {done_count} done</div>
     <div class="health-row"><span class="dot {'dot-green' if pulse_time != 'nunca' else 'dot-red'}"></span> Last Pulse — {pulse_time}</div>
   </div>
