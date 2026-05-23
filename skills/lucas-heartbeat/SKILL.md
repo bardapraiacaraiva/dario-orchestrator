@@ -828,6 +828,40 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do LUCAS Heartbeat deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via state machine / task YAML / audit log real
+- 🟡 **assumed** — plausível dado o design, mas precisa confirmar antes de reportar ao utilizador
+- 🟢 **projection** — forecast gerado pelo pulse (não verificável até execução concluir)
+
+O pulse summary (Step 10) deve incluir este checklist upfront para o CEO/manager saber exatamente o que é factual vs estimado. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Tasks executed this pulse: 4 | Budget used: 73% | Next wave: [T-12, T-15, T-18]
+```
+*(reader assume tudo verified — mas budget pode ser drift, T-18 pode ainda não ter deps resolvidas)*
+
+✅ Delivery-ready:
+```
+Tasks executed this pulse: 4 🔵 verified (audit/dispatch_2025-07-10.log)
+Budget used: 73% 🔵 verified (budgets/2025-07.yaml, lido às 14:32)
+Tasks stale: 2 🟡 assumed (updated_at não mudou >24h, mas agent pode estar silencioso)
+Next wave ready: [T-12, T-15] 🟢 projection (depends_on cascade calculado; execução não iniciada)
+AutoDiag: 0 warnings 🔵 verified (autodiag_runner.py exit 0, 14:31)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — stale flags validados com agent real (não apenas timestamp drift)
+- [ ] All 🔵 citations added — path do ficheiro + timestamp de leitura incluídos no pulse report
+- [ ] All 🟢 projections labeled como tal ao CEO — "wave pronta para executar" ≠ "wave executada"
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

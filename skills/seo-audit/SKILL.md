@@ -202,6 +202,30 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via crawl real, medição directa ou tool output desta sessão
+- 🟡 **assumed** — plausível com base em padrões do sector, mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa de impacto pós-fix (não verificável agora, forecast por design)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready: "O site tem cerca de 60 páginas sem meta description, performance lenta, e o schema provavelmente está mal configurado. Corrigindo isso o tráfego deve melhorar bastante." *(sem labels — reader não sabe o que foi medido vs assumido vs estimado)*
+
+✅ Delivery-ready:
+- 🔵 **verified** — 47 páginas sem meta description (crawl confirmado, lista em `/output/missing-meta.csv`)
+- 🔵 **verified** — LCP: 4.2s, CLS: 0.31, INP: 380ms (medido via PageSpeed API, URL: `/product-page`)
+- 🟡 **assumed** — GBP listing considerada activa (NAP encontrado no site, verificação no painel do cliente pendente)
+- 🟡 **assumed** — robots.txt bloqueia `/staging/` — assumido intencional, confirmar se deve permanecer bloqueado
+- 🟢 **projection** — corrigindo LCP para <2.5s estimativa de melhoria de +8-12 pts no Health Score (baseado em pesos da auditoria: Performance 10%)
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: GBP status, intenção do robots.txt, canonical strategy)
+- [ ] All 🔵 citations presentes — cada finding cita URL ou ficheiro de source (crawl log, PageSpeed result, screenshot)
+- [ ] All 🟢 projections claramente labelled ao cliente como estimativas de impacto, não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

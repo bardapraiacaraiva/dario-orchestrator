@@ -786,6 +786,37 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados reais do projeto
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast by design (não verificável — esperado pelo contexto)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "QS médio do último mês: 84. Skill `brand-copy` com melhor performance. SystemHealth: 0.78."
+> *(sem labels — reader assume que tudo é verified; pode estar a misturar actuals com placeholders)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — QS médio das últimas 10 tasks: **81.4** (calculado de `quality_score` fields em YAML)
+> - 🔵 **verified** — Skill com menor score: `lucas-financial` → QS 58 (flagged para revision)
+> - 🟡 **assumed** — `task_velocity` estimada em **0.87** (tasks_planned não confirmadas para este mês)
+> - 🟡 **assumed** — `memory_freshness` calculada em **72%** (última sync de memória não datada na sessão actual)
+> - 🟢 **projection** — SystemHealth projectado em **0.79 → "Normal"** (baseado nos valores acima; sujeito a confirmação dos 🟡 items)
+> - 🟢 **projection** — Se score médio subir para ≥ 85 nas próximas 5 tasks → SystemHealth entra em **"Fluidez"** (full autonomy)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — `tasks_planned` do mês validadas; data da última memory sync confirmada
+- [ ] All 🔵 citations added — YAML `quality_score` fields referenciados por task ID
+- [ ] All 🟢 projections labeled as such ao cliente — SystemHealth forecast apresentado como estimativa, não como estado actual
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

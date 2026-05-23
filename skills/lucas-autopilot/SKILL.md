@@ -924,6 +924,48 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do **lucas-autopilot** deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via state machine, task YAML, ou budget file lidos neste pulse
+- 🟡 **assumed** — plausível mas precisa confirm antes de agir (ex: worker availability, skill mapping)
+- 🟢 **projection** — forecast by design (estimativas de tempo, scores esperados, pulse scheduling)
+
+Output checklist upfront mostra ao operador exactamente o que é trust-as-is vs o que precisa de validação antes de executar wave seguinte. **Honest transparency > inflated dispatch.**
+
+---
+
+❌ NOT delivery-ready:
+```
+SCAN: 12 tasks | BUDGET: 67% | Dispatched: PROJ-001 → worker-brand | Next pulse: 60s
+```
+*(reader assume que tudo está verified — mas worker-brand pode estar busy, budget file pode estar stale, task YAML pode ter depends_on por resolver)*
+
+✅ Delivery-ready:
+```
+SCAN: 12 tasks total 🔵 verified (lidos de ~/.claude/orchestrator/tasks/active/ às 14:32)
+  └─ 3 done | 2 in_progress | 4 todo | 2 backlog | 1 blocked
+
+BUDGET: 67% spend este mês 🔵 verified (2025-07.yaml lido neste pulse)
+  └─ max_parallel = 3 — budget safe
+
+DISPATCH:
+  PROJ-001 → worker-brand (dario-brand) 🟡 assumed — worker reportado AVAILABLE mas sem lock atómico confirmado
+  PROJ-002 → sem assignee 🔵 verified — dispatch_engine retornou NO_WORKER para custom-skill
+
+UNBLOCK: PROJ-005 desbloqueado 🔵 verified — todos depends_on em "done" confirmados via YAML
+SCORE esperado (próximo pulse): 82/100 🟢 projection — baseado em média histórica dario-brand (5 runs)
+NEXT PULSE: 60s 🟢 projection — agendado se tasks ainda em queue; cancela se GUARDIAN activar
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — worker availability locked antes de lançar Agent tool (substituir assumptions com estado real do worker no momento de execução)
+- [ ] All 🔵 sources citadas — path do YAML + timestamp de leitura incluídos no audit log
+- [ ] All 🟢 projections comunicadas ao cliente como forecast, não garantia (pulse timing e scores sujeitos a state machine transitions)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

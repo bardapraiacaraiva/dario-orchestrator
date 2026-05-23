@@ -847,6 +847,42 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados reais do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do Lucas antes de entregar
+- 🟢 **projection** — previsão por design (não verificável no momento)
+
+Output checklist upfront mostra ao leitor exactamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Receita Abril: 4.300 EUR | Resultado líquido: ~2.303 EUR | IVA a entregar: 667 EUR
+Atrium paga a 30 dias. Margem líquida: 53.5%
+```
+*(reader assume tudo verified — mas IVA, prazo Atrium e margem podem ser estimates não confirmados)*
+
+✅ Delivery-ready:
+```
+🔵 verified   — Factura F/2026/002 Atrium: 2.500 EUR (emitida 01/04, due 01/05)
+🔵 verified   — Despesas fixas Abril: 340 EUR (Claude Code 100 + Hosting 25 + DataForSEO 50 + Contabilista 150 + Domínio 15)
+🟡 assumed    — Regime IVA trimestral (não mensal) — confirmar se volume 2025 ficou <650K
+🟡 assumed    — Taxa IRC efectiva ~25% usada no P&L — confirmar com contabilista se há deduções
+🟢 projection — Saldo projectado 30d: 3.835 EUR (depende de Atrium pagar em 15/05)
+🟢 projection — Resultado líquido estimado: ~2.303 EUR (pré-apuramento fiscal real)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions com actuals (regime IVA, taxa IRC real, NIFs, IBANs)
+- [ ] Todas as facturas 🔵 cruzadas com software AT certificado (InvoiceXpress / Moloni / PHC) antes de comunicar SAFT
+- [ ] Todas as 🟢 projecções de cash flow e resultado líquido apresentadas ao Lucas com label "estimativa" — expectativas claras antes de decisões de tesouraria
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown
