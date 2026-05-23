@@ -109,6 +109,23 @@ def generate():
 
     avg_quality = quality.get("global_avg_quality", 0) or 0
 
+    # Delivery-ready rate — new first-class metric (Caminho B, 2026-05-23)
+    # Reports % of REAL outputs the LLM judge marked "deliverable=yes"
+    # (no senior review needed). Honest production-quality signal.
+    delivery_yes = 0
+    delivery_total = 0
+    production_validated_count = 0
+    for skill_name, sm in (quality.get("skills") or {}).items():
+        if not isinstance(sm, dict):
+            continue
+        yes = sm.get("deliverable_yes_count", 0)
+        n = sm.get("production_n_real_outputs", 0)
+        if n:
+            delivery_yes += int(yes or 0)
+            delivery_total += int(n)
+            production_validated_count += 1
+    delivery_rate_pct = (100.0 * delivery_yes / delivery_total) if delivery_total else 0.0
+
     # Task rows
     task_rows = ""
     for t in tasks[:10]:
@@ -241,14 +258,23 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
   <!-- QUALITY -->
   <div class="card">
     <h3>Qualidade</h3>
-    <div style="text-align:center;margin-bottom:16px;">
-      <div class="big-num">{avg_quality:.1f}</div>
-      <div style="font-size:12px;color:var(--dim);">Score medio /100</div>
+    <div style="display:flex;gap:24px;justify-content:center;margin-bottom:16px;">
+      <div style="text-align:center;">
+        <div class="big-num">{avg_quality:.1f}</div>
+        <div style="font-size:11px;color:var(--dim);">Score medio /100</div>
+        <div style="font-size:10px;color:var(--dim);margin-top:2px;">(LLM-judge 5-dim)</div>
+      </div>
+      <div style="text-align:center;border-left:1px solid var(--border);padding-left:24px;">
+        <div class="big-num" style="color:{('var(--green)' if delivery_rate_pct >= 50 else 'var(--amber)' if delivery_rate_pct >= 25 else 'var(--red)')};">{delivery_rate_pct:.0f}%</div>
+        <div style="font-size:11px;color:var(--dim);">Delivery-ready</div>
+        <div style="font-size:10px;color:var(--dim);margin-top:2px;">({delivery_yes}/{delivery_total} real outputs)</div>
+      </div>
     </div>
     <div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px;">
       <span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">A: {tier_a}</span>
       <span class="badge" style="background:rgba(255,171,0,.15);color:var(--amber);border:1px solid rgba(255,171,0,.3);">B: {tier_b}</span>
       <span class="badge" style="background:rgba(136,150,179,.15);color:var(--dim);border:1px solid rgba(136,150,179,.3);">?: {unscored}</span>
+      <span class="badge" style="background:rgba(67,160,255,.15);color:#43a0ff;border:1px solid rgba(67,160,255,.3);">Prod: {production_validated_count}</span>
     </div>
     {q_html or '<div style="color:var(--dim);font-size:12px;text-align:center;">Sem scores registados</div>'}
   </div>
@@ -259,7 +285,7 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
     <div class="health-row"><span class="dot dot-green"></span> Orchestrator — company.yaml ({company['total']} entidades)</div>
     <div class="health-row"><span class="dot dot-green"></span> Skills — {total_skills} totais (DARIO {skills['dario']}, DIVA {skills['diva']}, LUCAS {skills['lucas']}, SEO {skills['seo']}, A360 {skills['a360']})</div>
     <div class="health-row"><span class="dot dot-green"></span> Budget Tracker — {budget.get('month','?')}, {pct:.1f}% usado</div>
-    <div class="health-row"><span class="dot dot-green"></span> Quality — {len(q_skills)} skills scored, avg {avg_quality:.1f}</div>
+    <div class="health-row"><span class="dot dot-green"></span> Quality — {len(q_skills)} skills scored, avg {avg_quality:.1f}, delivery-ready {delivery_rate_pct:.0f}% ({delivery_yes}/{delivery_total})</div>
     <div class="health-row"><span class="dot dot-green"></span> Tasks — {len(tasks)} activas, {done_count} done</div>
     <div class="health-row"><span class="dot {'dot-green' if pulse_time != 'nunca' else 'dot-red'}"></span> Last Pulse — {pulse_time}</div>
   </div>

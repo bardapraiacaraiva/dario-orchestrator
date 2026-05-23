@@ -236,6 +236,38 @@ def job_integrity_gate() -> dict:
     }
 
 
+def job_delivery_rate_recompute() -> dict:
+    """Recompute delivery_ready_rate from current production scores.
+
+    Cheap idempotent aggregation — pulls deliverable_*_count fields from
+    each skill in skill-metrics.yaml and updates the top-level
+    delivery_ready_rate_pct (introduced 2026-05-23, Caminho B).
+    """
+    try:
+        sys.path.insert(0, str(ORCH_DIR / "scripts"))
+        from compute_delivery_rate import compute, dump_y, load_y
+        result = compute()
+
+        metrics_path = ORCH_DIR / "quality" / "skill-metrics.yaml"
+        metrics = load_y(metrics_path)
+        metrics["delivery_ready_rate_pct"] = result["delivery_ready_rate_pct"]
+        metrics["delivery_ready_yes_count"] = result["delivery_ready_yes_count"]
+        metrics["delivery_ready_needs_review_count"] = result["delivery_ready_needs_review_count"]
+        metrics["delivery_ready_no_count"] = result["delivery_ready_no_count"]
+        metrics["delivery_ready_total"] = result["delivery_ready_total"]
+        metrics["production_validated_skills"] = result["production_validated_skills"]
+        dump_y(metrics, metrics_path)
+
+        return {
+            "delivery_rate_pct": result["delivery_ready_rate_pct"],
+            "yes": result["delivery_ready_yes_count"],
+            "total": result["delivery_ready_total"],
+            "production_skills": result["production_validated_skills"],
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
 def job_prompt_hints_promote() -> dict:
     """Prompt Hints (Upgrade 17) — extract recurring drilldown patterns
     into learned hints injected by context_injector."""
@@ -392,6 +424,7 @@ def run_all(dry_run: bool = False) -> dict:
     report["jobs"].append(_run_job("state_snapshot", job_state_snapshot))
     report["jobs"].append(_run_job("integrity_gate", job_integrity_gate))
     report["jobs"].append(_run_job("prompt_hints_promote", job_prompt_hints_promote))
+    report["jobs"].append(_run_job("delivery_rate_recompute", job_delivery_rate_recompute))
 
     report["duration_seconds"] = (_now() - start).total_seconds()
 
