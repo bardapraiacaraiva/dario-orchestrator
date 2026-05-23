@@ -135,3 +135,135 @@ Stop and flag to the user if any of these are detected:
 - Client requests unlimited revisions without additional cost
 - Timeline is unrealistic for the scope (e.g., full website in 1 week)
 - Client mentions they are "getting quotes from 5+ agencies" (price shopping, not value buying)
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Uma proposta é **delivery-ready (90+/100)** se TODAS estas check passam. Caso contrário, mark as draft.
+
+### 1. 3 Options com pricing CONCRETO (não ranges sozinhos)
+- [ ] Option 1, 2, 3 cada com preço SPECIFIC (não só "€2.500-3.500" sem reasoning)
+- [ ] Cada price tem cost breakdown justificativo (hours × rate ou value-anchored)
+- [ ] Option 2 explicitly flagged como "Recomendado" com 1 frase de why
+- [ ] Diferença Option 1→2→3 é CLARA (não overlap fuzzy)
+
+❌ NOT delivery-ready: "Option 2: €5.000-7.500" (range sozinho, sem detalhe do que muda)
+✅ Delivery-ready: "Option 2 — €6.500 (recomendado): 10 pages + custom design + GA4 events + 60d support. Valor calculado: 65h dev @ €80 + €1.300 design margin. Cliente típico dá ROI em 4-5 meses via +30% conversion."
+
+### 2. Executive Summary com 3 frases-pilares
+- [ ] O que cliente precisa (problema concreto, citing dados do briefing)
+- [ ] O que propomos (approach + diferencial)
+- [ ] Impacto esperado (métrica + timeline)
+
+❌ NOT delivery-ready: "Aumento de conversões e melhor SEO"
+✅ Delivery-ready: "LUSOconta precisa rebrand + onboarding pack para escalar de 30 para 100 clientes em 12 meses. Propomos brand redesign + 90-day launch campaign + onboarding automation com Make. Impacto: 100+ clientes paying em Q4, payback do investimento em 6 meses."
+
+### 3. Scope EXPLICIT — cada deliverable named + quantified
+- [ ] Pages count, asset count, feature list — todos com numbers
+- [ ] Cada item tem owner clara (us / client provides / third party)
+- [ ] Exclusões listadas (mínimo 6 do checklist)
+
+### 4. Timeline com dates concretas (não "Week 1-2")
+- [ ] Kickoff date proposta
+- [ ] Milestones com calendar dates ou +N business days
+- [ ] Total weeks claramente stated
+- [ ] Buffer para revisões included
+
+### 5. Payment terms COMPLETOS
+- [ ] Modelo (A/B/C) escolhido com justification
+- [ ] Schedule percentages + when each triggered
+- [ ] Late payment terms (%/mês após N dias)
+- [ ] Cancellation policy
+
+### 6. Output uses CLIENT NAME + REAL data throughout
+- [ ] Client name em capa + footer + cada secção
+- [ ] No placeholder angle-brackets <Client>, <Project>
+- [ ] Pricing reflete o ACTUAL cost calculation
+- [ ] Case studies cited são reais (com cliente nome + métrica)
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+Estrutura de uma proposta 92+/100. Usar como anchor.
+
+```markdown
+---
+type: proposal
+client: LUSOconta (Filipe Sampaio)
+project: Brand Redesign + 90-day Launch + Onboarding Automation
+date: 2026-05-23
+total_value: 8.500€ (Option 2 — Recommended)
+status: draft
+---
+
+# Proposta Comercial — LUSOconta
+## Brand Redesign + Launch Campaign + Onboarding Automation
+### Preparada para Filipe Sampaio · Maio 2026
+
+## Executive Summary
+LUSOconta tem product-market fit comprovado (30 PMEs PT paying, NPS 67) mas
+brand e onboarding manual estão a bloquear escala. Propomos 8 semanas em 3
+frentes paralelas: (1) Brand redesign Sage archetype, (2) Launch campaign 90-day
+para 70 novos clientes em Q3, (3) Onboarding automation via Make reduzindo
+time-to-first-value de 14 para 3 dias. Impacto: 100+ paying em Setembro, payback
+5-6 meses, NPS sustentável >70.
+
+## 3 Options Table (key extract)
+
+| Feature | Option 1 — Essencial | **Option 2 — Recomendado** | Option 3 — Premium |
+|---|---|---|---|
+| Brand identity | Logo refresh + palette | Full system + voice guide + 5 templates | Full + 12 templates + guideline site |
+| Launch campaign | Self-managed | Managed 30d (LI + Google) | Managed 90d (LI+Google+Meta+cold) |
+| Onboarding | Documented playbook | Make automation 60% | Full automation 100% + dashboards |
+| **Investment** | **4.200€** | **8.500€** | **18.500€** |
+| **Timeline** | **6 weeks** | **8 weeks** | **12 weeks** |
+| **Expected ROI** | 30 clientes/90d (10x em 12mo) | 70/90d (12x em 9mo) | 150/120d (15x em 8mo) |
+
+> **Por que Option 2:** 80% do valor de Option 3 a 46% do investimento, executável dentro do current cash.
+
+## Timeline (Option 2 — calendar dates concretas)
+- **Kickoff:** 2026-06-02 (Sem 1)
+- **Brand workshop:** 2026-06-02 → 2026-06-04
+- **Identity v1 + review:** 2026-06-16 (Sem 3)
+- **Landing live + campaign:** 2026-07-07 (Sem 6)
+- **Automation live:** 2026-07-21 (Sem 8)
+- **Project handover:** 2026-07-28
+
+## Terms (Modelo B — Milestones)
+- **40% (3.400€)** upon signature — 2026-05-30
+- **30% (2.550€)** upon brand approved — ~2026-06-23
+- **30% (2.550€)** upon delivery — ~2026-07-28
+- Late: 1.5% mensal após 30d. Cancellation: 50% refund até Sem 2, zero após.
+- IP transfer: completo upon final payment.
+
+## Exclusions (6+)
+- Hosting + domain (cliente continua Hostinger)
+- Stock photos/video (Unsplash free or cost)
+- Conteúdo persona pages (cliente provides briefings)
+- Tradução EN/FR (orçamento separado)
+- Ad spend €3.500 (cliente direct via card)
+- Plugins além de Make + HubSpot
+- Manutenção além de 60d incluídos
+
+## Case Studies (Real)
+- **LUSOconta v1** (2025): 0→30 clientes em 12 meses
+- **Lisbon Dog Care** (2026): WordPress redesign, +35% bookings em 90d
+- **Vivenda Creative Home** (2026): Lighthouse 92/100, migration successful
+
+## Next Steps
+1. Assinar proposta digital (DocuSign link) — até 2026-05-30
+2. Pagar 40% deposit (Stripe link)
+3. Kickoff call 2026-06-02 10h00 (calendar blocked)
+4. Pre-work briefings (questionário, 30min cliente time)
+
+> Proposta válida 15 dias. Após 2026-06-07 pricing pode ajustar +10%.
+```
+
+## Output anti-patterns (lista para spot-check)
+- Pricing range (€X-Y) sem breakdown of what changes between bounds
+- "Recommended" tag em Option 2 sem 1-sentence justification
+- Timeline em "Week 1-2" sem calendar dates
+- Executive Summary sem números no problema/solução/impacto
+- About Us sem 2-3 case studies reais (cliente nome + métrica)
+- Exclusões listadas em <5 items (scope creep risk)
+- Output sem frontmatter (impede tracking + filtering)
+- Placeholder angle-brackets <Client>/<Project> em vez de nome real
+- Single payment term presented (no flexibility = lower acceptance)
