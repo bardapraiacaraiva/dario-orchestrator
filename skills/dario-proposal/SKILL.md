@@ -180,6 +180,38 @@ Uma proposta é **delivery-ready (90+/100)** se TODAS estas check passam. Caso c
 - [ ] Pricing reflete o ACTUAL cost calculation
 - [ ] Case studies cited são reais (com cliente nome + métrica)
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact numa proposta comercial deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via briefing call, CRM, ou sessão anterior
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente antes de enviar
+- 🟢 **projection** — forecast de ROI/retorno por design (não verificável)
+
+Output checklist upfront mostra ao decisor exatamente o que é trust-as-is vs. o que precisa de verify antes de assinar.  **Honest transparency > inflated delivery.**
+
+---
+
+❌ **NOT delivery-ready:**
+> "O investimento recomendado é 6.500€ com entrega em 6 semanas, com retorno esperado em 3 meses."
+→ Reader assume que tudo é verified. Preço, prazo e ROI sem labels = proposta que mina credibilidade se algum dado estiver errado.
+
+✅ **Delivery-ready:**
+> - 🔵 **verified** — Scope: website 10 páginas, briefing call 12/01
+> - 🔵 **verified** — Cliente: Tasca do Morgado Lda., sector restauração
+> - 🟡 **assumed** — Budget range 5k–8k (mencionado informalmente, não confirmado por escrito)
+> - 🟡 **assumed** — Timeline: kickoff semana de 20/01 (depende de aprovação interna do cliente)
+> - 🟡 **assumed** — Copywriting: cliente fornece textos base (não explicitamente acordado)
+> - 🟢 **projection** — "Retorno esperado em 3–6 meses via aumento de reservas online" (benchmark sector, não garantia)
+> - 🟢 **projection** — "Estimativa de +25% conversão com SEO on-page" (baseado em casos similares, não dados deste cliente)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (budget, timeline, responsabilidade de copy)
+- [ ] All 🔵 citations adicionadas — nome legal do cliente, data do briefing, scope exato assinado
+- [ ] All 🟢 projections labeled como tal na proposta — cliente lê "estimativa baseada em benchmarks do sector", não promessa
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 Estrutura de uma proposta 92+/100. Usar como anchor.

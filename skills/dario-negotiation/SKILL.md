@@ -313,6 +313,43 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de negociação deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados reais do cliente / histórico da reunião
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar o playbook
+- 🟢 **projection** — cenário desenhado por design (walk-away, best/likely/worst — não verificável)
+
+Output checklist upfront mostra ao cliente exactly o que é trust-as-is vs o que precisa de verify antes da reunião. **Honest transparency > playbook inflado que falha em sala.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Accusation audit preparado para reunião com Prospect X.
+Budget estimado: €15.000. Timeline sensível. Decisor: CMO.
+Objecção principal: preço acima do mercado.
+```
+*(reader assume que tudo foi confirmado — se o budget estiver errado, o frame de preço colapsa)*
+
+✅ Delivery-ready:
+```
+- 🔵 verified — Prospect teve agência anterior que falhou delivery (confirmado em call de 12 Jan)
+- 🟡 assumed — Budget estimado €15.000 (baseado em tamanho da empresa; confirmar antes da reunião)
+- 🟡 assumed — Decisor final é o CMO (não confirmado — pode haver board approval)
+- 🟢 projection — Best outcome: retainer 6 meses €2.500/mês | Likely: projeto-piloto €4.000 | Worst: "precisamos de pensar"
+- 🔵 verified — Objecção de timeline é provável (mencionaram urgência em email de 9 Jan)
+- 🟡 assumed — Estão a falar com pelo menos mais uma agência (calibrated question 6 não foi feita ainda)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (budget real, decisores na sala, histórico de agências)
+- [ ] All 🔵 citations tied to source — call notes, emails, CRM entries com data
+- [ ] All 🟢 projections apresentados ao cliente como cenários, não como previsões garantidas (clear expectations pré-reunião)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

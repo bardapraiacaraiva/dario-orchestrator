@@ -220,6 +220,44 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact num SOP gerado deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via cliente data, sessão anterior, ou vault/RAG existente
+- 🟡 **assumed** — plausível para o processo descrito, mas precisa de confirmação antes de entregar o SOP
+- 🟢 **projection** — estimativa por design (prazo esperado, volume típico — não verificável sem execução real)
+
+Output checklist upfront mostra ao leitor exatamente o que está validado vs. o que precisa de sign-off antes de o SOP ir para produção. **Honest transparency > SOP que parece completo mas tem gaps escondidos.**
+
+---
+
+❌ NOT delivery-ready:
+```
+### Steps
+1. Enviar welcome email ao cliente em 24h
+2. Criar canal Slack com 3 membros da equipa
+3. Correr baseline diagnostic — resultado esperado: score > 70
+```
+*(Reader assume que os prazos, nomes e métricas são factos — podem ser assumptions sem base no cliente real.)*
+
+✅ Delivery-ready:
+```
+### Steps
+1. Enviar welcome email ao cliente em 🟢 **projection: 24h** (baseline de agência; confirmar SLA contratual)
+2. Criar canal Slack com 🟡 **assumed: 3 membros** (Account Manager + Lead + Cliente — confirmar equipa real)
+3. Correr baseline diagnostic → resultado esperado: 🔵 **verified: score > 70** (threshold definido em sessão 2025-04-10)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals do cliente (owner, ferramentas, nº de steps, SLAs reais)
+- [ ] All 🔵 items com citation adicionada — fonte: sessão, vault path, ou documento de referência
+- [ ] All 🟢 projections comunicadas explicitamente ao cliente — deixar claro que são estimativas de design, não garantias operacionais
+- [ ] Version + Owner preenchidos com dados reais (não placeholders `[Name]` / `[Date]`)
+- [ ] SOP pilotado em condições reais antes de marcar como `v1.0 — Production Ready`
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

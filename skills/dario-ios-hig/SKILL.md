@@ -399,6 +399,31 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via Apple HIG oficial, SwiftUI docs, ou session data do cliente
+- 🟡 **assumed** — plausível para a plataforma mas precisa de confirmação antes de entregar
+- 🟢 **projection** — estimativa de impacto/comportamento por design (não verificável sem teste real)
+
+Output checklist upfront mostra ao reader exactly o que é trust-as-is vs o que precisa de verify antes de ship.  **Honest transparency > inflated HIG score.**
+
+❌ NOT delivery-ready:
+> "O tab bar tem 49pt, safe area respeitada, Dynamic Type activo e acessibilidade a 95%."
+> — Reader assume que tudo é Apple-official. Não sabe se o 95% é medido, estimado, ou inventado.
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Tab bar height: 49pt (Apple HIG, iOS 17)
+> - 🔵 **verified** — Safe area bottom inset: 34pt (home indicator, iPhone 14+)
+> - 🟡 **assumed** — Dynamic Type habilitado no target app (cliente ainda não confirmou `minimumScaleFactor` implementado)
+> - 🟢 **projection** — Activar `.largeTitle` collapse on scroll deverá aumentar percepção de fluidez; validar com utilizadores reais em usability test
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: tamanhos de touch target medidos no Xcode Accessibility Inspector, contraste confirmado via ferramentas como Colour Contrast Analyser)
+- [ ] All 🔵 citations added — linkar secção específica do Apple HIG ou SwiftUI docs para cada valor numérico (pt sizes, spacing increments, minimum targets)
+- [ ] All 🟢 projections labeled como tal ao cliente — deixar claro que impacto em UX/acessibilidade é forecast até A/B test ou audit real confirmar
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

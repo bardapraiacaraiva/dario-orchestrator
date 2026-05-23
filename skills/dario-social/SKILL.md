@@ -272,6 +272,43 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de social media deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via audit real do cliente (handle, followers, engagement rate, best post)
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast/meta por design (não verificável no momento)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Instagram @marca_xyz — 4.200 seguidores, engagement 5.1%
+Hashtag set com #modalisboa incluída
+Posting goal: +30% alcance em 60 dias
+```
+*(reader assume que tudo é facto verificado — engagement pode ser estimativa, hashtag pode estar shadow-banned, projecção de alcance não está sinalizada)*
+
+✅ Delivery-ready:
+```
+🔵 verified   — @marca_xyz · 4.200 seguidores (extraído do perfil em 12 Jun)
+🔵 verified   — Engagement rate 5.1% (calculado nos últimos 30 posts via Later)
+🟡 assumed    — #modalisboa incluída no set (confirmar se não está shadow-banned para este nicho)
+🟡 assumed    — Tom "descontraído mas profissional" (baseado no briefing inicial — validar com cliente)
+🟢 projection — Meta: +30% alcance orgânico em 60 dias (benchmark sectorial, não garantido)
+🟢 projection — Estimativa 3–5% engagement rate pós-calendário (baseado em pilares definidos)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — handles reais, tom de voz, hashtags sem ban, content pillars aprovados
+- [ ] All 🔵 sources citadas — screenshots de analytics, data de extracção, ferramenta usada (Meta Insights / Later / Sprout)
+- [ ] All 🟢 projections comunicadas ao cliente como metas, não promessas (set expectations antes de entregar calendário)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

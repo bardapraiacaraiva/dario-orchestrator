@@ -201,6 +201,44 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via sessão anterior / memória / dados DARIO
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa by design (não verificável no momento do ingest)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. o que precisa de verify antes de agir. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Ingerido em `clients` como `client/atrium/audit-2026-04` (47 chunks). Tags: `audit`, `wcag`, `atrium`, `pt`."
+
+→ Reader assume que o nome, collection, chunk count e tags estão todos corretos — mas nenhum foi labeled. Se o engine estava down, os chunks são 0. Se o cliente não autorizou, o ingest não devia ter acontecido.
+
+---
+
+✅ Delivery-ready:
+> **Ingest Summary — `client/atrium/audit-2026-04`**
+>
+> | Item | Valor | Status |
+> |---|---|---|
+> | Collection | `clients` | 🔵 verified — definida pelo naming convention DARIO |
+> | Nome / slug | `client/atrium/audit-2026-04` | 🟡 assumed — slug da data infere mês; confirmar se é a versão final do audit |
+> | Chunks indexados | 47 | 🔵 verified — retornado pelo endpoint (`status: ok, chunks: 47`) |
+> | Tags aplicadas | `audit`, `wcag`, `atrium`, `pt` | 🟡 assumed — derivadas automaticamente; cliente pode querer adicionar `rgpd` ou `ga4` |
+> | Duplicado? | Não detectado | 🔵 verified — `search_kb` pré-ingest não retornou match |
+> | Relevância futura | Queries wcag/atrium vão recuperar este doc | 🟢 projection — depende de chunk quality e queries futuras |
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — slug bate com versão final do documento; tags revistas e aprovadas
+- [ ] All 🔵 sources citadas — response do endpoint (`status: ok`, `chunks: N`) logada ou screenshottada
+- [ ] All 🟢 projections comunicadas ao cliente como estimativas — não como garantias de recall
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

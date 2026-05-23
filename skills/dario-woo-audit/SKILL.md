@@ -217,6 +217,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de auditoria WooCommerce deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via acesso direto à loja, dashboard WooCommerce, ou dados de sessão anterior
+- 🟡 **assumed** — plausível pelo contexto mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa/forecast por design (não verificável sem dados reais de vendas)
+
+Output checklist upfront mostra ao cliente exatamente o que é trust-as-is vs. o que precisa verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ **NOT delivery-ready:**
+> "Checkout tem 3 passos — Score: 4/10. MBWay integrado. Taxa de abandono estimada 68%."
+> *(reader assume que tudo foi verificado ao vivo — nenhum label, nenhuma distinção entre o que foi visto vs. assumido)*
+
+✅ **Delivery-ready:**
+> - 🔵 **verified** — Checkout tem 3 passos (confirmado via navegação live na loja)
+> - 🔵 **verified** — Botão "Encomendar com obrigação de pagar" ausente (DL 24/2014 — screenshot capturado)
+> - 🟡 **assumed** — MBWay aparece como opção no checkout; funcionamento end-to-end (timeout, error handling) não testado sem transação real
+> - 🟡 **assumed** — IVA 23% aplicado nos produtos visíveis; tax class mapping em produtos com taxas reduzidas (6%/13%) não confirmado
+> - 🟢 **projection** — Corrigir checkout para 1 passo + ativar guest checkout pode reduzir abandono em ~15-20 pp (benchmark PT ecommerce)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — gateway MBWay/Multibanco testado com transação real; tax classes validadas por produto
+- [ ] All 🔵 citations added — screenshots/screen recordings do checkout flow, erros de gateway, campos de IVA
+- [ ] All 🟢 projections labeled como estimativas ao cliente — benchmarks de abandono e lift de conversão apresentados como referência, não garantia
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

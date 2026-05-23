@@ -183,6 +183,40 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no context summary deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — lido directamente do `project_*.md` ou ficheiro Obsidian confirmado
+- 🟡 **assumed** — inferido/estimado, precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast/target por design (não verificável no momento)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs o que precisa de verify antes de agir. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+## Projeto: Atrium
+Last audit score: 92/100
+Status: Phase 3 — SEO implementation
+Pending: 3 items
+```
+*(sem labels — o cliente não sabe se o score é do ficheiro de memória, estimado, ou da última sessão)*
+
+✅ Delivery-ready:
+```
+## Projeto: Atrium
+Last audit score: 92/100 (2025-01-14)   🔵 verified — project_wave74_atrium.md
+Status: Phase 3 — SEO implementation     🔵 verified — agent-memory, last updated 8 dias
+Pending items: 3 criticals               🔵 verified — agent-memory + Obsidian output 2025-01-12
+RAG chunks disponíveis: ~47              🟡 assumed — count estimado, colecção pode ter ingestão pendente
+Próximo milestone: Go-live Fev 2025      🟢 projection — target definido em sessão anterior, não confirmado recentemente
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir counts/estimates com actuals (ex: re-run RAG search e contar chunks reais)
+- [ ] Todos os 🔵 sources com data verificada — se `last_updated > 30 dias`, flag já levantada no Gate 2 e re-confirmada aqui
+- [ ] Todos os 🟢 projections comunicados explicitamente ao cliente como targets/forecasts, não como factos entregues
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

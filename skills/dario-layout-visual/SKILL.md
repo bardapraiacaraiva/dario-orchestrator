@@ -566,6 +566,51 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de layout & visual design deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via brand guidelines entregues, RAG consult, ou sessão anterior
+- 🟡 **assumed** — plausível dado o projecto, mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — decisão de design por construção (não verificável até render/teste real)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa de sync.  
+**Honest transparency > inflated delivery.**
+
+---
+
+❌ **NOT delivery-ready:**
+```
+Font pairing: Inter + Playfair Display
+Base size: 16px | Scale ratio: 1.250
+Primary: #1A1A2E | Accent: #E94560
+Grid: 12-col, 24px gutter
+```
+*(Sem labels — o cliente assume que tudo foi validado contra a brand, os targets de contraste WCAG e o device scope.)*
+
+---
+
+✅ **Delivery-ready:**
+```
+Font pairing: Inter (sans) + Playfair Display (serif) 🟡 — assumed boa separação
+  de personalidade; confirmar se cliente tem licença Playfair ou prefere alternativa
+  Google Fonts
+Base size: 16px | Scale ratio: 1.250 (Major Third) 🔵 — verified: ratio definido
+  pelo cliente em brief como "marketing/landing page feel"
+Primary colour: #1A1A2E 🔵 — verified: extraído das brand guidelines entregues
+Accent colour: #E94560 🟡 — assumed alinhamento com tom "bold/energético";
+  WCAG AA ratio calculado → 4.6:1 sobre branco 🔵 verified via checker
+Grid: 12-col, 24px gutter, 1440px max-width 🟢 — projection: breakpoints
+  responsivos (768/1024) definidos por design convention; validar com dev lead
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os items 🟡 confirmados — substituir assumptions com actuals (licenças tipográficas, aprovação de paleta, tom de voz visual)
+- [ ] Todos os 🔵 sources citados — brand guidelines, RAG consult outputs, brief original
+- [ ] Todos os 🟢 projections comunicados ao cliente como decisões de design a validar em browser (fluid type, container queries, breakpoint behaviour)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

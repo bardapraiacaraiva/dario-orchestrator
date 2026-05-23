@@ -220,6 +220,46 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output BIM deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior, modelo existente ou dados cliente já recebidos
+- 🟡 **assumed** — plausível para tipologia/fase, mas requer confirmação cliente antes de exportar para Revit/ArchiCAD
+- 🟢 **projection** — estimativa de design por fase LOD (não verificável até modelo fechado)
+
+Output checklist upfront mostra ao coordenador BIM exactamente o que é trust-as-is vs. precisa de sync antes de emitir schedules.  
+**Honest transparency > schedules infladas que geram clashes em obra.**
+
+---
+
+❌ NOT delivery-ready:
+```
+P.03 — Porta correr, Largura 1200mm, Vidro 10mm, Sistema Eclisse, Acústico 28dB
+```
+*(reader assume tudo verified — se dimensão errar, o vão é executado errado)*
+
+✅ Delivery-ready:
+```
+P.03 — Porta correr Sala→Cozinha
+  🔵 Sistema embutido Eclisse (confirmado em sessão anterior)
+  🟡 Largura 1200mm (assumed por proporcionalidade de sala — confirmar com peças desenhadas)
+  🟡 Acoustic_dB 28 (assumed classe mínima interior — confirmar com especialidade acústica)
+  🟢 Preço estimado instalação (projeção fase LOD 200 — actualizar em LOD 300)
+
+PAV.01 — Soalho carvalho eng. Jular Oak Classic
+  🔵 Referência Jular Oak Classic 190mm (confirmada pelo cliente)
+  🟡 Espessura 15mm (assumed standard — confirmar com caderno de encargos estrutura)
+  🟢 Lead time 4 semanas (projeção fornecedor — sujeito a stock na data de encomenda)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir dimensões/especificações assumed com actuals das peças desenhadas aprovadas
+- [ ] All 🔵 items com source citada — número de revisão do modelo, acta de reunião ou ficha técnica do fornecedor
+- [ ] All 🟢 projections labeled como tal no export — campo `LOD_Status` preenchido nos schedules CSV/IFC antes de emitir para coordenação de especialidades
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

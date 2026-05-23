@@ -412,6 +412,46 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status Checklist per Data Point (Gate 7 — validated FASE 1)
+
+Cada número/métrica/estado no output do DARIO Status deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — lido directamente de ficheiro, endpoint ou log em tempo real
+- 🟡 **assumed** — valor padrão/esperado mas não confirmado nesta execução
+- 🟢 **projection** — tendência calculada, não estado actual verificável
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs precisa confirm antes de agir.
+
+**Honest transparency > inflated health report.**
+
+---
+
+❌ NOT delivery-ready:
+```
+| RAG Engine | UP | 88 sources, 1215 chunks |
+| Eval Baseline | 94.2% | last run: 2026-04-20 |
+| Scheduled Tasks | 4/4 running |
+```
+*(reader assume tudo verified — mas RAG pode estar cached, eval pode ser stale, tasks podem ter mudado de estado)*
+
+✅ Delivery-ready:
+```
+| RAG Engine      | 🔵 verified   | UP — lido de /health endpoint @ 10:32 |
+| Eval Baseline   | 🟡 assumed    | 94.2% — last run >7 days, precisa re-run confirm |
+| Scheduled Tasks | 🔵 verified   | 3/4 running — DarioBackup: Disabled (confirmed Get-ScheduledTask) |
+| Knowledge Decay | 🟡 assumed    | 2 stale — script não correu nesta sessão, valor de cache |
+| AutoDiag        | 🟢 projection | WARN estimado — baseado em padrão histórico, audit não executado |
+```
+
+---
+
+**Ship checklist post-execução completa:**
+- [ ] Todos os 🟡 items confirmados — scripts correram com sucesso nesta sessão (não cached)
+- [ ] Todos os 🔵 sources têm timestamp da leitura (ex: `@ HH:MM`) para rastreabilidade
+- [ ] Todos os 🟢 projections/estimativas identificados como tal ao utilizador antes de qualquer acção correctiva
+- [ ] `DARIO_AUTODIAG_OK_{timestamp}` ou `DARIO_AUTODIAG_WARN_{check}_{id}` emitido e registado
+- [ ] Reactivation status verificado contra log real (não assumido OK por ausência de erros)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

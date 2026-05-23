@@ -300,6 +300,43 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/métrica/benchmark no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado dos dados reais do cliente (MRR reports, P&L, CRM exports)
+- 🟡 **assumed** — plausível com base em stage/sector, mas precisa de confirmação antes de delivery
+- 🟢 **projection** — forecast por design (LTV, payback trajectories — não verificável hoje)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. o que precisa validar antes de tomar decisões.  **Honest transparency > dashboard inflado.**
+
+---
+
+❌ NOT delivery-ready:
+```
+NRR: 112% 🟢 | CAC Payback: 14 meses 🟡 | LTV:CAC: 4.2:1 🟢
+```
+*Reader assume que todos os valores são reais — mas churn rate foi estimado, S&M spend não foi confirmado, e LTV usa ARPU de um mês atípico.*
+
+✅ Delivery-ready:
+```
+🔵 verified   — MRR Inicial Jan: €4.200 (export Stripe confirmado)
+🔵 verified   — Churned MRR Mar: €110 (lista de cancelamentos CRM)
+🟡 assumed    — Gross Margin: 72% (sector SaaS típico; aguarda P&L Q1)
+🟡 assumed    — CAC: €380 (S&M spend estimado; fatura agência por confirmar)
+🟢 projection — LTV: €3.840 (fórmula ARPU × 1/churn; válido se churn estável)
+🟢 projection — CAC Payback: 11 meses (assume margem e ARPU constantes 12m)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os 🟡 items confirmados — substituir assumptions com actuals (P&L, faturas S&M, contrato agência)
+- [ ] Todos os 🔵 items com fonte citada — Stripe export / ChartMogul / CRM snapshot + data do pull
+- [ ] Todos os 🟢 projections comunicados explicitamente ao cliente como forecast, não como KPI realizado
+- [ ] MRR Waterfall reconciliado — New + Expansion − Contraction − Churn = Net New MRR (zero rounding gap)
+- [ ] Stage do cliente confirmado (Seed / Growth / Mature) — benchmarks mudam materialmente por stage
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

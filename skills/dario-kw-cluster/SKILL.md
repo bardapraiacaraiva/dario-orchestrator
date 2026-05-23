@@ -155,6 +155,40 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados reais do cliente
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast por design (não verificável até publicação/indexação)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+Cluster 1: "design de interiores lisboa" (800/mo, KD 42)
+Supporting: "remodelação apartamento lisboa" (390/mo)
+→ Sem labels — reader não sabe se volumes são live data de hoje,
+  exportados há 6 meses, ou estimativas manuais. Tudo parece "verified".
+```
+
+✅ Delivery-ready:
+```
+Cluster 1: "design de interiores lisboa"
+- Volume: 800/mo 🔵 verified — extraído DataForSEO 2025-01-14
+- KD: 42 🔵 verified — DataForSEO mesma pull
+- Supporting "remodelação apartamento lisboa": 390/mo 🟡 assumed — volume de memória, confirmar com pull fresca
+- URL proposta /design-interiores-lisboa: 🟡 assumed — sem acesso ao site; confirmar não existe já
+- Tráfego esperado pós-publicação: +420 visitas/mês 🟢 projection — estimativa CTR 8% × volume
+- Dificuldade de ranquear em 90 dias: média 🟢 projection — baseado em KD + DA do domínio estimado
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — volumes re-pulled com data fresca, URLs existentes verificadas no site real
+- [ ] Todas as fontes 🔵 citadas com data da extração (DataForSEO / GSC / export manual)
+- [ ] Todos os 🟢 projections comunicados ao cliente como forecast, não como garantia de resultado
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

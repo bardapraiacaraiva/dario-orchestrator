@@ -300,6 +300,51 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados reais do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — forecast by design (não verificável no momento)
+
+O checklist aparece **upfront** no output — o reader sabe exactamente o que é trust-as-is vs o que precisa validar. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Client Health Score — Vivenda — Jun 2025
+Scope satisfaction: 7/10 | Payment timeliness: 9/10
+Total Score: 7.8 → NEUTRAL
+SLA breach rate este mês: 20%
+```
+*(reader assume que todos os scores, datas e métricas são factos confirmados — nenhum está labelled)*
+
+---
+
+✅ Delivery-ready:
+```
+Client Health Score — Vivenda — Jun 2025
+
+| Dimension              | Score |                |
+|------------------------|-------|----------------|
+| Scope satisfaction     | 7/10  | 🟡 assumed     |
+| Payment timeliness     | 9/10  | 🔵 verified    |
+| Referral likelihood    | 6/10  | 🟡 assumed     |
+
+Total Score: 7.4/10 → NEUTRAL 🟡 assumed
+SLA breach rate Jun: 20% (1 P2 breach em 5 tickets) 🔵 verified
+Previsão churn risk próx. 90 dias: MÉDIO 🟢 projection
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir scores assumidos com avaliação real (ex: reunião check-in ou resposta CSAT)
+- [ ] Todos os itens 🔵 têm fonte citada — nº ticket, data de pagamento, log SLA
+- [ ] Todos os itens 🟢 estão labelled como previsão ao cliente — evitar que interprete forecast como facto (ex: churn risk, NPS proxy, upsell potential)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

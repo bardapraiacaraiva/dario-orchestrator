@@ -234,6 +234,38 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact/cláusula no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados do cliente / legislação publicada
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — estimativa/recomendação por design (não verificável sem contexto específico)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. o que precisa verificar antes de assinar ou entregar. **Honest transparency > contrato que parece completo mas tem gaps.**
+
+---
+
+❌ NOT delivery-ready:
+> "Prazo de pagamento: 30 dias. Foro: Lisboa. Retenção na fonte: 25%. Duração do NDA: 3 anos."
+> — Reader assume que todos os valores são factos confirmados do cliente. Se o NIF está errado ou o foro não foi acordado, o contrato pode ser contestado.
+
+✅ Delivery-ready:
+> - 🔵 **verified** — RGPD (EU 2016/679) + Lei 58/2019 como base legal da Política de Privacidade
+> - 🔵 **verified** — Código Civil Art. 805 como fundamento da carta de interpelação por mora
+> - 🟡 **assumed** — NIF do cliente: `PT 123456789` *(confirmar antes de assinar)*
+> - 🟡 **assumed** — Prazo de feedback do cliente definido como 5 dias úteis *(acordar explicitamente)*
+> - 🟡 **assumed** — Foro competente: Comarca de Lisboa *(confirmar sede do cliente)*
+> - 🟢 **projection** — Cláusula penal do NDA fixada em €5.000 por violação *(valor recomendado — ajustar ao risco real)*
+> - 🟢 **projection** — Prazo de conservação de dados: 3 anos *(baseline razoável — revisar conforme finalidade específica)*
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — NIFs, moradas, valores, prazos, foro — substituídos por actuals antes da assinatura
+- [ ] Todos os itens 🔵 com referência legislativa explícita no documento (Art. X, DL Y/AAAA)
+- [ ] Todos os itens 🟢 comunicados ao cliente como recomendações, não como cláusulas fechadas — expectativas alinhadas antes da entrega final
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

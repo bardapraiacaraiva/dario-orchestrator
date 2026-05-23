@@ -446,6 +446,34 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/dimensão/requisito regulatório no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via DL 163/2006, norma EN/ISO, ou dados do projecto do cliente
+- 🟡 **assumed** — plausível mas requer confirmação do cliente antes da entrega
+- 🟢 **projection** — estimativa de design por defeito (não verificável sem levantamento)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. precisa verificar. **Honest transparency > inflated delivery.**
+
+---
+
+❌ **NOT delivery-ready:**
+> "A rampa tem 6% de inclinação, comprimento de 4,80m, com patamares de 1,50m × 1,50m e corrimãos a 0,90m."
+> *(Reader assume que tudo foi verificado — mas a inclinação real depende do levantamento topográfico e as dimensões do patamar dependem da planta actual.)*
+
+✅ **Delivery-ready:**
+> - 🔵 **verified** — Inclinação máxima de rampa: 6% até 6m de comprimento (DL 163/2006, Secção 1.6)
+> - 🟡 **assumed** — Comprimento da rampa: ~4,80m (baseado em cota estimada de 0,29m; confirmar com levantamento topográfico)
+> - 🟢 **projection** — Área do patamar de chegada: 1,50m × 1,50m (dimensionado por defeito; validar após planta definitiva)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir estimativas de cota, larguras de corredor e áreas de manobra por medições reais do levantamento
+- [ ] Todos os itens 🔵 com citação explícita ao artigo/tabela do DL 163/2006 ou norma EN/ISO referenciada
+- [ ] Todos os itens 🟢 claramente apresentados ao cliente como dimensionamento base sujeito a ajuste em projecto de execução
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

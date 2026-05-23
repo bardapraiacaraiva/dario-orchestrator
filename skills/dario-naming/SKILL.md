@@ -173,6 +173,40 @@ Naming workshop é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ### 6. Client name + REAL data, no placeholders
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de naming deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via tool call real (WHOIS, INPI, EUIPO, Google search)
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — score/previsão por design (não verificável objectivamente)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. o que precisa de validação antes de registar qualquer nome.  **Honest transparency > shortlist que parece mais limpa do que é.**
+
+❌ **NOT delivery-ready:**
+```
+| Vórtex | 9 | 8 | 9 | ✅ .com livre | ✅ handles livres | OK | 26/30 |
+```
+*Sem labels — cliente assume que domínio e INPI foram verificados em real-time. Se não foram, expõe o projecto a conflito de marca ou domínio já tomado.*
+
+✅ **Delivery-ready:**
+```
+| Vórtex | 🟢 9/10 (score subjectivo) | 🟢 8/10 | 🟡 .com — não verificado ao vivo, assumed available | 🔵 @vortex IG — 404 confirmado via search | 🟡 INPI classe 35 — quick screen, não tool call real | 26/30 |
+```
+```
+Top pick: Vórtex
+🔵 Pronunciável em PT e EN — confirmado análise linguística desta sessão
+🟡 .com disponível — assumed, requer WHOIS ao vivo antes de registar
+🟡 Sem conflito INPI classe 42 — screen visual, não substituí advogado de marcas
+🟢 Score de memorabilidade 9/10 — avaliação por design, subjectivo
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — WHOIS ao vivo para cada finalista, handles verificados em cada plataforma
+- [ ] Todos os itens 🔵 com source citada — ex: "INPI pesquisa em DD/MM/AAAA, classe X, resultado: sem conflito"
+- [ ] Todos os itens 🟢 sinalizados ao cliente como scores subjectivos, não rankings absolutos
+- [ ] Cliente informado que screen INPI/EUIPO **não substitui** consulta com advogado de marcas antes de registar
+
 ## Fully-worked A-tier example: Cuidai BR
 
 ```markdown

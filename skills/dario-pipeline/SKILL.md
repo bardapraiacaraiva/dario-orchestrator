@@ -234,6 +234,37 @@ Pipeline output é **delivery-ready (90+/100)** se TODAS estas check passam.
 - [ ] Templates referencem actual case studies + names
 - [ ] Sem placeholder angle-brackets
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados do cliente / fonte documentada
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast por design (não verificável até execução real)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Pipeline math: 500 emails → 10 meetings → 2 deals fechados por mês."
+> *(Reader assume que estes números são reais do cliente — não são. Zero labels, zero contexto.)*
+
+✅ Delivery-ready:
+> - 🟡 **assumed** — Volume de 500 emails/mês (assumido para 1 SDR/founder; confirmar capacidade real de outreach do cliente)
+> - 🔵 **verified** — Taxa de abertura 35% (benchmarks PT digital agency cold outbound, Sales Squad playbook)
+> - 🟢 **projection** — 2 deals fechados/mês a 30% close rate (forecast baseado no funil; actuais dependem de qualidade da lista e execução)
+> - 🟡 **assumed** — ICP: PMEs portuguesas, 5–50 colaboradores, revenue 500K–2M EUR (plausível para agência digital PT mas não confirmado com dados reais do cliente)
+> - 🔵 **verified** — Cadência 10 touches / 3 semanas (framework documentado no SKILL.md, validado por Blount/Ross methodology)
+> - 🟢 **projection** — "Aumento de leads em X% em 90 dias" no social proof email (placeholder; substituir por case study real antes de enviar)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — volume de outreach real, ICP revenue range e tamanho de empresa validados com o cliente
+- [ ] All 🔵 citations added — fontes dos benchmarks de conversão documentadas (Blount, Ross, Enns, Weinberg + dados de mercado PT)
+- [ ] All 🟢 projections labeled as such ao cliente — pipeline math apresentado como forecast, não garantia; case study metrics preenchidas com actuals antes de usar em cadência
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 Pipeline 92+/100 para SaaS PT B2B:

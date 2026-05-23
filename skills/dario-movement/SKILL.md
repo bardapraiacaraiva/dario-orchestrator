@@ -569,6 +569,30 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmed from prior session/memory/cliente data
+- 🟡 **assumed** — plausible but needs cliente confirm pre-delivery
+- 🟢 **projection** — forecast by design (not verifiable)
+
+Output checklist upfront mostra reader exactly o que é trust-as-is vs precisa verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+> "A comunidade já tem 4.200 membros ativos, viability score 0.8, e o movimento está na fase de Spark com potencial de atingir 20k em 6 meses."
+> *(reader não sabe o que é dado real, o que é suposição, o que é projecção — assume tudo como facto)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Comunidade actual: 4.200 membros no Discord (confirmado por cliente na sessão anterior)
+> - 🟡 **assumed** — Viability score 0.8: tensão cultural e enemy clarity estimados com base no briefing; densidade populacional do segmento não validada com dados externos
+> - 🟢 **projection** — 20k membros em 6 meses: forecast baseado no flywheel desenhado + benchmarks de movimentos adjacentes; não garantido
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: tamanho real do segmento, plataformas onde audiência já se agrega, linguagem orgânica validada em field research)
+- [ ] All citations added per 🔵 sources — ligar cada métrica de community health (DAU, cohort retention, NPS tribal) à fonte real do cliente
+- [ ] All 🟢 projections labeled as such ao cliente — deixar explícito que viability scores, growth curves do flywheel e timelines de fase (Spark → Institution) são forecasts by design, não promessas
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

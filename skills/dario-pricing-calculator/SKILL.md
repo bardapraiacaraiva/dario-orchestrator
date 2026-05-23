@@ -239,6 +239,35 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados reais fornecidos pelo cliente
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente antes de entrega
+- 🟢 **projection** — previsão por design (não verificável — depende de execução futura)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verificação. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "O teu break-even rate é 72€/h, o recommended rate é 135€/h e o teu revenue target anual é 168.480€."
+→ Reader assume que todos os inputs (custos fixos, salário-alvo, utilization) são reais — mas podem ser defaults.
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Custos fixos mensais: 3.200€ (factura partilhada pelo cliente na sessão anterior)
+> - 🟡 **assumed** — Utilization target: 65% (default aplicado — confirmar se reflecte o ritmo real de trabalho)
+> - 🟡 **assumed** — Salário-alvo do owner: 4.000€ brutos (nunca confirmado explicitamente — validar antes de calcular minimum rate)
+> - 🟢 **projection** — Revenue target anual: 168.480€ (projecção baseada em 104h facturáveis/mês × 135€/h × 12 — assume utilization sustentada)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir defaults (custos fixos, salário, employee costs, horas disponíveis, utilization) com valores reais do cliente
+- [ ] Todos os 🔵 sources citados — identificar de onde vieram os dados verificados (sessão X, documento Y)
+- [ ] Todos os itens 🟢 comunicados explicitamente ao cliente como projecções condicionais (ex: "este revenue target assume que mantens 65% de utilization todos os meses")
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

@@ -289,6 +289,40 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do audit deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via tool (PageSpeed, GSC, axe scan, SSL Labs) ou dados fornecidos pelo cliente na sessão
+- 🟡 **assumed** — plausível dado o stack/contexto, mas precisa confirmação do cliente antes de entrega final
+- 🟢 **projection** — estimativa de impacto por design (ex: melhoria esperada pós-fix); não verificável até implementação
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa de verificação. **Honest transparency > inflated delivery.**
+
+---
+
+❌ **NOT delivery-ready:**
+- "LCP: 4.2s" — sem indicar se veio de PageSpeed real ou foi estimado
+- "Plugin Yoast + Rank Math instalados simultaneamente" — sem confirmar se lista de plugins foi efectivamente fornecida
+- "Impacto estimado: +15% conversão no checkout" — apresentado como facto, sem label de projecção
+
+✅ **Delivery-ready:**
+- 🔵 **verified** — LCP mobile = 4.2s (PageSpeed Insights CrUX p75, run 2025-07-10)
+- 🟡 **assumed** — Backup strategy: assumed diário via Jetpack; cliente não confirmou frequência nem off-site storage
+- 🟡 **assumed** — `xmlrpc.php` assumed activo; não foi fornecido acesso a wp-admin nem headers confirmados
+- 🔵 **verified** — SSL Labs grade: A (scan directo em ssllabs.com)
+- 🟢 **projection** — Activar cache LiteSpeed + WebP: estimativa de redução de 35-45% no peso total de página (baseado em benchmark de sites com stack similar)
+- 🟡 **assumed** — Consent Mode v2: assumed NÃO configurado; sem acesso ao GTM container para confirmar
+- 🔵 **verified** — Livro de Reclamações electrónico: ausente (verificado no rodapé e sitemap, 2025-07-10)
+- 🟢 **projection** — Resolução dos 3 blockers WCAG 2.2 AA identificados: estimativa de conformidade EAA 2025 ≥ 80% (score axe pós-fix projectado)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions com actuals (ex: lista real de plugins, config de backups, acesso GTM)
+- [ ] Todos os scores 🔵 com fonte + data de scan citados no relatório final
+- [ ] Todas as projecções 🟢 claramente identificadas ao cliente como estimativas pré-implementação, não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

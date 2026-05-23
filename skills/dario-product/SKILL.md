@@ -339,6 +339,43 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via sessão anterior / dados do cliente / histórico de produto
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entrega
+- 🟢 **projection** — estimativa por design (não verificável até execução)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+RICE Score — Feature "Onboarding Flow": 240
+Sprint capacity: 34 story points
+MVP launch: 6 semanas
+```
+*(reader assume que tudo é verified — pode estar a planear com ficção)*
+
+✅ Delivery-ready:
+```
+- 🔵 verified   — Feature "Onboarding Flow" já mapeada em PRD v2 (sessão anterior)
+- 🟡 assumed    — Reach estimado em 1.200 users/quarter (aguarda dados Analytics do cliente)
+- 🟡 assumed    — Effort = 2 person-months (sem breakdown confirmado com tech lead)
+- 🟢 projection — RICE Score 240 calculado com inputs acima; revisitar após sync com equipa
+- 🟡 assumed    — Sprint capacity 34 pts baseada em média de equipa genérica (não histórico real)
+- 🟢 projection — MVP em 6 semanas assumindo 2 devs full-time sem bloqueios externos
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions por actuals (Reach real, effort validado com tech lead, capacity histórica da equipa)
+- [ ] Todos os itens 🔵 com source explícita citada (PRD version, sessão, documento de referência)
+- [ ] Todos os itens 🟢 apresentados ao cliente como estimativas de forecast — expectativas alinhadas antes de commit no roadmap
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

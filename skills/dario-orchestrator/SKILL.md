@@ -999,6 +999,42 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do **DARIO Orchestrator** deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via `company.yaml`, audit trail, ou session memory (ex: worker ativo, budget real, task ID existente)
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente antes de delivery (ex: disponibilidade de agente, dependências inferidas)
+- 🟢 **projection** — estimativa por design, não verificável no momento (ex: tempo de execução, token spend previsto)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ **NOT delivery-ready:**
+```
+Worker DIVA-copywriter assignado ao TASK-003. Budget: 40% usado. ETA: 2h.
+```
+*Problema: reader assume que worker está disponível, budget é real e ETA é garantido — nenhum deles verificado.*
+
+---
+
+✅ **Delivery-ready:**
+```
+- Worker DIVA-copywriter → TASK-003 🟡 assumed (nenhuma task active/ confirmada; verificar company.yaml)
+- Budget YYYY-MM: 40% consumido 🔵 verified (lido de ~/.claude/orchestrator/budgets/YYYY-MM.yaml)
+- ETA execução: ~2h 🟢 projection (estimado por heartbeat window padrão; depende de carga real)
+- Dependência TASK-002 → TASK-003: sem ciclo detetado 🔵 verified (circular dependency check passou em Phase 0)
+- Skill RAG consultada (query: "onboarding flow") 🟡 assumed (resultado relevante, mas match não confirmado pelo cliente)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — workers verificados em `active/`, dependências validadas pelo cliente, RAG matches aprovados
+- [ ] All 🔵 citations added — paths de ficheiros (`company.yaml`, `budgets/`, `audit/`) referenciados explicitamente no output
+- [ ] All 🟢 projections labeled como tal ao cliente — ETA, token spend e throughput marcados como estimativas, não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

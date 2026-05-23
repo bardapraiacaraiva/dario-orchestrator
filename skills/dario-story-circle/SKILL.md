@@ -186,6 +186,47 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via sessão anterior / memória / dados reais do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — narrativa construída por design (não verificável factualmente)
+
+Output checklist upfront mostra ao leitor exatamente o que é trust-as-is vs. o que precisa de verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Beat 5 (FIND): "Em 2019, após perder o maior cliente da carreira, Ana teve o insight 
+que mudou tudo." — ABT: "Ana vendia consultoria e vivia bem, MAS o mercado mudou, 
+PORTANTO criou o método X." Prova: 47 clientes transformados.
+```
+*Problema: leitor não sabe o que é fact real, o que foi assumido da conversa, o que é framing narrativo.*
+
+✅ Delivery-ready:
+```
+## Status Checklist — Brand Story: Ana / Método X
+
+🔵 verified   — Fundadora: Ana Ribeiro, consultora sénior desde 2015
+🟡 assumed    — Inciting incident: "perda de cliente em 2019" (a confirmar data e contexto exacto)
+🟡 assumed    — Beat 6 (TAKE): risco financeiro mencionado genericamente — confirmar valor/detalhe real
+🟢 projection — Beat 8 (CHANGE): transformação descrita nos clientes (narrativa construída; validar com 1-2 testimonials reais)
+🟢 projection — ABT one-liner: framing narrativo proposto — cliente deve rever se ressoa com a sua voz
+🔵 verified   — Prova: 47 clientes (confirmado em sessão anterior)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os 🟡 items confirmados — substituir assumptions com factos reais do fundador (datas, nomes, valores)
+- [ ] Todos os 🔵 items com fonte/sessão citada no ficheiro de output
+- [ ] Todos os 🟢 projections comunicados ao cliente como *framing narrativo* — não apresentar como facto biográfico
+- [ ] Inciting incident (beat 2/3) validado directamente com o fundador antes de publicar
+- [ ] Versão Full (600-1000 words) revista pelo cliente para autenticidade de voz
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

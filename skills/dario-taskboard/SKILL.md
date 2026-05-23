@@ -379,6 +379,41 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do Taskboard deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via YAML persistido em `~/.claude/orchestrator/tasks/` ou audit log da sessão
+- 🟡 **assumed** — plausível dado o contexto do projecto, mas precisa de confirmar com utilizador antes de entrega
+- 🟢 **projection** — estimativa de design (token budget, deadline, revision cycles — não verificável até execução)
+
+Output checklist upfront mostra ao utilizador exactamente o que é trust-as-is vs. precisa de sync. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+PROJ-007 | "Redesign homepage" | assignee: diva-brand | 3 revisões | deadline: sexta
+```
+*(reader assume que tudo está confirmado — assignee pode não existir em company.yaml, deadline nunca foi registado)*
+
+✅ Delivery-ready:
+```
+🔵 ID: PROJ-007 (gerado e persistido em active/)
+🔵 Título: "Redesign homepage" (criado nesta sessão, YAML escrito)
+🟡 Assignee: diva-brand (existe em company.yaml? — confirmar antes de checkout)
+🟡 Priority: high (assumed por contexto do sprint — utilizador não especificou)
+🟢 estimated_tokens: 8 000 (projecção de design; actual_tokens preenchido pós-execução)
+🟢 revision_max_loops: 3 (default da execution_policy — pode variar se policy mudar)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os 🟡 items confirmados — assignee existe em `company.yaml`, priority validada pelo utilizador
+- [ ] Todos os 🔵 items citam source (ID do YAML persistido, timestamp do audit log)
+- [ ] Todos os 🟢 projections comunicados ao cliente como estimativas — expectativas claras sobre token budget e revision loops antes de `in_progress`
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```yaml

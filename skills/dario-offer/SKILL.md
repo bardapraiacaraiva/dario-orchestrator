@@ -247,6 +247,37 @@ Output é **delivery-ready (90+/100)** se TODAS estas checks passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via inputs do cliente (avatar, preço actual, objecções reais)
+- 🟡 **assumed** — plausível baseado no framework Hormozi, mas precisa confirmação antes de entregar
+- 🟢 **projection** — valor percebido / forecast construído por design (não verificável externamente)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa de sync antes de publicar a oferta.
+
+**Honest transparency > oferta inflada que não converte.**
+
+---
+
+❌ **NOT delivery-ready:**
+- Bonus Stack com "Value: $2.000" sem label — o cliente assume que é um preço de mercado real
+- Avatar descrito como "empreendedores 35-50 anos em Lisboa" sem confirmar com cliente quem é realmente o ICP
+- Guarantee com "100% money back em 30 dias" sem saber se o cliente tem política legal para isso
+
+✅ **Delivery-ready:**
+- 🔵 **verified** — "Objecção #1: 'Não tenho tempo'" (confirmada em call com cliente, 3 leads disseram isto)
+- 🟡 **assumed** — "Timeframe prometido: 90 dias" (baseado em benchmarks do nicho — cliente precisa confirmar que é entregável)
+- 🟢 **projection** — "Valor total do Bonus Stack: $14.700" (calculado por design para anchoring — não é preço de venda real)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions com actuals do cliente (preço real, capacidade de entrega, prazo legal da guarantee)
+- [ ] Todos os 🔵 sources citados — inputs do cliente documentados (call notes, formulário, CRM)
+- [ ] Todos os 🟢 projections comunicados ao cliente como valores de perceived value para anchoring, **não** como preços de mercado verificados
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

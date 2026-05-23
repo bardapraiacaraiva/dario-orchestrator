@@ -421,6 +421,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de delivery
+- 🟢 **projection** — forecast by design (não verificável até medição in situ)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa verify. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "A parede entre fracções atinge DnT,w = 52 dB com solução de pladur duplo + lã mineral 50mm. O ruído de equipamentos fica abaixo dos 32 dB(A) exigidos pelo RRAE."
+*(Reader assume que todos os valores são medidos/confirmados — podem ser estimativas de catálogo ou hipóteses de projecto.)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Requisito RRAE para parede entre fracções: DnT,w ≥ 50 dB (DL 96/2008)
+> - 🟡 **assumed** — Desempenho estimado da solução pladur duplo + lã 50mm: DnT,w ≈ 52 dB (valor de catálogo Saint-Gobain; não inclui flanking paths do projecto real)
+> - 🟡 **assumed** — Lden da localização: ~60 dB (zona urbana moderada assumida; mapa de ruído da CM não consultado)
+> - 🟢 **projection** — LAr,nT do AVAC previsto ≤ 30 dB(A) após selecção de equipamento com atenuação de 8 dB na conduta — confirmar com folha de dados do fabricante
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir valores de catálogo por ensaios certificados ou medições in situ (DnT,w real com flanking)
+- [ ] Mapa de ruído municipal consultado e Lden/Ln reais inseridos (substituir zona assumida)
+- [ ] All 🔵 citations added — artigo RRAE e tabela NP 4499 referenciados no relatório acústico
+- [ ] All 🟢 projections labeled ao cliente como estimativas de projecto, sujeitas a ensaio pós-construção (RRAE Art.º 14 — verificação obrigatória)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

@@ -297,6 +297,48 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no blueprint deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via RAG/session/dados do cliente (ex: ferramentas em uso, campos reais)
+- 🟡 **assumed** — plausível com base no contexto mas precisa confirmação antes de implementar
+- 🟢 **projection** — estimativa por design (ops count, frequência, budget)
+
+Output checklist upfront mostra ao implementador exactly o que é trust-as-is vs o que precisa validar antes de ligar o cenário.
+**Honest transparency > blueprint que parece pronto mas falha no módulo 3.**
+
+---
+
+❌ **NOT delivery-ready:**
+```
+monthly_ops_estimate: 9.000
+trigger: Webhook — form submit
+crm_endpoint: POST /api/contacts
+```
+*Sem labels → implementador assume tudo verified → liga cenário → ops explodem ou endpoint errado.*
+
+---
+
+✅ **Delivery-ready:**
+```
+trigger: Webhook — form submit (Typeform)            🔵 verified — confirmado em sessão
+crm_endpoint: POST /api/contacts                     🟡 assumed — cliente mencionou HubSpot mas URL não validada
+monthly_ops_estimate: ~9.000 ops/mês                 🟢 projection — baseado em 100 runs/dia × 3 ops × 30 dias
+error_alert_channel: Slack #automations              🟡 assumed — canal existente não confirmado
+idempotency_key: form.submission_id                  🔵 verified — campo presente no payload Typeform
+iterator_batch_size: 10 items                        🟡 assumed — volume real de registos por run não confirmado
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os 🟡 items confirmados — substituir assumptions com actuals (endpoint real, canal Slack, volume por run)
+- [ ] Todas as citações/fontes adicionadas por 🔵 (RAG hit, sessão, doc do cliente)
+- [ ] Todos os 🟢 projections labeled como estimativas ao cliente — especialmente ops budget (evitar surpresa de quota)
+- [ ] Data mapping table: cada campo com status próprio (source field não assumido se payload não foi partilhado)
+- [ ] Error handler pattern confirmado com cliente (Break vs Resume — depende da error tolerance declarada)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

@@ -217,6 +217,49 @@ tier1_count: 7
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — decisão de design ou inferência futura (não verificável agora)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verificação. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+date: 2026-04-15
+project: Atrium Golden Visa
+type: audit
+status: delivered
+tags: [seo, wordpress, golden-visa]
+score_global: 74
+```
+*Nenhum label → reader assume que tudo está verified. Data pode estar errada, score pode ser estimativa, status pode não refletir realidade do cliente.*
+
+---
+
+✅ Delivery-ready:
+```
+date: 2026-04-15            🔵 verified — ISO date do sistema no momento do save
+project: Atrium Golden Visa 🔵 verified — confirmado em sessão anterior (client onboard)
+type: audit                 🔵 verified — output gerado por dario-wp-audit
+status: delivered           🟡 assumed — marcado como delivered mas cliente ainda não confirmou recepção
+tags: [seo, wordpress]      🟡 assumed — tags inferidas do conteúdo; confirmar se vault usa taxonomia diferente
+score_global: 74            🟢 projection — score calculado por heurística DARIO, não auditoria manual
+vault_path: 05 - Claude - IA/Outputs/  🔵 verified — path existe e foi validado antes do write
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os 🟡 items confirmados (ex: `status` actualizado para `delivered` só após cliente confirmar recepção; `tags` validadas contra taxonomia real do vault)
+- [ ] Todos os 🔵 sources citados no frontmatter ou no body do ficheiro (ex: data de sessão de origem)
+- [ ] Todos os 🟢 projections sinalizados explicitamente ao cliente (ex: `score_global` é estimativa DARIO — não auditoria certificada)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

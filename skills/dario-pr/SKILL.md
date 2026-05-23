@@ -333,6 +333,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact num press release, pitch ou award submission deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados do cliente / brief recebido
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de enviar para media
+- 🟢 **projection** — estimativa ou resultado esperado por design (não verificável no momento)
+
+Output checklist upfront mostra ao jornalista, editor e cliente exatamente o que é trust-as-is vs. o que precisa de facto-check antes da distribuição. **Honest transparency > comunicado que volta com erratas.**
+
+❌ NOT delivery-ready:
+```
+"A empresa fundada em 2019 tem 47 colaboradores e cresceu 340% em 2024,
+com presença em 6 países e faturação de €2.3M."
+```
+*(tudo sem label — jornalista e cliente assumem que todos os dados foram verificados; um número errado destrói credibilidade)*
+
+✅ Delivery-ready:
+```
+"A empresa 🔵 fundada em 2021 (confirmado no brief) conta hoje com
+🟡 ~40 colaboradores (assumido — confirmar headcount exato) e registou
+🟢 crescimento projetado de +200% para 2025 (forecast da empresa,
+não auditado — label como projeção ao media)."
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: headcount, datas de lançamento, preços, nomes de jornalistas, beat assignments)
+- [ ] All 🔵 citations locked — fontes documentadas e disponíveis para fact-check por jornalistas (ex: relatório, comunicado anterior, website oficial)
+- [ ] All 🟢 projections explicitamente labeled como tal no corpo do comunicado ou pitch — nunca apresentar forecasts como factos consumados ao media
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

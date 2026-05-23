@@ -257,6 +257,44 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / dados reais do cliente (ex: equipa existente, projectos activos)
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast by design (não verificável — ex: capacidade futura, crescimento salarial)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs precisa verificar. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Developer: 85% utilização | Salary proposto: 2.800 EUR | Freelancer disponível 20h/semana
+```
+*Reader assume tudo como facto — utilização pode estar desactualizada, salary sem source, freelancer sem confirmação de disponibilidade actual.*
+
+---
+
+✅ Delivery-ready:
+```
+- 🔵 Developer João — 3 projectos activos (Atrium, Vivenda, LUCAS) confirmados em sessão
+- 🟡 Utilização estimada em 85% — assumido com base em scope declarado; confirmar horas reais no timesheet
+- 🟡 Salary range Senior Dev: 2.800–4.000 EUR — benchmark PT 2026 interno; confirmar vs oferta de mercado actual antes de publicar JD
+- 🟢 Capacidade disponível em Q3: projecção se pipeline actual se mantiver; rever se fechar novo cliente
+- 🟡 Freelancer designer — 10h/semana livres assumidas; confirmar disponibilidade real antes de alocar projecto
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — horas reais validadas no timesheet / tool de tracking
+- [ ] All 🟡 salary ranges alinhados com mercado actual (LinkedIn Jobs, ITjobs.pt, Glassdoor PT)
+- [ ] All 🟡 freelancer availabilities reconfirmadas directamente com cada freelancer
+- [ ] All 🔵 sources citadas — sessão, documento ou tool onde dado foi extraído
+- [ ] All 🟢 projections de capacidade e hiring need comunicadas ao cliente como forecast, não como garantia
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

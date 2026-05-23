@@ -480,6 +480,35 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados reais do cliente / fontes citadas
+- 🟡 **assumed** — plausível com base no contexto, mas precisa de confirmação do cliente antes da entrega
+- 🟢 **projection** — forecast ou estimativa por design (não verificável até execução)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verificação. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "A activation rate actual é 34%, o MVP deve estar pronto em 6 semanas, e o segmento principal são PMEs com 10–50 colaboradores."
+*(reader assume tudo verified — nenhum label, nenhuma fonte, expectativas infladas)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Framework DHM (Biddle) aplicado conforme documentado em `dario-rag` (Delight / Hard-to-copy / Margin-enhancing)
+> - 🟡 **assumed** — Activation rate estimada em ~30–35% com base no estágio MVP declarado; cliente deve confirmar métrica real antes de definir OKR de activation
+> - 🟡 **assumed** — Segmento-alvo "PMEs SaaS B2B, 10–50 seats" inferido do contexto LUSOconta — confirmar ICP antes de priorizar roadmap Q3
+> - 🟢 **projection** — Se hipótese de value risk validada em 3 user interviews, estima-se redução de churn em 8–12 pp no ciclo seguinte (Torres: assumption testing → experiment design)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (activation rate real, ICP validado, métricas NSM actuais)
+- [ ] All 🔵 citations added — RAG source confirmada para cada framework citado (Cagan, Torres, Perri, Doshi, Rachitsky, Biddle)
+- [ ] All 🟢 projections labeled as such ao cliente — expectativas de forecast explicitamente comunicadas como estimativas, não garantias
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

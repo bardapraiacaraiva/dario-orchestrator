@@ -262,6 +262,47 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via cliente input, RAG, ou sessão anterior
+- 🟡 **assumed** — plausível mas precisa de confirmação do cliente antes de entregar
+- 🟢 **projection** — forecast/copy claim por design (não verificável até mercado testar)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa verificar. **Honest transparency > inflated copy.**
+
+---
+
+❌ NOT delivery-ready:
+```
+"Os nossos clientes aumentaram receita em 47% em 90 dias."
+"Awareness Level 3 — Solution-Aware."
+"Garantia de 30 dias sem perguntas."
+```
+*(reader assume que tudo é verified — pode entregar copy com dados fabricados ou awareness errada)*
+
+✅ Delivery-ready:
+```
+🔵 verified   — Awareness Level: 3 (Solution-Aware) — confirmado por cliente em briefing
+🟡 assumed    — Resultado "47% de aumento de receita" — plausível pelo caso partilhado,
+                 mas número exacto não confirmado; substituir por testemunho literal antes de publicar
+🟡 assumed    — Sophistication Stage: 3 (Unique Mechanism) — inferido do mercado descrito;
+                 cliente deve confirmar se há claims de mecanismo já saturados no nicho
+🟢 projection — "Podes fechar os teus primeiros 3 clientes em 21 dias" — forecast de copy
+                 baseado no avatar e oferta; não verificável; labelar como resultado típico/esperado
+🔵 verified   — Guarantee "30 dias money-back" — confirmado na estrutura da oferta do cliente
+🟡 assumed    — Dominant emotion: "medo de ficar para trás" — inferida do avatar descrito;
+                 cliente deve validar se ressoa ou se é mais aspiracional (esperança/orgulho)
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — assumptions substituídas por actuals (resultados reais, emotion validada, sophistication stage confirmado)
+- [ ] All 🔵 citations fechadas — proof elements (testemunhos, screenshots, credenciais) entregues pelo cliente e integrados na cópia final
+- [ ] All 🟢 projections labeled ao cliente — headlines e bullets com claims de resultado marcados como "resultado típico" ou "projecção" para compliance e expectativas claras
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

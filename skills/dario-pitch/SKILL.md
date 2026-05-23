@@ -277,6 +277,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes da entrega
+- 🟢 **projection** — forecast por design (não verificável no momento)
+
+Output checklist upfront mostra ao leitor exactamente o que é trust-as-is vs o que precisa verificar. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "73% of applications fail. Market TAM is €4.2B. Our close rate is 3× industry average."
+> *(reader não sabe se estes números são internos, estimados ou inventados — undermines credibility no investor room)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — "73% rejection rate" (sourced: SEF/AIMA 2023 report, confirmed last session)
+> - 🟡 **assumed** — "TAM €4.2B" (baseado em benchmarks públicos — cliente deve confirmar com own research pré-pitch)
+> - 🟢 **projection** — "3× close rate vs industry average por Year 2" (forecast by design; apresentar como target ao investidor, não como historical fact)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir market size estimates, fee assumptions e competitor positioning com actuals do cliente
+- [ ] All 🔵 citations added — cada stat no deck tem fonte visível (slide footer ou appendix) pronta para due diligence
+- [ ] All 🟢 projections labeled — investidor vê claramente o que é forecast vs track record (evita securities / credibility issues)
+- [ ] ABT one-liner validado — números embutidos no "And / But / Therefore" passaram pelo checklist acima antes de entrar no hook script
+- [ ] Hook stat confirmado — o shock stat dos primeiros 90 segundos é 🔵 verified; nunca abrir com 🟡 assumed em frente a VCs
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown
