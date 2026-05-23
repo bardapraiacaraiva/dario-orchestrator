@@ -168,3 +168,200 @@ If DataForSEO MCP tools are available, use `on_page_instant_pages` for real page
 | robots.txt not found | Note that no robots.txt was detected at the root domain. Recommend creating one with appropriate directives. Continue audit on remaining categories. |
 | HTTPS not configured | Flag as a critical issue. Report whether HTTP is served without redirect, mixed content exists, or SSL certificate is missing/expired. |
 | Core Web Vitals data unavailable | Note that CrUX data is not available (common for low-traffic sites). Suggest using Lighthouse lab data as a proxy and recommend increasing traffic before re-testing. |
+
+## Delivery-ready self-check (run BEFORE delivering to client)
+
+Output é **delivery-ready (90+/100)** se TODAS estas check passam.
+
+### Gate 1 — Crawlability & robots.txt auditado com dados reais
+- [ ] robots.txt fetched e analisado (não assumido)
+- [ ] XML sitemap localizado e referenciado no robots.txt verificado
+- [ ] AI crawler policy documentada (GPTBot, ClaudeBot, Google-Extended, Bytespider)
+- [ ] Noindex tags intencionais vs acidentais distinguidos com URLs concretos
+- ❌ NOT delivery-ready: "O robots.txt parece estar a bloquear alguns recursos importantes."
+- ✅ Delivery-ready: "robots.txt em cuidai.pt/robots.txt bloqueia `/wp-admin/` (correto) e `/assets/` (PROBLEMA — bloqueia CSS/JS críticos). `GPTBot` sem regra explícita → rasteado para treino sem consentimento."
+
+### Gate 2 — Indexability com evidências de duplicate/thin content
+- [ ] Canonical tags verificados: self-referencing, sem conflito com noindex
+- [ ] Duplicados identificados (www vs non-www, parâmetros URL, variantes)
+- [ ] Thin content flagged com contagem de palavras real por tipo de página
+- [ ] Hreflang auditado se site multi-língua/multi-região
+- ❌ NOT delivery-ready: "Existem algumas páginas duplicadas que podem afetar o SEO."
+- ✅ Delivery-ready: "luso conta.pt resolve www e non-www para HTTPS sem redirect 301 — 2 versões indexáveis. 14 páginas de categoria com <120 palavras (mínimo recomendado: 300). Canonical em `/conta-poupanca/` aponta para `/poupanca/` — conflito detectado."
+
+### Gate 3 — Security headers com status concreto por header
+- [ ] HTTPS enforced + SSL válido confirmado (sem mixed content)
+- [ ] Cada header listado com status: ✅ presente / ⚠️ misconfigured / ❌ ausente
+- [ ] HSTS max-age reportado (recomendado ≥31536000)
+- [ ] CSP avaliado: presente mas permissivo (unsafe-inline) conta como ⚠️, não ✅
+- ❌ NOT delivery-ready: "Os security headers precisam de ser melhorados."
+- ✅ Delivery-ready: "saquei.pt — CSP: ❌ ausente | HSTS: ✅ max-age=31536000 | X-Frame-Options: ✅ DENY | X-Content-Type-Options: ✅ nosniff | Referrer-Policy: ⚠️ no-referrer-when-downgrade (recomendado: strict-origin-when-cross-origin)"
+
+### Gate 4 — Core Web Vitals com valores 75th percentile reais
+- [ ] LCP, INP, CLS reportados com valores numéricos reais (não estimados)
+- [ ] Fonte indicada: CrUX (dados reais) vs Lighthouse (lab data) — distinção explícita
+- [ ] FID **nunca mencionado** (removido em setembro 2024)
+- [ ] INP correto como métrica de interatividade desde março 2024
+- [ ] Páginas com "Needs Improvement" ou "Poor" identificadas com URLs
+- ❌ NOT delivery-ready: "O site tem bom desempenho mas o FID pode ser otimizado para melhor UX."
+- ✅ Delivery-ready: "tributario.ai (CrUX, nov 2024, 75th pct): LCP 3.8s ❌ (>2.5s) | INP 310ms ❌ (>200ms) | CLS 0.04 ✅. Páginas críticas: `/simulador/` e `/irs-2024/` com LCP >4s. Lab data (Lighthouse mobile): LCP 4.2s."
+
+### Gate 5 — JavaScript rendering com rendering gap documentado
+- [ ] Framework detetado (React/Vue/Angular/Next.js/SSR/CSR/SSG)
+- [ ] Rendering gap verificado: conteúdo crítico em HTML inicial vs requer JS
+- [ ] Canonical e meta robots servidos no HTML inicial (não injetados via JS)
+- [ ] Structured data time-sensitive (e.g. Product) em server-rendered HTML
+- ❌ NOT delivery-ready: "O site usa React, o que pode causar problemas de indexação."
+- ✅ Delivery-ready: "atrium.pt usa Next.js — SSR confirmado para páginas de produto. PORÉM: canonical tag injetada via `useEffect` (JS) — difere do HTML raw que serve canonical vazio. Google pode usar canonical vazio. Structured data `Product` ausente do HTML inicial em 8 páginas de produto."
+
+### Gate 6 — Output usa NOME DO CLIENTE + dados reais, sem angle-brackets placeholder
+- [ ] Cliente identificado pelo nome real (ex: Cuidai, LUSOconta, SAQUEI)
+- [ ] URLs reais usados, não `https://example.com` ou `[URL]`
+- [ ] Valores numéricos reais em todas as métricas (0 campos `[X ms]` ou `[inserir]`)
+- [ ] Data da auditoria registada (ex: "auditoria realizada a 14 jan 2025")
+- ❌ NOT delivery-ready: "O LCP de `[site do cliente]` é `[X]`s, acima do threshold de 2.5s."
+- ✅ Delivery-ready: "Auditoria técnica Vivenda.pt — 14 jan 2025. LCP: 3.1s (desktop) / 4.7s (mobile). robots.txt: sitemap não referenciado. SSL válido. INP: 180ms ✅."
+
+---
+
+## Fully-worked A-tier example (delivery-ready reference)
+
+```markdown
+# Auditoria SEO Técnica — Cuidai.pt
+**Data:** 14 janeiro 2025 | **Auditado por:** DARIO | **Fonte CWV:** CrUX (75th pct, nov 2024)
+
+---
+
+## 1. Crawlability
+
+**robots.txt** (cuidai.pt/robots.txt):
+- ✅ Existe e é válido
+- ✅ Sitemap referenciado: `Sitemap: https://cuidai.pt/sitemap.xml`
+- ⚠️ Bloqueia `/uploads/` — imagens de cuidadores não rasteáveis pelo Googlebot
+- ❌ Nenhuma regra para AI crawlers
+
+**Política AI crawlers recomendada:**
+```
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: *
+Allow: /
+```
+> Nota: bloquear `Google-Extended` não afeta indexação Google Search (usa `Googlebot`).
+
+**Sitemap:** 847 URLs indexadas. 23 URLs retornam 404 no sitemap — remover.
+
+---
+
+## 2. Indexability
+
+- ❌ **www/non-www:** cuidai.pt e www.cuidai.pt ambos acessíveis sem redirect 301
+- ⚠️ **Thin content:** 31 páginas de perfil de cuidador com <90 palavras
+- ✅ **Canonical:** self-referencing correto nas páginas principais
+- ✅ **Sem hreflang** necessário (site PT apenas)
+- ❌ **Parâmetros URL:** `/cuidadores/?cidade=Lisboa&tipo=idosos` indexável sem canonical
+
+**Ação prioritária:** implementar redirect 301 www → non-www.
+
+---
+
+## 3. Security Headers
+
+| Header | Status | Detalhe |
+|--------|--------|---------|
+| HTTPS | ✅ | SSL válido, expira 2025-09-12 |
+| HSTS | ✅ | max-age=31536000; includeSubDomains |
+| CSP | ⚠️ | Presente mas inclui `unsafe-inline` |
+| X-Frame-Options | ✅ | SAMEORIGIN |
+| X-Content-Type-Options | ✅ | nosniff |
+| Referrer-Policy | ❌ | Ausente |
+
+**Mixed content:** 3 imagens servidas via HTTP em `/sobre-nos/` — corrigir.
+
+---
+
+## 4. URL Structure
+
+- ✅ URLs descritivas: `/cuidadores/lisboa/idosos/` (lógico, hyphenated)
+- ❌ 4 redirects em cadeia detetados: `/cuidador` → `/cuidadores` → `/cuidadores/` (2 hops)
+- ⚠️ 7 URLs com >100 caracteres na secção de blog
+- ✅ Trailing slash consistente em todo o site
+
+---
+
+## 5. Mobile Optimization
+
+- ✅ Viewport meta tag presente em todas as páginas
+- ✅ Design responsivo confirmado (CSS media queries)
+- ⚠️ 3 botões CTA no formulário de registo com touch target 38x38px (mínimo: 48x48px)
+- ✅ Font-size base: 16px
+- ✅ Sem scroll horizontal detetado
+- **Nota:** Mobile-first indexing 100% ativo desde 5 julho 2024 — versão mobile é a indexada
+
+---
+
+## 6. Core Web Vitals (CrUX, 75th percentile, novembro 2024)
+
+| Métrica | Valor | Status |
+|---------|-------|--------|
+| LCP | 2.9s | ⚠️ Needs Improvement (>2.5s) |
+| INP | 155ms | ✅ Good (<200ms) |
+| CLS | 0.08 | ✅ Good (<0.1) |
+
+**Páginas críticas (LCP >2.5s):** `/`, `/cuidadores/`, `/como-funciona/`
+**Causa provável LCP:** imagem hero não otimizada (1.2MB, formato JPEG). Recomendar WebP + lazy load removido do LCP element.
+
+---
+
+## 7. Structured Data
+
+- ✅ JSON-LD detetado em homepage (`Organization`, `WebSite`)
+- ❌ Páginas de cuidador sem `Person` ou `Service` markup
+- ⚠️ `FAQPage` presente em `/faq/` mas 2 entradas com `acceptedAnswer` vazio
+- Ver skill `seo-schema` para análise completa e geração de markup
+
+---
+
+## 8. JavaScript Rendering
+
+- **Framework:** Next.js 14 (SSR + ISR confirmado via headers `x-nextjs-cache`)
+- ✅ Conteúdo crítico presente no HTML inicial (sem rendering gap)
+- ✅ Canonical servido no HTML raw (não injetado via JS)
+- ⚠️ Meta description em `/cuidadores/[id]/` injetada via `useEffect` — não presente no HTML inicial em 12% dos perfis testados
+- ✅ Structured data no HTML inicial
+
+---
+
+## Resumo de Prioridades
+
+| Prioridade | Issue | Impacto |
+|-----------|-------|---------|
+| 🔴 Alta | www/non-www sem redirect 301 | Duplicate content, PageRank dividido |
+| 🔴 Alta | LCP 2.9s em homepage | Core Web Vitals ranking signal |
+| 🔴 Alta | 23 URLs 404 no sitemap | Crawl budget desperdiçado |
+| 🟡 Média | Meta description via JS (12% perfis) | Snippets incorretos no Google |
+| 🟡 Média | Touch targets 38px (3 botões) | UX mobile + Mobile-first indexing |
+| 🟢 Baixa | Referrer-Policy ausente | Security posture |
+```
+
+---
+
+## Output anti-patterns
+
+- Mencionar **FID** (First Input Delay) em qualquer contexto — foi removido em setembro 2024; a métrica correta é INP
+- Reportar Core Web Vitals sem indicar fonte (CrUX real user data vs Lighthouse lab data) — são interpretações diferentes
+- Listar security headers sem status individual por header (✅/⚠️/❌) — "headers em falta" sem especificar quais é inútil
+- Afirmar "bloquear Google-Extended afeta o Google Search" — não afeta; afeta apenas Gemini training
+- Entregar auditoria com `[URL do cliente]`, `[inserir valor]` ou outros placeholders angle-bracket não substituídos
+- Assumir robots.txt sem o fetcher — descrever conteúdo sem verificar é fabricação de dados
+- Marcar CSP como ✅ quando contém `unsafe-inline` ou `unsafe-eval` — é misconfiguration, não conformidade
+- Ignorar AI crawler management como fora de escopo — é consideração técnica SEO crítica em 2025
+- Reportar LCP/INP/CLS sem indicar percentil (deve ser sempre 75th percentile para avaliação ranking)
+- Misturar recomendações de GEO/AI visibility neste output — referenciar `seo-geo` skill sem duplicar conteúdo
