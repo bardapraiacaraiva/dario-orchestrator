@@ -871,6 +871,41 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do **lucas-analytics** deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de sessão anterior / ficheiros reais do orchestrator / cliente data já ingerida
+- 🟡 **assumed** — plausível dado o contexto, mas precisa de confirm do cliente antes de entregar
+- 🟢 **projection** — forecast by design (ROI estimado, trend futuro, playbook projetado)
+
+Output checklist upfront mostra ao reader exatamente o que é trust-as-is vs. precisa verificar. **Honest transparency > inflated dashboard.**
+
+---
+
+❌ **NOT delivery-ready:**
+```
+seo-local: Score 91.5 | Rev% 0% | ROI 441x | Trend: improving
+```
+*(sem labels — reader assume que todos os dados são factos verificados; roi_multiplier pode ser estimativa)*
+
+✅ **Delivery-ready:**
+```
+🔵 seo-local avg quality: 91.5 (confirmed — 3 tasks in done/ com score registado)
+🟡 revision rate 0%: assumed — nenhuma revision task encontrada, mas log pode estar incompleto
+🟢 ROI projection: 441x — calculado sobre token_cost_estimate vs retainer; não auditado externamente
+🟡 "Tier A, Trend: improving" — assumed; apenas 1 ciclo de dados disponível para confirmar tendência
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — ex: revision logs completos, token counts reais vs. estimados
+- [ ] All 🔵 citations adicionadas — path exacto do ficheiro fonte (`done/`, `revenue.yaml`, `success-patterns.yaml`)
+- [ ] All 🟢 projections labeled como tal ao cliente — ROI multipliers e domain playbooks apresentados como *projeções baseadas em dados parciais*, não garantias
+- [ ] `projects_analyzed` count validado contra ficheiros reais em `tasks/done/` antes de publicar dashboard
+- [ ] Qualquer skill em Tier C marcada como 🟡 até root cause confirmada (não assumir causa sem log evidência)
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

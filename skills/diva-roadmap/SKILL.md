@@ -225,6 +225,37 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no roadmap deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de diagnóstico, briefing, ou memória de sessão anterior
+- 🟡 **assumed** — plausível dado o tipo de projecto, mas precisa confirmação do cliente pré-entrega
+- 🟢 **projection** — estimativa de design (não verificável até execução)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs. o que precisa validar. **Honest transparency > roadmap inflado com falsa precisão.**
+
+❌ NOT delivery-ready:
+```
+Timeline: 10 meses | Orçamento: €180.000 | Empreiteiro: Silva & Filhos
+Fase 1 — Projecto: M1–M3 | Contingência: 8%
+```
+*(reader assume tudo verificado — nenhum label, empreiteiro pode não estar adjudicado, orçamento pode ser chute)*
+
+✅ Delivery-ready:
+```
+Timeline: 10 meses 🟢 (projection — sem caderno encargos fechado)
+Orçamento total: €180.000 🔵 (verified — briefing sessão 2024-11-03)
+Empreiteiro: Silva & Filhos 🟡 (assumed — indicado pelo cliente, adjudicação pendente)
+Contingência: 8% 🟢 (projection — standard DIVA para remodelação integral)
+Paleta: Warm White #F5F0EB + Sage #8A9E8C + Brass #B08D57 🟡 (assumed — baseado em moodboard aprovado verbalmente, confirmação escrita pendente)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir empreiteiro/designer assumidos por nomes adjudicados; paleta validada por escrito
+- [ ] All 🔵 items com referência à fonte (sessão, documento, email) anotada no Obsidian
+- [ ] All 🟢 projections comunicadas explicitamente ao cliente como estimativas ("prazo +-1 semana", "orçamento +-10%")
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

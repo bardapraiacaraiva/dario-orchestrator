@@ -338,6 +338,42 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado via sessão anterior / memória / dados do cliente
+- 🟡 **assumed** — plausível mas precisa confirmação do cliente antes de entrega
+- 🟢 **projection** — estimativa por design (não verificável até execução)
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs o que precisa de verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+KNX para toda a casa — custo estimado €45.000.
+Sala: 3 circuitos de iluminação, 2 estores motorizados, zona AVAC.
+Recomendação: Loxone Miniserver Gen 2.
+```
+*(sem labels — cliente assume que tudo está verified; erros de protocolo ou custo passam despercebidos)*
+
+✅ Delivery-ready:
+```
+- 🔵 verified   — Moradia nova construção, 280m², Lisboa, 4 quartos
+- 🔵 verified   — Protocolo KNX seleccionado (cliente confirmou orçamento premium)
+- 🟡 assumed    — 14 pontos de iluminação na sala (planta fornecida, circuitos a validar c/ electricista)
+- 🟡 assumed    — 2 estores motorizados por quarto (dimensão vãos não confirmada)
+- 🟡 assumed    — Integração bomba de calor Daikin via KNX gateway (modelo exato por confirmar)
+- 🟢 projection — Custo total estimado Tier Premium: €38.000–€52.000 (±20% pré-execução)
+- 🟢 projection — Poupança energética estimada 18–25% AVAC com controlo por zonas
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — plantas finais revistas, circuitos e vãos validados com electricista/arquitecto
+- [ ] All 🟡 brand assumptions confirmadas — modelos exatos de actuadores, motores e gateways definidos
+- [ ] All 🔵 sources citadas — referência à sessão/documento onde dados do cliente foram captados
+- [ ] All 🟢 projections claramente apresentadas ao cliente como estimativas pré-obra (não valores fixos)
+- [ ] Custo por tier revisto se scope mudou entre needs assessment e entrega final
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

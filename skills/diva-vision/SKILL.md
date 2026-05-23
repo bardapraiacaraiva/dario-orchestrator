@@ -323,6 +323,36 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output de análise visual deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado por referência técnica conhecida (RGEU, dimensões standard, materiais identificados com certeza)
+- 🟡 **assumed** — estimativa plausível a partir de pistas visuais, requer confirmação do cliente antes de usar em projecto
+- 🟢 **projection** — previsão de potencial ou custo gerada por design (não verificável sem medição/orçamento real)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs o que precisa validar antes de avançar. **Honest transparency > inflated delivery.**
+
+---
+
+❌ NOT delivery-ready:
+> "Sala com ~18m², teto a 2.60m, pavimento em carvalho maciço, intervenção estimada €8.000–12.000."
+*(reader assume que tudo foi medido/confirmado — nada está labelado)*
+
+✅ Delivery-ready:
+> - 🔵 **verified** — Porta de entrada: largura standard 0.90m (referência RGEU usada para escala)
+> - 🟡 **assumed** — Área estimada: ~18m² (derivada de proporções visuais; confirmar com fita/laser antes de projecto)
+> - 🟡 **assumed** — Pavimento identificado como soalho de madeira maciça (possível carvalho; confirmar espécie e estado estrutural in situ)
+> - 🟡 **assumed** — Tecto estimado a 2.60m (proporcionalidade com mobiliário visível; medir antes de orçamentar pladur/iluminação)
+> - 🟢 **projection** — Potencial de intervenção: €8.000–12.000 (estimativa fase conceptual ±30%; valida com empreiteiro antes de compromisso)
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — dimensões medidas in situ, materiais validados, patologias inspeccionadas fisicamente
+- [ ] All 🔵 citations added — referência RGEU, norma ou dimensão standard usada explicitada no output
+- [ ] All 🟢 projections labeled as such ao cliente — estimativas orçamentais e potencial de design comunicados com margem de erro clara (ex: "±30%, fase conceptual")
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

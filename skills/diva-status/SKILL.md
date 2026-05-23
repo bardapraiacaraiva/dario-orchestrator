@@ -227,6 +227,35 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status Checklist per Data Point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no output do `diva-status` deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado por leitura real de ficheiro/API/bash no momento da execução
+- 🟡 **assumed** — plausível mas requer confirmação do cliente antes de entregar
+- 🟢 **projection** — estimativa por design, não verificável em runtime
+
+Output checklist upfront mostra ao reader exactamente o que é trust-as-is vs. o que precisa verify. **Honest transparency > inflated delivery.**
+
+❌ NOT delivery-ready:
+```
+Skills: 19/19 — Health Score: 94/100 — Last eval: 2025-01-10 — Pass rate: 28/30
+```
+*(reader assume tudo verified — nenhum label, nada distingue dado real de placeholder)*
+
+✅ Delivery-ready:
+```
+Skills: 19/19 🔵 verified (ls retornou 19 ficheiros, sizes confirmados)
+Health Score: 94/100 🟢 projection (calculado por fórmula interna, não auditado externamente)
+Last eval: 2025-01-10 🟡 assumed (data lida de MEMORY.md — cliente deve confirmar se eval foi re-executado desde então)
+Pass rate: 28/30 🔵 verified (output directo do eval suite run desta sessão)
+```
+
+**Ship checklist post-cliente-sync:**
+- [ ] All 🟡 items confirmed — substituir assumptions com actuals (ex: data do último eval, projects tracked em MEMORY.md validados pelo cliente)
+- [ ] All 🔵 citations mantidas — path do ficheiro ou endpoint que gerou cada número incluído no output
+- [ ] All 🟢 projections labeled as such ao cliente — Health Score e qualquer metric derivada por fórmula marcados como "calculado por design, não auditado"
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown

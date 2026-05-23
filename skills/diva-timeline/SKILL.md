@@ -281,6 +281,42 @@ Output é **delivery-ready (90+/100)** se TODAS estas check passam.
 
 ---
 
+### 7. Status checklist per data point (Gate 7 — validated FASE 1)
+
+Cada número/nome/fact no cronograma gerado deve ter label EXPLÍCITO:
+
+- 🔵 **verified** — confirmado de dados do cliente / sessão anterior / RAG knowledge base
+- 🟡 **assumed** — plausível para o projecto mas precisa confirmação do cliente antes de entrega
+- 🟢 **projection** — estimativa de design / forecast (não verificável até execução)
+
+Output checklist upfront mostra ao cliente exactamente o que é trust-as-is vs o que precisa de validação. **Honest transparency > cronograma inflado com falsas certezas.**
+
+---
+
+❌ NOT delivery-ready:
+```
+Licenciamento: 8 semanas
+Estrutura: 3 semanas
+Entrega prevista: Março 2026
+```
+*(reader assume que tudo é verified — mas a câmara pode levar 16 semanas, e o cliente ainda não confirmou o município)*
+
+✅ Delivery-ready:
+```
+- Licenciamento: 8–12 semanas 🟡 assumed — município não confirmado; Sintra/Lisboa histórico sugere 10 sem.
+- Estrutura: 3 semanas 🔵 verified — memória descritiva do cliente indica laje simples, sem obra de contenção
+- Entrega prevista: Abril 2026 🟢 projection — forecast baseado em cadência standard; clima invernal e disponibilidade de empreiteiro não validados
+```
+
+---
+
+**Ship checklist post-cliente-sync:**
+- [ ] Todos os itens 🟡 confirmados — substituir assumptions com actuals (município, heritage zone, MEP complexity, área m2)
+- [ ] Todas as fontes 🔵 citadas com referência à sessão / RAG hit / documento do cliente
+- [ ] Todos os itens 🟢 apresentados ao cliente como estimativas de planeamento — não como datas contratuais
+- [ ] Data de início validada (mês/ano confirmado → aplicar multiplier de inverno se Nov–Fev)
+- [ ] Fases com riscos conhecidos (amianto, DGPC, vizinhos) sinalizadas explicitamente no cronograma entregue
+
 ## Fully-worked A-tier example (delivery-ready reference)
 
 ```markdown
