@@ -17,6 +17,24 @@ ORCH = HOME / ".claude" / "orchestrator"
 SKILLS = HOME / ".claude" / "skills"
 DASHBOARD = ORCH / "dashboard.html"
 
+# Single source of truth for the dashboard version label. Mirrors the
+# orchestrator's v12.x major (license_manager.py + runtime.py reference
+# v12.1 as the current line; installer is v12.3.0).
+DARIO_VERSION = "v12.1"
+
+
+def git_head_short() -> str:
+    """Return the orchestrator repo's short commit hash, or empty if unavailable."""
+    try:
+        import subprocess
+        out = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True, text=True, timeout=2, cwd=str(HOME / ".claude"),
+        )
+        return out.stdout.strip() if out.returncode == 0 else ""
+    except Exception:
+        return ""
+
 def load_yaml_safe(path):
     try:
         with open(path, encoding="utf-8") as f:
@@ -189,6 +207,7 @@ def generate():
     done_count = sum(1 for t in tasks if t.get("status") == "done")
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    head_short = git_head_short() or "no-git"
 
     html = f"""<!DOCTYPE html>
 <html lang="pt"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -292,7 +311,7 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
 </div>
 
 <div class="footer">
-  DARIO Orchestrator v1.6 — Dashboard gerado automaticamente a partir dos ficheiros YAML reais<br>
+  DARIO Orchestrator {DARIO_VERSION} ({head_short}) — Dashboard gerado automaticamente a partir dos ficheiros YAML reais<br>
   Regenerar: <code>python3 ~/.claude/orchestrator/generate_dashboard.py</code>
 </div>
 
