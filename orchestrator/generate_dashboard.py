@@ -71,6 +71,30 @@ def get_pulse():
         return load_yaml_safe(path)
     return {}
 
+
+def get_padrao_a_metrics():
+    """Aggregate polished_production_runs.yaml on-the-fly.
+
+    Returns dict {last_30_days: agg, all_time: agg} where each agg has
+    overall + per_skill stats. Returns None if no runs file or no entries.
+    """
+    runs_path = ORCH / "quality" / "polished_production_runs.yaml"
+    if not runs_path.exists():
+        return None
+    try:
+        sys.path.insert(0, str(ORCH))
+        from scripts.aggregate_polished_metrics import aggregate, load_runs
+    except ImportError:
+        return None
+    runs = load_runs()
+    if not runs:
+        return None
+    return {
+        "last_30_days": aggregate(runs, window_days=30),
+        "all_time": aggregate(runs, window_days=None),
+        "n_runs_total": len(runs),
+    }
+
 def count_skills():
     counts = {"dario": 0, "diva": 0, "lucas": 0, "seo": 0, "a360": 0, "other": 0}
     if SKILLS.exists():
@@ -117,6 +141,7 @@ def generate():
     budget = get_budget()
     quality = get_quality()
     pulse = get_pulse()
+    padrao_a = get_padrao_a_metrics()
     skills = count_skills()
     company = get_company()
     total_skills = sum(skills.values())
@@ -294,6 +319,75 @@ def generate():
     tier_b = sum(1 for _, d in q_skills.items() if isinstance(d, dict) and 70 <= (d.get("avg_quality_score", 0) or 0) < 85)
     unscored = sum(1 for _, d in q_skills.items() if isinstance(d, dict) and not d.get("avg_quality_score"))
 
+    # Padrão A — polished wrapper telemetry widget
+    if padrao_a is None:
+        padrao_a_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:16px;">'
+            'Sem runs registados ainda<br>'
+            '<span style="font-size:10px;">Cada invocação de /dario-X-polished'
+            ' adiciona uma entrada</span></div>'
+        )
+        padrao_a_summary = "n=0"
+    else:
+        agg_30 = padrao_a["last_30_days"]["overall"]
+        agg_all = padrao_a["all_time"]["overall"]
+        per_skill_30 = padrao_a["last_30_days"]["per_skill"]
+        n_30 = agg_30["n_runs"]
+        n_all = padrao_a["n_runs_total"]
+        pass_30 = (agg_30["gate_pass_rate"] or 0) * 100
+        lift_30 = agg_30.get("mean_lift_pts")
+        lift_color = "var(--green)" if lift_30 and lift_30 >= 4 else "var(--amber)" if lift_30 and lift_30 > 0 else "var(--dim)"
+        padrao_a_summary = f"n={n_all} all-time / n={n_30} last-30d"
+
+        # Top per-skill rows
+        sorted_skills = sorted(
+            per_skill_30.items(),
+            key=lambda kv: (kv[1].get("mean_lift_pts") or 0),
+            reverse=True,
+        )
+        rows_html = ""
+        for skill, m in sorted_skills[:6]:
+            lift = m.get("mean_lift_pts")
+            lift_str = f"+{lift}" if lift is not None else "—"
+            pass_pct = (m.get("gate_pass_rate") or 0) * 100
+            sk_color = "var(--green)" if lift is not None and lift >= 4 else "var(--amber)" if lift is not None and lift > 0 else "var(--red)"
+            short_name = skill.replace("dario-", "").replace("-polished", "")
+            rows_html += (
+                f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;">'
+                f'<span style="flex:1;color:var(--dim);">{short_name}</span>'
+                f'<span style="width:50px;text-align:right;color:var(--dim);font-size:11px;">{m["n_runs"]}r</span>'
+                f'<span style="width:50px;text-align:right;color:var(--dim);font-size:11px;">{pass_pct:.0f}%</span>'
+                f'<span style="width:40px;text-align:right;font-weight:600;color:{sk_color};">{lift_str}</span>'
+                f'</div>'
+            )
+
+        if not rows_html:
+            rows_html = '<div style="color:var(--dim);font-size:11px;text-align:center;padding:8px;">Sem runs no último 30d</div>'
+
+        lift_display = f"+{lift_30}" if lift_30 is not None else "—"
+        padrao_a_html = (
+            f'<div style="display:flex;gap:20px;justify-content:center;margin-bottom:14px;">'
+            f'<div style="text-align:center;">'
+            f'<div class="big-num" style="color:{lift_color};font-size:1.8rem;">{lift_display}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Mean lift 30d</div>'
+            f'</div>'
+            f'<div style="text-align:center;border-left:1px solid var(--border);padding-left:20px;">'
+            f'<div class="big-num" style="font-size:1.8rem;color:var(--cyan);">{pass_30:.0f}%</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Gate pass 30d</div>'
+            f'</div>'
+            f'<div style="text-align:center;border-left:1px solid var(--border);padding-left:20px;">'
+            f'<div class="big-num" style="font-size:1.8rem;">{n_30}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Runs 30d</div>'
+            f'</div>'
+            f'</div>'
+            f'<div style="font-size:10px;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">'
+            f'Per-skill (last 30d) — runs · pass% · lift</div>'
+            f'{rows_html}'
+            f'<div style="font-size:10px;color:var(--dim);margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">'
+            f'All-time: {n_all} runs · target lift &ge; +4pts'
+            f'</div>'
+        )
+
     # Pulse time
     pulse_time = pulse.get("pulse_time", "nunca")
     if isinstance(pulse_time, str) and "T" in pulse_time:
@@ -406,6 +500,15 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
     {clients_html or '<div style="color:var(--dim);font-size:12px;text-align:center;padding:20px;">Sem clientes registados<br><span style="font-size:10px;">Correr: python scripts/compute_client_stats.py</span></div>'}
   </div>
 
+  <!-- PADRÃO A — Polished wrapper telemetry -->
+  <div class="card">
+    <h3>Padrão A — Polished Wrappers ({padrao_a_summary})</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Production runs telemetry · self-polishing skill loop · A/B target +4pts mean lift
+    </div>
+    {padrao_a_html}
+  </div>
+
   <!-- SYSTEM HEALTH -->
   <div class="card">
     <h3>Saude do Sistema</h3>
@@ -414,6 +517,7 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
     <div class="health-row"><span class="dot dot-green"></span> Budget Tracker — {budget.get('month','?')}, {pct:.1f}% usado</div>
     <div class="health-row"><span class="dot dot-green"></span> Quality — {len(q_skills)} skills scored, avg {avg_quality:.1f}, delivery-ready {delivery_rate_pct:.0f}% ({delivery_yes}/{delivery_total})</div>
     <div class="health-row"><span class="dot {'dot-amber' if queue_pending > 0 else 'dot-green'}"></span> Review Queue — {queue_pending} pending, {queue_resolved} resolved {'(avg TTR ' + f'{queue_avg_ttr_min:.0f}min)' if queue_resolved else ''}</div>
+    <div class="health-row"><span class="dot {'dot-green' if padrao_a else 'dot-amber'}"></span> Padrão A — {padrao_a_summary}{', last-30d lift +' + str(padrao_a['last_30_days']['overall'].get('mean_lift_pts', '?')) + 'pts' if padrao_a and padrao_a['last_30_days']['overall'].get('mean_lift_pts') is not None else ''}</div>
     <div class="health-row"><span class="dot dot-green"></span> Top clients — {len(top_clients)} ativos (ver card dedicado)</div>
     <div class="health-row"><span class="dot dot-green"></span> Tasks — {len(tasks)} activas, {done_count} done</div>
     <div class="health-row"><span class="dot {'dot-green' if pulse_time != 'nunca' else 'dot-red'}"></span> Last Pulse — {pulse_time}</div>
