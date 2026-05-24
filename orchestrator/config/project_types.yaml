@@ -1,0 +1,54 @@
+# Project type classification — dev vs client
+# ─────────────────────────────────────────────────────────────────────
+# Maps project slug (as used in budget by_project and task project field)
+# to its type: "client" (paid work) or "dev" (DARIO internal development).
+#
+# Single source of truth for budget breakdown + dashboard "spend by type" widget.
+# When a NEW project enters the budget, add it here. Unmapped projects
+# default to "unknown" in the breakdown report (so they're visible, not silently misclassified).
+#
+# Owners:
+#   - barda is the only user; ownership column is for future multi-tenant.
+
+schema_version: 1
+default_for_unmapped: unknown   # Forces visibility instead of silent misclassification
+
+# Client projects — paid work, money in / value out
+clients:
+  cuidai:           {name: "Cuidaí BR Caregiver",         owner: barda, status: active}
+  credito:          {name: "SAQUEI SaaS BR (fintech)",    owner: barda, status: active}
+  saquei:           {name: "SAQUEI SaaS BR (alias)",      owner: barda, status: active}
+  atrium:           {name: "Atrium Golden Visa",          owner: barda, status: active}
+  atrium-premium:   {name: "Atrium Premium RE",           owner: barda, status: active}
+  atrium-rebuild:   {name: "Atrium Rebuild Plan",         owner: barda, status: active}
+  lucas:            {name: "LUCAS/LUSOconta SaaS",        owner: barda, status: active}
+  lusoconta:        {name: "LUCAS/LUSOconta (alias)",     owner: barda, status: active}
+  vivenda:          {name: "Vivenda Creative Home",       owner: barda, status: active}
+  vivenda-pilot:    {name: "Vivenda (pilot phase)",       owner: barda, status: active}
+  vivenda-test:     {name: "Vivenda (test phase)",        owner: barda, status: active}
+  lisbon-dog-care:  {name: "Lisbon Dog Care",             owner: barda, status: active}
+  pupli:            {name: "Pupli App (ex-Patudos)",      owner: barda, status: active}
+  patudos:          {name: "Pupli/Patudos (alias)",       owner: barda, status: active}
+  atelier-ai:       {name: "Atelier AI",                  owner: barda, status: active}
+  arrecada-gov:     {name: "ARRECADA.GOV",                owner: barda, status: active}
+  arrecada:         {name: "ARRECADA.GOV (alias)",        owner: barda, status: active}
+  tributario-ai:    {name: "Tributário.AI BR",            owner: barda, status: active}
+
+# Dev / internal — building DARIO itself, no paying customer
+dev:
+  audit:                {description: "Internal audits, retrospectives, postmortems"}
+  test:                 {description: "Test runs, smoke tests, integration runs"}
+  vapor:                {description: "Catch-all for shelved experiments"}
+  dario:                {description: "DARIO orchestrator development"}
+  dspy:                 {description: "DSPy investigation (archived 2026-05-24)"}
+  orchestrator:         {description: "Orchestrator infrastructure work"}
+  prometheus:           {description: "PROMETHEUS squad work"}
+  padrao-a:             {description: "Padrão A polished wrappers development"}
+  ruflo-audit:          {description: "Ruflo competitor audit + 3 waves"}
+  refactor:             {description: "Refactor/cleanup work"}
+  internal:             {description: "Generic internal work"}
+  test-wrapper-2026:    {description: "Test wrapper for fresh-machine validation"}
+
+# Aliases for legacy / blank entries (won't be classified as either dev or client)
+# These will appear under "unknown" in the breakdown so they're visible.
+ignore_in_total: []   # Add slugs here only if intentionally excluded

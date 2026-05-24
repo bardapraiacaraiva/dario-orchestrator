@@ -146,6 +146,21 @@ def generate():
     company = get_company()
     total_skills = sum(skills.values())
 
+    # Budget breakdown by project type (dev vs client)
+    spend_by_type = None
+    try:
+        sys.path.insert(0, str(ORCH))
+        from scripts.budget_breakdown_by_type import (
+            aggregate_month, load_budget_file, load_types_config,
+        )
+        _cfg = load_types_config()
+        _bm = datetime.now().strftime("%Y-%m")
+        _bf = ORCH / "budgets" / f"{_bm}.yaml"
+        if _bf.exists():
+            spend_by_type = aggregate_month(load_budget_file(_bf), _cfg)
+    except Exception:
+        spend_by_type = None
+
     pct = budget.get("percentage", 0)
     if isinstance(pct, str): pct = float(pct)
     budget_color = "green" if pct < 80 else "amber" if pct < 95 else "red"
@@ -388,6 +403,66 @@ def generate():
             f'</div>'
         )
 
+    # Spend-by-type widget (gap #4: dev vs client visibility)
+    if spend_by_type is None or spend_by_type.get("total_tokens", 0) == 0:
+        spend_type_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:16px;">'
+            'Sem spend tracked este mês</div>'
+        )
+        spend_type_summary = "n/a"
+    else:
+        total = spend_by_type["total_tokens"]
+        by_type = spend_by_type["by_type"]
+        pcts = spend_by_type["percentages_by_type"]
+        client_t = by_type.get("client", 0)
+        dev_t = by_type.get("dev", 0)
+        unknown_t = by_type.get("unknown", 0)
+        client_pct = pcts.get("client", 0)
+        dev_pct = pcts.get("dev", 0)
+        unknown_pct = pcts.get("unknown", 0)
+
+        unknown_warning = ""
+        if unknown_t > 0:
+            unknown_warning = (
+                f'<div style="font-size:11px;color:var(--amber);margin-top:8px;">'
+                f'⚠ {unknown_t:,} tokens ({unknown_pct:.1f}%) sem classificação — '
+                f'adicionar projeto a config/project_types.yaml'
+                f'</div>'
+            )
+
+        spend_type_html = (
+            f'<div style="display:flex;gap:16px;justify-content:center;margin-bottom:14px;">'
+            f'<div style="text-align:center;">'
+            f'<div class="big-num" style="font-size:1.8rem;color:var(--green);">{client_pct:.0f}%</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Client</div>'
+            f'<div style="font-size:9px;color:var(--dim);">{client_t:,} tokens</div>'
+            f'</div>'
+            f'<div style="text-align:center;border-left:1px solid var(--border);padding-left:16px;">'
+            f'<div class="big-num" style="font-size:1.8rem;color:var(--cyan);">{dev_pct:.0f}%</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Dev (DARIO)</div>'
+            f'<div style="font-size:9px;color:var(--dim);">{dev_t:,} tokens</div>'
+            f'</div>'
+            f'</div>'
+            f'<div style="font-size:10px;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Top 5 projetos</div>'
+        )
+        for row in spend_by_type["breakdown"][:5]:
+            slug = (row["project"] or "<blank>")[:20]
+            pct_row = row["tokens"] / total * 100 if total else 0
+            type_color = {
+                "client": "var(--green)",
+                "dev": "var(--cyan)",
+                "unknown": "var(--amber)",
+            }.get(row["type"], "var(--dim)")
+            spend_type_html += (
+                f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px;">'
+                f'<span style="flex:1;color:var(--dim);">{slug}</span>'
+                f'<span style="color:{type_color};font-size:10px;width:50px;text-align:right;">{row["type"]}</span>'
+                f'<span style="color:var(--dim);width:50px;text-align:right;">{pct_row:.1f}%</span>'
+                f'</div>'
+            )
+        spend_type_html += unknown_warning
+        spend_type_summary = f"client {client_pct:.0f}% · dev {dev_pct:.0f}%"
+
     # Pulse time
     pulse_time = pulse.get("pulse_time", "nunca")
     if isinstance(pulse_time, str) and "T" in pulse_time:
@@ -507,6 +582,15 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
       Production runs telemetry · self-polishing skill loop · A/B target +4pts mean lift
     </div>
     {padrao_a_html}
+  </div>
+
+  <!-- SPEND BY TYPE — dev vs client (gap #4) -->
+  <div class="card">
+    <h3>Spend by Type ({spend_type_summary})</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Token attribution dev (DARIO internal) vs client (paid work) · fonte: config/project_types.yaml
+    </div>
+    {spend_type_html}
   </div>
 
   <!-- SYSTEM HEALTH -->
