@@ -79,22 +79,63 @@ def estimate_cost_usd(model: str, input_tokens: int, output_tokens: int) -> floa
     return round(cost, 6)
 
 
+SPEND_JSONL = ORCH_DIR / "quality" / "api_spend_log.jsonl"
+
+
 def _append_entry(entry: dict) -> None:
-    """Append one spend entry to the shared log (append-only)."""
-    SPEND_LOG.parent.mkdir(parents=True, exist_ok=True)
-    existing: dict = {}
-    if SPEND_LOG.exists():
-        with open(SPEND_LOG, encoding="utf-8") as f:
-            existing = yaml.safe_load(f) or {}
-    existing.setdefault("schema_version", 1)
-    existing.setdefault("description",
-        "Direct Anthropic API spend log (scripts only, NOT orchestrator subscription work). "
-        "Append-only — every TrackedAnthropic.messages.create() writes one row."
-    )
-    existing.setdefault("entries", [])
-    existing["entries"].append(entry)
-    with open(SPEND_LOG, "w", encoding="utf-8") as f:
-        yaml.safe_dump(existing, f, sort_keys=False, allow_unicode=True)
+    """Append one spend entry — concurrent-safe via JSONL append + file lock.
+
+    Migrated from full-file YAML rewrite (O(n) + race condition) to JSONL
+    append (O(1) + atomic). Legacy YAML still updated for backward compat
+    until aggregator is switched.
+    """
+    import json
+    import os
+    SPEND_JSONL.parent.mkdir(parents=True, exist_ok=True)
+
+    # Primary write: JSONL append-only, single open(..., "a") is atomic
+    # on POSIX for writes <PIPE_BUF (~4KB); JSON entries fit comfortably.
+    with open(SPEND_JSONL, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        try:
+            os.fsync(f.fileno())  # durability on crash
+        except (AttributeError, OSError):
+            pass
+
+    # Legacy YAML write — guarded by a simple lock file to prevent race.
+    # TODO: deprecate YAML once aggregator reads JSONL natively.
+    lock_path = SPEND_LOG.with_suffix(".yaml.lock")
+    acquired = False
+    try:
+        # Best-effort lock (atomic O_CREAT|O_EXCL); silently skip YAML write
+        # if another writer holds it. Entries are still safe in JSONL.
+        try:
+            fd = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.close(fd)
+            acquired = True
+        except FileExistsError:
+            return  # JSONL already captured it; skip the redundant YAML write
+
+        existing: dict = {}
+        if SPEND_LOG.exists():
+            with open(SPEND_LOG, encoding="utf-8") as f:
+                existing = yaml.safe_load(f) or {}
+        existing.setdefault("schema_version", 1)
+        existing.setdefault("description",
+            "Direct Anthropic API spend log (scripts only, NOT orchestrator subscription work). "
+            "Append-only — every TrackedAnthropic.messages.create() writes one row. "
+            "Primary source of truth is api_spend_log.jsonl; this YAML is a legacy mirror."
+        )
+        existing.setdefault("entries", [])
+        existing["entries"].append(entry)
+        with open(SPEND_LOG, "w", encoding="utf-8") as f:
+            yaml.safe_dump(existing, f, sort_keys=False, allow_unicode=True)
+    finally:
+        if acquired:
+            try:
+                lock_path.unlink()
+            except OSError:
+                pass
 
 
 class _TrackedMessages:

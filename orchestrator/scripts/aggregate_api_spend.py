@@ -28,15 +28,41 @@ import yaml
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 SPEND_LOG = ORCH_DIR / "quality" / "api_spend_log.yaml"
+SPEND_JSONL = ORCH_DIR / "quality" / "api_spend_log.jsonl"
 METRICS_FILE = ORCH_DIR / "quality" / "api_spend_metrics.yaml"
 
 
 def load_entries() -> list[dict]:
-    if not SPEND_LOG.exists():
-        return []
-    with open(SPEND_LOG, encoding="utf-8") as f:
-        data = yaml.safe_load(f) or {}
-    return data.get("entries") or []
+    """Load entries from JSONL (source of truth) with YAML fallback for
+    pre-2026-05-24 entries logged before JSONL migration."""
+    import json
+    entries: list[dict] = []
+
+    # Primary: JSONL (concurrent-safe, source of truth post-2026-05-24)
+    if SPEND_JSONL.exists():
+        with open(SPEND_JSONL, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entries.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue  # skip malformed line, don't crash whole aggregate
+
+    # Secondary: YAML — read but DON'T double-count entries also in JSONL.
+    # Heuristic: YAML entries written before JSONL existed are unique;
+    # post-migration both files have same entries, so we only take YAML
+    # if it has more entries than JSONL (legacy data).
+    if SPEND_LOG.exists():
+        with open(SPEND_LOG, encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        yaml_entries = data.get("entries") or []
+        if len(yaml_entries) > len(entries):
+            # YAML has historical entries JSONL doesn't — use YAML count
+            entries = yaml_entries
+
+    return entries
 
 
 def _parse_ts(ts: str | None) -> datetime:

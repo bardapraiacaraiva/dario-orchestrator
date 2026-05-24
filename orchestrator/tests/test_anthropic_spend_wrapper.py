@@ -15,11 +15,16 @@ sys.path.insert(0, str(ORCH_DIR))
 
 @pytest.fixture
 def isolated_spend_log(tmp_path, monkeypatch):
-    """Redirect SPEND_LOG to tmp_path for isolated testing."""
-    fake = tmp_path / "api_spend_log.yaml"
-    monkeypatch.setattr("scripts.anthropic_spend_wrapper.SPEND_LOG", fake)
-    monkeypatch.setattr("scripts.aggregate_api_spend.SPEND_LOG", fake)
-    return fake
+    """Redirect BOTH SPEND_LOG (yaml legacy) and SPEND_JSONL (new primary)
+    to tmp_path. Tests that seed YAML directly still work via load_entries
+    fallback behavior."""
+    fake_yaml = tmp_path / "api_spend_log.yaml"
+    fake_jsonl = tmp_path / "api_spend_log.jsonl"
+    monkeypatch.setattr("scripts.anthropic_spend_wrapper.SPEND_LOG", fake_yaml)
+    monkeypatch.setattr("scripts.anthropic_spend_wrapper.SPEND_JSONL", fake_jsonl)
+    monkeypatch.setattr("scripts.aggregate_api_spend.SPEND_LOG", fake_yaml)
+    monkeypatch.setattr("scripts.aggregate_api_spend.SPEND_JSONL", fake_jsonl)
+    return fake_yaml
 
 
 @pytest.fixture
