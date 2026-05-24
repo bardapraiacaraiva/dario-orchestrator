@@ -185,13 +185,52 @@ For each task, determine the best executor:
 | Licensing | worker-diva-licensing | dir-regulatory | Regulation Squad |
 | Energy cert | worker-diva-energy | dir-regulatory | - |
 
-3. **Assign task** (atomic checkout):
+3. **Resolve skill by execution_policy (Padrão A routing, added 2026-05-24):**
+
+   For each task, after picking the worker, resolve the actual skill to dispatch:
+
+   ```
+   if task.execution_policy in {"client_facing", "critical", "financial"}:
+       if worker.skill_client_facing exists:
+           if worker.requires_briefing_validation == true:
+               # Tier 2 wrappers (brand, sales-letter): briefing must include
+               # specific inputs. Verify before dispatch:
+               #   - brand: competitive context + tone + archetype hint
+               #   - sales-letter: testimonials/proof + offer terms + awareness level
+               if briefing missing required inputs:
+                   ask user for clarification, do NOT dispatch
+                   return
+           dispatch_skill = worker.skill_client_facing  # polished variant
+       else:
+           dispatch_skill = worker.skill  # fallback to base
+   else:
+       dispatch_skill = worker.skill  # internal/default tasks use base skill
+   ```
+
+   **Tier 1 wrappers (default route, no validation required):**
+   - worker-pitch → `dario-pitch-polished` (+6.3 mean lift validated)
+   - worker-offer → `dario-offer-polished` (+6.5 mean lift)
+   - worker-funnel → `dario-funnel-polished` (+6.5 mean lift)
+   - worker-product → `dario-product-polished` (+6.5 mean lift)
+   - worker-wp-audit → `dario-wp-audit-polished` (+6.0 mean lift, 3/3 pass)
+   - worker-financial-model → `dario-financial-model-polished` (**+8.0 mean lift**, math-strict gate)
+
+   **Tier 2 wrappers (briefing validation required):**
+   - worker-brand → `dario-brand-polished` (validate competitive context)
+   - worker-sales-letter → `dario-sales-letter-polished` (validate testimonials + offer terms)
+
+   **Cost:** Polished wrappers run in the Claude Code session — **zero marginal API cost** under Claude Max subscription. Each wrapper takes ~2-3× tokens vs single-pass base skill but produces +6.5pts mean quality lift.
+
+   **Reference:** `orchestrator/PADRAO_A_AB_TEST_RESULTS.md` for full validation data (26 briefings, 8 wrappers, 62% gate-pass rate, mean lift +6.5pts).
+
+4. **Assign task** (atomic checkout):
    - Set `assignee` to the chosen worker ID
+   - Set `skill` field on the task to `dispatch_skill` (resolved in step 3)
    - Set `status` to `todo`
    - Set `checked_out_at` timestamp
    - Only ONE agent can own a task at a time
 
-4. **Plan parallelism:**
+5. **Plan parallelism:**
    - Independent tasks run simultaneously via Agent tool
    - Maximum 3 parallel workers per heartbeat (cost + context)
    - Tasks with `depends_on` wait for predecessors to reach `done`
