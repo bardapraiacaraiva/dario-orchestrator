@@ -176,6 +176,14 @@ def generate():
     except Exception:
         api_spend = None
 
+    # Model drift events (v4 schema, Risk #10 stamp+warn)
+    drift_events = None
+    try:
+        from db import DB
+        drift_events = DB().get_drift_events()
+    except Exception:
+        drift_events = None
+
     pct = budget.get("percentage", 0)
     if isinstance(pct, str): pct = float(pct)
     budget_color = "green" if pct < 80 else "amber" if pct < 95 else "red"
@@ -541,6 +549,49 @@ def generate():
             f'{callers_html}'
         )
 
+    # Model drift widget (Risk #10)
+    if drift_events is None or len(drift_events) == 0:
+        drift_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:14px;">'
+            '<span style="color:var(--green);">●</span> No drift detected<br>'
+            '<span style="font-size:10px;">All polished runs match declared model</span></div>'
+        )
+        drift_summary = "0 events"
+    else:
+        # Group by skill
+        from collections import Counter as _Counter
+        by_skill = _Counter(e.get("skill", "?") for e in drift_events)
+        latest = drift_events[0] if drift_events else None
+        rows_html = ""
+        for skill, count in sorted(by_skill.items(), key=lambda x: x[1], reverse=True)[:5]:
+            short = skill.replace("dario-", "").replace("-polished", "")
+            rows_html += (
+                f'<div style="display:flex;justify-content:space-between;'
+                f'margin-bottom:4px;font-size:11px;">'
+                f'<span style="color:var(--dim);">{short}</span>'
+                f'<span style="color:var(--amber);font-weight:600;">{count} events</span>'
+                f'</div>'
+            )
+        latest_html = ""
+        if latest:
+            latest_html = (
+                f'<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);'
+                f'font-size:10px;color:var(--dim);">'
+                f'Latest: <b>{latest.get("skill","?")}</b> — '
+                f'{latest.get("declared_model","?")} → {latest.get("actual_model","?")}'
+                f'<br>{latest.get("ts","?")}</div>'
+            )
+        drift_html = (
+            f'<div style="text-align:center;margin-bottom:12px;">'
+            f'<div class="big-num" style="font-size:1.8rem;color:var(--amber);">{len(drift_events)}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Total drift events</div>'
+            f'</div>'
+            f'<div style="font-size:10px;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">By skill (top 5)</div>'
+            f'{rows_html}'
+            f'{latest_html}'
+        )
+        drift_summary = f"{len(drift_events)} events"
+
     # Pulse time
     pulse_time = pulse.get("pulse_time", "nunca")
     if isinstance(pulse_time, str) and "T" in pulse_time:
@@ -678,6 +729,15 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
       Scripts que usam anthropic SDK directo (DSPy, judge, etc.) · NÃO conta subscription work
     </div>
     {api_spend_html}
+  </div>
+
+  <!-- MODEL DRIFT — Risk #10 stamp + warn -->
+  <div class="card">
+    <h3>Model Drift ({drift_summary})</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Polished wrappers running on a model different from their `tested_with_model` declaration
+    </div>
+    {drift_html}
   </div>
 
   <!-- SYSTEM HEALTH -->

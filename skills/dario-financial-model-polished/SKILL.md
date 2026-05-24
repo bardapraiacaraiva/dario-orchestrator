@@ -4,6 +4,7 @@ description: "Self-polishing financial model builder — autonomous variant of d
 argument-hint: "[business model + revenue streams + cost structure + horizon]"
 allowed-tools: Read, Write, Glob, Grep
 license: MIT
+tested_with_model: claude-opus-4-7
 ---
 
 # DARIO Skill — Financial Model (Self-Polishing)
@@ -95,6 +96,7 @@ cd ~/.claude/orchestrator && \
     --client $CLIENT_SLUG \
     --briefing-summary "$ONE_LINE_DESCRIPTION" \
     --gate-decision $GATE_DECISION \
+    --model-used "claude-opus-4-7" \
     --status-mix "$VERIFIED/$ASSUMED/$PROJECTION"
 ```
 

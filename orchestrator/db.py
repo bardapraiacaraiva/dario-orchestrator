@@ -178,6 +178,30 @@ class DB:
                     pass
             conn.execute("INSERT OR IGNORE INTO schema_versions (version, description) VALUES (3, 'Padrão A polished_runs + api_spend tables')")
 
+        if current < 4:
+            # v4: Risk #10 LLM version drift — stamp + warn
+            # Adds model_used to polished_runs + new model_drift_events table
+            for sql in [
+                "ALTER TABLE polished_runs ADD COLUMN model_used TEXT DEFAULT ''",
+                """CREATE TABLE IF NOT EXISTS model_drift_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ts TEXT NOT NULL,
+                    skill TEXT NOT NULL,
+                    declared_model TEXT NOT NULL,
+                    actual_model TEXT NOT NULL,
+                    severity TEXT NOT NULL DEFAULT 'warning',
+                    note TEXT DEFAULT '',
+                    tenant_id TEXT DEFAULT 'default'
+                )""",
+                "CREATE INDEX IF NOT EXISTS idx_drift_skill ON model_drift_events(skill)",
+                "CREATE INDEX IF NOT EXISTS idx_drift_ts ON model_drift_events(ts)",
+            ]:
+                try:
+                    conn.execute(sql)
+                except sqlite3.OperationalError:
+                    pass  # column may already exist
+            conn.execute("INSERT OR IGNORE INTO schema_versions (version, description) VALUES (4, 'Risk #10: model_used in polished_runs + model_drift_events table')")
+
     # ─── TASKS ───────────────────────────────────────────────────────────────
 
     def create_task(self, data: dict = None, **kwargs) -> dict:
@@ -512,8 +536,14 @@ class DB:
                             gate_decision: str, briefing_summary: str = "",
                             status_mix: str = "", notes: str = "",
                             ts: str | None = None,
-                            tenant_id: str = "default") -> int:
-        """Append a Padrão A polished wrapper run entry. Returns row id."""
+                            tenant_id: str = "default",
+                            model_used: str = "") -> int:
+        """Append a Padrão A polished wrapper run entry. Returns row id.
+
+        model_used: identifier of the LLM that generated this run (e.g.
+        "claude-opus-4-7"). Optional but recommended for drift detection
+        (see check_model_drift.py).
+        """
         if gate_decision not in {"revised", "ship_v1", "aborted"}:
             raise ValueError(f"Invalid gate_decision: {gate_decision}")
         if not 0 <= v1_score <= 100:
@@ -534,11 +564,49 @@ class DB:
             cursor = conn.execute("""
                 INSERT INTO polished_runs
                     (ts, skill, client, briefing_summary, gate_decision,
-                     v1_score, v2_score, final, lift_pts, status_mix, notes, tenant_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     v1_score, v2_score, final, lift_pts, status_mix, notes, tenant_id,
+                     model_used)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (ts, skill, client, briefing_summary, gate_decision,
-                  v1_score, v2_score, final, lift, status_mix, notes, tenant_id))
+                  v1_score, v2_score, final, lift, status_mix, notes, tenant_id,
+                  model_used))
             return cursor.lastrowid
+
+    # ─── MODEL DRIFT EVENTS (v4) ─────────────────────────────────────────────
+
+    def record_model_drift(self, skill: str, declared_model: str,
+                           actual_model: str, severity: str = "warning",
+                           note: str = "", ts: str | None = None,
+                           tenant_id: str = "default") -> int:
+        """Log a model drift event when actual != declared for a skill."""
+        if severity not in {"info", "warning", "critical"}:
+            raise ValueError(f"Invalid severity: {severity}")
+        if not declared_model or not actual_model:
+            raise ValueError("declared_model and actual_model required")
+        ts = ts or datetime.now(UTC).isoformat(timespec="seconds")
+        with self._conn() as conn:
+            cursor = conn.execute("""
+                INSERT INTO model_drift_events
+                    (ts, skill, declared_model, actual_model, severity, note, tenant_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (ts, skill, declared_model, actual_model, severity, note, tenant_id))
+            return cursor.lastrowid
+
+    def get_drift_events(self, skill: str | None = None,
+                         since_iso: str | None = None,
+                         tenant_id: str = "default") -> list[dict]:
+        """Query drift events with optional filters."""
+        sql = "SELECT * FROM model_drift_events WHERE tenant_id = ?"
+        params: list = [tenant_id]
+        if skill:
+            sql += " AND skill = ?"
+            params.append(skill)
+        if since_iso:
+            sql += " AND ts >= ?"
+            params.append(since_iso)
+        sql += " ORDER BY ts DESC"
+        with self._conn() as conn:
+            return [dict(r) for r in conn.execute(sql, params).fetchall()]
 
     def get_polished_runs(self, skill: str | None = None,
                           since_iso: str | None = None,

@@ -4,6 +4,7 @@ description: "Self-polishing long-form sales letter — autonomous variant of da
 argument-hint: "[product + audience + offer + objections]"
 allowed-tools: Read, Write, Glob, Grep
 license: MIT
+tested_with_model: claude-opus-4-7
 ---
 
 # DARIO Skill — Sales Letter (Self-Polishing)
@@ -97,6 +98,7 @@ cd ~/.claude/orchestrator && \
     --client $CLIENT_SLUG \
     --briefing-summary "$ONE_LINE_DESCRIPTION" \
     --gate-decision $GATE_DECISION \
+    --model-used "claude-opus-4-7" \
     --status-mix "$VERIFIED/$ASSUMED/$PROJECTION"
 ```
 

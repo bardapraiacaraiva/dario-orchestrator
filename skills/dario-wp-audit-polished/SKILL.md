@@ -4,6 +4,7 @@ description: "Self-polishing WordPress + WooCommerce audit — autonomous varian
 argument-hint: "[site URL + stack + business context + audit scope]"
 allowed-tools: Read, Write, Glob, Grep, WebFetch
 license: MIT
+tested_with_model: claude-opus-4-7
 ---
 
 # DARIO Skill — WordPress / WooCommerce Audit (Self-Polishing)
@@ -98,6 +99,7 @@ cd ~/.claude/orchestrator && \
     --client $CLIENT_SLUG \
     --briefing-summary "$ONE_LINE_DESCRIPTION" \
     --gate-decision $GATE_DECISION \
+    --model-used "claude-opus-4-7" \
     --status-mix "$VERIFIED/$ASSUMED/$PROJECTION"
 ```
 

@@ -4,6 +4,7 @@ description: "Self-polishing product development workflow — autonomous variant
 argument-hint: "[product goal + users + constraints + horizon]"
 allowed-tools: Read, Write, Glob, Grep
 license: MIT
+tested_with_model: claude-opus-4-7
 ---
 
 # DARIO Skill — Product Development (Self-Polishing)
@@ -96,6 +97,7 @@ cd ~/.claude/orchestrator && \
     --client $CLIENT_SLUG \
     --briefing-summary "$ONE_LINE_DESCRIPTION" \
     --gate-decision $GATE_DECISION \
+    --model-used "claude-opus-4-7" \
     --status-mix "$VERIFIED/$ASSUMED/$PROJECTION"
 ```
 

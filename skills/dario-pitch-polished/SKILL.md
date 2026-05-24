@@ -4,6 +4,7 @@ description: "Self-polishing pitch deck generator — single-skill autonomous ve
 argument-hint: "[client/venture brief + audience + ask]"
 allowed-tools: Read, Write, Glob, Grep
 license: MIT
+tested_with_model: claude-opus-4-7
 ---
 
 # DARIO Skill — Pitch Deck (Self-Polishing)
@@ -159,6 +160,7 @@ cd ~/.claude/orchestrator && \
     --client $CLIENT_SLUG \
     --briefing-summary "$ONE_LINE_DESCRIPTION" \
     --gate-decision $GATE_DECISION \
+    --model-used "claude-opus-4-7" \
     --status-mix "$VERIFIED/$ASSUMED/$PROJECTION"
 ```
 

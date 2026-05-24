@@ -4,6 +4,7 @@ description: "Self-polishing brand positioning workshop — single-skill autonom
 argument-hint: "[client/business + target + competitive context]"
 allowed-tools: Read, Write, Glob, Grep
 license: MIT
+tested_with_model: claude-opus-4-7
 ---
 
 # DARIO Skill — Brand Positioning (Self-Polishing)
@@ -101,6 +102,7 @@ cd ~/.claude/orchestrator && \
     --client $CLIENT_SLUG \
     --briefing-summary "$ONE_LINE_DESCRIPTION" \
     --gate-decision $GATE_DECISION \
+    --model-used "claude-opus-4-7" \
     --status-mix "$VERIFIED/$ASSUMED/$PROJECTION"
 ```
 

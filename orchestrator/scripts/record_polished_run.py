@@ -77,6 +77,7 @@ def append_run(
     gate_decision: str = "revised",
     status_mix: str | None = None,
     notes: str | None = None,
+    model_used: str = "",
 ) -> dict:
     """Validate + append a new run entry. Dual-write: SQLite primary + YAML mirror.
 
@@ -117,6 +118,8 @@ def append_run(
         entry["status_mix"] = status_mix
     if notes:
         entry["notes"] = notes
+    if model_used:
+        entry["model_used"] = model_used
 
     # Primary write: SQLite (concurrent-safe via WAL + busy_timeout)
     try:
@@ -129,6 +132,7 @@ def append_run(
             status_mix=status_mix or "",
             notes=notes or "",
             ts=ts,
+            model_used=model_used,
         )
     except Exception as e:
         # Don't lose the entry if SQLite is unavailable — YAML still captures it
@@ -164,6 +168,8 @@ def main() -> int:
     ap.add_argument("--status-mix", default=None,
                     help="Gate 7 verified/assumed/projection counts (e.g. '7/4/5')")
     ap.add_argument("--notes", default=None, help="Free-form notes")
+    ap.add_argument("--model-used", default="",
+                    help="LLM model identifier (e.g. claude-opus-4-7) for drift detection")
     args = ap.parse_args()
 
     try:
@@ -177,6 +183,7 @@ def main() -> int:
             gate_decision=args.gate_decision,
             status_mix=args.status_mix,
             notes=args.notes,
+            model_used=args.model_used,
         )
     except ValueError as e:
         print(f"[record_polished_run] VALIDATION ERROR: {e}", file=sys.stderr)

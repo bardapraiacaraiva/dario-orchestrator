@@ -4,6 +4,7 @@ description: "Self-polishing funnel designer — autonomous variant of dario-fun
 argument-hint: "[business + traffic source + current metrics + goal]"
 allowed-tools: Read, Write, Glob, Grep
 license: MIT
+tested_with_model: claude-opus-4-7
 ---
 
 # DARIO Skill — Funnel Designer (Self-Polishing)
@@ -96,6 +97,7 @@ cd ~/.claude/orchestrator && \
     --client $CLIENT_SLUG \
     --briefing-summary "$ONE_LINE_DESCRIPTION" \
     --gate-decision $GATE_DECISION \
+    --model-used "claude-opus-4-7" \
     --status-mix "$VERIFIED/$ASSUMED/$PROJECTION"
 ```
 
