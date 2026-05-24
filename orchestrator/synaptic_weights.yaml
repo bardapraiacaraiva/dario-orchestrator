@@ -118,10 +118,10 @@ affinity_graph:
     notes: Sales letter delivers the offer
     weight: 0.55
   dario-pipeline + dario-proposal:
-    avg_combined_score: 86.5
+    avg_combined_score: 86.7
     co_activations: 2
     notes: Pipeline leads to proposals
-    weight: 0.95
+    weight: 1.0
   dario-proposal + diva-contract:
     avg_combined_score: 0
     co_activations: 0
@@ -316,22 +316,22 @@ affinity_graph:
     avg_combined_score: 89.2
     co_activations: 7
     notes: Audit reveals schema gaps
-    weight: 0.6
+    weight: 0.8
   seo-audit + seo-technical:
     avg_combined_score: 85.2
     co_activations: 7
     notes: Full audit includes technical checks
-    weight: 0.6
+    weight: 0.8
   seo-content + seo-plan:
     avg_combined_score: 86.2
     co_activations: 3
     notes: Content audit informs content strategy
-    weight: 0.6
+    weight: 0.8
   seo-local + seo-schema:
     avg_combined_score: 85.8
     co_activations: 3
     notes: Local SEO needs LocalBusiness schema
-    weight: 0.6
+    weight: 0.8
 reinforcement:
   failure_decrement: 0.05
   max_weight: 1.0
