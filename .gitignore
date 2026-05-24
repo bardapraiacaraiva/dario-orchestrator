@@ -56,6 +56,10 @@
 # --- Allow Padrão A pre-flight validator config (Tier 2 briefing rules) ---
 !orchestrator/config/padrao_a_briefing_validators.yaml
 
+# --- Allow versioned git hooks (used via core.hooksPath) ---
+!orchestrator/scripts/hooks/
+!orchestrator/scripts/hooks/*
+
 # --- Allow test suite + pytest config ---
 !orchestrator/tests/
 !orchestrator/tests/*.py

@@ -257,6 +257,7 @@ def test_mcp_cnj_datajud_module_loads():
 
 # ─── Integration tests ────────────────────────────────────
 
+@pytest.mark.vip_only
 def test_lex_skills_in_semantic_corpus():
     from semantic_dispatch import extract_skill_corpus
     corpus = extract_skill_corpus()
@@ -266,6 +267,7 @@ def test_lex_skills_in_semantic_corpus():
     return True
 
 
+@pytest.mark.vip_only
 @pytest.mark.real_embedding
 def test_semantic_dispatch_routes_to_lex_trabalhista():
     """End-to-end semantic routing — requires real Ollama. The mock returns

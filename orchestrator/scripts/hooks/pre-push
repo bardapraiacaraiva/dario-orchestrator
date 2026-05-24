@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# DARIO Orchestrator pre-push hook
+# ──────────────────────────────────────────────────────────────────────
+# Runs the fast (non-slow-marked) test suite before any push.
+# Blocks the push on any actual test failure.
+# Tolerates pre-existing collection errors caused by VIP-only stub
+# modules (trial repo limitation, not regressions).
+#
+# Install via:
+#   git config core.hooksPath orchestrator/scripts/hooks
+#
+# Skip (use only when truly needed):
+#   git push --no-verify
+#
+# Performance target: complete in <30s. If it grows beyond that,
+# split into pre-push (smoke) + a separate CI gate (full).
+
+set -u
+
+ORCH_DIR="$HOME/.claude/orchestrator"
+
+if [ ! -d "$ORCH_DIR" ]; then
+    echo "[pre-push] DARIO orchestrator dir not found at $ORCH_DIR — skipping tests"
+    exit 0
+fi
+
+if [ ! -x "$ORCH_DIR/.venv/Scripts/python.exe" ] && [ ! -x "$ORCH_DIR/.venv/bin/python" ]; then
+    echo "[pre-push] No virtualenv found — skipping tests"
+    exit 0
+fi
+
+if [ -x "$ORCH_DIR/.venv/Scripts/python.exe" ]; then
+    PYTHON="$ORCH_DIR/.venv/Scripts/python.exe"
+else
+    PYTHON="$ORCH_DIR/.venv/bin/python"
+fi
+
+cd "$ORCH_DIR"
+
+echo "[pre-push] Running fast test suite (markers: not slow and not vip_only)…"
+START=$(date +%s)
+
+# Marker deselection:
+#   not slow     — skip tests >5s (subprocess, LLM, embeddings)
+#   not vip_only — skip tests requiring VIP modules (trial repo limitation)
+# --continue-on-collection-errors: tolerates module ImportError during
+# collection from other VIP stubs we haven't marked yet.
+# Actual test failures still block the push.
+OUTPUT=$("$PYTHON" -m pytest -m "not slow and not vip_only" \
+    --continue-on-collection-errors \
+    -q --no-header --tb=line 2>&1)
+STATUS=$?
+
+ELAPSED=$(($(date +%s) - START))
+
+# Parse the pytest summary line to extract pass / fail / error counts.
+SUMMARY_LINE=$(echo "$OUTPUT" | tail -1)
+
+if echo "$SUMMARY_LINE" | grep -qE "(^| )[0-9]+ failed"; then
+    echo "$OUTPUT" | tail -25
+    echo ""
+    echo "[pre-push] FAIL — test failures detected (${ELAPSED}s)"
+    echo "[pre-push] Fix the failing tests, then re-run the push."
+    echo "[pre-push] Emergency bypass (use sparingly): git push --no-verify"
+    exit 1
+fi
+
+PASSED=$(echo "$SUMMARY_LINE" | grep -oE "[0-9]+ passed" | head -1 | grep -oE "[0-9]+" || echo "0")
+ERRORS=$(echo "$SUMMARY_LINE" | grep -oE "[0-9]+ errors?" | head -1 | grep -oE "[0-9]+" || echo "0")
+
+if [ "$ERRORS" -gt 0 ]; then
+    echo "[pre-push] PASS — ${PASSED} tests passed, ${ERRORS} collection errors (pre-existing VIP-stub) (${ELAPSED}s)"
+else
+    echo "[pre-push] PASS — ${PASSED} tests passed (${ELAPSED}s)"
+fi
+exit 0

@@ -2,6 +2,8 @@ workers:
   worker-brand:
     type: worker
     skill: dario-brand
+    skill_client_facing: dario-brand-polished  # Padrão A wrapper, Tier 2 (validated 2026-05-24)
+    requires_briefing_validation: true         # Pre-flight: competitive context + tone + archetype hint
     reports_to: dir-marketing
     capabilities:
     - brand_positioning
@@ -11,6 +13,7 @@ workers:
   worker-offer:
     type: worker
     skill: dario-offer
+    skill_client_facing: dario-offer-polished  # Padrão A wrapper, Tier 1 (validated 2026-05-24, +6.5 mean lift)
     reports_to: dir-marketing
     capabilities:
     - offer_creation
@@ -23,6 +26,8 @@ workers:
   worker-sales-letter:
     type: worker
     skill: dario-sales-letter
+    skill_client_facing: dario-sales-letter-polished  # Padrão A wrapper, Tier 2 (validated 2026-05-24)
+    requires_briefing_validation: true                # Pre-flight: testimonials + offer terms + awareness level
     reports_to: dir-marketing
     capabilities:
     - long_form_copy
@@ -45,6 +50,7 @@ workers:
   worker-funnel:
     type: worker
     skill: dario-funnel
+    skill_client_facing: dario-funnel-polished  # Padrão A wrapper, Tier 1 (validated 2026-05-24, +6.5 mean lift)
     reports_to: dir-marketing
     capabilities:
     - funnel_design
@@ -97,6 +103,7 @@ workers:
   worker-pitch:
     type: worker
     skill: dario-pitch
+    skill_client_facing: dario-pitch-polished  # Padrão A wrapper, Tier 1 (POC validated 2026-05-24, +6.3 mean lift)
     reports_to: dir-marketing
     capabilities:
     - pitch_deck
@@ -190,6 +197,7 @@ workers:
   worker-product:
     type: worker
     skill: dario-product
+    skill_client_facing: dario-product-polished  # Padrão A wrapper, Tier 1 (validated 2026-05-24, +6.5 mean lift)
     reports_to: dir-product
     capabilities:
     - prd_generator
@@ -213,6 +221,7 @@ workers:
   worker-wp-audit:
     type: worker
     skill: dario-wp-audit
+    skill_client_facing: dario-wp-audit-polished  # Padrão A wrapper, Tier 1 (validated 2026-05-24, +6.0 mean lift, 3/3 pass)
     reports_to: dir-technical
     capabilities:
     - wordpress_audit
@@ -431,6 +440,7 @@ workers:
   worker-financial-model:
     type: worker
     skill: dario-financial-model
+    skill_client_facing: dario-financial-model-polished  # Padrão A wrapper, Tier 1 BEST LIFT (validated 2026-05-24, +8.0 mean lift, math-strict gate)
     reports_to: dir-agency-finance
     capabilities:
     - pl_forecast
