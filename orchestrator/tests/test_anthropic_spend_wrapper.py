@@ -16,14 +16,18 @@ sys.path.insert(0, str(ORCH_DIR))
 @pytest.fixture
 def isolated_spend_log(tmp_path, monkeypatch):
     """Redirect BOTH SPEND_LOG (yaml legacy) and SPEND_JSONL (new primary)
-    to tmp_path. Tests that seed YAML directly still work via load_entries
-    fallback behavior."""
+    to tmp_path, AND point SQLite DB at a fresh tmp file so the aggregator's
+    DB-first read doesn't pick up the production database."""
     fake_yaml = tmp_path / "api_spend_log.yaml"
     fake_jsonl = tmp_path / "api_spend_log.jsonl"
+    fake_db = tmp_path / "test_orchestrator.db"
     monkeypatch.setattr("scripts.anthropic_spend_wrapper.SPEND_LOG", fake_yaml)
     monkeypatch.setattr("scripts.anthropic_spend_wrapper.SPEND_JSONL", fake_jsonl)
     monkeypatch.setattr("scripts.aggregate_api_spend.SPEND_LOG", fake_yaml)
     monkeypatch.setattr("scripts.aggregate_api_spend.SPEND_JSONL", fake_jsonl)
+    # Force a fresh DB for these tests — production DB has unrelated rows
+    import db as _db_module
+    monkeypatch.setattr(_db_module, "DB_PATH", fake_db)
     return fake_yaml
 
 

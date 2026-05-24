@@ -31,6 +31,44 @@ METRICS_FILE = ORCH_DIR / "quality" / "polished_production_metrics.yaml"
 
 
 def load_runs() -> list[dict]:
+    """Load runs — SQLite primary (v3 schema), YAML fallback for legacy entries.
+
+    Source of truth precedence:
+      1. SQLite polished_runs table
+      2. YAML file (legacy / fallback)
+
+    Returns whichever source has more entries (handles migration period
+    where SQLite may still be backfilling from YAML).
+    """
+    sources: list[list[dict]] = []
+
+    # Source 1: SQLite (preferred)
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(Path.home() / ".claude" / "orchestrator"))
+        from db import DB
+        db_rows = DB().get_polished_runs()
+        if db_rows:
+            sources.append(db_rows)
+    except Exception:
+        pass
+
+    # Source 2: YAML legacy
+    if RUNS_FILE.exists():
+        with open(RUNS_FILE, encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        yaml_entries = data.get("runs") or []
+        if yaml_entries:
+            sources.append(yaml_entries)
+
+    if not sources:
+        return []
+    sources.sort(key=len, reverse=True)
+    return sources[0]
+
+
+def _legacy_load_runs() -> list[dict]:
+    """Legacy YAML-only loader, kept for tests / fallback compatibility."""
     if not RUNS_FILE.exists():
         return []
     with open(RUNS_FILE, encoding="utf-8") as f:

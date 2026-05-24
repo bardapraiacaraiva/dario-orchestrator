@@ -122,6 +122,46 @@ Anthropic — retrofit when next touched. New scripts: no excuse.
 
 ---
 
+## Quality logs — SQLite is source of truth (post-2026-05-24)
+
+Padrão A telemetry (`polished_runs`) and direct API spend (`api_spend`)
+live in SQLite via `db.py` (schema v3). YAML/JSONL files are kept as
+backward-compat mirrors during the migration period (legacy aggregators
+still read them).
+
+```python
+# Write (new code):
+from db import DB
+DB().record_polished_run(
+    skill="dario-pitch-polished", client="cuidai",
+    v1_score=80, v2_score=88, final="v2",
+    gate_decision="revised",
+)
+DB().record_api_spend(
+    caller="dspy/compile_sprint4",
+    model="claude-opus-4-7",
+    input_tokens=1000, output_tokens=500,
+    cost_usd=0.0175,
+)
+
+# Read:
+runs = DB().get_polished_runs(skill="dario-pitch-polished", month="2026-05")
+spend = DB().get_api_spend(caller="dspy/compile_sprint4", since_iso="2026-05-01")
+```
+
+**Concurrency:** SQLite uses WAL mode + 5s busy timeout. 50 concurrent
+inserts validated by `tests/test_db_v3_polished_and_spend.py::test_concurrent_inserts_via_threads`.
+The race condition that affected YAML append-rewrite is **structurally
+impossible** here.
+
+**Tenant isolation:** all v3 tables have `tenant_id` (default `'default'`).
+Pre-work for RFC_MULTI_TENANT Path B per-tenant install.
+
+Migration tool: `python -m scripts.migrate_quality_to_sqlite --apply` —
+idempotent backfill from YAML/JSONL to SQLite.
+
+---
+
 ## When in doubt
 
 1. Read `~/.claude/skills/dario-onboarding/SKILL.md` first (5-min tour with

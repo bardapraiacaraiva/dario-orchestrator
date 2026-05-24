@@ -83,14 +83,31 @@ SPEND_JSONL = ORCH_DIR / "quality" / "api_spend_log.jsonl"
 
 
 def _append_entry(entry: dict) -> None:
-    """Append one spend entry — concurrent-safe via JSONL append + file lock.
+    """Append one spend entry — triple-write (SQLite primary, JSONL fallback, YAML legacy).
 
-    Migrated from full-file YAML rewrite (O(n) + race condition) to JSONL
-    append (O(1) + atomic). Legacy YAML still updated for backward compat
-    until aggregator is switched.
+    SQLite (db.py api_spend table, v3 schema) is the new source of truth.
+    JSONL kept as crash-safe append-only secondary.
+    YAML kept for backward compat with old aggregators (skipped if lock held).
     """
     import json
     import os
+
+    # Primary: SQLite (concurrent-safe via WAL)
+    try:
+        from db import DB
+        DB().record_api_spend(
+            caller=entry["caller"],
+            model=entry["model"],
+            input_tokens=int(entry["input_tokens"]),
+            output_tokens=int(entry["output_tokens"]),
+            cost_usd=float(entry["cost_usd"]),
+            ts=entry.get("ts"),
+        )
+    except Exception as e:
+        # Don't break API call if DB unavailable — JSONL will capture it
+        print(f"[anthropic_spend_wrapper] SQLite write failed (non-fatal): {e}",
+              file=sys.stderr)
+
     SPEND_JSONL.parent.mkdir(parents=True, exist_ok=True)
 
     # Primary write: JSONL append-only, single open(..., "a") is atomic

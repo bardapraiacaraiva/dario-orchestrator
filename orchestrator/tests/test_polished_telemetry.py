@@ -17,10 +17,14 @@ from scripts.aggregate_polished_metrics import aggregate, load_runs
 
 @pytest.fixture
 def temp_runs_file(tmp_path, monkeypatch):
-    """Redirect RUNS_FILE to a tmp path for isolated testing."""
+    """Redirect RUNS_FILE to a tmp path AND point SQLite DB at a fresh tmp file
+    so the aggregator's DB-first read doesn't pick up the production database."""
     fake = tmp_path / "polished_production_runs.yaml"
+    fake_db = tmp_path / "test_orchestrator.db"
     monkeypatch.setattr("scripts.record_polished_run.RUNS_FILE", fake)
     monkeypatch.setattr("scripts.aggregate_polished_metrics.RUNS_FILE", fake)
+    import db as _db_module
+    monkeypatch.setattr(_db_module, "DB_PATH", fake_db)
     return fake
 
 

@@ -33,36 +33,58 @@ METRICS_FILE = ORCH_DIR / "quality" / "api_spend_metrics.yaml"
 
 
 def load_entries() -> list[dict]:
-    """Load entries from JSONL (source of truth) with YAML fallback for
-    pre-2026-05-24 entries logged before JSONL migration."""
-    import json
-    entries: list[dict] = []
+    """Load entries — SQLite primary (v3 schema), JSONL fallback, YAML legacy.
 
-    # Primary: JSONL (concurrent-safe, source of truth post-2026-05-24)
+    Source of truth precedence:
+      1. SQLite api_spend table (post-2026-05-24 schema v3)
+      2. JSONL file (post-2026-05-24 migration)
+      3. YAML file (legacy)
+
+    Takes the source with the most entries to avoid losing historical data
+    during migration period.
+    """
+    import json
+    sources: list[tuple[str, list[dict]]] = []
+
+    # Source 1: SQLite (preferred)
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(Path.home() / ".claude" / "orchestrator"))
+        from db import DB
+        db_rows = DB().get_api_spend()
+        if db_rows:
+            sources.append(("sqlite", db_rows))
+    except Exception:
+        pass
+
+    # Source 2: JSONL
     if SPEND_JSONL.exists():
+        jsonl_entries: list[dict] = []
         with open(SPEND_JSONL, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if not line:
                     continue
                 try:
-                    entries.append(json.loads(line))
+                    jsonl_entries.append(json.loads(line))
                 except json.JSONDecodeError:
-                    continue  # skip malformed line, don't crash whole aggregate
+                    continue
+        if jsonl_entries:
+            sources.append(("jsonl", jsonl_entries))
 
-    # Secondary: YAML — read but DON'T double-count entries also in JSONL.
-    # Heuristic: YAML entries written before JSONL existed are unique;
-    # post-migration both files have same entries, so we only take YAML
-    # if it has more entries than JSONL (legacy data).
+    # Source 3: YAML legacy
     if SPEND_LOG.exists():
         with open(SPEND_LOG, encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
         yaml_entries = data.get("entries") or []
-        if len(yaml_entries) > len(entries):
-            # YAML has historical entries JSONL doesn't — use YAML count
-            entries = yaml_entries
+        if yaml_entries:
+            sources.append(("yaml", yaml_entries))
 
-    return entries
+    if not sources:
+        return []
+    # Pick the source with the most entries (handles partial migration state)
+    sources.sort(key=lambda s: len(s[1]), reverse=True)
+    return sources[0][1]
 
 
 def _parse_ts(ts: str | None) -> datetime:

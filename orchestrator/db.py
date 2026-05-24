@@ -135,6 +135,49 @@ class DB:
                     pass  # Column already exists
             conn.execute("INSERT OR IGNORE INTO schema_versions (version, description) VALUES (2, 'Add model tracking, tenant_id, indexes')")
 
+        if current < 3:
+            # v3: Padrão A telemetry + direct API spend tables
+            # Migrates from quality/polished_production_runs.yaml + api_spend_log.jsonl
+            for sql in [
+                """CREATE TABLE IF NOT EXISTS polished_runs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ts TEXT NOT NULL,
+                    skill TEXT NOT NULL,
+                    client TEXT NOT NULL,
+                    briefing_summary TEXT DEFAULT '',
+                    gate_decision TEXT NOT NULL,
+                    v1_score INTEGER NOT NULL,
+                    v2_score INTEGER,
+                    final TEXT NOT NULL,
+                    lift_pts INTEGER DEFAULT 0,
+                    status_mix TEXT DEFAULT '',
+                    notes TEXT DEFAULT '',
+                    tenant_id TEXT DEFAULT 'default'
+                )""",
+                """CREATE TABLE IF NOT EXISTS api_spend (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ts TEXT NOT NULL,
+                    caller TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    input_tokens INTEGER NOT NULL,
+                    output_tokens INTEGER NOT NULL,
+                    total_tokens INTEGER NOT NULL,
+                    cost_usd REAL NOT NULL,
+                    tenant_id TEXT DEFAULT 'default'
+                )""",
+                "CREATE INDEX IF NOT EXISTS idx_polished_runs_skill ON polished_runs(skill)",
+                "CREATE INDEX IF NOT EXISTS idx_polished_runs_ts ON polished_runs(ts)",
+                "CREATE INDEX IF NOT EXISTS idx_polished_runs_client ON polished_runs(client)",
+                "CREATE INDEX IF NOT EXISTS idx_api_spend_caller ON api_spend(caller)",
+                "CREATE INDEX IF NOT EXISTS idx_api_spend_ts ON api_spend(ts)",
+                "CREATE INDEX IF NOT EXISTS idx_api_spend_model ON api_spend(model)",
+            ]:
+                try:
+                    conn.execute(sql)
+                except sqlite3.OperationalError:
+                    pass
+            conn.execute("INSERT OR IGNORE INTO schema_versions (version, description) VALUES (3, 'Padrão A polished_runs + api_spend tables')")
+
     # ─── TASKS ───────────────────────────────────────────────────────────────
 
     def create_task(self, data: dict = None, **kwargs) -> dict:
@@ -461,6 +504,106 @@ class DB:
             """, (run_id, step, skill, artifact_json, score, status, now))
             conn.execute("UPDATE chain_runs SET current_step = ?, updated_at = ? WHERE run_id = ?",
                         (step, now, run_id))
+
+    # ─── PADRÃO A POLISHED RUNS (v3) ─────────────────────────────────────────
+
+    def record_polished_run(self, skill: str, client: str, v1_score: int,
+                            v2_score: int | None, final: str,
+                            gate_decision: str, briefing_summary: str = "",
+                            status_mix: str = "", notes: str = "",
+                            ts: str | None = None,
+                            tenant_id: str = "default") -> int:
+        """Append a Padrão A polished wrapper run entry. Returns row id."""
+        if gate_decision not in {"revised", "ship_v1", "aborted"}:
+            raise ValueError(f"Invalid gate_decision: {gate_decision}")
+        if not 0 <= v1_score <= 100:
+            raise ValueError(f"v1_score must be 0-100, got {v1_score}")
+        if v2_score is not None and not 0 <= v2_score <= 100:
+            raise ValueError(f"v2_score must be 0-100, got {v2_score}")
+        if final not in {"v1", "v2", "aborted"}:
+            raise ValueError(f"Invalid final: {final}")
+        if gate_decision == "aborted" and final != "aborted":
+            raise ValueError("aborted gate must have aborted final")
+        if gate_decision == "ship_v1" and v2_score is not None:
+            raise ValueError("ship_v1 must have None v2_score")
+
+        ts = ts or datetime.now(UTC).isoformat(timespec="seconds")
+        lift = (v2_score - v1_score) if v2_score is not None else 0
+
+        with self._conn() as conn:
+            cursor = conn.execute("""
+                INSERT INTO polished_runs
+                    (ts, skill, client, briefing_summary, gate_decision,
+                     v1_score, v2_score, final, lift_pts, status_mix, notes, tenant_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (ts, skill, client, briefing_summary, gate_decision,
+                  v1_score, v2_score, final, lift, status_mix, notes, tenant_id))
+            return cursor.lastrowid
+
+    def get_polished_runs(self, skill: str | None = None,
+                          since_iso: str | None = None,
+                          month: str | None = None,
+                          tenant_id: str = "default") -> list[dict]:
+        """Query polished_runs with optional filters."""
+        sql = "SELECT * FROM polished_runs WHERE tenant_id = ?"
+        params: list = [tenant_id]
+        if skill:
+            sql += " AND skill = ?"
+            params.append(skill)
+        if since_iso:
+            sql += " AND ts >= ?"
+            params.append(since_iso)
+        if month:
+            sql += " AND ts LIKE ?"
+            params.append(f"{month}%")
+        sql += " ORDER BY ts ASC"
+        with self._conn() as conn:
+            return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+    # ─── API SPEND (v3) ──────────────────────────────────────────────────────
+
+    def record_api_spend(self, caller: str, model: str,
+                         input_tokens: int, output_tokens: int,
+                         cost_usd: float, ts: str | None = None,
+                         tenant_id: str = "default") -> int:
+        """Append an API spend entry from TrackedAnthropic.messages.create()."""
+        if not caller:
+            raise ValueError("caller required")
+        if input_tokens < 0 or output_tokens < 0:
+            raise ValueError("token counts must be non-negative")
+        if cost_usd < 0:
+            raise ValueError("cost_usd must be non-negative")
+
+        ts = ts or datetime.now(UTC).isoformat(timespec="seconds")
+        with self._conn() as conn:
+            cursor = conn.execute("""
+                INSERT INTO api_spend
+                    (ts, caller, model, input_tokens, output_tokens,
+                     total_tokens, cost_usd, tenant_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (ts, caller, model, input_tokens, output_tokens,
+                  input_tokens + output_tokens, cost_usd, tenant_id))
+            return cursor.lastrowid
+
+    def get_api_spend(self, since_iso: str | None = None,
+                      month: str | None = None,
+                      caller: str | None = None,
+                      tenant_id: str = "default") -> list[dict]:
+        """Query api_spend with optional filters."""
+        sql = "SELECT * FROM api_spend WHERE tenant_id = ?"
+        params: list = [tenant_id]
+        if since_iso:
+            sql += " AND ts >= ?"
+            params.append(since_iso)
+        if month:
+            sql += " AND ts LIKE ?"
+            params.append(f"{month}%")
+        if caller:
+            sql += " AND caller = ?"
+            params.append(caller)
+        sql += " ORDER BY ts ASC"
+        with self._conn() as conn:
+            return [dict(r) for r in conn.execute(sql, params).fetchall()]
 
     # ─── MIGRATION ───────────────────────────────────────────────────────────
 

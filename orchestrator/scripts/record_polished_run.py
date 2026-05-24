@@ -78,7 +78,13 @@ def append_run(
     status_mix: str | None = None,
     notes: str | None = None,
 ) -> dict:
-    """Validate + append a new run entry. Returns the entry that was written."""
+    """Validate + append a new run entry. Dual-write: SQLite primary + YAML mirror.
+
+    SQLite (db.py polished_runs table, v3 schema) is the source of truth for
+    queries. YAML is kept as a backward-compat mirror so legacy aggregators
+    still work during the migration period. New code should use db.get_polished_runs()
+    directly.
+    """
     if gate_decision not in VALID_GATE_DECISIONS:
         raise ValueError(
             f"gate_decision must be one of {VALID_GATE_DECISIONS}, "
@@ -95,8 +101,9 @@ def append_run(
     if gate_decision == "ship_v1" and v2_score is not None:
         raise ValueError("If gate_decision=ship_v1, v2_score must be None")
 
+    ts = datetime.now(UTC).isoformat(timespec="seconds")
     entry = {
-        "ts": datetime.now(UTC).isoformat(timespec="seconds"),
+        "ts": ts,
         "skill": skill,
         "client": client,
         "briefing_summary": briefing_summary,
@@ -111,9 +118,27 @@ def append_run(
     if notes:
         entry["notes"] = notes
 
+    # Primary write: SQLite (concurrent-safe via WAL + busy_timeout)
+    try:
+        from db import DB
+        DB().record_polished_run(
+            skill=skill, client=client,
+            v1_score=v1_score, v2_score=v2_score,
+            final=final, gate_decision=gate_decision,
+            briefing_summary=briefing_summary,
+            status_mix=status_mix or "",
+            notes=notes or "",
+            ts=ts,
+        )
+    except Exception as e:
+        # Don't lose the entry if SQLite is unavailable — YAML still captures it
+        print(f"[record_polished_run] SQLite write failed (non-fatal): {e}",
+              file=sys.stderr)
+
+    # Secondary write: YAML mirror for backward compat with legacy aggregators
+    # TODO: deprecate once aggregate_polished_metrics reads from DB only
     data = _ensure_runs_file()
     data["runs"].append(entry)
-
     RUNS_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(RUNS_FILE, "w", encoding="utf-8") as f:
         yaml.safe_dump(data, f, sort_keys=False, allow_unicode=True)
