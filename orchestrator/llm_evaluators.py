@@ -158,9 +158,9 @@ SKILL_EVAL_TYPE = {
 def _call_haiku(prompt: str) -> dict:
     """Call Haiku for evaluation. Returns parsed JSON response."""
     try:
-        # Try Anthropic API first
-        import anthropic
-        client = anthropic.Anthropic()
+        # Try Anthropic API first (via TrackedAnthropic for spend visibility)
+        from scripts.anthropic_spend_wrapper import TrackedAnthropic
+        client = TrackedAnthropic(caller="llm_evaluators")
         response = client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=200,

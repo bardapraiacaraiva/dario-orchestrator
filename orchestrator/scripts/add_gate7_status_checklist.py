@@ -87,8 +87,8 @@ def find_insertion_point(content: str) -> tuple[int, str] | None:
 
 
 def generate_gate7(skill_md: str) -> str:
-    from anthropic import Anthropic
-    client = Anthropic()
+    from scripts.anthropic_spend_wrapper import TrackedAnthropic
+    client = TrackedAnthropic(caller="scripts/add_gate7_status_checklist")
     resp = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=1500,

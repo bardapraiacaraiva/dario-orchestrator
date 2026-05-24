@@ -149,12 +149,12 @@ Tamanho: 250-400 palavras max. Concise + actionable."""
 def call_anthropic(prompt: str, model: str = "claude-sonnet-4-6",
                    max_tokens: int = 2500) -> str:
     try:
-        from anthropic import Anthropic
+        from scripts.anthropic_spend_wrapper import TrackedAnthropic
     except ImportError:
         raise RuntimeError("pip install anthropic")
     if not os.environ.get("ANTHROPIC_API_KEY"):
         raise RuntimeError("ANTHROPIC_API_KEY not set")
-    client = Anthropic()
+    client = TrackedAnthropic(caller="assemble_bundle")
     resp = client.messages.create(
         model=model,
         max_tokens=max_tokens,

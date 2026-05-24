@@ -109,14 +109,14 @@ Responde APENAS JSON:
 def llm_judge(skill: str, context: str, output: str, model: str = "claude-haiku-4-5") -> dict:
     """Run the LLM-judge delivery-ready rubric. Returns dict with score + verdict."""
     try:
-        from anthropic import Anthropic
+        from scripts.anthropic_spend_wrapper import TrackedAnthropic
     except ImportError:
         raise RuntimeError("pip install anthropic — required for LLM-judge mode")
 
     if not os.environ.get("ANTHROPIC_API_KEY"):
         raise RuntimeError("ANTHROPIC_API_KEY not set in env")
 
-    client = Anthropic()
+    client = TrackedAnthropic(caller="score_real_output")
     resp = client.messages.create(
         model=model,
         max_tokens=500,

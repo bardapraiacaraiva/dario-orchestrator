@@ -16,7 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from anthropic import Anthropic
+from scripts.anthropic_spend_wrapper import TrackedAnthropic
 
 try:
     from ruamel.yaml import YAML
@@ -121,7 +121,7 @@ JUDGE_TEMPLATE = (
 
 
 def main() -> int:
-    client = Anthropic()
+    client = TrackedAnthropic(caller="scripts/sprint2_rescore")
     print("=== Sprint 2 - re-evaluating 8 skills with refined briefings ===\n")
     new_scores: dict[str, dict] = {}
 

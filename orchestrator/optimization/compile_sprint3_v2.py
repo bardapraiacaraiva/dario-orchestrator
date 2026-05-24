@@ -36,8 +36,9 @@ ORCH_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ORCH_DIR))
 
 import dspy
-from anthropic import Anthropic
 from dspy.teleprompt import BootstrapFewShot
+
+from scripts.anthropic_spend_wrapper import TrackedAnthropic
 
 from optimization.compile_sprint3 import (
     FUNNEL_GOLDENS,
@@ -88,7 +89,7 @@ Responde APENAS JSON:
 def _get_judge_client():
     global _JUDGE_CLIENT
     if _JUDGE_CLIENT is None:
-        _JUDGE_CLIENT = Anthropic()
+        _JUDGE_CLIENT = TrackedAnthropic(caller="dspy/compile_sprint3_v2")
     return _JUDGE_CLIENT
 
 

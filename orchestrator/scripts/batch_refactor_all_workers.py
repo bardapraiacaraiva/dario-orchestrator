@@ -58,8 +58,8 @@ PT-PT/BR misto OK. Target 80-150 linhas markdown."""
 
 
 def generate_refactor(skill_name: str, skill_md: str) -> str:
-    from anthropic import Anthropic
-    client = Anthropic()
+    from scripts.anthropic_spend_wrapper import TrackedAnthropic
+    client = TrackedAnthropic(caller="scripts/batch_refactor_all_workers")
     resp = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=5500,

@@ -570,11 +570,11 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
 def call_claude_api(prompt: str, skill: str, model: str, retries: int = 2) -> dict:
     """Call Claude API with retry and cost tracking."""
     try:
-        import anthropic
+        from scripts.anthropic_spend_wrapper import TrackedAnthropic
     except ImportError:
         return {"success": False, "error": "anthropic SDK not installed"}
 
-    client = anthropic.Anthropic()
+    client = TrackedAnthropic(caller=f"providers/anthropic/call_claude_api/{skill}")
     model_config = MODELS.get(model, MODELS["sonnet"])
     system_prompt = get_system_prompt(skill)
 
@@ -688,7 +688,8 @@ Respond with ONLY a JSON object:
 {{"score": <0-100>, "feedback": "<one sentence>", "dimensions": {{"structure": <0-25>, "specificity": <0-25>, "actionability": <0-25>, "completeness": <0-25>}}}}"""
 
     try:
-        client = anthropic.Anthropic()
+        from scripts.anthropic_spend_wrapper import TrackedAnthropic
+        client = TrackedAnthropic(caller="providers/anthropic/score")
         response = client.messages.create(
             model=MODELS["haiku"]["id"],
             max_tokens=256,

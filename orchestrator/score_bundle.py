@@ -165,7 +165,7 @@ def build_bundle_text(components: list[dict]) -> tuple[str, list[str]]:
 def judge_bundle(bundle_name: str, context: str, components: list[dict],
                  model: str = "claude-haiku-4-5") -> dict:
     try:
-        from anthropic import Anthropic
+        from scripts.anthropic_spend_wrapper import TrackedAnthropic
     except ImportError:
         raise RuntimeError("pip install anthropic — required for LLM-judge")
 
@@ -173,7 +173,7 @@ def judge_bundle(bundle_name: str, context: str, components: list[dict],
         raise RuntimeError("ANTHROPIC_API_KEY not set")
 
     bundle_text, skills = build_bundle_text(components)
-    client = Anthropic()
+    client = TrackedAnthropic(caller="score_bundle")
     resp = client.messages.create(
         model=model,
         max_tokens=900,

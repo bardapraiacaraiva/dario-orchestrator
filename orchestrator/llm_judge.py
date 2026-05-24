@@ -110,8 +110,8 @@ def score_via_api(prompt: str, retries: int = 1) -> dict:
     can disable retry with retries=0 or escalate with retries=2.
     """
     try:
-        import anthropic
-        client = anthropic.Anthropic()
+        from scripts.anthropic_spend_wrapper import TrackedAnthropic
+        client = TrackedAnthropic(caller="llm_judge")
 
         response = client.messages.create(
             model=HAIKU_MODEL,

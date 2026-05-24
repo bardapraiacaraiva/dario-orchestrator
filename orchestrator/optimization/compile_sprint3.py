@@ -21,8 +21,9 @@ ORCH_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ORCH_DIR))
 
 import dspy
-from anthropic import Anthropic
 from dspy.teleprompt import BootstrapFewShot
+
+from scripts.anthropic_spend_wrapper import TrackedAnthropic
 
 from optimization.signatures_v2 import FunnelDesign, OfferGeneration, PitchDeck
 
@@ -305,7 +306,7 @@ def compile_and_eval(skill_name, ProgramCls, goldens):
 
     # Live re-eval with judge
     test_briefings = [g.briefing for g in goldens]
-    client = Anthropic()
+    client = TrackedAnthropic(caller="dspy/compile_sprint3")
     print(f"  re-evaluating with live judge on {len(test_briefings)} briefings...")
     scores = []
     for brief in test_briefings:

@@ -104,3 +104,82 @@ def test_exception_list_files_actually_exist():
         f"Files in ALLOWED_EXCEPTIONS no longer exist (clean them up): "
         f"{[str(p.relative_to(ORCH_DIR)) for p in missing]}"
     )
+
+
+# ─────────────────────────────────────────────────────────────────────
+# Anthropic SDK discipline — must use TrackedAnthropic for spend tracking
+# (CONVENTIONS.md "Direct Anthropic API calls" rule)
+# ─────────────────────────────────────────────────────────────────────
+
+RAW_ANTHROPIC_PATTERNS = [
+    # Raw instantiation patterns — block them
+    re.compile(r"\bclient\s*=\s*Anthropic\s*\("),       # client = Anthropic(
+    re.compile(r"\banthropic\.Anthropic\s*\("),         # anthropic.Anthropic(
+    re.compile(r"_JUDGE_CLIENT\s*=\s*Anthropic\s*\("),  # _JUDGE_CLIENT = Anthropic(
+]
+
+# Files where raw Anthropic usage is allowed:
+#   - The wrapper itself (it wraps the real SDK)
+#   - Tests (mock the SDK directly)
+ANTHROPIC_RAW_ALLOWED = {
+    ORCH_DIR / "scripts" / "anthropic_spend_wrapper.py",
+    # Documentation files showing examples
+    ORCH_DIR / "CONVENTIONS.md",
+}
+
+
+def _is_anthropic_check_skipped(path: Path) -> bool:
+    parts = path.parts
+    if any(p.startswith(".") for p in parts):
+        return True
+    if "tests" in parts:
+        return True
+    if path.suffix == ".md":
+        return True
+    if path in ANTHROPIC_RAW_ALLOWED:
+        return True
+    return False
+
+
+def test_no_raw_anthropic_client_instantiation():
+    """All production code MUST use TrackedAnthropic(caller=...) for spend
+    visibility. Raw Anthropic() or anthropic.Anthropic() calls bypass the
+    spend log + dashboard widget — blocked.
+
+    See CONVENTIONS.md "Direct Anthropic API calls" + scripts/anthropic_spend_wrapper.py.
+    """
+    import os
+    violations: list[tuple[Path, int, str]] = []
+    for root, dirs, files in os.walk(ORCH_DIR):
+        dirs[:] = [d for d in dirs if not d.startswith(".") and d != "__pycache__"]
+        root_path = Path(root)
+        for name in files:
+            if not name.endswith(".py"):
+                continue
+            path = root_path / name
+            if _is_anthropic_check_skipped(path):
+                continue
+            try:
+                text = path.read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                continue
+            for line_num, line in enumerate(text.splitlines(), 1):
+                stripped = line.strip()
+                # Skip comment-only lines
+                if stripped.startswith("#"):
+                    continue
+                for pat in RAW_ANTHROPIC_PATTERNS:
+                    if pat.search(line):
+                        violations.append((path, line_num, stripped[:120]))
+                        break
+
+    assert not violations, (
+        f"Found {len(violations)} raw Anthropic client instantiations "
+        "(see CONVENTIONS.md 'Direct Anthropic API calls'). "
+        "Replace with: from scripts.anthropic_spend_wrapper import TrackedAnthropic; "
+        "client = TrackedAnthropic(caller='your-script-name')\n"
+        + "\n".join(
+            f"  {p.relative_to(ORCH_DIR)}:{ln}: {snippet}"
+            for p, ln, snippet in violations[:20]
+        )
+    )
