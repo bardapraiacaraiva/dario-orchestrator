@@ -1,0 +1,89 @@
+{
+  "generate.predict": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "briefing": "Cuidaí BR — plataforma caregiver multigeracional. MVP fork de SAQUEI. Multi-tenant Prisma. Capital R$ 100K split: 12K legal, 2K INPI, 36K infra, 50K reserva.",
+        "reasoning": "Cuidaí BR addresses fragmented eldercare + childcare coordination in Brazil's 215M population. Multi-generational caregiving (avós→pais→filhos) is culturally embedded but operationally chaotic. MVP leverages proven SAQUEI codebase (Prisma multi-tenant) to accelerate GTM. R$ 100K seed is lean but sufficient for legal foundation + infrastructure runway. Target: family offices, care networks, institutional buyers (nursing homes, daycare chains).",
+        "narrative_arc": "Brazilian families juggle 3 generations of care needs across fragmented WhatsApp groups and spreadsheets. Cuidaí BR is the single OS for multigeracional caregiving—coordinating schedules, medical records, expenses, and tasks across family members and professional caregivers. MVP validates demand with 50 beta families; seed funds legal moat (INPI), scalable infra, and 12-month runway to R$ 500K MRR.",
+        "key_slides": [
+          "1. Capa — Cuidaí BR: o SO da família multigeracional",
+          "2. Problema — 215M brasileiros, 35M cuidadores informais, zero coordenação",
+          "3. Solução — Plataforma unificada: agenda + saúde + financeiro + tarefas",
+          "4. Mercado — TAM R$ 4.8B (35M cuidadores × R$ 137/mês); SAM R$ 1.2B; SOM R$ 18M",
+          "5. Tração — MVP fork SAQUEI, 50 beta families, NPS 62",
+          "6. Modelo — R$ 29/mês individual + R$ 99/mês family + R$ 499/mês enterprise",
+          "7. Tech — Prisma multi-tenant, mobile-first, integração SMS + WhatsApp",
+          "8. Compliance — LGPD-ready, HIPAA-adjacent para dados saúde",
+          "9. Equipa — Founder ex-SAQUEI + product manager + CTO",
+          "10. Roadmap — M1 500 families → M6 5K families → M12 R$ 500K MRR",
+          "11. Ask — R$ 100K seed: R$ 12K legal, R$ 2K INPI, R$ 36K infra, R$ 50K reserva",
+          "12. Por quê agora — Envelhecimento populacional BR acelerado, demanda care explode 2026-2030"
+        ],
+        "tam_sam_som": "TAM R$ 4.8B (35M cuidadores informais × R$ 137/mês médio). SAM R$ 1.2B (25% addressable: famílias classe A/B + care networks). SOM R$ 18M (15K paying families × R$ 100/mês ano 2).",
+        "financial_ask": "R$ 100K seed (8% equity). Uso: R$ 12K legal (constituição + contratos), R$ 2K INPI (marca + patente), R$ 36K infra (Prisma hosting + CDN + backup 12 meses), R$ 50K reserva operacional (payroll founder 6 meses). Milestones: M3 500 beta families, M6 5K paying, M12 R$ 500K MRR → Series A R$ 2M."
+      },
+      {
+        "augmented": true,
+        "briefing": "Tributário.AI — SaaS B2B fiscal BR Reforma Tributária CBS+IBS. Founder Day 0 pendente. LIVE landing + app demo. Financial model: cash R$ 110K, BE M6, R$ 1M ARR M12.",
+        "reasoning": "Tributário.AI targets a massive, urgent pain point: Brazilian accountants and CFOs scrambling to comply with the 2026 CBS/IBS tax reform. The founder is pre-launch but has validated demand (live landing + working demo), proven unit economics (BE M6, R$ 1M ARR M12), and minimal burn (R$ 110K cash). The pitch must emphasize urgency (regulatory deadline), market size (300K+ tax professionals), and path to profitability. Positioning: \"compliance automation for the biggest tax reform in 30 years.\"",
+        "narrative_arc": "Brazilian companies face existential compliance risk: CBS/IBS reform launches 2026, replacing PIS/COFINS with new calculation rules. Accountants manually recalculate taxes for 100+ clients each—error-prone and unsustainable. Tributário.AI automates CBS/IBS compliance in real-time, integrating with ERP/accounting software to flag risks and generate audit-ready reports. Early traction shows R$ 1M ARR achievable by M12 with 50-100 SME clients; seed capital accelerates sales and product depth.",
+        "key_slides": [
+          "1. Capa — Tributário.AI: Automação de Conformidade CBS/IBS para o Brasil",
+          "2. Problema — CBS/IBS 2026: 300K contadores + CFOs enfrentam recálculo manual; risco de multa R$ 10M+",
+          "3. Solução — SaaS integrado: ERP → análise CBS/IBS real-time → relatórios auditáveis",
+          "4. Mercado — TAM R$ 2.4B (300K profissionais × R$ 8K/ano); SAM R$ 480M; SOM R$ 12M",
+          "5. Tração — Landing page live, demo funcional, 3 LOIs de clientes-piloto",
+          "6. Modelo — R$ 299/mês (PME) + R$ 999/mês (empresa), 70% margem bruta",
+          "7. Tech — Engine de cálculo CBS/IBS + integração API ERP (SAP, Totvs, Bling)",
+          "8. Compliance — Certificação SPED, conformidade RFB, auditoria externa Q1 2025",
+          "9. Equipa — Founder (ex-Big4 tax), CTO dev, especialista fiscal",
+          "10. Roadmap — M1-M3 10 clientes pagos → M6 break-even → M12 R$ 1M ARR",
+          "11. Ask — R$ 500K seed (12% equity), 18 meses runway, atinge R$ 3M ARR M18",
+          "12. Por quê agora — CBS/IBS entra em vigor 2026; demanda urgente; mercado pronto"
+        ],
+        "tam_sam_som": "TAM R$ 2.4B (300K contadores + CFOs × R$ 8K/ano potencial). SAM R$ 480M (20% adoção em 3 anos). SOM R$ 12M (1.5K clientes × R$ 8K/ano, ano 2).",
+        "financial_ask": "R$ 500K seed (12% equity). Uso: 50% dev (engine CBS/IBS + integrações ERP), 30% sales/GTM, 15% compliance/legal, 5% reserva operacional. Milestones: M3 10 clientes pagos, M6 break-even, M12 R$ 1M ARR, M18 R$ 3M ARR."
+      }
+    ],
+    "signature": {
+      "instructions": "Generate a 12-slide pitch deck outline for the venture described.\n\nMust include narrative arc (problem → solution → traction → ask),\nkey slides with 1-line summary each, TAM/SAM/SOM with concrete\nnumbers, and financial ask with use-of-funds.",
+      "fields": [
+        {
+          "prefix": "Briefing:",
+          "description": "Venture, stage, market, traction, founder context."
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Narrative Arc:",
+          "description": "3-4 sentence story arc tying all slides together."
+        },
+        {
+          "prefix": "Key Slides:",
+          "description": "12 slides numbered, each 'N. Slide title — 1-line summary'."
+        },
+        {
+          "prefix": "Tam Sam Som:",
+          "description": "TAM, SAM, SOM with concrete numbers + reasoning."
+        },
+        {
+          "prefix": "Financial Ask:",
+          "description": "Amount + use-of-funds breakdown + milestones unlocked."
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.2.1",
+      "cloudpickle": "3.1"
+    }
+  }
+}

@@ -80,7 +80,7 @@ That's it. Same goldens, same programs, same DSPy infrastructure. Only the rewar
 
 ---
 
-## Expected outcome
+## Expected outcome (PRE-RUN PROJECTION — falsified, see "Actual results" below)
 
 Based on `dspy_compile_result_2026_05_22.md` (dario-brand +17% lift with proper metric):
 
@@ -91,6 +91,70 @@ Based on `dspy_compile_result_2026_05_22.md` (dario-brand +17% lift with proper 
 | dario-pitch | -0.1 (stale) | +10 to +15 |
 
 **Mean global projected:** 83.6 → 86.5+ (single compile run, ~$1.50 cost)
+
+---
+
+## Actual results (2026-05-24, post-run)
+
+Compile ran cleanly. Judge-on-goldens scores:
+
+| Skill | judge-on-goldens (n=3) | Scores | What this means |
+|---|---|---|---|
+| dario-offer | **85.0** | 86, 82, 87 | At-ceiling on raw briefings |
+| dario-funnel | **85.7** | 84, 88, 85 | At-ceiling on raw briefings |
+| dario-pitch | **84.3** | 84, 85, 84 | At-ceiling on raw briefings |
+
+The fix DOES work mechanically — `optimization/compiled/dario-{offer,funnel,pitch}_v2.json` artifacts are saved and BootstrapFewShot used the judge as the reward signal, not word overlap.
+
+But the **lift didn't materialize** because the metric was not the bottleneck. Three reasons:
+
+1. **Ceiling effect** — these skills were already near the structural ceiling (~85) on raw briefings without human-in-loop. MEMORY.md `caminho_b_final_2026_05_23.md` already noted "mean ceiling estrutural ~85-86 sem human-in-the-loop". The v2 judge confirmed it.
+2. **3 goldens is too few** for BootstrapFewShot to find meaningfully better demos. Optimizer ran with `max_bootstrapped_demos=2` — nearly trivial search space.
+3. **Single-eval judge variance ±5pts** swamps any small lift.
+
+---
+
+## The conflation bug (introduced by v2-pre-fix; now fixed)
+
+The first version of `compile_sprint3_v2.py` overwrote `avg_quality_score` with judge-on-goldens output. This caused a spurious "regression" on dario-pitch:
+
+- Before run: `avg_quality_score = 90.9` (which was actually `production_avg_delivery_ready` from 5 real client outputs, 4 yes / 1 needs-review)
+- After run: `avg_quality_score = 84.3` (judge on 3 synthetic goldens, raw model output)
+
+These are **two different metrics measuring two different artifacts**. Conflating them looked like a 6.6pt drop. There was no drop — the production performance is unchanged at 91.0.
+
+**Fix applied:** Script now writes to a dedicated namespace (`avg_judge_synthetic_goldens`, `live_scores_compiled_sprint3v2`) and explicitly DOES NOT touch `avg_quality_score` (which represents production delivery quality). Restored baselines:
+
+| Skill | conflated value | restored to | source |
+|---|---|---|---|
+| dario-offer | 85.0 | **88.0** | production_avg_delivery_ready (n=1) |
+| dario-funnel | 85.7 | **86.3** | pre-v2 baseline (no production data) |
+| dario-pitch | 84.3 | **91.0** | production_avg_delivery_ready (n=5, 4 yes / 1 needs-review) |
+
+Global mean restored: 85.12 → 85.38. Tier A count: 7 → 8.
+
+---
+
+## Lessons learned (write these down so future-me doesn't repeat them)
+
+1. **Metric != bottleneck.** Identifying a bug in code does not mean fixing it produces measurable output lift. Verify with a small experiment BEFORE projecting big numbers.
+2. **Production score ≠ synthetic-goldens score.** They measure different artifacts (polished real deliverables vs raw model output on training briefings). Never write one over the other. Use distinct field names.
+3. **Ceiling is structural.** Sub-90 scores on raw briefings reflect the limit of "model + skill alone, no human polish". Pushing past that ceiling needs more goldens, human-in-loop, or different artifact type — not a better optimizer.
+4. **Bootstrap needs corpus depth.** 3 goldens × 2 bootstrapped demos = nearly no learning capacity. Minimum useful: 8-12 goldens per skill, cross-vertical.
+5. **One-run-on-same-goldens is noisy signal.** Re-evaluating on the training set with single-pass judge produces ±5pt variance. Need held-out test set + multiple runs to claim lift.
+
+---
+
+## What WOULD lift these skills (next real experiment)
+
+Based on what we now know:
+
+1. **Expand goldens to 8-12 per skill**, cross-vertical (vet clinic, dental, contabilidade, design — not just SaaS/realty).
+2. **Add held-out test set** of 3 verticals NOT in trainset. Measure on that, not on goldens.
+3. **Run 3-5 evaluation passes** to bound the variance.
+4. **Try MIPROv2** instead of BootstrapFewShot — does instruction optimization too, not just demo selection.
+
+This is now the real bottleneck and the real next experiment. The metric fix here remains correct (judge > word-overlap, always), but is no longer the headline story.
 
 ---
 

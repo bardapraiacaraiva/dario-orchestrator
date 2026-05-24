@@ -193,50 +193,59 @@ def main():
         scores, avg = compile_and_eval(skill_name, ProgramCls, goldens)
         results[skill_name] = {"scores": scores, "avg": avg}
 
-    # Update metrics
+    # Update metrics — CRITICAL: do NOT overwrite avg_quality_score.
+    # avg_quality_score represents real production quality (delivery-ready outputs
+    # scored on actual client work). Judge-on-synthetic-goldens is a DIFFERENT
+    # signal — it measures raw model output on training briefings, which is
+    # apples-vs-oranges to production. Conflating these (v2-pre-fix) caused the
+    # spurious "regression" 90.9 → 84.3 on dario-pitch.
+    #
+    # This pass writes ONLY synthetic-golden fields. Production fields untouched.
     metrics_path = ORCH_DIR / "quality" / "skill-metrics.yaml"
     metrics = load_y(metrics_path)
-    print("\n=== Updating skill-metrics.yaml ===")
+    print("\n=== Updating skill-metrics.yaml (synthetic-golden fields only) ===")
     for skill_name, data in results.items():
         if skill_name not in metrics["skills"]:
             print(f"  ! {skill_name} not in metrics; skipping")
             continue
         meta = metrics["skills"][skill_name]
-        old = float(meta.get("avg_quality_score", 0))
+        prev_judge = meta.get("avg_judge_synthetic_goldens")
         new = data["avg"]
+        # Synthetic-golden tracking fields (new namespace, do NOT touch avg_quality_score)
+        meta["live_scores_compiled_sprint3v2"] = data["scores"]
+        meta["avg_judge_synthetic_goldens"] = round(new, 1)
+        meta["compile_artifact_v2"] = f"optimization/compiled/{skill_name}_v2.json"
+        meta["last_judge_synthetic_at"] = datetime.now(UTC).isoformat()
+        # Append history note (production avg_quality unaffected)
         meta.setdefault("score_history", []).append({
             "date": datetime.now(UTC).isoformat()[:10],
-            "old": old, "new": new,
+            "judge_synthetic_old": prev_judge,
+            "judge_synthetic_new": round(new, 1),
             "briefing_quality": "sprint3v2-dspy-judge-metric",
+            "note": "synthetic-goldens only; production avg_quality_score untouched",
         })
-        meta["pre_compile_baseline_sprint3v2"] = {
-            "avg_score": old, "n_runs": meta.get("total_executions", 0),
-        }
-        meta["live_scores_compiled_sprint3v2"] = data["scores"]
-        meta["avg_quality_score"] = round(new, 1)
-        meta["best_score"] = max(int(new), int(meta.get("best_score", 0)))
-        meta["compile_artifact_v2"] = f"optimization/compiled/{skill_name}_v2.json"
-        meta["tier"] = "A" if new >= 90 else "B" if new >= 70 else "C"
-        meta["improvement_trend"] = "improving" if new > old else "stable"
-        meta["last_scored_at"] = datetime.now(UTC).isoformat()
-        meta["total_executions"] = meta.get("total_executions", 0) + len(data["scores"])
-        print(f"  {skill_name}: {old} -> {new:.1f}  ({'+' if new>old else ''}{new-old:.1f})")
+        prev_str = f"{prev_judge}" if prev_judge is not None else "n/a"
+        print(f"  {skill_name}: judge_synthetic {prev_str} -> {new:.1f}")
+        prod = meta.get("avg_quality_score")
+        if prod is not None:
+            print(f"    (production avg_quality_score preserved: {prod})")
 
-    # Recompute global avg
+    metrics["last_updated"] = datetime.now(UTC).isoformat()
+
+    # Global average remains based on production avg_quality_score (unchanged semantics)
     scored = [(n, float(m.get("avg_quality_score", 0)))
               for n, m in metrics["skills"].items()
               if isinstance(m, dict) and m.get("avg_quality_score") is not None]
-    all_avg = sum(s for _, s in scored) / len(scored)
-    metrics["global_avg_quality"] = round(all_avg, 1)
-    metrics["last_updated"] = datetime.now(UTC).isoformat()
-    A = sum(1 for _, s in scored if s >= 90)
-    B = sum(1 for _, s in scored if 70 <= s < 90)
-    print(f"\n=== Global mean: {all_avg:.2f}")
-    print(f"  A (>=90): {A}")
-    print(f"  B (70-89): {B}")
+    if scored:
+        all_avg = sum(s for _, s in scored) / len(scored)
+        metrics["global_avg_quality"] = round(all_avg, 1)
+        A = sum(1 for _, s in scored if s >= 90)
+        B = sum(1 for _, s in scored if 70 <= s < 90)
+        print(f"\n=== Global mean (production avg_quality_score): {all_avg:.2f}")
+        print(f"  A (>=90): {A}  |  B (70-89): {B}")
 
     dump_y(metrics, metrics_path)
-    print("\nOK skill-metrics.yaml updated")
+    print("\nOK skill-metrics.yaml updated (synthetic-golden fields only)")
 
 
 if __name__ == "__main__":

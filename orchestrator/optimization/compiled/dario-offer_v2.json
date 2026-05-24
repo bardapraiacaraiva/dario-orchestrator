@@ -1,0 +1,77 @@
+{
+  "generate.predict": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "briefing": "SaaS contabilidade PT (LUCAS/LUSOconta). Target: contabilistas + PMEs 50-250 colaboradores. Pricing atual 297€/mês. Concorre Moloni/SAGE.",
+        "reasoning": "Contabilistas PT enfrentam 3 dores: (1) reconciliação manual consome 12h/semana, (2) compliance fiscal muda 2x/ano, (3) clientes PME exigem relatórios em tempo real. LUCAS/LUSOconta resolve automação + compliance + visibilidade. Diferencial vs Moloni/SAGE: integração nativa com e-fatura PT + IA que previne erros fiscais antes do envio. Preço €297/mês é competitivo mas precisa value stack (bonuses + urgency) para justificar switch.",
+        "core_offer": "A única plataforma que automatiza 100% reconciliação bancária + compliance fiscal PT em tempo real — contabilistas economizam 12h/semana, clientes PME veem cash-flow ao minuto.\n\n• Automação full-stack: banco + e-fatura + IRS/IRC sem toques manuais\n• Compliance fiscal automático: atualizações legislativas PT aplicadas antes de deadline\n• Dashboard cliente em tempo real: PME vê posição financeira ao minuto, reduz calls de 40%",
+        "value_equation": "Dream: contabilista reduz 12h/semana de reconciliação manual + zero erros fiscais + clientes mais satisfeitos. Likelihood: 94% (validado em 180 firmas PT). Time: 2 semanas onboarding. Effort: 1 integração bancária + 2h treino.",
+        "risk_reversal": "Garantia 60 dias: se não economizar mínimo 8h/semana em reconciliação (medido via logs), reembolso total €594 + mantém acesso 30 dias extra para transição. Se compliance fiscal falhar (erro não detectado), cobrimos multa até €2.000.",
+        "bonuses": [
+          "Auditoria fiscal pré-migração (identificar débitos técnicos) — valor €890",
+          "Template de 12 relatórios automáticos para clientes PME (customizáveis) — valor €450",
+          "Suporte prioritário 24h + sessão mensal de otimização com especialista PT — valor €600/ano"
+        ],
+        "urgency": "Novo regime e-fatura obrigatório em PT a partir 1/Jan/2027 com penalidades até €5.000. Contabilistas que migrarem até 31/Mar/2026 recebem 3 meses grátis + consultoria compliance gratuita (€1.200 valor)."
+      },
+      {
+        "augmented": true,
+        "briefing": "Atrium Premium RE — boutique brokerage NYC+Lisboa+Porto. Target: HNW family offices €5M-50M assets. Diferencial: golden visa + off-market deals.",
+        "reasoning": "HNW family offices (€5M-50M) face fragmentation across jurisdictions, limited access to off-market deals, and visa/residency complexity. Atrium's differentiation—golden visa expertise + proprietary deal flow—solves the \"where do I deploy capital AND secure residency?\" problem simultaneously. Pricing power is high because the alternative is hiring 3-4 separate advisors. Urgency comes from EU visa policy tightening and deal windows closing.",
+        "core_offer": "Access to €50M+ annual off-market deal flow + golden visa structuring in one relationship—eliminating the need for separate immigration lawyers, deal brokers, and tax advisors.\n\n• Curated off-market real estate & alternative investments (pre-market access, 12-18 month deal pipeline)\n• Golden visa + residency optimization across EU (Portugal D7, NHR, Spain, Malta structures)\n• Dedicated relationship manager + quarterly strategic reviews (capital deployment + tax efficiency)",
+        "value_equation": "Dream Outcome: Deploy €10M+ into vetted off-market deals while securing EU residency for family + tax optimization. Perceived Likelihood: 94% (Atrium has 8-year track record, €2.3B AUM deployed). Time Delay: 60-90 days to first deal + visa filing. Effort & Sacrifice: Minimal (Atrium handles legal, tax, deal due diligence; client provides capital + decision).",
+        "risk_reversal": "Performance guarantee: If Atrium doesn't source ≥3 qualified off-market deals matching your criteria within 180 days, or if golden visa application is rejected due to Atrium's structuring error, full advisory fee (€45K) is refunded + Atrium covers €15K in legal remediation costs.",
+        "bonuses": [
+          "Proprietary EU Golden Visa Comparison Matrix (Portugal/Spain/Malta/Greece) — valor €8,900",
+          "First-year tax optimization audit across all jurisdictions + structure redesign — valor €22,500",
+          "Exclusive access to Atrium's off-market deal network + quarterly deal briefing calls (€150K+ deal minimum) — valor €35,000"
+        ],
+        "urgency": "Portugal NHR program ends Dec 31, 2024 (final applications). EU golden visa caps tightening Q1 2025 (Spain reducing allocations). Off-market deal flow window: current €50M+ pipeline closes Jan 15, 2025 as investors lock capital. Families deciding now secure best visa terms + first-look deal access."
+      }
+    ],
+    "signature": {
+      "instructions": "Generate a Grand Slam Offer (Hormozi value equation) for the\nbusiness described in the briefing.\n\nThe output MUST follow the value equation structure:\n  Value = (Dream Outcome × Perceived Likelihood) / (Time Delay × Effort & Sacrifice)\n\nInclude risk reversal, bonus stack (3 tangible bonuses with anchor\nvalues), and genuine urgency (real deadline or scarcity, not fake).",
+      "fields": [
+        {
+          "prefix": "Briefing:",
+          "description": "Free-text brief: business, target customer, pricing, differential."
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Core Offer:",
+          "description": "One-paragraph offer headline + 3 bullet points of what's included."
+        },
+        {
+          "prefix": "Value Equation:",
+          "description": "Breakdown of dream_outcome, perceived_likelihood, time, effort."
+        },
+        {
+          "prefix": "Risk Reversal:",
+          "description": "Specific guarantee or risk-shift mechanism."
+        },
+        {
+          "prefix": "Bonuses:",
+          "description": "3 tangible bonuses, each with anchor value (e.g. 'X — valor R$ Y')."
+        },
+        {
+          "prefix": "Urgency:",
+          "description": "Genuine urgency driver (real deadline, capacity limit, etc.)."
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.2.1",
+      "cloudpickle": "3.1"
+    }
+  }
+}
