@@ -1,0 +1,87 @@
+{
+  "generate.predict": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "briefing": "SAQUEI — SaaS B2C BR. Tráfego atual: Google Ads + Meta Ads para landing R$ 29 relatório. Quer escalar com newsletter.",
+        "reasoning": "SAQUEI is a B2C SaaS in Brazil with a low-ticket entry point (R$ 29 report). Current paid traffic (Google + Meta) drives cold audiences to a landing page. The goal to scale via newsletter indicates a shift toward owned-media retention and upsell. The funnel must: (1) convert cold traffic to email subscribers at high volume, (2) nurture with valuable content to build trust, (3) upsell from report to higher-tier products/subscriptions, (4) retain and expand via engagement loops. Conversion thresholds should reflect B2C sensitivity: high top-of-funnel volume, moderate nurture-to-purchase, strong retention for expansion.",
+        "stages": [
+          "Cold traffic → Landing page (lead magnet + R$ 29 report)",
+          "Email nurture sequence (7-10 days, value-first content)",
+          "Upsell to premium subscription or course",
+          "Active subscriber retention + engagement loops",
+          "Expansion via referral or product ecosystem"
+        ],
+        "conversion_thresholds": "Landing page 12% (cold → email) → nurture sequence 8% (email → click-through) → upsell 4% (nurture → paid upgrade) → retention 65% (month 2 active) → expansion 18% (referral or cross-sell)",
+        "copy_hooks": [
+          "'Descubra quanto você REALMENTE gasta por mês (relatório gratuito)'",
+          "'Os 3 erros que custam R$ 5k+ por ano aos brasileiros'",
+          "'Seu dinheiro trabalha 24h? Veja como os top 10% fazem'",
+          "'Acesso VIP: planilhas + templates que economizam 5h/semana'",
+          "'Indique um amigo e ganhe 3 meses grátis'"
+        ],
+        "automations": "landing_page_submit → immediate R$ 29 report delivery + welcome email. day_1 → value email #1 (case study). day_3 → value email #2 (tip/framework). day_5 → soft upsell (premium tier). day_7 → social proof email (testimonials). cart_abandon → 2-email recovery sequence (24h + 48h). subscriber_inactive_14d → re-engagement campaign. subscriber_active_30d → referral incentive email."
+      },
+      {
+        "augmented": true,
+        "briefing": "LUCAS/LUSOconta — SaaS contabilidade PT. Tráfego: LinkedIn outbound + referral contabilistas. Pricing 297€/mês.",
+        "reasoning": "LUSOconta targets Portuguese accountants & small business owners via LinkedIn outbound (high-intent B2B) and referral networks (trust-based). At €297/mth, the ACV is mid-market SaaS. The funnel must prioritize qualification (not all leads convert), build credibility through social proof, and leverage referral incentives. Key insight: accountants are risk-averse, so proof of compliance, data security, and ROI (time savings) are critical. Referral partners need clear commission structure to sustain pipeline.",
+        "stages": [
+          "LinkedIn Outbound Sequence (5-touch) — awareness + credibility",
+          "Demo Request Landing Page — qualification gate (company size, pain point)",
+          "Live/Recorded Demo + Case Study — proof of concept for similar firms",
+          "Free Trial 14-day (full access) — hands-on validation",
+          "Conversion to Paid + Referral Incentive Setup — onboarding + partner commission"
+        ],
+        "conversion_thresholds": "LinkedIn CTR 2.1% → demo request 18% → demo-to-trial 42% → trial-to-paid 28% → referral activation 65%",
+        "copy_hooks": [
+          "Hook 1: 'Contabilistas em PT economizam 12h/semana com automação de declarações'",
+          "Hook 2: 'Conformidade fiscal 2024 garantida — ou devolvemos a subscrição'",
+          "Hook 3: 'De 47 clientes para 200+ em 8 meses: o case de Silva & Associados'",
+          "Email subject 1: 'Porque é que 340 contabilistas escolheram LUSOconta este ano'",
+          "Email subject 2: 'Ganhe €500/cliente referido — sem limite de comissão'"
+        ],
+        "automations": "demo_request @ 0min → calendar link + compliance whitepaper. demo_completed @ 24h → trial activation email + onboarding video. trial_end @ day 13 → conversion offer (first month 50% off) + success story. trial_abandoned @ day 7 → 1-call rescue sequence. referral_signup @ conversion → partner dashboard access + commission tracking + monthly payout automation."
+      }
+    ],
+    "signature": {
+      "instructions": "Design a multi-stage marketing funnel for the business described.\n\nMust specify the stages (typically 4-6), conversion thresholds, key\ncopy hooks, CTAs per stage, and automation triggers.",
+      "fields": [
+        {
+          "prefix": "Briefing:",
+          "description": "Business, product, target, pricing, current traffic source."
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Stages:",
+          "description": "Funnel stages in order, each with name + purpose."
+        },
+        {
+          "prefix": "Conversion Thresholds:",
+          "description": "Per-stage conversion benchmark (% expected). One per stage."
+        },
+        {
+          "prefix": "Copy Hooks:",
+          "description": "Headline / hook per stage (3-5 of them)."
+        },
+        {
+          "prefix": "Automations:",
+          "description": "Triggers + actions (eg 'cart_abandon → 3-email sequence')."
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.2.1",
+      "cloudpickle": "3.1"
+    }
+  }
+}

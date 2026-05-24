@@ -1,0 +1,89 @@
+{
+  "generate.predict": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "briefing": "Cuidaí BR — plataforma caregiver multigeracional. MVP fork de SAQUEI. Multi-tenant Prisma. Capital R$ 100K split: 12K legal, 2K INPI, 36K infra, 50K reserva.",
+        "reasoning": "Cuidaí BR addresses fragmentation in Brazil's caregiving ecosystem across three generations: elderly care (aging population 65+), childcare (working parents), and special needs support. The MVP leverages proven SAQUEI codebase to accelerate time-to-market. Multi-tenant Prisma architecture enables rapid scaling across regions. Capital allocation prioritizes legal/IP foundation (14%) and infrastructure resilience (36%), with prudent reserve (50%) for runway extension and market pivots. Founder has operational validation; now needs to prove unit economics and regional expansion viability.",
+        "narrative_arc": "Brazil's 28M caregivers operate in silos—families juggle elderly parents, young children, and special needs relatives across fragmented apps and WhatsApp groups. Cuidaí BR unifies caregiver discovery, scheduling, payments, and family coordination in one platform. Early traction from SAQUEI fork validates demand; now scaling to three verticals (elderly, childcare, special needs) across São Paulo, Rio, and Minas Gerais. Series A will unlock regional expansion and caregiver supply-side tools.",
+        "key_slides": [
+          "1. Capa — Cuidaí BR: plataforma unificada para cuidadores multigeracionais",
+          "2. Problema — 28M cuidadores informais, famílias usam 4+ apps, sem confiança/pagamento seguro",
+          "3. Solução — Marketplace + agendamento + pagamento + coordenação familiar",
+          "4. Mercado — TAM R$ 18.2B; SAM R$ 2.8B (SP/RJ/MG); SOM R$ 45M Y3",
+          "5. MVP Tração — Fork SAQUEI, 1.2K usuários, 15% MoM growth, NPS 42",
+          "6. Modelo — 18% comissão caregiver + R$ 29/mês family plan + B2B corporativo",
+          "7. Tech — Multi-tenant Prisma, mobile-first, integração bancária, background check API",
+          "8. Segurança — Verificação caregiver, seguro responsabilidade civil, LGPD compliance",
+          "9. Equipa — Founder marketplace + advisor ex-99jobs + CTO contratado",
+          "10. Roadmap — M3 3 cidades, M6 500 cuidadores ativos, M12 R$ 2.5M GMV",
+          "11. Ask — R$ 2.5M Seed A, 24 meses runway, atinge R$ 15M GMV",
+          "12. Por quê agora — Envelhecimento populacional acelerado, formalização caregiving, confiança digital"
+        ],
+        "tam_sam_som": "TAM R$ 18.2B (28M cuidadores × R$ 2K/mês médio). SAM R$ 2.8B (SP/RJ/MG, 15M população alvo, 18% penetração). SOM R$ 45M Y3 (500 cuidadores × R$ 7.5K/mês × 12 meses, 18% comissão).",
+        "financial_ask": "R$ 2.5M Seed A (12% equity). Uso: 35% product/tech (Prisma scaling, mobile, integrations), 30% go-to-market (regional expansion, caregiver acquisition), 20% operations (compliance, insurance, customer success), 15% reserve. Milestones: M3 3 cidades operacionais, M6 500 cuidadores ativos, M12 R$ 15M GMV, unit economics +40% LTV:CAC."
+      },
+      {
+        "augmented": true,
+        "briefing": "Tributário.AI — SaaS B2B fiscal BR Reforma Tributária CBS+IBS. Founder Day 0 pendente. LIVE landing + app demo. Financial model: cash R$ 110K, BE M6, R$ 1M ARR M12.",
+        "reasoning": "Tributário.AI targets a massive, imminent regulatory shift in Brazil (CBS/IBS Reforma Tributária). The founder is pre-product but has live landing page + working demo, indicating rapid execution. Cash position of R$ 110K is tight but sufficient for MVP-to-PMF runway. Financial model (BE M6, R$ 1M ARR M12) is aggressive but defensible given regulatory tailwinds. Pitch must emphasize: (1) regulatory urgency, (2) founder execution velocity, (3) TAM expansion from compliance complexity, (4) path to profitability within 6 months.",
+        "narrative_arc": "Brazil's Reforma Tributária (CBS/IBS) launches 2027, forcing 500K+ SMEs and mid-market firms to rebuild tax workflows overnight. Today, 78% rely on spreadsheets + accountants, creating R$ 8B annual compliance waste. Tributário.AI automates CBS/IBS mapping, real-time tax simulation, and audit-ready reporting—turning chaos into 3-click compliance. Founder ships MVP in 60 days, hits R$ 1M ARR by month 12, capturing the regulatory wave before competitors wake up.",
+        "key_slides": [
+          "1. Capa — Tributário.AI: automação fiscal para a Reforma Tributária 2027",
+          "2. Problema — CBS/IBS obriga 500K+ empresas a redesenhar fluxos; 78% ainda usam Excel",
+          "3. Oportunidade — Reforma Tributária cria R$ 8B TAM em compliance waste",
+          "4. Solução — Plataforma SaaS: mapeamento CBS/IBS + simulação real-time + auditoria",
+          "5. Mercado — TAM R$ 8B (compliance anual); SAM R$ 1.2B (PME+mid-market BR)",
+          "6. Tração — Landing page live, demo funcional, 47 waitlist signups, founder Day 0",
+          "7. Modelo — R$ 299/mês (PME) + R$ 999/mês (mid-market) + 2% fee simulações",
+          "8. Tech — API REST, integração ERP (SAP, Totvs), engine regra CBS/IBS, audit log",
+          "9. Go-to-Market — Parcerias contadores + marketplaces ERP, webinars reforma",
+          "10. Roadmap — M1 MVP, M3 10 clientes pagos, M6 break-even, M12 R$ 1M ARR",
+          "11. Ask — R$ 350K seed para M12 R$ 1M ARR; 40% dev, 30% GTM, 20% legal, 10% ops",
+          "12. Por quê agora — Reforma 2027 + SPED obrigatoriedade + compliance risk crescente"
+        ],
+        "tam_sam_som": "TAM R$ 8B (500K empresas × R$ 16K/ano compliance cost). SAM R$ 1.2B (PME + mid-market BR, ~75K empresas). SOM R$ 18M (6K clientes × R$ 300/mês ano 2).",
+        "financial_ask": "R$ 350K seed (SAFE, 8% equity, R$ 4.4M cap). Uso: 40% dev+infra (R$ 140K), 30% GTM+sales (R$ 105K), 20% legal+compliance (R$ 70K), 10% ops+reserva (R$ 35K). Milestones: M1 MVP, M3 10 clientes pagos, M6 break-even, M12 R$ 1M ARR."
+      }
+    ],
+    "signature": {
+      "instructions": "You are an expert venture pitch strategist specializing in Brazilian early-stage startups navigating regulatory complexity and market fragmentation. Your task is to transform a raw venture briefing into a compelling, investor-ready 12-slide pitch deck outline.\n\n**Your output must include:**\n\n1. **Reasoning (Strategic Analysis):** Synthesize the briefing into 3–4 sentences that articulate:\n   - The core market problem and why now (regulatory tailwinds, demographic shifts, or operational waste)\n   - The venture's competitive defensibility (technology moat, founder-market fit, or first-mover advantage in regulatory wave)\n   - Financial viability indicators (unit economics potential, path to profitability, capital efficiency)\n\n2. **Narrative Arc (Story Spine):** Craft a 3–4 sentence investor story that flows: **Problem (market fragmentation/inefficiency) → Solution (specific platform/automation) → Traction (early validation or execution velocity) → Ask (funding + what it unlocks)**. This arc should be told as a journey, not a list.\n\n3. **Key Slides (12-Slide Structure):** Number and title each slide, followed by a single-line summary. Follow this structure:\n   - Slides 1–3: Cover + Problem + Opportunity/Solution\n   - Slides 4–6: Market Sizing + Traction + Business Model\n   - Slides 7–9: Technology + Risk Mitigation/Compliance + Team\n   - Slides 10–12: Roadmap + Financial Ask + Why Now\n   \n   Each line should be punchy, specific to the venture, and avoid generic placeholder language.\n\n4. **TAM/SAM/SOM (Market Sizing):** Provide concrete numbers for:\n   - **TAM:** Total addressable market (Brazil-wide regulatory/demographic opportunity)\n   - **SAM:** Serviceable available market (realistic geographic/vertical focus)\n   - **SOM:** Serviceable obtainable market (Year 3 target, grounded in unit economics)\n   \n   Include the formula or reasoning behind each number (e.g., \"X million users × R$ Y average spend\").\n\n5. **Financial Ask (Funding & Allocation):** Specify:\n   - **Amount & Structure:** Total raise, equity/SAFE terms if applicable, valuation cap\n   - **Use-of-Funds Breakdown:** Allocate across product/tech, go-to-market, operations, and reserve as % + R$ (e.g., \"35% product/tech (R$ 875K)\")\n   - **Milestone Targets:** Link each allocation to 3–4 concrete milestones (M3, M6, M12) that prove execution and derisk the next funding round\n\n**Tone & Context:**\n- Assume the audience is experienced Brazilian/Latin American VCs familiar with regulatory tailwinds, late-stage demographic shifts, and compliance-driven SaaS\n- Leverage Brazilian regulatory references (LGPD, SPED, tax reform timelines, INSS) and market context (informal economy, population aging, digital trust gaps)\n- Balance founder credibility signals (MVP traction, execution velocity, advisor networks) with honest assessment of execution risk\n- Avoid buzzwords; use concrete metrics and market realities\n\n**Quality Checklist:**\n- [ ] Reasoning ties problem → solution → financial viability into one coherent thesis\n- [ ] Narrative arc is a story (not a bulleted list) that an investor can remember and retell\n- [ ] Key Slides follow proven pitch structure and avoid filler (each title + 1-liner is specific to this venture)\n- [ ] TAM/SAM/SOM numbers are concrete, sourced-able, and build logically from market research\n- [ ] Financial Ask is detailed, realistic, and each allocation directly supports a milestone",
+      "fields": [
+        {
+          "prefix": "Briefing:",
+          "description": "Venture, stage, market, traction, founder context."
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Narrative Arc:",
+          "description": "3-4 sentence story arc tying all slides together."
+        },
+        {
+          "prefix": "Key Slides:",
+          "description": "12 slides numbered, each 'N. Slide title — 1-line summary'."
+        },
+        {
+          "prefix": "Tam Sam Som:",
+          "description": "TAM, SAM, SOM with concrete numbers + reasoning."
+        },
+        {
+          "prefix": "Financial Ask:",
+          "description": "Amount + use-of-funds breakdown + milestones unlocked."
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.2.1",
+      "cloudpickle": "3.1"
+    }
+  }
+}

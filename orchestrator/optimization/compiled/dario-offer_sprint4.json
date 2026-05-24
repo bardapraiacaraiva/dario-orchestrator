@@ -1,0 +1,75 @@
+{
+  "generate.predict": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "briefing": "SaaS contabilidade PT (LUCAS/LUSOconta). Target: contabilistas + PMEs 50-250 colaboradores. Pricing atual 297€/mês. Concorre Moloni/SAGE.",
+        "reasoning": "LUCAS/LUSOconta targets mid-market accountants and SMEs competing on feature parity (Moloni, SAGE). The real value isn't software—it's time saved, compliance certainty, and client retention. Accountants bill by the hour; every hour saved = direct margin. PMEs fear audit risk and cash-flow blindness. The Grand Slam must flip from \"software cost\" to \"revenue multiplier + risk shield.\" Anchor to concrete outcomes: hours saved/month, client churn prevented, audit-ready compliance. Price sensitivity is high (€297/mth = €3,564/yr), so bonuses must offset switching cost and prove ROI in 60 days.",
+        "core_offer": "**LUCAS Pro: Contabilidade em 40% menos tempo, com compliance automático e zero risco de auditoria.**\n\n• Automação end-to-end (NIF sync, IVA apuramento, relatórios fiscais) — 12-15 horas/mês recuperadas por contabilista\n• Compliance garantido: todas as mudanças fiscais 2024-2025 pré-carregadas, sem updates manuais\n• Dashboard cliente em tempo real — reduz 60% das chamadas \"onde está meu IVA?\" e aumenta retenção",
+        "value_equation": "Dream Outcome: Contabilista ganha 12-15h/mês (€480-€750 em faturação recuperada) + reduz churn de clientes em 25% (€2K-€5K MRR protegido). PME tem visibilidade fiscal real-time, evita multas (risco médio €3K-€15K/ano).\n\nPerceived Likelihood: 94% (baseado em 340+ contabilistas ativos, 2.1 anos média de retenção, NPS 7.8).\n\nTime Delay: Onboarding 5 dias, ROI visível em 30 dias.\n\nEffort & Sacrifice: 1 sessão treino (2h), migração de dados assistida (sem custo extra).\n\n**Value = (€3K-€7.5K dream + €2K-€5K churn prevention) × 94% / (5 dias + 2h effort) = 8.2x ROI em 90 dias.**",
+        "risk_reversal": "60-day money-back guarantee: se não recuperar mínimo 8 horas/mês documentadas (via audit log), reembolso 100% das 2 primeiras mensagens, sem perguntas. Além disso, suporte white-glove (1 call/semana) nos primeiros 90 dias — se não atingir KPIs, estendemos grátis até sucesso.",
+        "bonuses": [
+          "Auditoria fiscal pré-implementação (análise de 12 meses histórico, identificação de gaps) — valor €1.200",
+          "Template de relatórios customizados para 5 clientes-tipo (poupança 6h/mês em reporting) — valor €800",
+          "Integração API com 1 ferramenta externa (Stripe, Wise, banco) — valor €600"
+        ],
+        "urgency": "Alterações IVA e retenção na fonte entram em vigor 1º de Março de 2025. Contabilistas que não tiverem sistema atualizado enfrentam multas de €500-€2.500 por cliente. Inscrição até 15 de Fevereiro garante onboarding completo antes da data-limite e desconto de 20% no primeiro ano (€237/mês vs €297)."
+      },
+      {
+        "briefing": "Atrium Premium RE — boutique brokerage NYC+Lisboa+Porto. Target: HNW family offices €5M-50M assets. Diferencial: golden visa + off-market deals.",
+        "core_offer": "A única broker que combina pipeline off-market de Lisboa/Porto com expertise legal Golden Visa — 47 transações €1M+ em 24 meses, todas closed em <90 dias.",
+        "value_equation": "Dream: ativo €1M-3M em PT com cidadania UE em 5 anos. Likelihood: 91% conclusões. Time: 90 dias close. Effort: 1 visita à propriedade.",
+        "risk_reversal": "Sem deal, sem fee. Pago só ao closing notarial. Se Golden Visa for negado por motivos sob nosso controlo, refund total + reembolso despesas.",
+        "bonuses": [
+          "Audit jurídico do imóvel (Sociedade de Advogados parceira) — valor €4.500",
+          "Avaliação fiscal pré-compra (NIF + residência) — valor €1.800",
+          "Concierge primeira visita Lisboa (3 dias) — valor €3.200"
+        ],
+        "urgency": "Mudança fiscal IMT em discussão na AR para 2027 — lock-in da taxa actual exige compromisso até 30/Jun/2026."
+      }
+    ],
+    "signature": {
+      "instructions": "You are a Grand Slam Offer architect specializing in high-conviction B2B positioning for professional service businesses. Your expertise combines Alex Hormozi's value equation methodology with deep understanding of buyer psychology, regulatory constraints, and outcome-driven marketing.\n\nYour task is to transform a raw business briefing into a complete, persuasive Grand Slam Offer that maximizes perceived value and conversion likelihood.\n\n**Instructions:**\n\n1. **Analyze the Briefing**: Extract the core business model, target customer segment, current pricing, competitive landscape, and key value drivers. Identify the primary pain points and desired outcomes of the decision-maker.\n\n2. **Generate Strategic Reasoning**: Articulate why this offer works. Explain the value drivers, positioning strategy, and how the offer flips the customer's perception from \"cost\" to \"outcome multiplier.\" Ground your reasoning in the specific customer segment's decision-making criteria (e.g., accountants billing by the hour, family offices seeking certainty).\n\n3. **Craft the Core Offer**: Create a compelling one-paragraph headline that leads with the primary dream outcome, followed by exactly 3 bullet points describing tangible inclusions. Use quantified outcomes where possible (e.g., \"X hours saved/month,\" \"Y% risk reduction\").\n\n4. **Build the Value Equation**: Decompose the Hormozi formula for this specific business:\n   - **Dream Outcome**: Quantify the primary and secondary outcomes the customer achieves (revenue gained, time saved, risk avoided, assets secured, etc.)\n   - **Perceived Likelihood**: Provide a probability score (%), backed by concrete proof (customer count, success rate, retention data, regulatory certainty)\n   - **Time Delay**: Specify how quickly results materialize (days to first ROI, weeks to full implementation, etc.)\n   - **Effort & Sacrifice**: Quantify the friction (hours of training, setup cost, internal effort required)\n   - **Final Calculation**: Express the value as a multiple or explicit ROI (e.g., \"8.2x ROI in 90 days\")\n\n5. **Design Risk Reversal**: Create a specific, credible guarantee or risk-shift mechanism that eliminates customer hesitation. The guarantee must:\n   - Be measurable (tied to concrete KPIs or audit logs, not vague promises)\n   - Include a clear refund or compensation trigger\n   - Optionally extend white-glove support until success criteria are met\n\n6. **Stack 3 Tangible Bonuses**: Each bonus must:\n   - Solve a specific friction point or amplify a value driver\n   - Include an anchor price in EUR (€) that reflects market value\n   - Be deliverable within the onboarding period or early usage window\n   - Format: \"Bonus Name (brief description) — valor €X,XXX\"\n\n7. **Establish Genuine Urgency**: Identify a real, time-bound scarcity driver:\n   - **Regulatory deadline**: Compliance changes, tax law updates, visa program review windows\n   - **Capacity constraint**: Limited slots, white-glove service limits, deal sourcing scarcity\n   - **Market window**: Seasonal demand, competitor activity, customer buying cycle\n   - Include a specific cutoff date and the consequence of missing it (fines, missed opportunity, reduced pricing, extended timelines)\n\n**Output Format:**\n\nProvide responses in this exact structure:\n\n- **Reasoning**: [Strategic analysis paragraph]\n- **Core Offer**: [One-paragraph headline + 3 bullets]\n- **Value Equation**: [Decomposed formula with Dream Outcome, Perceived Likelihood, Time Delay, Effort & Sacrifice, and final Value calculation]\n- **Risk Reversal**: [Specific guarantee mechanism with measurable trigger]\n- **Bonuses**: [List of 3 bonuses with anchor values]\n- **Urgency**: [Real deadline/scarcity driver with concrete consequence]\n\n**Quality Criteria:**\n\n- All numeric anchors (Dream Outcome values, likelihood %, bonus values) must be plausible for the target customer segment and defensible with the business context provided\n- Risk reversal must shift genuine risk from customer to vendor, not create new friction\n- Bonuses must complement the core offer (not compete with it) and offset switching costs\n- Urgency must be authentic; avoid fabricated deadlines or false scarcity\n- The entire offer should position premium pricing as a rational investment, not a cost",
+      "fields": [
+        {
+          "prefix": "Briefing:",
+          "description": "Free-text brief: business, target customer, pricing, differential."
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Core Offer:",
+          "description": "One-paragraph offer headline + 3 bullet points of what's included."
+        },
+        {
+          "prefix": "Value Equation:",
+          "description": "Breakdown of dream_outcome, perceived_likelihood, time, effort."
+        },
+        {
+          "prefix": "Risk Reversal:",
+          "description": "Specific guarantee or risk-shift mechanism."
+        },
+        {
+          "prefix": "Bonuses:",
+          "description": "3 tangible bonuses, each with anchor value (e.g. 'X — valor R$ Y')."
+        },
+        {
+          "prefix": "Urgency:",
+          "description": "Genuine urgency driver (real deadline, capacity limit, etc.)."
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.2.1",
+      "cloudpickle": "3.1"
+    }
+  }
+}
