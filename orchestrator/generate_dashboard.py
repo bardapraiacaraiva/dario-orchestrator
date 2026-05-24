@@ -176,7 +176,7 @@ def generate():
             # Top by total_outputs_obsidian, excluding internal/archived
             ranked = [
                 (cid, c) for cid, c in clients.items()
-                if c.get("status") not in ("internal", "archived")
+                if c.get("status") not in ("internal", "archived", "unknown", None)
                 and c.get("total_outputs_obsidian", 0) > 0
             ]
             ranked.sort(key=lambda x: -(x[1].get("total_outputs_obsidian") or 0))
@@ -197,6 +197,27 @@ def generate():
         s = (c.get("status") or "").lower()
         if "blocked" in s or "pending" in s: return "dot-amber"
         return "dot-green"
+
+    # MRR aggregates (sum monthly_value per currency, active billing only)
+    mrr_by_currency: dict[str, int] = {}
+    active_paying = 0
+    if client_stats_path.exists():
+        try:
+            cs2 = load_yaml_safe(client_stats_path)
+            for cid, c in (cs2.get("clients") or {}).items():
+                bs = (c.get("billing_status") or "").lower()
+                mv = c.get("monthly_value") or 0
+                cur = (c.get("currency") or "EUR").upper()
+                if bs == "active" and mv > 0:
+                    mrr_by_currency[cur] = mrr_by_currency.get(cur, 0) + mv
+                    active_paying += 1
+        except Exception:
+            pass
+    mrr_pieces = []
+    sym = {"EUR": "€", "BRL": "R$", "USD": "$"}
+    for cur, val in sorted(mrr_by_currency.items()):
+        mrr_pieces.append(f"{sym.get(cur, cur)}{val:,}")
+    mrr_header = " · ".join(mrr_pieces) if mrr_pieces else "—"
 
     clients_html = ""
     for cid, c in top_clients[:6]:
@@ -319,6 +340,7 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
   <div class="meta">
     <span>Gerado: {now}</span>
     <span class="badge" style="background:rgba({'0,230,118' if pct<80 else '255,171,0' if pct<95 else '255,82,82'},.15);color:var(--{budget_color});border:1px solid rgba({'0,230,118' if pct<80 else '255,171,0' if pct<95 else '255,82,82'},.3);">Budget: {pct:.1f}%</span>
+    <span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);" title="Soma monthly_value de clientes com billing_status=active. {active_paying} clientes pagantes.">MRR: {mrr_header}</span>
     <span>Pulse: {pulse_time}</span>
     <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);"></span>
   </div>
