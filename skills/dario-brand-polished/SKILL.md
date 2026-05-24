@@ -26,6 +26,19 @@ Original `dario-brand` unchanged — zero functionality loss.
 
 ### Step 1 — GENERATE v1
 
+**MANDATORY first action — load the base skill's full content:**
+
+```
+Read tool → ~/.claude/skills/dario-brand/SKILL.md
+```
+
+The polished wrapper SKILL.md (this file) contains only the polish-loop
+mechanics — it does NOT contain the base skill's frameworks, RAG queries,
+or domain expertise. Without reading the base skill first, you will
+improvise and produce v1 quality below the wrappers' validated baseline.
+
+After reading base, follow its workflow to produce v1.
+
 Execute full `dario-brand` workflow:
 - RAG consult (Kapferer Prism + Neumeier Zag + StoryBrand SB7 + Aaker)
 - Gather inputs (target, competitors, differential, tone)

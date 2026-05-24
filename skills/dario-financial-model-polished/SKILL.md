@@ -25,6 +25,19 @@ Padrão A wrapper around `dario-financial-model`. Financial models are HIGHEST r
 
 ### Step 1 — GENERATE v1
 
+**MANDATORY first action — load the base skill's full content:**
+
+```
+Read tool → ~/.claude/skills/dario-financial-model/SKILL.md
+```
+
+The polished wrapper SKILL.md (this file) contains only the polish-loop
+mechanics — it does NOT contain the base skill's frameworks, RAG queries,
+or domain expertise. Without reading the base skill first, you will
+improvise and produce v1 quality below the wrappers' validated baseline.
+
+After reading base, follow its workflow to produce v1.
+
 Execute full `dario-financial-model` workflow:
 - Gather: revenue streams + pricing tiers + customer growth assumption + cost structure (CAC, COGS, opex)
 - Build: P&L 12-24 months, cash flow, break-even month, scenario sensitivity (-30%/-+30% revenue)

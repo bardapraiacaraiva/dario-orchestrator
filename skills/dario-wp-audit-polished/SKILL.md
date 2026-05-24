@@ -25,6 +25,19 @@ Padrão A wrapper around `dario-wp-audit`. Base autonomous ceiling ~85. Producti
 
 ### Step 1 — GENERATE v1
 
+**MANDATORY first action — load the base skill's full content:**
+
+```
+Read tool → ~/.claude/skills/dario-wp-audit/SKILL.md
+```
+
+The polished wrapper SKILL.md (this file) contains only the polish-loop
+mechanics — it does NOT contain the base skill's frameworks, RAG queries,
+or domain expertise. Without reading the base skill first, you will
+improvise and produce v1 quality below the wrappers' validated baseline.
+
+After reading base, follow its workflow to produce v1.
+
 Execute full `dario-wp-audit` workflow:
 - WebFetch + analysis: performance, security, SEO, content, plugin bloat, theme health, checkout flow (if Woo), accessibility, PT legal compliance
 - Categorize findings: CRITICO / IMPORTANTE / OTIMIZAÇÃO

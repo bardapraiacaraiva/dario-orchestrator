@@ -28,7 +28,20 @@ The base `dario-pitch` skill remains unchanged and continues to work for all exi
 
 ## Workflow (5 steps, MUST execute all of them, in order)
 
-### Step 1 — GENERATE v1 (raw draft)
+### Step 1 — GENERATE v1
+
+**MANDATORY first action — load the base skill's full content:**
+
+```
+Read tool → ~/.claude/skills/dario-pitch/SKILL.md
+```
+
+The polished wrapper SKILL.md (this file) contains only the polish-loop
+mechanics — it does NOT contain the base skill's frameworks, RAG queries,
+or domain expertise. Without reading the base skill first, you will
+improvise and produce v1 quality below the wrappers' validated baseline.
+
+After reading base, follow its workflow to produce v1 (raw draft).
 
 Execute the full `dario-pitch` workflow as if you were that skill:
 - Gather inputs (audience, ask, stakes, proof, analogy)

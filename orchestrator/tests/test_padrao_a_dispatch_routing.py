@@ -203,6 +203,35 @@ class TestPolishedSkillsExist:
             f"Skill name field mismatch (expected, actual): {mismatches}"
         )
 
+    def test_polished_wrappers_load_base_skill(self):
+        """Each polished wrapper must instruct Claude to Read the base SKILL.md
+        in Step 1. Without this, the wrapper improvises and produces v1 below
+        the validated A/B baseline (this was gap #5 in the architecture audit,
+        fixed 2026-05-24).
+        """
+        missing_directive = []
+        missing_base_reference = []
+        for polished in ALL_PADRAO_A_WORKERS.values():
+            base = polished.replace("-polished", "")
+            text = (SKILLS_DIR / polished / "SKILL.md").read_text(encoding="utf-8")
+
+            if "MANDATORY first action — load the base skill" not in text:
+                missing_directive.append(polished)
+                continue
+
+            # The directive must point to the correct base skill path
+            expected_ref = f"~/.claude/skills/{base}/SKILL.md"
+            if expected_ref not in text:
+                missing_base_reference.append((polished, expected_ref))
+
+        assert not missing_directive, (
+            f"Polished wrappers missing base-load directive: {missing_directive}. "
+            "Each Step 1 must instruct Read of ~/.claude/skills/<base>/SKILL.md."
+        )
+        assert not missing_base_reference, (
+            f"Polished wrappers pointing to wrong base path: {missing_base_reference}"
+        )
+
 
 class TestRoutingLogicEquivalence:
     """Simulate the dispatch routing rule and verify it picks the right skill."""

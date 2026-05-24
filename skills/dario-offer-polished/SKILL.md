@@ -26,6 +26,19 @@ Original `dario-offer` unchanged.
 
 ### Step 1 — GENERATE v1
 
+**MANDATORY first action — load the base skill's full content:**
+
+```
+Read tool → ~/.claude/skills/dario-offer/SKILL.md
+```
+
+The polished wrapper SKILL.md (this file) contains only the polish-loop
+mechanics — it does NOT contain the base skill's frameworks, RAG queries,
+or domain expertise. Without reading the base skill first, you will
+improvise and produce v1 quality below the wrappers' validated baseline.
+
+After reading base, follow its workflow to produce v1.
+
 Execute full `dario-offer` workflow (Hormozi value equation):
 - RAG consult (Hormozi $100M Offers + $100M Leads + value stack)
 - Gather inputs (business, target, current pricing, competitor offers)

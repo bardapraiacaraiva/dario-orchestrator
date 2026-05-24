@@ -24,6 +24,19 @@ Padrão A wrapper around `dario-sales-letter`. Base autonomous ceiling ~83 (verb
 
 ### Step 1 — GENERATE v1
 
+**MANDATORY first action — load the base skill's full content:**
+
+```
+Read tool → ~/.claude/skills/dario-sales-letter/SKILL.md
+```
+
+The polished wrapper SKILL.md (this file) contains only the polish-loop
+mechanics — it does NOT contain the base skill's frameworks, RAG queries,
+or domain expertise. Without reading the base skill first, you will
+improvise and produce v1 quality below the wrappers' validated baseline.
+
+After reading base, follow its workflow to produce v1.
+
 Execute full `dario-sales-letter` workflow:
 - RAG consult (Gary Halbert + Eugene Schwartz + Dan Kennedy + StoryBrand + Jon Benson VSL)
 - Gather: product, audience awareness level (Schwartz 5), pain points, objections, offer

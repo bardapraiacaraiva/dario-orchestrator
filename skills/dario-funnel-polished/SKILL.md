@@ -24,6 +24,19 @@ Padrão A wrapper around `dario-funnel`. Base skill autonomous ceiling ~85 (spri
 
 ### Step 1 — GENERATE v1
 
+**MANDATORY first action — load the base skill's full content:**
+
+```
+Read tool → ~/.claude/skills/dario-funnel/SKILL.md
+```
+
+The polished wrapper SKILL.md (this file) contains only the polish-loop
+mechanics — it does NOT contain the base skill's frameworks, RAG queries,
+or domain expertise. Without reading the base skill first, you will
+improvise and produce v1 quality below the wrappers' validated baseline.
+
+After reading base, follow its workflow to produce v1.
+
 Execute full `dario-funnel` workflow (Brunson Value Ladder + Hormozi lead gen):
 - RAG consult (DotCom Secrets, Expert Secrets, $100M Leads)
 - Gather inputs (business, target, traffic, current conv rates, ARPU)
