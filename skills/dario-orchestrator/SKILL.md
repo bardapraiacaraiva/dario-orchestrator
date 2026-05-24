@@ -193,12 +193,17 @@ For each task, determine the best executor:
    if task.execution_policy in {"client_facing", "critical", "financial"}:
        if worker.skill_client_facing exists:
            if worker.requires_briefing_validation == true:
-               # Tier 2 wrappers (brand, sales-letter): briefing must include
-               # specific inputs. Verify before dispatch:
-               #   - brand: competitive context + tone + archetype hint
-               #   - sales-letter: testimonials/proof + offer terms + awareness level
-               if briefing missing required inputs:
-                   ask user for clarification, do NOT dispatch
+               # Tier 2 wrappers (brand, sales-letter): run pre-flight validator
+               # via Bash before dispatch. Validator returns exit 0 (pass),
+               # 1 (fail — missing inputs), or 2 (skip — not Tier 2).
+               validator_result = run_bash(
+                   "cd ~/.claude/orchestrator && "
+                   ".venv/Scripts/python.exe -m scripts.padrao_a_briefing_validator "
+                   "--worker {worker.id} --briefing {task.briefing} --json"
+               )
+               if validator_result.exit_code == 1:
+                   ask user for missing inputs (from JSON missing_required list)
+                   do NOT dispatch
                    return
            dispatch_skill = worker.skill_client_facing  # polished variant
        else:
@@ -206,6 +211,18 @@ For each task, determine the best executor:
    else:
        dispatch_skill = worker.skill  # internal/default tasks use base skill
    ```
+
+   **Pre-flight validator command (for Tier 2):**
+   ```bash
+   cd ~/.claude/orchestrator && \
+   .venv/Scripts/python.exe -m scripts.padrao_a_briefing_validator \
+       --worker worker-brand \
+       --briefing "$BRIEFING_TEXT" \
+       --json
+   ```
+   Exit codes: 0 pass · 1 fail (missing inputs in stdout JSON) · 2 skip (Tier 1) · 3 error.
+   Rules: `~/.claude/orchestrator/config/padrao_a_briefing_validators.yaml`.
+   Tests: `tests/test_padrao_a_briefing_validator.py` (30 tests).
 
    **Tier 1 wrappers (default route, no validation required):**
    - worker-pitch → `dario-pitch-polished` (+6.3 mean lift validated)

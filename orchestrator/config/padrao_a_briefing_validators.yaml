@@ -1,0 +1,197 @@
+# Padrão A — Briefing Validators for Tier 2 wrappers
+# ─────────────────────────────────────────────────────────────────────
+# These rules tell the dispatcher what a briefing MUST contain before
+# Tier 2 polished wrappers (brand, sales-letter) are dispatched. If a
+# briefing fails validation, the dispatcher should ask the user for
+# the missing inputs instead of letting the wrapper hit its internal
+# gate and abort silently.
+#
+# Why Tier 2 only:
+#   Wave 2 A/B test (2026-05-24, see PADRAO_A_AB_TEST_RESULTS.md) showed
+#   that dario-brand-polished and dario-sales-letter-polished aborted on
+#   2/3 briefings each — these skills are most sensitive to sparse input
+#   (positioning needs competitive context; copy needs testimonials).
+#
+# How validation works:
+#   For each required input, the briefing must match at least ONE keyword
+#   (case-insensitive) OR ONE regex pattern. Missing inputs are returned
+#   as a structured list so the caller can construct a clarification ask.
+#
+# This file is loaded by scripts/padrao_a_briefing_validator.py.
+
+validators:
+
+  worker-brand:
+    skill_client_facing: dario-brand-polished
+    rationale: "Brand work without competitive context produces generic positioning"
+    required_inputs:
+      competitive_context:
+        description: "Mention of named competitors OR competitive positioning words"
+        keywords:
+          - "vs"
+          - "versus"
+          - "compete"
+          - "compete with"
+          - "concorre"
+          - "concorrente"
+          - "concorrencia"
+          - "differential"
+          - "diferencial"
+          - "competitor"
+          - "competition"
+          - "market position"
+          - "alternativa"
+          - "alternative to"
+        patterns: []
+      tone_target:
+        description: "Target audience descriptor OR explicit tone register"
+        keywords:
+          - "HNW"
+          - "high net worth"
+          - "family office"
+          - "SMB"
+          - "SME"
+          - "Gen Z"
+          - "millennial"
+          - "boomer"
+          - "executive"
+          - "C-level"
+          - "CFO"
+          - "CEO"
+          - "CTO"
+          - "premium"
+          - "luxury"
+          - "mass-market"
+          - "professional"
+          - "casual"
+          - "formal"
+          - "playful"
+          - "premium"
+          - "audience"
+          - "target"
+          - "persona"
+          - "tom"
+          - "registro"
+          - "publico-alvo"
+          - "publico alvo"
+          - "ICP"
+        patterns: []
+    optional_inputs:
+      archetype_hint:
+        description: "Brand personality / archetype hint (skill picks if absent)"
+        keywords:
+          - "aspirational"
+          - "trustworthy"
+          - "innovative"
+          - "caring"
+          - "hero"
+          - "sage"
+          - "magician"
+          - "creator"
+          - "explorer"
+          - "rebel"
+          - "ruler"
+          - "jester"
+          - "everyman"
+          - "lover"
+          - "outlaw"
+          - "caregiver"
+          - "innocent"
+
+  worker-sales-letter:
+    skill_client_facing: dario-sales-letter-polished
+    rationale: "Long-form copy without testimonials + offer terms produces generic prose"
+    required_inputs:
+      testimonials_or_proof:
+        description: "Customer testimonials, case studies, social proof, or named clients"
+        keywords:
+          - "testimonial"
+          - "depoimento"
+          - "case study"
+          - "caso de"
+          - "caso real"
+          - "cliente disse"
+          - "client said"
+          - "review"
+          - "rating"
+          - "NPS"
+          - "n="
+          - "customers"
+          - "clientes"
+          - "users"
+          - "MAU"
+          - "DAU"
+          - "subscribers"
+          - "members"
+          - "ARR"
+          - "MRR"
+          - "GMV"
+        patterns:
+          - "\\d+[+]?\\s*(clientes|customers|users|families|families|membros|members)"
+      offer_terms:
+        description: "Specific pricing, offer terms, guarantee, or CTA"
+        keywords:
+          - "R$"
+          - "EUR"
+          - "USD"
+          - "preço"
+          - "preco"
+          - "price"
+          - "plano"
+          - "plan"
+          - "tier"
+          - "subscription"
+          - "free trial"
+          - "trial"
+          - "garantia"
+          - "guarantee"
+          - "refund"
+          - "money-back"
+          - "satisfacao"
+          - "satisfaction"
+          - "free"
+          - "gratis"
+          - "gratuito"
+          - "discount"
+          - "desconto"
+          - "off"
+        patterns:
+          - "\\d+\\s*(R\\$|EUR|USD|GBP|reais)"
+          - "(R\\$|EUR|USD|GBP|€|\\$)\\s*\\d+"
+          - "\\d+[\\.,]?\\d*/m[eê]s"
+          - "\\d+%\\s+(off|discount|desconto)"
+      audience_awareness:
+        description: "Awareness level (Schwartz 5) OR detailed persona/ICP"
+        keywords:
+          - "unaware"
+          - "problem-aware"
+          - "solution-aware"
+          - "product-aware"
+          - "most-aware"
+          - "schwartz"
+          - "persona"
+          - "ICP"
+          - "ideal customer"
+          - "target customer"
+          - "buyer persona"
+          - "publico alvo"
+          - "publico-alvo"
+          - "audience"
+          - "decision maker"
+          - "decisor"
+        patterns: []
+
+# ─────────────────────────────────────────────────────────────────────
+# Tier 1 workers — recorded here for completeness; validation NOT applied
+# ─────────────────────────────────────────────────────────────────────
+tier_1_no_validation_required:
+  - worker-pitch
+  - worker-offer
+  - worker-funnel
+  - worker-product
+  - worker-wp-audit
+  - worker-financial-model
+note: |
+  Tier 1 wrappers are robust enough that their internal gate handles sparse
+  input gracefully (output is still usable as draft + signals weak dims for
+  human review). They don't need pre-flight validation.

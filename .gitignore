@@ -53,6 +53,9 @@
 !orchestrator/quality/eval-baseline.yaml
 !orchestrator/quality/client-revenue.yaml.example
 
+# --- Allow Padrão A pre-flight validator config (Tier 2 briefing rules) ---
+!orchestrator/config/padrao_a_briefing_validators.yaml
+
 # --- Allow test suite + pytest config ---
 !orchestrator/tests/
 !orchestrator/tests/*.py
