@@ -90,12 +90,15 @@ jobs:
               "langgraph-checkpoint-sqlite>=2.0" "temporalio>=1.10" \
               "dspy>=2.5" "deepeval>=3.9"
 
-      - name: Run fast tests
+      - name: Run fast tests (aligned with pre-push hook markers)
         env:
           # Skip Ollama-dependent paths; conftest auto-mocks _embed by default.
           DARIO_TEST_MODE: "1"
         run: |
-          python -m pytest tests/ -m "not slow" \
+          # Marker filter MUST match scripts/hooks/pre-push to avoid CI/local drift.
+          # vip_only = tests that require proprietary modules; can't run in trial CI.
+          python -m pytest tests/ -m "not slow and not vip_only" \
+              --continue-on-collection-errors \
               --maxfail=5 \
               --tb=short \
               -q
