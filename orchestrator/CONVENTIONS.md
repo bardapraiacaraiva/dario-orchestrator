@@ -67,6 +67,36 @@ Runtime state is gitignored. Versioned files live in git.
 
 ---
 
+## Direct Anthropic API calls — MUST use TrackedAnthropic
+
+Any Python script that imports `anthropic` and calls `messages.create(...)`
+bills the API directly (not the Max subscription). These calls were
+invisible until 2026-05-24 when `TrackedAnthropic` was added to wrap
+them with spend logging.
+
+**Rule:** every new script using anthropic SDK MUST use the wrapper.
+
+```python
+# ❌ Don't (silent spend)
+from anthropic import Anthropic
+client = Anthropic()
+
+# ✅ Do (spend logged to dashboard)
+from scripts.anthropic_spend_wrapper import TrackedAnthropic
+client = TrackedAnthropic(caller="my-script/short-name")
+```
+
+Verify spend live:
+```bash
+python -m scripts.aggregate_api_spend         # CLI breakdown
+# Dashboard shows: "API Spend Direct" card with 24h/month/all-time
+```
+
+Existing scripts (compile_sprint3_v2, compile_sprint4) still use raw
+Anthropic — retrofit when next touched. New scripts: no excuse.
+
+---
+
 ## When in doubt
 
 1. Read `~/.claude/skills/dario-onboarding/SKILL.md` first (5-min tour with

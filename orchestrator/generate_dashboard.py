@@ -161,6 +161,21 @@ def generate():
     except Exception:
         spend_by_type = None
 
+    # Direct-script API spend (anthropic SDK calls via TrackedAnthropic wrapper)
+    api_spend = None
+    try:
+        from scripts.aggregate_api_spend import aggregate as api_aggregate
+        from scripts.aggregate_api_spend import load_entries as api_load_entries
+        _entries = api_load_entries()
+        if _entries:
+            api_spend = {
+                "last_24h": api_aggregate(_entries, window_hours=24),
+                "this_month": api_aggregate(_entries, month=datetime.now().strftime("%Y-%m")),
+                "all_time": api_aggregate(_entries),
+            }
+    except Exception:
+        api_spend = None
+
     pct = budget.get("percentage", 0)
     if isinstance(pct, str): pct = float(pct)
     budget_color = "green" if pct < 80 else "amber" if pct < 95 else "red"
@@ -463,6 +478,69 @@ def generate():
         spend_type_html += unknown_warning
         spend_type_summary = f"client {client_pct:.0f}% · dev {dev_pct:.0f}%"
 
+    # Direct-script API spend widget (gap #6 — visibility for scripts that
+    # bypass the orchestrator's subscription path and hit the API directly)
+    if api_spend is None:
+        api_spend_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:16px;">'
+            'Sem direct API calls registadas<br>'
+            '<span style="font-size:10px;">Scripts devem usar '
+            '<code>TrackedAnthropic</code> em vez de <code>Anthropic</code> '
+            'para serem visíveis aqui</span></div>'
+        )
+        api_spend_summary = "n=0"
+    else:
+        s24 = api_spend["last_24h"]
+        smonth = api_spend["this_month"]
+        sall = api_spend["all_time"]
+        usd_24h = s24["total_usd"]
+        usd_month = smonth["total_usd"]
+        calls_24h = s24["n_calls"]
+
+        # Color based on 24h spend severity (informational thresholds)
+        usd_color = "var(--green)" if usd_24h < 1 else \
+                    "var(--amber)" if usd_24h < 10 else "var(--red)"
+
+        api_spend_summary = f"${usd_24h:.2f} 24h · ${usd_month:.2f} mês"
+
+        # Top callers (by month)
+        callers = sorted(smonth["by_caller"].items(),
+                         key=lambda kv: kv[1]["cost_usd"], reverse=True)[:5]
+        callers_html = ""
+        for caller, m in callers:
+            caller_short = caller[:30]
+            callers_html += (
+                f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px;">'
+                f'<span style="flex:1;color:var(--dim);">{caller_short}</span>'
+                f'<span style="color:var(--dim);font-size:10px;width:40px;text-align:right;">{m["calls"]}c</span>'
+                f'<span style="color:var(--text);font-weight:600;width:60px;text-align:right;">${m["cost_usd"]:.4f}</span>'
+                f'</div>'
+            )
+        if not callers_html:
+            callers_html = '<div style="color:var(--dim);font-size:11px;text-align:center;padding:8px;">Sem chamadas este mês</div>'
+
+        api_spend_html = (
+            f'<div style="display:flex;gap:16px;justify-content:center;margin-bottom:14px;">'
+            f'<div style="text-align:center;">'
+            f'<div class="big-num" style="font-size:1.6rem;color:{usd_color};">${usd_24h:.2f}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">24h spend</div>'
+            f'<div style="font-size:9px;color:var(--dim);">{calls_24h} calls</div>'
+            f'</div>'
+            f'<div style="text-align:center;border-left:1px solid var(--border);padding-left:16px;">'
+            f'<div class="big-num" style="font-size:1.6rem;color:var(--cyan);">${usd_month:.2f}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Mês {datetime.now().strftime("%Y-%m")}</div>'
+            f'<div style="font-size:9px;color:var(--dim);">{smonth["n_calls"]} calls</div>'
+            f'</div>'
+            f'<div style="text-align:center;border-left:1px solid var(--border);padding-left:16px;">'
+            f'<div class="big-num" style="font-size:1.6rem;">${sall["total_usd"]:.2f}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">All-time</div>'
+            f'<div style="font-size:9px;color:var(--dim);">{sall["n_calls"]} calls</div>'
+            f'</div>'
+            f'</div>'
+            f'<div style="font-size:10px;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Top callers (this month) · calls · cost</div>'
+            f'{callers_html}'
+        )
+
     # Pulse time
     pulse_time = pulse.get("pulse_time", "nunca")
     if isinstance(pulse_time, str) and "T" in pulse_time:
@@ -591,6 +669,15 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
       Token attribution dev (DARIO internal) vs client (paid work) · fonte: config/project_types.yaml
     </div>
     {spend_type_html}
+  </div>
+
+  <!-- DIRECT API SPEND — anthropic SDK scripts (gap #6) -->
+  <div class="card">
+    <h3>API Spend Direct ({api_spend_summary})</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Scripts que usam anthropic SDK directo (DSPy, judge, etc.) · NÃO conta subscription work
+    </div>
+    {api_spend_html}
   </div>
 
   <!-- SYSTEM HEALTH -->
