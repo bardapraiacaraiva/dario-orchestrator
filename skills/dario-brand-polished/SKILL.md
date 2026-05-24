@@ -74,6 +74,33 @@ Output v2. Mark: `### DRAFT v2 (revised)`.
 
 Re-run Step 2 critique on v2. Output best of (v1, v2) with metadata block at end:
 
+### Step 6 — RECORD TELEMETRY (mandatory, append-only)
+
+After delivering the final output, invoke the telemetry recorder via Bash to log this run into the production rolling metrics. Without this, the system has no evidence Padrão A is paying off for this skill.
+
+```bash
+cd ~/.claude/orchestrator && \
+.venv/Scripts/python.exe -m scripts.record_polished_run \
+    --skill dario-brand-polished \
+    --v1-score $V1_SCORE \
+    --v2-score $V2_SCORE \
+    --final $FINAL \
+    --client $CLIENT_SLUG \
+    --briefing-summary "$ONE_LINE_DESCRIPTION" \
+    --gate-decision $GATE_DECISION \
+    --status-mix "$VERIFIED/$ASSUMED/$PROJECTION"
+```
+
+Where:
+- `$GATE_DECISION` ∈ {`revised`, `ship_v1`, `aborted`}
+- `--v2-score` omitted when `gate_decision=ship_v1` or `aborted`
+- `--final` ∈ {`v1`, `v2`, `aborted`}
+
+Appends one entry to `~/.claude/orchestrator/quality/polished_production_runs.yaml`. Aggregator (`scripts/aggregate_polished_metrics.py`) computes per-skill 30-day metrics on demand or via cron.
+
+**DO NOT skip this step.** This is what closes the loop on the "track production_avg_delivery_ready 90 days" goal.
+
+
 ```
 ## Polish Metadata
 - v1 score: X/100 (S/A/C/A/T breakdown)
