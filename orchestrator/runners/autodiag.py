@@ -55,7 +55,31 @@ COMPANY_FILE = ORCH_DIR / "company.yaml"
 QUALITY_FILE = ORCH_DIR / "quality" / "skill-metrics.yaml"
 BUDGET_DIR = ORCH_DIR / "budgets"
 AUDIT_DIR = ORCH_DIR / "audit"
-MEMORY_DIR = Path.home() / ".claude" / "projects" / "C--Users-barda" / "memory"
+def _resolve_memory_dir() -> Path:
+    """Resolve the auto-memory dir without hard-coding a user slug.
+
+    Claude Code creates dirs like ~/.claude/projects/C--Users-<user>/memory/.
+    We pick the first existing one (there's usually only one per user).
+    Falls back to barda's path for legacy compat if no match found.
+    Override via DARIO_MEMORY_DIR env var for multi-tenant installs (RFC §5 PW-1).
+    """
+    import os
+    override = os.environ.get("DARIO_MEMORY_DIR")
+    if override:
+        return Path(override)
+
+    projects_dir = Path.home() / ".claude" / "projects"
+    if projects_dir.exists():
+        for child in projects_dir.iterdir():
+            if child.is_dir() and (child / "memory").is_dir():
+                return child / "memory"
+
+    # Last-resort fallback (legacy barda path) — preserves existing behavior
+    # when the new logic finds nothing.
+    return Path.home() / ".claude" / "projects" / "C--Users-barda" / "memory"
+
+
+MEMORY_DIR = _resolve_memory_dir()
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("autodiag")

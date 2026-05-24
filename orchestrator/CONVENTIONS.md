@@ -67,6 +67,31 @@ Runtime state is gitignored. Versioned files live in git.
 
 ---
 
+## Path discipline — NO hardcoded user slugs
+
+Every path in production code MUST use `Path.home()` or an env var override.
+NEVER hardcode user-specific slugs like `C--Users-barda`, `/Users/barda/`,
+or `barda` in path strings.
+
+```python
+# ❌ Don't — breaks for any other user / multi-tenant install
+MEMORY_DIR = Path("/c/Users/barda/.claude/projects/C--Users-barda/memory")
+
+# ✅ Do — works on any machine
+MEMORY_DIR = Path.home() / ".claude" / "projects" / "<resolved>" / "memory"
+# Or with env var override (RFC §5 PW-1 pattern):
+override = os.environ.get("DARIO_MEMORY_DIR")
+```
+
+Enforced by `tests/test_no_hardcoded_user_paths.py` — pre-push hook
+catches violations.
+
+Why: RFC_MULTI_TENANT.md Path B (per-tenant install) assumes each
+client's `~/.claude/` is parameterized via `Path.home()`. One hardcoded
+user slug breaks isolation for the next client install.
+
+---
+
 ## Direct Anthropic API calls — MUST use TrackedAnthropic
 
 Any Python script that imports `anthropic` and calls `messages.create(...)`
