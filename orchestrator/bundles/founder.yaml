@@ -17,10 +17,13 @@ bundle:
     - capital R$ 30-200K
     - horizon 0-12 meses ao lançamento
 
+  # Pricing simplified 2026-05-24 per RFC_STRATEGIC_DECISIONS Risk #4:
+  # 3-tier structure (R$ 297/997/2997) was theatre — consulting model (C framing)
+  # uses single tier + per-engagement contract instead.
   pricing:
-    tier_1_starter: { price_brl: 297, includes: ["a360_pre_pmf", "brand_starter"] }
-    tier_2_pro: { price_brl: 997, includes: ["a360_pre_pmf", "a360_offer_pack", "brand_pro", "copy_starter"] }
-    tier_3_full: { price_brl: 2997, includes: ["a360_full_lifecycle", "brand_pro", "copy_full", "1on1_support"] }
+    install: { price_brl: 997, includes: ["a360_full_lifecycle", "brand_pro", "copy_full"] }
+    # For consulting engagements (Automation Solution AI), pricing is per-contract
+    # — see commercial terms in each client engagement, not in this bundle.
 
   squads_included:
     a360:

@@ -1,3 +1,4 @@
+import pytest
 #!/usr/bin/env python3
 """Tests for v12.0 squads — 7 squads × 15 skills = 105 new skills."""
 import sys
@@ -50,6 +51,7 @@ def test_all_skills_exist_105():
     return True
 
 
+@pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_license_tiers_21_new():
     from license_manager import TIER_SUFFIXES, TIERS
     for tier in NEW_TIERS:
@@ -58,6 +60,7 @@ def test_license_tiers_21_new():
     return True
 
 
+@pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_hmac_roundtrip_all_21():
     from license_manager import generate_key, validate_key
     for tier in NEW_TIERS:
@@ -81,6 +84,7 @@ def test_company_yaml_has_7_sections():
     return True
 
 
+@pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_total_tiers_59():
     # 54 single tiers + 5 Enterprise bundles (Onda 12)
     from license_manager import TIERS

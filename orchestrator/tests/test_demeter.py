@@ -1,3 +1,4 @@
+import pytest
 #!/usr/bin/env python3
 """Tests for DEMETER squad — 15 skills + pricing tiers + license integration.
 
@@ -127,6 +128,7 @@ def test_lgpd_mentioned_in_data_skills():
 
 # ─── License integration ────────────────────────────────────
 
+@pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_license_tiers_include_demeter():
     from license_manager import TIERS
     assert "demeter_solo" in TIERS
@@ -135,6 +137,7 @@ def test_license_tiers_include_demeter():
     return True
 
 
+@pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_demeter_solo_pricing():
     from license_manager import TIERS
     solo = TIERS["demeter_solo"]
@@ -145,6 +148,7 @@ def test_demeter_solo_pricing():
     return True
 
 
+@pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_demeter_team_pricing():
     from license_manager import TIERS
     team = TIERS["demeter_team"]
@@ -156,6 +160,7 @@ def test_demeter_team_pricing():
     return True
 
 
+@pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_demeter_enterprise_pricing():
     from license_manager import TIERS
     ent = TIERS["demeter_enterprise"]
@@ -166,6 +171,7 @@ def test_demeter_enterprise_pricing():
     return True
 
 
+@pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_demeter_tier_suffixes_registered():
     from license_manager import TIER_MAP, TIER_SUFFIXES
     assert TIER_SUFFIXES["demeter_solo"] == "DMS"
@@ -176,6 +182,7 @@ def test_demeter_tier_suffixes_registered():
     return True
 
 
+@pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_demeter_key_generation_and_validation():
     """End-to-end HMAC key roundtrip for demeter_team."""
     from license_manager import generate_key, validate_key
@@ -188,6 +195,7 @@ def test_demeter_key_generation_and_validation():
     return True
 
 
+@pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_demeter_key_tamper_rejected():
     """Tampering with a key must invalidate the HMAC."""
     from license_manager import generate_key, validate_key

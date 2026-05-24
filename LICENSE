@@ -3,30 +3,81 @@ Copyright (c) 2026 Barda / Automation Solution AI (marco@automationsolutionai.co
 
 ALL RIGHTS RESERVED. This is proprietary software, not open-source.
 
-The full license text is in `orchestrator/LICENSE`. A short summary:
+────────────────────────────────────────────────────────────────────────
+Honest summary (post 2026-05-24 strategic decision)
+────────────────────────────────────────────────────────────────────────
 
-  1. EVALUATION LICENSE (7-day trial)
-     - One copy on one device for evaluation purposes
-     - Reading the source code to understand behavior is permitted
-     - Automatic termination after 7 days
+DARIO is a prompt library + helper scripts for Claude Code, operated as
+a consulting accelerator under Automation Solution AI. The value lives
+in:
 
-  2. COMMERCIAL LICENSE (after purchase of a valid key)
-     - Scope determined by the tier suffix in the key (DARIO-XXXX-...-SUF)
-     - 59 tiers available, including 5 Onda 12 bundles
-     - Includes updates for the duration of the paid subscription
+  - Curation: 580+ skills organised across 32 squads
+  - Workflow design: Padrão A polished wrappers, dispatch patterns,
+    pre-flight validators, telemetry layer
+  - Operator know-how: barda's hands-on engagement with each client
 
-  3. PROHIBITED under both licenses
-     - Redistribution of the Software, in whole or in part
-     - Derivative works (ports, clean-room reimplementations, rebranding)
-     - Reverse engineering of license enforcement
-     - Sublicensing, lease, or sale to third parties
-     - Building competing products that reuse the architecture, skill
-       catalog organisation, or pricing tier model
+The value does NOT live in obfuscated binaries or cryptographic anti-
+piracy measures. Those were removed 2026-05-24 (see
+orchestrator/RFC_STRATEGIC_DECISIONS.md) because they defended against
+zero real threats. A determined attacker bypasses any obfuscation in
+30 minutes; the cost/benefit was negative.
 
-For commercial inquiries, license purchases, partnerships, or written
-authorisation to redistribute:
+────────────────────────────────────────────────────────────────────────
+What you can do
+────────────────────────────────────────────────────────────────────────
 
-    Email: barda@automationsolutionai.com
-    Web:   https://github.com/bardapraiacaraiva/dario-orchestrator
+1. EVALUATION (7-day trial, no key required)
+   - Install on one machine for evaluation
+   - Read source code to understand behavior
+   - Run all skills, scripts, tests
+   - Automatic expiry after 7 days unless activated
 
-See `orchestrator/LICENSE` for the complete legally-binding text.
+2. WITH A VALID LICENSE KEY (purchased via barda@automationsolutionai.com)
+   - Use indefinitely (PRO = R$ 297/month) or higher tier
+   - Apply to your own client work
+   - Receive updates + barda's support during paid period
+
+3. AUTOMATION SOLUTION AI ENGAGEMENT (consulting model)
+   - Per-engagement contract terms (not covered by this LICENSE alone)
+   - DARIO installed at your company, barda operates with you
+   - Pricing tied to results, not tool usage
+
+────────────────────────────────────────────────────────────────────────
+What you cannot do
+────────────────────────────────────────────────────────────────────────
+
+  - Redistribute the Software, in whole or in part, without written
+    permission
+  - Sublicense, lease, or resell to third parties
+  - Build competing commercial products by repackaging this codebase
+  - Remove copyright notices
+
+You CAN:
+  - Fork privately for your own use under an active license
+  - Modify your local copy (no obligation to share modifications)
+  - Read all source code (no obfuscation is in place)
+
+────────────────────────────────────────────────────────────────────────
+Contact
+────────────────────────────────────────────────────────────────────────
+
+Email: barda@automationsolutionai.com
+Web:   https://github.com/bardapraiacaraiva/dario-orchestrator
+
+For commercial inquiries, license purchases, partnerships, custom
+engagements (Automation Solution AI model), or written redistribution
+permission.
+
+────────────────────────────────────────────────────────────────────────
+Legal text
+────────────────────────────────────────────────────────────────────────
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+Use in violation of the terms above terminates the license immediately.
