@@ -129,6 +129,38 @@ Run Step 2 critique against v2. Then pick:
 - A/B baseline available via: `dario-pitch` skill on same briefing
 ```
 
+### Step 6 — RECORD TELEMETRY (mandatory, append-only)
+
+After delivering the pitch, invoke the telemetry recorder via Bash to log this
+run into the production rolling metrics. This is what closes the loop on
+"track production_avg_delivery_ready 90 days" — without it, the system has no
+evidence Padrão A is paying off.
+
+```bash
+cd ~/.claude/orchestrator && \
+.venv/Scripts/python.exe -m scripts.record_polished_run \
+    --skill dario-pitch-polished \
+    --v1-score $V1_SCORE \
+    --v2-score $V2_SCORE \
+    --final $FINAL \
+    --client $CLIENT_SLUG \
+    --briefing-summary "$ONE_LINE_DESCRIPTION" \
+    --gate-decision $GATE_DECISION \
+    --status-mix "$VERIFIED/$ASSUMED/$PROJECTION"
+```
+
+Where:
+- `$GATE_DECISION` ∈ {`revised`, `ship_v1`, `aborted`}
+- `--v2-score` omitted when `gate_decision=ship_v1` or `aborted`
+- `--final` ∈ {`v1`, `v2`, `aborted`}
+
+This appends one entry to `~/.claude/orchestrator/quality/polished_production_runs.yaml`.
+Aggregator (`scripts/aggregate_polished_metrics.py`) reads the file and
+computes per-skill 30-day metrics on demand or via cron.
+
+**DO NOT skip this step.** Telemetry without data is the failure mode that
+made DSPy investigation drift on hypotheses for 2 sprints.
+
 ---
 
 ## Why this works (and why it's not magic)
