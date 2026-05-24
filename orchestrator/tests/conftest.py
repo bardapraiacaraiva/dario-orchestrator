@@ -66,13 +66,24 @@ def pytest_configure(config):
 
 @pytest.fixture(autouse=True)
 def mock_ollama_embed(request, monkeypatch):
-    """Replace `semantic_dispatch._embed` with a deterministic mock by default."""
+    """Replace `semantic_dispatch._embed` with a deterministic mock by default.
+
+    If `semantic_dispatch` is unavailable (e.g. trial repo where it's a VIP
+    stub that raises ImportError), this becomes a no-op — the test simply
+    doesn't get embedding mocking. Tests that don't use embeddings work fine;
+    tests that do will hit a different error closer to their actual usage.
+    """
     if request.node.get_closest_marker("real_embedding"):
         # Test opted out — let it use the real Ollama HTTP client.
         yield
         return
 
-    import semantic_dispatch
+    try:
+        import semantic_dispatch
+    except ImportError:
+        # VIP-only module not available in this install — fixture becomes no-op
+        yield
+        return
 
     monkeypatch.setattr(semantic_dispatch, "_embed", _deterministic_embed)
 
