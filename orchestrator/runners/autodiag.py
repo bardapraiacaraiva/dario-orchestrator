@@ -410,6 +410,82 @@ def check_quality_regression(tasks: list, fix: bool) -> dict:
     return {"id": "quality_regression", "severity": "critical", "passed": len(issues) == 0, "issues": issues}
 
 
+def check_skill_regression(tasks: list, fix: bool) -> dict:
+    """Per-skill regression detection.
+
+    Trigger: any skill whose last 5 live_scores show mean drop >= 10 pts
+    vs that skill's avg_quality_score baseline. Routes to pending-review.yaml.
+
+    Unlike check_quality_regression (global mean), this catches skill-level
+    degradation that gets masked by stable global averages.
+    """
+    if not QUALITY_FILE.exists():
+        return {"id": "skill_regression", "severity": "critical", "passed": True, "issues": [], "note": "no metrics"}
+
+    metrics = load_yaml(str(QUALITY_FILE))
+    skills = (metrics or {}).get("skills") or {}
+
+    issues = []
+    flagged_for_review = []
+
+    for skill_name, sd in skills.items():
+        if not isinstance(sd, dict):
+            continue
+        # Collect live_scores from any field that exposes them
+        live = sd.get("live_scores") or sd.get("live_scores_compiled_sprint3v2") or \
+               sd.get("live_scores_compiled_sprint3") or sd.get("live_scores_compiled") or []
+        if not isinstance(live, list) or len(live) < 5:
+            continue
+        last_5 = [float(s) for s in live[-5:] if isinstance(s, (int, float))]
+        if len(last_5) < 5:
+            continue
+        baseline = float(sd.get("avg_quality_score", 0) or 0)
+        if baseline <= 0:
+            continue
+        last_5_avg = sum(last_5) / 5
+        drop = baseline - last_5_avg
+        if drop >= 10.0:
+            issues.append({
+                "skill": skill_name,
+                "baseline": round(baseline, 1),
+                "last_5_avg": round(last_5_avg, 1),
+                "drop": round(drop, 1),
+                "tier": sd.get("tier", "unknown"),
+                "action": f"per-skill regression: {skill_name} dropped {round(drop,1)}pts over last 5 runs",
+            })
+            flagged_for_review.append({
+                "skill": skill_name,
+                "reason": "skill_regression",
+                "drop_pts": round(drop, 1),
+                "detected_at": datetime.now(UTC).isoformat(),
+            })
+
+    # Auto-route to pending-review.yaml (non-destructive: append-only)
+    if fix and flagged_for_review:
+        review_path = ORCH_DIR / "quality" / "pending-review.yaml"
+        try:
+            existing = load_yaml(str(review_path)) if review_path.exists() else {}
+            if not isinstance(existing, dict):
+                existing = {}
+            queue = existing.get("regression_queue") or []
+            existing_skills = {item.get("skill") for item in queue if isinstance(item, dict)}
+            for entry in flagged_for_review:
+                if entry["skill"] not in existing_skills:
+                    queue.append(entry)
+            existing["regression_queue"] = queue
+            existing["last_skill_regression_scan"] = datetime.now(UTC).isoformat()
+            dump_yaml(existing, str(review_path))
+        except Exception as e:
+            log.warning(f"skill_regression: failed to write pending-review.yaml: {e}")
+
+    return {
+        "id": "skill_regression",
+        "severity": "critical",
+        "passed": len(issues) == 0,
+        "issues": issues,
+    }
+
+
 def check_memory_staleness(fix: bool) -> dict:
     """Check if project memories are stale (>30 days)."""
     issues = []
@@ -454,6 +530,7 @@ def run_all_checks(fix: bool = False, single: str = None) -> list:
         "budget_drift": lambda: check_budget_drift(tasks, fix),
         "stale_review": lambda: check_stale_review(tasks, fix),
         "quality_regression": lambda: check_quality_regression(tasks, fix),
+        "skill_regression": lambda: check_skill_regression(tasks, fix),
         "memory_staleness": lambda: check_memory_staleness(fix),
     }
 

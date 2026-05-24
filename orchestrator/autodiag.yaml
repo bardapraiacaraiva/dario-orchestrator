@@ -51,6 +51,13 @@ checks:
     auto_fix: false
     fix_action: "Flag quality regression, notify user, pause auto-execution"
 
+  - id: skill_regression
+    name: "Per-Skill Quality Regression"
+    description: "Per-skill check: any skill whose last 5 live_scores show mean drop >=10pts vs its avg_quality_score baseline. Catches degradation masked by stable global mean."
+    severity: critical
+    auto_fix: true
+    fix_action: "Append flagged skill to quality/pending-review.yaml regression_queue"
+
   - id: memory_staleness
     name: "Memory Staleness Check"
     description: "Check if project memories are >30 days old without update"
