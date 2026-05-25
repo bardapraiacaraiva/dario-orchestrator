@@ -221,7 +221,7 @@ def test_context_injector_integration():
         }],
     })
     try:
-        from context_injector import get_skill_hints
+        from cognitive.context_injector import get_skill_hints
         rendered = get_skill_hints(SANDBOX_SKILL)
         assert "Foo" in rendered, f"learned hint not picked up: {rendered}"
         return True

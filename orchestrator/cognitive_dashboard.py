@@ -99,7 +99,7 @@ def collect_cot_health() -> dict:
 
 
 def collect_semantic_memory() -> dict:
-    from episode_promoter import stats as ep_stats
+    from cognitive.episode_promoter import stats as ep_stats
     s = ep_stats()
     # Read recent patterns from disk
     sem_dir = ORCH_DIR / "memory" / "semantic"

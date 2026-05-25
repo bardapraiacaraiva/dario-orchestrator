@@ -96,7 +96,7 @@ def validate_task(task_id: str, strict: bool = False) -> dict:
     # any technical validation. Previously defined in YAML but never invoked.
     try:
         sys.path.insert(0, str(ORCH_DIR))
-        from ethical_gate import evaluate as ethical_evaluate
+        from safety.ethical_gate import evaluate as ethical_evaluate
         eg = ethical_evaluate(task)
         result["checks"]["ethical_gate"] = eg["verdict"] != "FAIL"
         result["ethical_gate"] = {

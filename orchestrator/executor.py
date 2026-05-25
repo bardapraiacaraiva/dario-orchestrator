@@ -63,12 +63,12 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-from approval_gates import get_approval_level, request_approval
+from safety.approval_gates import get_approval_level, request_approval
 from artifact_schemas import SchemaValidationFilter
 from checkpoint_interrupt import interrupt_task, should_interrupt
 from db import DB
 from filter_pipeline import BudgetFilter, FilterPipeline, LoggingFilter, QualityGateFilter, TokenBudgetFilter
-from guardrails import validate_task
+from safety.guardrails import validate_task
 from model_router import ModelRouterFilter
 from output_guardrails import OutputGuardrailFilter
 
@@ -385,7 +385,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
         # ─── AUTO-LEARN (capture insights from high-quality tasks) ────────
         if score >= 90:
             try:
-                from memory_blocks import auto_learn
+                from cognitive.memory_blocks import auto_learn
                 auto_learn(output[:200], scope=project or "global", skill=skill, score=score)
             except Exception:
                 pass
@@ -395,7 +395,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
             # promote new candidates to semantic memory. Idempotent: existing
             # SEM-*.yaml entries are skipped, so re-runs are safe.
             try:
-                from episode_promoter import promote as _promote_episodes
+                from cognitive.episode_promoter import promote as _promote_episodes
                 _promote_episodes(days=7, generate_rules=True, verbose=False)
             except Exception:
                 pass

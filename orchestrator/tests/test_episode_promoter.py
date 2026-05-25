@@ -8,7 +8,7 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 
-import episode_promoter as ep_module
+from cognitive import episode_promoter as ep_module
 
 
 def test_load_episodes_returns_list():

@@ -206,7 +206,7 @@ def get_checkpoint(task_id: str) -> dict:
 
 # Unified with approval_gates.py (fixed: was divergent duplicate list)
 try:
-    from approval_gates import POLICY_APPROVAL, SKILL_APPROVAL
+    from safety.approval_gates import POLICY_APPROVAL, SKILL_APPROVAL
     APPROVAL_REQUIRED_SKILLS = {s for s, level in SKILL_APPROVAL.items() if level in ("approve", "dual")}
     APPROVAL_REQUIRED_POLICIES = {p for p, level in POLICY_APPROVAL.items() if level in ("approve", "dual")}
 except ImportError:

@@ -145,7 +145,7 @@ def _run_job(name: str, fn):
 def job_promote_episodes() -> dict:
     """Episode → Semantic promotion (last 24h window)."""
     sys.path.insert(0, str(ORCH_DIR))
-    from episode_promoter import promote, stats
+    from cognitive.episode_promoter import promote, stats
     pre_stats = stats()
     result = promote(days=1, generate_rules=True, verbose=False)
     post_stats = stats()
@@ -205,7 +205,7 @@ def job_state_snapshot() -> dict:
     except Exception as e:
         snapshot["qvalue_error"] = str(e)[:100]
     try:
-        from episode_promoter import stats as ep_stats
+        from cognitive.episode_promoter import stats as ep_stats
         snapshot["semantic"] = ep_stats()
     except Exception as e:
         snapshot["semantic_error"] = str(e)[:100]

@@ -69,6 +69,16 @@
 !orchestrator/enforcement/
 !orchestrator/enforcement/*.py
 
+# --- Allow safety package (Recommendation #2 stage 1, 2026-05-25) ---
+!orchestrator/safety/
+!orchestrator/safety/*.py
+
+# --- Allow finance + cognitive packages (Recommendation #2 stage 2, 2026-05-25) ---
+!orchestrator/finance/
+!orchestrator/finance/*.py
+!orchestrator/cognitive/
+!orchestrator/cognitive/*.py
+
 # --- Allow test suite + pytest config ---
 !orchestrator/tests/
 !orchestrator/tests/*.py

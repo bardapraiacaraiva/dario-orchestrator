@@ -33,8 +33,8 @@ RESTORED_MODULES = [
     "chain_graph",
     "dispatch_cot",
     "dynamic_branch",
-    "episode_promoter",
-    "ethical_gate",
+    "cognitive.episode_promoter",  # moved 2026-05-25 in Phase 4 stage 2
+    "safety.ethical_gate",         # moved 2026-05-25 in Phase 4 stage 1
     "executor",
     "golden_eval",
     "prompt_hints",
@@ -77,7 +77,7 @@ def test_restored_module_imports(mod_name):
     ("cron_daily.py", "--help"),
     ("golden_eval.py", "--help"),
     ("synaptic_update.py", "--help"),
-    ("episode_promoter.py", "--help"),
+    ("cognitive/episode_promoter.py", "--help"),  # moved 2026-05-25 Phase 4 stage 2
     ("dispatch_cot.py", "--help"),
 ])
 def test_critical_cli_help(module_file, help_arg):

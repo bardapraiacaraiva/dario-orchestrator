@@ -9,7 +9,7 @@ sys.path.insert(0, str(ORCH_DIR))
 
 import pytest
 
-from ethical_gate import evaluate
+from safety.ethical_gate import evaluate
 
 pytestmark = pytest.mark.slow
 
