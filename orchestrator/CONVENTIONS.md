@@ -162,6 +162,37 @@ idempotent backfill from YAML/JSONL to SQLite.
 
 ---
 
+## Pre-dispatch enforcement layer — MANDATORY for orchestrated work
+
+Closed audit Risk #1 (2026-05-25): "max 3 parallel", "stop at 95% budget",
+"validate task schema" were Claude-honored markdown rules. Now they're
+Python-enforced rails that raise exceptions on violation.
+
+Every dispatcher (orchestrator, autopilot, ad-hoc scripts) MUST call:
+
+```python
+from enforcement.budget_gate import check_budget_or_raise
+from enforcement.dispatch_validator import validate_task_or_raise
+from enforcement.parallelism_guard import slot
+
+check_budget_or_raise()                    # raises BudgetExceededError at >=95%
+resolved_skill = validate_task_or_raise(task)  # raises TaskValidationError on bad input
+with slot(caller="<dispatcher-name>"):     # raises ParallelismExceededError at max
+    dispatch_to_worker(task, resolved_skill)
+```
+
+Skipping any of the 3 means accepting silent over-spend, malformed tasks,
+or parallelism violations. The whole point is to make those impossible
+at the Python level, not just "I hope Claude remembers".
+
+Concurrency: parallelism_guard uses portalocker so 2 Python processes
+can't both believe they're under the limit. Tested with 5 racing threads:
+exactly max_parallel succeed, the rest raise.
+
+Tests: tests/test_enforcement_layer.py — 32 behavior tests in <2s.
+
+---
+
 ## When in doubt
 
 1. Read `~/.claude/skills/dario-onboarding/SKILL.md` first (5-min tour with

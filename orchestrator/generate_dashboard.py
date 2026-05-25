@@ -184,6 +184,22 @@ def generate():
     except Exception:
         drift_events = None
 
+    # Enforcement layer state (Risk #1 thin layer)
+    enforcement_state = None
+    try:
+        from enforcement.parallelism_guard import active_slots, _get_max_parallel
+        from enforcement.budget_gate import is_budget_safe, DEFAULT_HARDSTOP_PCT
+        slots = active_slots()
+        enforcement_state = {
+            "active_slots": len(slots),
+            "max_parallel": _get_max_parallel(),
+            "slot_callers": [s.get("caller", "?") for s in slots[:5]],
+            "budget_safe": is_budget_safe(),
+            "budget_hardstop": DEFAULT_HARDSTOP_PCT,
+        }
+    except Exception:
+        enforcement_state = None
+
     pct = budget.get("percentage", 0)
     if isinstance(pct, str): pct = float(pct)
     budget_color = "green" if pct < 80 else "amber" if pct < 95 else "red"
@@ -592,6 +608,44 @@ def generate():
         )
         drift_summary = f"{len(drift_events)} events"
 
+    # Enforcement layer widget (Risk #1)
+    if enforcement_state is None:
+        enforcement_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:14px;">'
+            'Enforcement layer not available</div>'
+        )
+        enforcement_summary = "unavailable"
+    else:
+        slots_used = enforcement_state["active_slots"]
+        slots_max = enforcement_state["max_parallel"]
+        budget_safe = enforcement_state["budget_safe"]
+        slots_color = ("var(--green)" if slots_used < slots_max
+                       else "var(--red)")
+        budget_color = "var(--green)" if budget_safe else "var(--red)"
+        budget_label = "SAFE" if budget_safe else "BLOCKED"
+        callers_html = ""
+        if enforcement_state["slot_callers"]:
+            callers_html = (
+                '<div style="font-size:10px;color:var(--dim);margin-top:6px;">'
+                'Active: ' + ", ".join(enforcement_state["slot_callers"]) +
+                '</div>'
+            )
+        enforcement_html = (
+            f'<div style="display:flex;gap:16px;justify-content:center;margin-bottom:10px;">'
+            f'<div style="text-align:center;">'
+            f'<div class="big-num" style="font-size:1.6rem;color:{slots_color};">'
+            f'{slots_used}/{slots_max}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Parallel slots</div>'
+            f'</div>'
+            f'<div style="text-align:center;border-left:1px solid var(--border);padding-left:16px;">'
+            f'<div class="big-num" style="font-size:1.6rem;color:{budget_color};">{budget_label}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Budget gate (≥{enforcement_state["budget_hardstop"]:.0f}%)</div>'
+            f'</div>'
+            f'</div>'
+            f'{callers_html}'
+        )
+        enforcement_summary = f"{slots_used}/{slots_max} slots, budget {budget_label}"
+
     # Pulse time
     pulse_time = pulse.get("pulse_time", "nunca")
     if isinstance(pulse_time, str) and "T" in pulse_time:
@@ -738,6 +792,15 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
       Polished wrappers running on a model different from their `tested_with_model` declaration
     </div>
     {drift_html}
+  </div>
+
+  <!-- ENFORCEMENT LAYER — Risk #1 thin layer (parallelism + budget gate) -->
+  <div class="card">
+    <h3>Enforcement Layer ({enforcement_summary})</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Real Python guards on critical invariants · parallelism + budget hard-stop
+    </div>
+    {enforcement_html}
   </div>
 
   <!-- SYSTEM HEALTH -->

@@ -240,16 +240,53 @@ For each task, determine the best executor:
 
    **Reference:** `orchestrator/PADRAO_A_AB_TEST_RESULTS.md` for full validation data (26 briefings, 8 wrappers, 62% gate-pass rate, mean lift +6.5pts).
 
-4. **Assign task** (atomic checkout):
+4. **MANDATORY pre-dispatch enforcement** (added 2026-05-25, closes Risk #1):
+
+   Before any actual dispatch decision, call the 3 Python enforcement guards.
+   These RAISE on violation (not warnings). Failure = blocked dispatch.
+
+   ```bash
+   # All 3 callable directly via Bash, or import in Python:
+   python -c "
+   import sys
+   sys.path.insert(0, '$HOME/.claude/orchestrator')
+   from enforcement.budget_gate import check_budget_or_raise
+   from enforcement.dispatch_validator import validate_task_or_raise
+   from enforcement.parallelism_guard import claim_slot, release_slot
+
+   # 1. Budget gate (raises BudgetExceededError at >=95%)
+   check_budget_or_raise()
+
+   # 2. Task validation (raises TaskValidationError on bad schema)
+   resolved_skill = validate_task_or_raise(task_dict)
+
+   # 3. Parallelism slot (raises ParallelismExceededError at max)
+   slot_id = claim_slot(caller='dario-orchestrator')
+   try:
+       # ... actual dispatch ...
+   finally:
+       release_slot(slot_id)
+   "
+   ```
+
+   These guards are tested with REAL behavior tests (32 tests, including
+   concurrent threading proving max parallel is enforced cross-process).
+   Skipping them returns the orchestrator to pre-2026-05-25 state where
+   invariants were honor-system markdown rules.
+
+   See `orchestrator/CONVENTIONS.md` "Pre-dispatch enforcement layer" and
+   `orchestrator/enforcement/` package.
+
+5. **Assign task** (atomic checkout):
    - Set `assignee` to the chosen worker ID
    - Set `skill` field on the task to `dispatch_skill` (resolved in step 3)
    - Set `status` to `todo`
    - Set `checked_out_at` timestamp
    - Only ONE agent can own a task at a time
 
-5. **Plan parallelism:**
+6. **Plan parallelism:**
    - Independent tasks run simultaneously via Agent tool
-   - Maximum 3 parallel workers per heartbeat (cost + context)
+   - Max parallel ENFORCED by `enforcement.parallelism_guard` (not honor system)
    - Tasks with `depends_on` wait for predecessors to reach `done`
 
 ### Phase 4: EXECUTE (Heartbeat Windows)

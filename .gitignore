@@ -63,6 +63,10 @@
 !orchestrator/scripts/hooks/
 !orchestrator/scripts/hooks/*
 
+# --- Allow enforcement layer (Risk #1 thin enforcement, 2026-05-25) ---
+!orchestrator/enforcement/
+!orchestrator/enforcement/*.py
+
 # --- Allow test suite + pytest config ---
 !orchestrator/tests/
 !orchestrator/tests/*.py
