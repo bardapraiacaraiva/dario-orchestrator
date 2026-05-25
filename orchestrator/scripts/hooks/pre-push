@@ -70,5 +70,22 @@ if [ "$ERRORS" -gt 0 ]; then
     echo "[pre-push] Fix the import/syntax issue, then re-run the push."
     exit 1
 fi
+
+# Sanity check: if pytest ran for <2s OR reported 0 passed, something went
+# wrong (test interrupted, pytest crashed, all tests filtered out). Refuse
+# to push to avoid false-positive "PASS" like the 2026-05-25 incident where
+# a killed pytest reported "0 tests passed (966s)" and proceeded.
+# (Fix: Faixa 2 #3 follow-up, 2026-05-25)
+MIN_EXPECTED_TESTS=500  # we have 650+ today; tighten as suite grows
+if [ "$PASSED" -lt "$MIN_EXPECTED_TESTS" ]; then
+    echo "$OUTPUT" | tail -25
+    echo ""
+    echo "[pre-push] FAIL — only ${PASSED} tests passed (expected >=${MIN_EXPECTED_TESTS})"
+    echo "[pre-push] Either pytest was interrupted/killed, the filter is wrong,"
+    echo "[pre-push] or many tests are being skipped/missed. Investigate before pushing."
+    echo "[pre-push] Emergency bypass: git push --no-verify"
+    exit 1
+fi
+
 echo "[pre-push] PASS — ${PASSED} tests passed (${ELAPSED}s)"
 exit 0
