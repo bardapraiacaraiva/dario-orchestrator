@@ -16,6 +16,7 @@ Override threshold for tests: pass kwargs to check_budget_or_raise().
 """
 
 from __future__ import annotations
+from typing import Any
 
 import logging
 import os
@@ -35,7 +36,7 @@ DEFAULT_WARNING_PCT = float(os.getenv("DARIO_BUDGET_WARNING_PCT", "80"))
 DEFAULT_HARDSTOP_PCT = float(os.getenv("DARIO_BUDGET_HARDSTOP_PCT", "95"))
 
 
-def _load_budget_yaml(month: str) -> dict:
+def _load_budget_yaml(month: str) -> dict[str, Any]:
     path = BUDGETS_DIR / f"{month}.yaml"
     if not path.exists():
         return {}
@@ -45,7 +46,7 @@ def _load_budget_yaml(month: str) -> dict:
         return {}
 
 
-def _load_budget_sqlite(month: str) -> dict:
+def _load_budget_sqlite(month: str) -> dict[str, Any]:
     """Best-effort SQLite read. Returns empty dict on any error."""
     try:
         import sys
@@ -66,7 +67,7 @@ def _load_budget_sqlite(month: str) -> dict:
     return {}
 
 
-def current_budget_state(month: str | None = None) -> dict:
+def current_budget_state(month: str | None = None) -> dict[str, Any]:
     """Read budget for current month. Returns dict with percentage.
 
     Defensively picks the source with the higher percentage to avoid
@@ -76,7 +77,7 @@ def current_budget_state(month: str | None = None) -> dict:
     yaml_data = _load_budget_yaml(month)
     sqlite_data = _load_budget_sqlite(month)
 
-    def _pct(d: dict) -> float:
+    def _pct(d: dict[str, Any]) -> float:
         if not d:
             return -1.0
         p = d.get("percentage")
@@ -108,7 +109,7 @@ def check_budget_or_raise(
     hardstop_pct: float | None = None,
     warning_pct: float | None = None,
     month: str | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Raise BudgetExceededError if budget percentage >= hardstop_pct.
 
     Logs a WARNING when >= warning_pct (but does not raise).

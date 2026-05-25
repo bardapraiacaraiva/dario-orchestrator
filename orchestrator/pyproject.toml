@@ -42,6 +42,7 @@ test = [
     "pytest-asyncio>=1.3,<2.0",
     "pytest-cov>=7.0,<8.0",
     "pytest-xdist>=3.8,<4.0",
+    "hypothesis>=6.0,<7.0",  # property-based tests (Faixa 2 #3, 2026-05-25)
     "pytest-rerunfailures>=16.0,<17.0",
     "pytest-repeat>=0.9,<1.0",
 ]
@@ -132,23 +133,35 @@ ignore = [
 
 [tool.mypy]
 python_version = "3.13"
+# Baseline strictness — applies to ALL files in scope.
 strict_optional = true
 warn_return_any = true
 warn_unused_ignores = true
-disallow_untyped_defs = false  # too aggressive for current codebase; lift gradually
+warn_redundant_casts = true
+warn_unreachable = true
+no_implicit_optional = true
+disallow_any_generics = true
+check_untyped_defs = true
 ignore_missing_imports = true
-# Onda 4 #2 — incremental strict checking. Start with the foundational
-# modules we wrote in Onda 1-3; expand the `files` list as legacy code
-# gets typed up. `follow_imports=skip` prevents mypy from cascading into
-# untyped dependencies (the legacy upgrade packs).
+# Strict-by-default for new modules (post-Phase 4 refactor 2026-05-25 +
+# Faixa 1 #1-#6 packages). disallow_untyped_defs is enforced via per-module
+# override below — gradual lift from "type your new code" to "type everything".
+disallow_untyped_defs = false
 files = [
-    # Foundational
+    # Foundational schemas
     "schemas",
-    "otel_setup.py",
-    "chain_graph.py",
-    "chain_schemas.py",
     "config",
     "optimization",
+    # New (Faixa 1) — these MUST stay strictly typed
+    "enforcement",
+    "safety",
+    "core/secrets.py",
+    "core/audit_signing.py",
+    "core/audit_logger.py",
+    # Post-Phase-4 packages (paths updated 2026-05-25)
+    "cognitive/chain_graph.py",
+    "execution/chain_schemas.py",
+    "observability/otel_setup.py",
     # Intelligence sub-modules (Onda 3-6)
     "upgrades/intelligence_qvalue.py",
     "upgrades/intelligence_tiered.py",
@@ -165,12 +178,25 @@ files = [
     "upgrades/execution_parallel.py",
     # Durable execution piloto (Onda 5 #5)
     "durable",
-    # Memory + Dream subsystems (Onda 7 #3)
+    # Memory + Dream subsystems
     "memory",
     "dream",
 ]
 follow_imports = "skip"
 explicit_package_bases = true
+
+# Strict-typed modules — these MUST have type annotations on every def.
+# Add new modules here as they get fully typed.
+[[tool.mypy.overrides]]
+module = [
+    "enforcement.*",
+    "safety.sandbox",
+    "safety.prompt_shield",
+    "core.secrets",
+    "core.audit_signing",
+]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
 
 [[tool.mypy.overrides]]
 # Auto-generated / external interfaces — relax for these.

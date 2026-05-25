@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import logging
 import re
+from typing import Any
 from pathlib import Path
 
 import yaml
@@ -41,11 +42,11 @@ VALID_EXECUTION_POLICIES = {"default", "client_facing", "critical", "financial"}
 TASK_ID_RE = re.compile(r"^[A-Z][A-Z0-9_]{1,30}-\d{1,5}$")
 
 
-_workers_cache: dict | None = None
+_workers_cache: dict[str, Any] | None = None
 _workers_cache_mtime: float = 0.0
 
 
-def _load_workers() -> dict:
+def _load_workers() -> dict[str, Any]:
     """Load workers section from company.yaml. Cached by mtime."""
     global _workers_cache, _workers_cache_mtime
     if not COMPANY_YAML.exists():
@@ -67,7 +68,7 @@ def _skill_exists(skill: str) -> bool:
     return (SKILLS_DIR / skill / "SKILL.md").is_file()
 
 
-def validate_task(task: dict, strict_id: bool = False) -> dict:
+def validate_task(task: Any, strict_id: bool = False) -> dict[str, Any]:
     """Validate a task dict. Returns {valid, errors, warnings, resolved_skill}.
 
     Non-raising — caller decides what to do with the result.
@@ -77,9 +78,14 @@ def validate_task(task: dict, strict_id: bool = False) -> dict:
     warnings: list[str] = []
     resolved_skill: str | None = None
 
+    # Runtime guard against callers that bypass the type annotation.
     if not isinstance(task, dict):
-        return {"valid": False, "errors": [f"task must be dict, got {type(task).__name__}"],
-                "warnings": [], "resolved_skill": None}
+        return {
+            "valid": False,
+            "errors": [f"task must be dict, got {type(task).__name__}"],
+            "warnings": [],
+            "resolved_skill": None,
+        }
 
     # ─── Required fields ──────────────────────────────────────────────
     task_id = (task.get("id") or "").strip()
@@ -159,7 +165,7 @@ def validate_task(task: dict, strict_id: bool = False) -> dict:
     }
 
 
-def validate_task_or_raise(task: dict, strict_id: bool = False) -> str:
+def validate_task_or_raise(task: Any, strict_id: bool = False) -> str:
     """Validate task; raise TaskValidationError on failure.
 
     Returns the resolved skill name on success.

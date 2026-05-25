@@ -131,7 +131,7 @@ class SandboxResult:
     def ok(self) -> bool:
         return self.returncode == 0 and not self.timeout_hit
 
-    def to_audit_dict(self) -> dict:
+    def to_audit_dict(self) -> dict[str, object]:
         return {
             "cmd": " ".join(self.cmd),
             "returncode": self.returncode,
@@ -168,22 +168,28 @@ def _build_env(allowlist: list[str], extra: Optional[dict[str, str]] = None) -> 
     return env, sorted(keys_used)
 
 
-def _apply_posix_limits(cpu_seconds: int, memory_mb: int):
+def _apply_posix_limits(cpu_seconds: int, memory_mb: int) -> None:
     """preexec_fn for POSIX subprocess to set rlimits.
 
     Called in the CHILD process between fork and exec — so any failure here
     just means the limit wasn't applied, not that the parent crashes.
+
+    The `resource` module is POSIX-only; on Windows the module is None and
+    we early-return. mypy doesn't know about RLIMIT_* attrs on Windows so
+    we use getattr to bypass the static check (runtime check above gates).
     """
     if not _POSIX or resource is None:
         return
     try:
-        resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, cpu_seconds))
-    except (ValueError, OSError):
+        rlimit_cpu = getattr(resource, "RLIMIT_CPU")
+        resource.setrlimit(rlimit_cpu, (cpu_seconds, cpu_seconds))  # type: ignore[attr-defined]
+    except (ValueError, OSError, AttributeError):
         pass
     try:
+        rlimit_as = getattr(resource, "RLIMIT_AS")
         mem_bytes = memory_mb * 1024 * 1024
-        resource.setrlimit(resource.RLIMIT_AS, (mem_bytes, mem_bytes))
-    except (ValueError, OSError):
+        resource.setrlimit(rlimit_as, (mem_bytes, mem_bytes))  # type: ignore[attr-defined]
+    except (ValueError, OSError, AttributeError):
         pass
 
 
@@ -263,7 +269,7 @@ def run_sandboxed(
     if _POSIX:
         # Capture args by value (don't reference outer scope mutating vars)
         cs, mm = cpu_seconds, memory_mb
-        def _pre():
+        def _pre() -> None:
             _apply_posix_limits(cs, mm)
         preexec = _pre
     else:
@@ -328,7 +334,7 @@ def run_sandboxed(
 # ─── CLI for ad-hoc testing ──────────────────────────────────────────────
 
 
-def _cli():
+def _cli() -> int:
     import argparse
     import json
     p = argparse.ArgumentParser(description="DARIO sandbox runner (Faixa 1 #1 v1)")

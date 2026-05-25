@@ -46,7 +46,7 @@ from __future__ import annotations
 import re
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Iterator
 
 # ─── Patterns: prompt injection (BLOCK on match) ─────────────────────────
 
@@ -90,7 +90,7 @@ SUSPICIOUS_PATTERNS = [
 
 
 # Common secret formats. Each tuple is (pattern, name, mask_replacement).
-SECRET_PATTERNS: list[tuple[re.Pattern, str, str]] = [
+SECRET_PATTERNS: list[tuple[re.Pattern[str], str, str]] = [
     # Anthropic API keys (real format: sk-ant-api01-XXXXX..., sk-ant-admin..., etc.)
     # Hyphen-separated tier id (api01/api02/admin01/test/...) before random portion.
     (re.compile(r"sk-ant-(api\d{2}|admin\d{2}|test)[-_][A-Za-z0-9_-]{40,}", re.I), "anthropic-api-key", "sk-ant-***REDACTED***"),
@@ -193,8 +193,8 @@ def inspect_output(text: str) -> dict[str, Any]:
     sanitized = text
     for pat, name, replacement in SECRET_PATTERNS:
         if pat.search(sanitized):
-            for m in pat.finditer(sanitized):
-                v.matches.append({"type": "secret", "kind": name, "snippet": m.group(0)[:40] + "..."})
+            for found in pat.finditer(sanitized):
+                v.matches.append({"type": "secret", "kind": name, "snippet": found.group(0)[:40] + "..."})
             sanitized = pat.sub(replacement, sanitized)
             # Block on SSH private key — never proceed
             if name == "ssh-private-key":
@@ -228,7 +228,7 @@ class SecretLeakageDetected(Exception):
 
 
 @contextmanager
-def shield(skill: str = "<unknown>"):
+def shield(skill: str = "<unknown>") -> "Iterator[_Shield]":
     """Context manager that wraps skill execution with input + output checks.
 
     Usage:
@@ -237,32 +237,32 @@ def shield(skill: str = "<unknown>"):
             result = call_anthropic(user_input)
             safe = s.sanitize_output(result)
     """
+    yield _Shield(skill)
 
-    class _Shield:
-        def __init__(self):
-            self.skill = skill
-            self.events: list[dict] = []
 
-        def check_input(self, text: str) -> None:
-            v = inspect_input(text)
-            self.events.append({"phase": "input", **v})
-            if v["block"]:
-                raise PromptInjectionDetected(f"[{skill}] {v['reason']}")
+class _Shield:
+    def __init__(self, skill: str) -> None:
+        self.skill = skill
+        self.events: list[dict[str, Any]] = []
 
-        def sanitize_output(self, text: str) -> str:
-            v = inspect_output(text)
-            self.events.append({"phase": "output", **v})
-            if v["block"]:
-                raise SecretLeakageDetected(f"[{skill}] {v['reason']}")
-            return v["sanitized"]
+    def check_input(self, text: str) -> None:
+        v = inspect_input(text)
+        self.events.append({"phase": "input", **v})
+        if v["block"]:
+            raise PromptInjectionDetected(f"[{self.skill}] {v['reason']}")
 
-    yield _Shield()
+    def sanitize_output(self, text: str) -> str:
+        v = inspect_output(text)
+        self.events.append({"phase": "output", **v})
+        if v["block"]:
+            raise SecretLeakageDetected(f"[{self.skill}] {v['reason']}")
+        return str(v["sanitized"])
 
 
 # ─── CLI for ad-hoc testing ──────────────────────────────────────────────
 
 
-def _cli():
+def _cli() -> int:
     import argparse
     import json
     p = argparse.ArgumentParser(description="Prompt injection + secret shield (Faixa 1 #3)")

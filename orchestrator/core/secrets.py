@@ -137,7 +137,8 @@ def set_secret(name: str, value: str, caller: str = "unknown") -> None:
     try:
         keyring.set_password(SERVICE_NAME, name, value)
         _audit("set", name, caller)
-    except Exception as e:
+        _update_catalog(name, add=True)
+    except Exception:
         _audit("set", name, caller, ok=False)
         raise
 
@@ -196,6 +197,7 @@ def delete_secret(name: str, caller: str = "unknown") -> bool:
     try:
         keyring.delete_password(SERVICE_NAME, name)
         _audit("delete", name, caller)
+        _update_catalog(name, add=False)
         return True
     except keyring.errors.PasswordDeleteError:
         # Not present
@@ -238,27 +240,15 @@ def _update_catalog(name: str, add: bool = True) -> None:
         pass
 
 
-# Wrap set/delete to maintain catalog
-_orig_set = set_secret
-_orig_delete = delete_secret
-
-
-def set_secret(name: str, value: str, caller: str = "unknown") -> None:
-    _orig_set(name, value, caller)
-    _update_catalog(name, add=True)
-
-
-def delete_secret(name: str, caller: str = "unknown") -> bool:
-    result = _orig_delete(name, caller)
-    if result:
-        _update_catalog(name, add=False)
-    return result
+# Catalog maintenance is done inline in the primary set_secret/delete_secret
+# above (post-mypy refactor 2026-05-25 — was double-defined which mypy flagged
+# as `no-redef`).
 
 
 # ─── CLI ──────────────────────────────────────────────────────────────────
 
 
-def _cli():
+def _cli() -> int:
     import argparse
     p = argparse.ArgumentParser(description="DARIO Secrets Manager (Faixa 1 #2)")
     sub = p.add_subparsers(dest="cmd", required=True)

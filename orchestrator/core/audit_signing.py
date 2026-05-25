@@ -317,7 +317,7 @@ def verify_seal(seal: dict[str, Any]) -> tuple[bool, str]:
 # ─── CLI ─────────────────────────────────────────────────────────────────
 
 
-def _cli():
+def _cli() -> int:
     import argparse
     p = argparse.ArgumentParser(description="Audit trail signing tools (Faixa 1 #5)")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -364,6 +364,7 @@ def _cli():
             print(f"FAIL at entry #{result['broken_at']}: {result['reason']}")
             print(f"     verified {result['verified']} entries before break")
             return 1
+    return 0
 
 
 if __name__ == "__main__":

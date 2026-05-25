@@ -45,6 +45,7 @@ import time
 import uuid
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Any, Iterator
 
 import portalocker
 
@@ -86,7 +87,7 @@ def _ensure_files() -> None:
         LOCK_FILE.touch()
 
 
-def _load_slots(now: datetime) -> list[dict]:
+def _load_slots(now: datetime) -> list[dict[str, Any]]:
     """Read current slots, reaping any that exceeded SLOT_TIMEOUT_SECONDS."""
     try:
         data = json.loads(SLOTS_FILE.read_text(encoding="utf-8"))
@@ -95,7 +96,7 @@ def _load_slots(now: datetime) -> list[dict]:
     if not isinstance(data, list):
         data = []
     cutoff = now - timedelta(seconds=SLOT_TIMEOUT_SECONDS)
-    alive: list[dict] = []
+    alive: list[dict[str, Any]] = []
     for s in data:
         try:
             ts = datetime.fromisoformat(s.get("claimed_at", ""))
@@ -111,7 +112,7 @@ def _load_slots(now: datetime) -> list[dict]:
     return alive
 
 
-def _save_slots(slots: list[dict]) -> None:
+def _save_slots(slots: list[dict[str, Any]]) -> None:
     SLOTS_FILE.write_text(json.dumps(slots, indent=2), encoding="utf-8")
 
 
@@ -161,7 +162,7 @@ def release_slot(slot_id: str) -> bool:
         return released
 
 
-def active_slots() -> list[dict]:
+def active_slots() -> list[dict[str, Any]]:
     """Read-only inspection — used by dashboard widget + tests."""
     _ensure_files()
     with portalocker.Lock(str(LOCK_FILE), timeout=10) as _:
@@ -173,7 +174,7 @@ def active_count() -> int:
 
 
 @contextlib.contextmanager
-def slot(caller: str = "anonymous", max_parallel: int | None = None):
+def slot(caller: str = "anonymous", max_parallel: int | None = None) -> "Iterator[str]":
     """Context manager — auto-claim and auto-release a slot.
 
     Raises ParallelismExceededError if no slot available.
