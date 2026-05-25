@@ -69,7 +69,7 @@ def _skill_frontmatter(name: str) -> dict:
     if not path.exists():
         return {}
     try:
-        from semantic_dispatch import _parse_frontmatter
+        from dispatch.semantic_dispatch import _parse_frontmatter
         content = path.read_text(encoding="utf-8", errors="ignore")
         return _parse_frontmatter(content) or {}
     except Exception:
@@ -141,7 +141,7 @@ def check_embeddings_coverage() -> dict:
     try:
         import sqlite3
 
-        from semantic_dispatch import extract_skill_corpus
+        from dispatch.semantic_dispatch import extract_skill_corpus
         corpus = extract_skill_corpus()
         conn = sqlite3.connect(str(ORCH_DIR / "orchestrator.db"))
         rows = conn.execute("SELECT skill_name FROM skill_embeddings").fetchall()
@@ -182,7 +182,7 @@ def check_embeddings_freshness() -> dict:
     try:
         import sqlite3
 
-        from semantic_dispatch import _augment_description, _hash, _load_keyword_index, extract_skill_corpus
+        from dispatch.semantic_dispatch import _augment_description, _hash, _load_keyword_index, extract_skill_corpus
         corpus = extract_skill_corpus()
         keyword_index = _load_keyword_index()
         conn = sqlite3.connect(str(ORCH_DIR / "orchestrator.db"))
@@ -391,7 +391,7 @@ def auto_fix() -> dict:
     fixes = {"applied": [], "skipped": []}
 
     try:
-        from semantic_dispatch import bootstrap_embeddings
+        from dispatch.semantic_dispatch import bootstrap_embeddings
         # Only triggered if a check would have caught the issue
         report_pre = run_all()
         needs_bootstrap = any(

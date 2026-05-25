@@ -244,25 +244,25 @@ class TestLicenseClientSimplified:
     """Verify the simplified client surface — fail-soft on network errors."""
 
     def test_server_url_returns_none_when_unset(self, monkeypatch):
-        import license_client
+        from licensing import license_client
         monkeypatch.delenv("DARIO_LICENSE_SERVER", raising=False)
         assert license_client.server_url() is None
         assert license_client.is_enabled() is False
 
     def test_server_url_returns_configured_value(self, monkeypatch):
-        import license_client
+        from licensing import license_client
         monkeypatch.setenv("DARIO_LICENSE_SERVER", "https://example.com/")
         assert license_client.server_url() == "https://example.com"
         assert license_client.is_enabled() is True
 
     def test_post_returns_none_when_server_unset(self, monkeypatch):
-        import license_client
+        from licensing import license_client
         monkeypatch.delenv("DARIO_LICENSE_SERVER", raising=False)
         assert license_client._post("/anything", {"x": 1}) is None
 
     def test_post_returns_none_on_network_error(self, monkeypatch):
         """Server unreachable → None (fail-soft, never raise)."""
-        import license_client
+        from licensing import license_client
         monkeypatch.setenv("DARIO_LICENSE_SERVER",
                            "http://localhost-not-running:1")
         # 5-second timeout default; this will fail and return None
@@ -271,7 +271,7 @@ class TestLicenseClientSimplified:
 
     def test_no_cert_pinning_in_module(self):
         """Regression guard: cert pinning + bypass flags must remain removed."""
-        import license_client
+        from licensing import license_client
         forbidden = ["_spki_sha256", "_verify_pin_or_raise", "_maybe_verify_pin"]
         for name in forbidden:
             assert not hasattr(license_client, name), (

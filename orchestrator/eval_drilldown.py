@@ -291,7 +291,7 @@ def drilldown_drifting(eval_ids: list = None) -> dict:
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("eval_drilldown")
     except SystemExit:
         raise

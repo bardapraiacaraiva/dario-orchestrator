@@ -45,8 +45,8 @@ from pathlib import Path
 
 # Optional server client (fail-soft if not present)
 try:
-    from license_client import is_enabled as server_enabled
-    from license_client import (
+    from licensing.license_client import is_enabled as server_enabled
+    from licensing.license_client import (
         init_trial_remote, report_activation, report_check, revalidate,
     )
 except ImportError:

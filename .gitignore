@@ -79,6 +79,14 @@
 !orchestrator/cognitive/
 !orchestrator/cognitive/*.py
 
+# --- Allow licensing package (Recommendation #2 stage 3, 2026-05-25) ---
+!orchestrator/licensing/
+!orchestrator/licensing/*.py
+
+# --- Allow dispatch package (Recommendation #2 stage 4, 2026-05-25) ---
+!orchestrator/dispatch/
+!orchestrator/dispatch/*.py
+
 # --- Allow test suite + pytest config ---
 !orchestrator/tests/
 !orchestrator/tests/*.py

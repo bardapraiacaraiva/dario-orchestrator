@@ -172,7 +172,7 @@ def _run_engine(script: str, args: list) -> dict:
 async def lifespan(app: FastAPI):
     # LICENSE CHECK (was ORPHAN — never enforced, anyone could run indefinitely)
     try:
-        from license_manager import check_license
+        from licensing.license_manager import check_license
         lic = check_license()
         if not lic.get("valid"):
             log.error(f"[LICENSE] {lic.get('reason', 'Invalid')}. Runtime blocked.")
@@ -233,7 +233,7 @@ except Exception as e:
 # Returns 402 Payment Required when trial expired or no license.
 # Bypass requires DARIO_LICENSE_BYPASS=1 env AND dev.flag file (double-gate).
 try:
-    from license_guard import fastapi_middleware as license_middleware
+    from licensing.license_guard import fastapi_middleware as license_middleware
     license_middleware(app)
     log.info("[LICENSE] Middleware installed — all non-whitelisted endpoints guarded")
 except Exception as e:
@@ -244,7 +244,7 @@ try:
     from fastapi import Request
     from starlette.middleware.base import BaseHTTPMiddleware
 
-    from auth import verify_key  # check_permission imported elsewhere on demand
+    from licensing.auth import verify_key  # check_permission imported elsewhere on demand
 
     class AuthMiddleware(BaseHTTPMiddleware):
         async def dispatch(self, request: Request, call_next):

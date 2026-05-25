@@ -87,7 +87,7 @@ def collect_drift_status() -> dict:
 
 
 def collect_cot_health() -> dict:
-    from dispatch_cot import stats
+    from dispatch.dispatch_cot import stats
     s = stats()
     return {
         "total_traces": s["total_traces"],
@@ -203,7 +203,7 @@ def collect_synaptic_health() -> dict:
 
 
 def collect_embeddings_status() -> dict:
-    from semantic_dispatch import cache_stats, extract_skill_corpus
+    from dispatch.semantic_dispatch import cache_stats, extract_skill_corpus
     s = cache_stats()
     corpus = extract_skill_corpus()
     return {
@@ -567,7 +567,7 @@ def generate(output_path: Path = None, open_browser: bool = False) -> Path:
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("cognitive_dashboard")
     except SystemExit:
         raise

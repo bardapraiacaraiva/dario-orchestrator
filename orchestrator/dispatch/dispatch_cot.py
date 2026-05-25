@@ -106,7 +106,7 @@ def _gather_signals(task: dict) -> dict:
 
     # Signal 2: semantic
     try:
-        from semantic_dispatch import semantic_match
+        from dispatch.semantic_dispatch import semantic_match
         text = f"{task.get('title', '')} {task.get('description', '')}".strip()
         if text:
             top_matches = semantic_match(text, top_k=3)
@@ -124,7 +124,7 @@ def _gather_signals(task: dict) -> dict:
 
     # Signal 3: keyword
     try:
-        from dispatch_engine import KEYWORD_SKILL_MAP
+        from dispatch.dispatch_engine import KEYWORD_SKILL_MAP
         text = f"{task.get('title', '')} {task.get('description', '')}".lower()
         scored = {}
         for kw, skill in KEYWORD_SKILL_MAP.items():
@@ -425,7 +425,7 @@ def stats() -> dict:
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("dispatch_cot")
     except SystemExit:
         raise

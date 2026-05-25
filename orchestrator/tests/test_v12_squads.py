@@ -51,7 +51,7 @@ def test_all_skills_exist_105():
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_license_tiers_21_new():
-    from license_manager import TIER_SUFFIXES, TIERS
+    from licensing.license_manager import TIER_SUFFIXES, TIERS
     for tier in NEW_TIERS:
         assert tier in TIERS, f"{tier} missing in TIERS"
         assert tier in TIER_SUFFIXES, f"{tier} missing in TIER_SUFFIXES"
@@ -59,7 +59,7 @@ def test_license_tiers_21_new():
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_hmac_roundtrip_all_21():
-    from license_manager import generate_key, validate_key
+    from licensing.license_manager import generate_key, validate_key
     for tier in NEW_TIERS:
         key = generate_key(tier, "test@example.com")
         r = validate_key(key)
@@ -82,7 +82,7 @@ def test_company_yaml_has_7_sections():
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_total_tiers_59():
     # 54 single tiers + 5 Enterprise bundles (Onda 12)
-    from license_manager import TIERS
+    from licensing.license_manager import TIERS
     assert len(TIERS) == 59, f"expected 59 tiers (54 + 5 bundles), got {len(TIERS)}"
     bundles = [k for k, v in TIERS.items() if "bundle_components" in v]
     assert len(bundles) == 5, f"expected 5 bundles, got {len(bundles)}"

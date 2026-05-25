@@ -40,7 +40,7 @@ def slo_dispatch_latency() -> dict:
     start = time.perf_counter()
     try:
         result = subprocess.run(
-            [sys.executable, str(ORCH / "dispatch_engine.py"), "--status"],
+            [sys.executable, str(ORCH / "dispatch" / "dispatch_engine.py"), "--status"],
             capture_output=True, text=True, timeout=30, cwd=str(ORCH),
         )
         duration_s = time.perf_counter() - start

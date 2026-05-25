@@ -79,7 +79,7 @@ def mock_ollama_embed(request, monkeypatch):
         return
 
     try:
-        import semantic_dispatch
+        from dispatch import semantic_dispatch
     except ImportError:
         # Module not available in this install — fixture becomes no-op
         yield

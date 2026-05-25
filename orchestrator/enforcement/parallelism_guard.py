@@ -72,7 +72,7 @@ def _get_max_parallel() -> int:
     try:
         import sys
         sys.path.insert(0, str(ORCH_DIR))
-        from license_manager import get_max_parallel
+        from licensing.license_manager import get_max_parallel
         return int(get_max_parallel())
     except Exception:
         return DEFAULT_MAX_PARALLEL

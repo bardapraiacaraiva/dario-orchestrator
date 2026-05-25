@@ -54,7 +54,7 @@ def _load_keyword_index() -> dict:
         if str(ORCH_DIR) not in sys.path:
             sys.path.insert(0, str(ORCH_DIR))
             sys_path_added = True
-        from dispatch_engine import KEYWORD_SKILL_MAP
+        from dispatch.dispatch_engine import KEYWORD_SKILL_MAP
         if sys_path_added:
             sys.path.remove(str(ORCH_DIR))
     except Exception:
@@ -325,7 +325,7 @@ def cache_stats() -> dict:
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("semantic_dispatch")
     except SystemExit:
         raise

@@ -62,7 +62,7 @@ def _check() -> dict:
     """Wrapper around license_manager.check_license — never crash on import."""
     try:
         sys.path.insert(0, str(ORCH_DIR))
-        from license_manager import check_license
+        from licensing.license_manager import check_license
         return check_license()
     except Exception as e:
         # If license_manager can't load, fail-CLOSED (safer default)
@@ -81,7 +81,7 @@ def enforce_or_exit(component: str = "orchestrator", quiet: bool = False) -> Non
     """Call at start of CLI scripts. Exits with code 2 on invalid license.
 
     Usage:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("executor")
         # ... rest of script ...
     """
@@ -126,7 +126,7 @@ def require_license(component: str = "function"):
     """Decorator for functions. Skips execution if license invalid.
 
     Usage:
-        from license_guard import require_license
+        from licensing.license_guard import require_license
 
         @require_license("executor.run_task")
         def run_task(...):
@@ -151,7 +151,7 @@ def fastapi_middleware(app):
     """Add a FastAPI middleware that guards all non-whitelisted endpoints.
 
     Usage in runtime.py:
-        from license_guard import fastapi_middleware
+        from licensing.license_guard import fastapi_middleware
         fastapi_middleware(app)
     """
     from fastapi import Request

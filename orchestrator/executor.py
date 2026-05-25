@@ -69,7 +69,7 @@ from checkpoint_interrupt import interrupt_task, should_interrupt
 from db import DB
 from filter_pipeline import BudgetFilter, FilterPipeline, LoggingFilter, QualityGateFilter, TokenBudgetFilter
 from safety.guardrails import validate_task
-from model_router import ModelRouterFilter
+from dispatch.model_router import ModelRouterFilter
 from output_guardrails import OutputGuardrailFilter
 
 PYTHON = sys.executable
@@ -376,7 +376,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
         # outcome) so signals get recalibrated over time.
         if score > 0:
             try:
-                from dispatch_cot import postmortem as _cot_postmortem
+                from dispatch.dispatch_cot import postmortem as _cot_postmortem
                 _outcome = "success" if status == "done" else "revision"
                 _cot_postmortem(task_id, score, _outcome)
             except Exception:
@@ -661,7 +661,7 @@ def execute_pulse(dry_run: bool = False) -> dict:
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("executor")
     except SystemExit:
         raise

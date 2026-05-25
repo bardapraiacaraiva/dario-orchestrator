@@ -236,7 +236,7 @@ def test_mcp_cnj_datajud_module_loads():
 
 @pytest.mark.vip_only
 def test_lex_skills_in_semantic_corpus():
-    from semantic_dispatch import extract_skill_corpus
+    from dispatch.semantic_dispatch import extract_skill_corpus
     corpus = extract_skill_corpus()
     lex_skills_in_corpus = [s for s in corpus if s.startswith("lex-")]
     assert len(lex_skills_in_corpus) >= 15, \
@@ -248,7 +248,7 @@ def test_lex_skills_in_semantic_corpus():
 def test_semantic_dispatch_routes_to_lex_trabalhista():
     """End-to-end semantic routing — requires real Ollama. The mock returns
     hash-derived vectors that defeat ranking by meaning."""
-    from semantic_dispatch import semantic_match
+    from dispatch.semantic_dispatch import semantic_match
     matches = semantic_match("reclamação trabalhista verbas rescisórias", top_k=5)
     top_skills = [m[0] for m in matches]
     assert "lex-trabalhista" in top_skills, \

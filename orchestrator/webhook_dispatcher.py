@@ -434,7 +434,7 @@ def status() -> dict:
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("webhook_dispatcher")
     except SystemExit:
         raise

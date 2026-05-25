@@ -121,7 +121,7 @@ def _semantic_similarity(text_a: str, text_b: str) -> float:
     """Cosine similarity via Ollama nomic-embed-text. Returns 0.0 on failure."""
     try:
         sys.path.insert(0, str(ORCH_DIR))
-        from semantic_dispatch import _cosine, _embed
+        from dispatch.semantic_dispatch import _cosine, _embed
         va = _embed(text_a[:4000])
         vb = _embed(text_b[:4000])
         if not va or not vb:
@@ -377,7 +377,7 @@ def calibration_status() -> dict:
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("golden_eval")
     except SystemExit:
         raise

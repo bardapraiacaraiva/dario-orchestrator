@@ -339,7 +339,7 @@ def _load_task(task_id: str) -> dict:
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("ethical_gate")
     except SystemExit:
         raise

@@ -292,7 +292,7 @@ def gate_decision(score: int, dimensions: dict, skill: str = None,
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("confidence_engine")
     except SystemExit:
         raise

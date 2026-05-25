@@ -179,7 +179,7 @@ def job_regression_check() -> dict:
 def job_dispatch_cot_stats() -> dict:
     """CoT trace + postmortem aggregate."""
     sys.path.insert(0, str(ORCH_DIR))
-    from dispatch_cot import stats
+    from dispatch.dispatch_cot import stats
     s = stats()
     return {
         "total_traces": s["total_traces"],
@@ -210,7 +210,7 @@ def job_state_snapshot() -> dict:
     except Exception as e:
         snapshot["semantic_error"] = str(e)[:100]
     try:
-        from semantic_dispatch import cache_stats as sem_stats
+        from dispatch.semantic_dispatch import cache_stats as sem_stats
         snapshot["embeddings"] = {"total": sem_stats()["total"]}
     except Exception as e:
         snapshot["embeddings_error"] = str(e)[:100]
@@ -588,7 +588,7 @@ def status() -> dict:
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("cron_daily")
     except SystemExit:
         raise

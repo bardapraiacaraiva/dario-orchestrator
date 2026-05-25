@@ -474,7 +474,7 @@ def save_to_obsidian(label: str, content: str) -> Path:
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("weekly_summary")
     except SystemExit:
         raise

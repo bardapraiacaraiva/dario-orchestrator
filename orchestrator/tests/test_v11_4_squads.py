@@ -131,7 +131,7 @@ def test_all_skills_have_valid_frontmatter():
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_license_tiers_all_present():
-    from license_manager import TIER_SUFFIXES, TIERS
+    from licensing.license_manager import TIER_SUFFIXES, TIERS
     for name, cfg in SQUADS.items():
         for tier_key in cfg["tier_keys"]:
             assert tier_key in TIERS, f"tier {tier_key} missing in TIERS"
@@ -142,7 +142,7 @@ def test_license_tiers_all_present():
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
 def test_hmac_keys_roundtrip_all_squads():
-    from license_manager import generate_key, validate_key
+    from licensing.license_manager import generate_key, validate_key
     for name, cfg in SQUADS.items():
         for tier_key in cfg["tier_keys"]:
             key = generate_key(tier_key, f"test-{name}@example.com")

@@ -386,7 +386,7 @@ def _try_semantic_match(task: dict) -> str | None:
     if not SEMANTIC_DISPATCH_ENABLED:
         return None
     try:
-        from semantic_dispatch import infer_skill_semantic
+        from dispatch.semantic_dispatch import infer_skill_semantic
         skill, matches = infer_skill_semantic(task)
         if skill and matches:
             top = matches[0]
@@ -530,7 +530,7 @@ def find_best_worker(task: dict, hierarchy: CompanyHierarchy, workload: dict, ex
     # The CoT writes to dispatch_cot/{task_id}.yaml; legacy infer_skill_from_task
     # still drives the actual selection so behaviour stays backwards-compatible.
     try:
-        from dispatch_cot import reason as _cot_reason
+        from dispatch.dispatch_cot import reason as _cot_reason
         _cot = _cot_reason(task, persist=bool(task.get("id")))
         _decision = _cot.get("decision", {})
         if _decision.get("winner"):
@@ -853,7 +853,7 @@ def cmd_explain(args):
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("dispatch_engine")
     except SystemExit:
         raise

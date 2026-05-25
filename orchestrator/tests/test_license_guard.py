@@ -11,7 +11,7 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-import license_guard
+from licensing import license_guard
 
 
 def _backup_license():
@@ -184,7 +184,7 @@ def test_enforce_or_exit_exits_on_expired():
         result = subprocess.run(
             [sys.executable, "-c",
              f"import sys; sys.path.insert(0, r'{ORCH_DIR}'); "
-             "from license_guard import enforce_or_exit; enforce_or_exit('test', quiet=True)"],
+             "from licensing.license_guard import enforce_or_exit; enforce_or_exit('test', quiet=True)"],
             env=env, capture_output=True, timeout=10,
         )
         assert result.returncode == 2, f"expected exit 2, got {result.returncode}"
@@ -202,7 +202,7 @@ def test_enforce_or_exit_passes_on_pro():
         result = subprocess.run(
             [sys.executable, "-c",
              f"import sys; sys.path.insert(0, r'{ORCH_DIR}'); "
-             "from license_guard import enforce_or_exit; enforce_or_exit('test', quiet=True); "
+             "from licensing.license_guard import enforce_or_exit; enforce_or_exit('test', quiet=True); "
              "print('OK')"],
             env=env, capture_output=True, timeout=10, text=True,
         )
@@ -227,7 +227,7 @@ def test_check_returns_dict():
 def test_cli_check_smoke():
     """CLI --check should exit 0 if license valid."""
     result = subprocess.run(
-        [sys.executable, str(ORCH_DIR / "license_guard.py"), "--check"],
+        [sys.executable, str(ORCH_DIR / "licensing" / "license_guard.py"), "--check"],
         capture_output=True, timeout=10,
     )
     # Either 0 (valid) or 2 (invalid) — both acceptable, just confirming no crash

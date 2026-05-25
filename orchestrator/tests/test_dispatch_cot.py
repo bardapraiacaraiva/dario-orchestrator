@@ -9,7 +9,7 @@ sys.path.insert(0, str(ORCH_DIR))
 
 import pytest
 
-import dispatch_cot
+from dispatch import dispatch_cot
 
 pytestmark = pytest.mark.slow
 

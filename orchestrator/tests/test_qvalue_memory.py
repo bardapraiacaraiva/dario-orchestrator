@@ -115,7 +115,7 @@ def test_td_learning_updates_qvalue():
 
 def test_dispatch_integration_does_not_crash():
     """Verify dispatch_engine import + Q-value fallback path doesn't crash."""
-    from dispatch_engine import infer_skill_from_task
+    from dispatch.dispatch_engine import infer_skill_from_task
     # A task with no obvious keyword/semantic match
     result = infer_skill_from_task({
         "title": "xyzabc nonsense gibberish",

@@ -345,7 +345,7 @@ def clear_skill(skill: str) -> bool:
 def main():
     # license_guard wired (v11.1+ hardening)
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("prompt_hints")
     except SystemExit:
         raise

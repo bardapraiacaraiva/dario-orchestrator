@@ -28,18 +28,18 @@ PYTHON = sys.executable
 
 # Restored Risk #7 modules — these must all import cleanly post-v12.4.0.
 RESTORED_MODULES = [
-    "dispatch_engine",
+    "dispatch.dispatch_engine",     # moved 2026-05-25 in Phase 4 stage 4
     "confidence_engine",
     "chain_graph",
-    "dispatch_cot",
+    "dispatch.dispatch_cot",        # moved 2026-05-25 in Phase 4 stage 4
     "dynamic_branch",
-    "cognitive.episode_promoter",  # moved 2026-05-25 in Phase 4 stage 2
-    "safety.ethical_gate",         # moved 2026-05-25 in Phase 4 stage 1
+    "cognitive.episode_promoter",   # moved 2026-05-25 in Phase 4 stage 2
+    "safety.ethical_gate",          # moved 2026-05-25 in Phase 4 stage 1
     "executor",
     "golden_eval",
     "prompt_hints",
     "qvalue_memory_wire",
-    "semantic_dispatch",
+    "dispatch.semantic_dispatch",   # moved 2026-05-25 in Phase 4 stage 4
     "synaptic_update",
 ]
 
@@ -73,12 +73,12 @@ def test_restored_module_imports(mod_name):
 
 
 @pytest.mark.parametrize("module_file,help_arg", [
-    ("dispatch_engine.py", "--help"),
+    ("dispatch/dispatch_engine.py", "--help"),    # Phase 4 stage 4
     ("cron_daily.py", "--help"),
     ("golden_eval.py", "--help"),
     ("synaptic_update.py", "--help"),
-    ("cognitive/episode_promoter.py", "--help"),  # moved 2026-05-25 Phase 4 stage 2
-    ("dispatch_cot.py", "--help"),
+    ("cognitive/episode_promoter.py", "--help"),  # Phase 4 stage 2
+    ("dispatch/dispatch_cot.py", "--help"),       # Phase 4 stage 4
 ])
 def test_critical_cli_help(module_file, help_arg):
     """Each critical CLI must respond to --help with exit code 0.
@@ -102,13 +102,13 @@ def test_critical_cli_help(module_file, help_arg):
 
 
 def test_dispatch_engine_status_lists_workers():
-    """`dispatch_engine.py --status` must list workers from company.yaml.
+    """`dispatch/dispatch_engine.py --status` must list workers from company.yaml.
 
     Catches: company.yaml schema drift, company_loader bug, dispatch_engine
     regression in its CompanyHierarchy parsing.
     """
     result = subprocess.run(
-        [PYTHON, str(ORCH_DIR / "dispatch_engine.py"), "--status"],
+        [PYTHON, str(ORCH_DIR / "dispatch" / "dispatch_engine.py"), "--status"],
         capture_output=True,
         text=True,
         timeout=30,

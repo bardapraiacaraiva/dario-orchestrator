@@ -47,7 +47,7 @@ sys.path.insert(0, str(ORCH_DIR))
 from artifact_schemas import SchemaValidationFilter
 from db import DB
 from filter_pipeline import BudgetFilter, FilterPipeline, LoggingFilter, QualityGateFilter, TokenBudgetFilter
-from model_router import ModelRouterFilter
+from dispatch.model_router import ModelRouterFilter
 from output_guardrails import OutputGuardrailFilter
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
