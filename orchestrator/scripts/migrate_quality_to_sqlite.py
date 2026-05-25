@@ -136,7 +136,7 @@ def main() -> int:
                     help="Actually insert into SQLite (default: dry run)")
     args = ap.parse_args()
 
-    from db import DB
+    from core.db import DB
     db = DB()
 
     label = "APPLY" if args.apply else "DRY-RUN"

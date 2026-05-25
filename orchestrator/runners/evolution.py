@@ -130,7 +130,7 @@ def generate_journal() -> dict:
     # Compute dispatch accuracy from DB audit logs
     try:
         sys.path.insert(0, str(ORCH_DIR))
-        from db import DB
+        from core.db import DB
         db = DB()
         audit = db.get_audit(limit=200)
         dispatches = [e for e in audit if e.get("action") == "task_dispatch_ok"]

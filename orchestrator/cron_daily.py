@@ -195,12 +195,12 @@ def job_state_snapshot() -> dict:
     sys.path.insert(0, str(ORCH_DIR))
     snapshot = {}
     try:
-        from synaptic_update import stats as syn_stats
+        from cognitive.synaptic_update import stats as syn_stats
         snapshot["synaptic"] = syn_stats()
     except Exception as e:
         snapshot["synaptic_error"] = str(e)[:100]
     try:
-        from qvalue_memory_wire import stats as q_stats
+        from cognitive.qvalue_memory_wire import stats as q_stats
         snapshot["qvalue"] = q_stats()
     except Exception as e:
         snapshot["qvalue_error"] = str(e)[:100]
@@ -347,7 +347,7 @@ def job_prompt_hints_promote() -> dict:
     """Prompt Hints (Upgrade 17) — extract recurring drilldown patterns
     into learned hints injected by context_injector."""
     sys.path.insert(0, str(ORCH_DIR))
-    from prompt_hints import list_hints, promote
+    from cognitive.prompt_hints import list_hints, promote
     pre_count = len(list_hints())
     stats = promote(verbose=False)
     post_count = len(list_hints())
@@ -533,7 +533,7 @@ def run_all(dry_run: bool = False) -> dict:
     if alerts or warnings:
         try:
             sys.path.insert(0, str(ORCH_DIR))
-            from webhook_dispatcher import send as _wh_send
+            from streaming.webhook_dispatcher import send as _wh_send
             for a in alerts + warnings:
                 _wh_send({
                     "event": f"cron_daily_{a['source']}",

@@ -164,7 +164,7 @@ def find_best_worker(skill: str, directors: dict = None) -> dict:
     # Get current workload to check availability
     workload = {}
     try:
-        from db import DB
+        from core.db import DB
         db = DB()
         active = db.get_tasks(status="in_progress")
         for t in active:
@@ -216,7 +216,7 @@ def decompose_task(task: dict, template_name: str = "") -> list[dict]:
     Decompose a complex task into subtasks.
     Uses template if available, otherwise infers from skill.
     """
-    from db import DB
+    from core.db import DB
     db = DB()
 
     task_id = task.get("id", "")
@@ -283,7 +283,7 @@ def decompose_task(task: dict, template_name: str = "") -> list[dict]:
 
 def delegate_subtasks(task: dict, template_name: str = "") -> dict:
     """Decompose and create all subtasks in DB."""
-    from db import DB
+    from core.db import DB
     db = DB()
 
     subtasks = decompose_task(task, template_name)
@@ -312,7 +312,7 @@ def delegate_subtasks(task: dict, template_name: str = "") -> dict:
 
 def check_subtasks_complete(parent_id: str) -> dict:
     """Check if all subtasks of a parent are done. For aggregation."""
-    from db import DB
+    from core.db import DB
     db = DB()
 
     subtasks = db.get_tasks(parent=parent_id)
@@ -368,7 +368,7 @@ def main():
 
     if args.task:
         try:
-            from db import DB
+            from core.db import DB
             task = DB().get_task(args.task)
             if not task:
                 print(f"Task {args.task} not found")

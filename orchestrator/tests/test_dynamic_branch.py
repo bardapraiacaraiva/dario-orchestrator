@@ -8,7 +8,7 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 
-import dynamic_branch as db
+from cognitive import dynamic_branch as db
 
 
 def test_excellence_foundational_continues_serial():

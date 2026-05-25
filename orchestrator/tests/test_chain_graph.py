@@ -11,7 +11,7 @@ import pytest
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-import chain_graph as cg
+from cognitive import chain_graph as cg
 
 # ─── Test executors ──────────────────────────────────────────────────────────
 

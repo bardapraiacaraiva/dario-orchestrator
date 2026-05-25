@@ -8,7 +8,7 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 
-from chain_validator import _load_chains, list_chains, validate_full_chain, validate_step_output
+from execution.chain_validator import _load_chains, list_chains, validate_full_chain, validate_step_output
 
 
 def test_chains_loaded():

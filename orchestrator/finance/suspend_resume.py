@@ -34,7 +34,7 @@ sys.path.insert(0, str(ORCH_DIR))
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("suspend_resume")
 
-from db import DB
+from core.db import DB
 
 
 def save_checkpoint(task_id: str, checkpoint_data: dict) -> dict:

@@ -26,7 +26,7 @@ def isolated_spend_log(tmp_path, monkeypatch):
     monkeypatch.setattr("scripts.aggregate_api_spend.SPEND_LOG", fake_yaml)
     monkeypatch.setattr("scripts.aggregate_api_spend.SPEND_JSONL", fake_jsonl)
     # Force a fresh DB for these tests — production DB has unrelated rows
-    import db as _db_module
+    from core import db as _db_module
     monkeypatch.setattr(_db_module, "DB_PATH", fake_db)
     return fake_yaml
 

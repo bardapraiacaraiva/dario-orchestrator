@@ -13,7 +13,7 @@ import yaml
 ORCH = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH))
 
-from db import DB
+from core.db import DB
 
 db = DB()
 tasks_dir = ORCH / "tasks" / "active"
@@ -44,7 +44,7 @@ for yaml_path in sorted(tasks_dir.glob("CUI-*.yaml")):
 
         # Update status to 'blocked' if the YAML had blocked_reason
         if data.get("blocked_reason"):
-            from task_store import TaskStore
+            from core.task_store import TaskStore
             ts = TaskStore()
             ts.update(tid, {
                 "status": "blocked",

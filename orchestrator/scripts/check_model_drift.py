@@ -168,7 +168,7 @@ def main() -> int:
 
     sys.path.insert(0, str(ORCH_DIR))
     try:
-        from db import DB
+        from core.db import DB
     except ImportError as e:
         print(f"DB module not available: {e}", file=sys.stderr)
         return 3

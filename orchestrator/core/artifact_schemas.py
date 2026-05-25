@@ -13,7 +13,7 @@ Usage:
     python artifact_schemas.py --list
 
 Integration with FilterPipeline:
-    from artifact_schemas import SchemaValidationFilter
+    from core.artifact_schemas import SchemaValidationFilter
     pipeline.add(SchemaValidationFilter(max_retries=3))
 """
 
@@ -243,7 +243,7 @@ def validate_artifact(output: str, skill: str, strict: bool = False) -> dict:
 # =============================================================================
 
 try:
-    from filter_pipeline import ExecutionFilter
+    from streaming.filter_pipeline import ExecutionFilter
 
     class SchemaValidationFilter(ExecutionFilter):
         """Post-execution schema validation. Tripwire on invalid artifacts."""

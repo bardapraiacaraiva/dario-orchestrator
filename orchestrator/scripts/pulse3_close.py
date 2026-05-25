@@ -9,7 +9,7 @@ import yaml
 ORCH = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH))
 
-from task_store import TaskStore
+from core.task_store import TaskStore
 
 ts = TaskStore()
 NOW = datetime.now(UTC).isoformat()

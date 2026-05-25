@@ -171,8 +171,8 @@ def collect_cron_history() -> dict:
 
 
 def collect_qvalue_top() -> dict:
-    from qvalue_memory_wire import stats as q_stats
-    from qvalue_memory_wire import top_strategies
+    from cognitive.qvalue_memory_wire import stats as q_stats
+    from cognitive.qvalue_memory_wire import top_strategies
     s = q_stats()
     top = top_strategies(5)
     return {
@@ -184,7 +184,7 @@ def collect_qvalue_top() -> dict:
 
 
 def collect_synaptic_health() -> dict:
-    from synaptic_update import _load_weights, stats
+    from cognitive.synaptic_update import _load_weights, stats
     s = stats()
     weights = _load_weights()
     graph = weights.get("affinity_graph", {})

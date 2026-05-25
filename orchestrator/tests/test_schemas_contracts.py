@@ -248,7 +248,7 @@ class TestTaskSpecIntegration:
     """validate_task() must keep its legacy dict-in / dict-out shape."""
 
     def test_valid_task_passes(self):
-        from task_spec import validate_task
+        from core.task_spec import validate_task
 
         result = validate_task({
             "id": "ATR-001",
@@ -259,14 +259,14 @@ class TestTaskSpecIntegration:
         assert result["spec_version"] == "TASK-FORMAT-SPEC-V1"
 
     def test_missing_fields_reported(self):
-        from task_spec import validate_task
+        from core.task_spec import validate_task
 
         result = validate_task({"id": "ATR-001"})
         assert result["valid"] is False
         assert any("title" in e for e in result["errors"])
 
     def test_invalid_executor_type_reported(self):
-        from task_spec import validate_task
+        from core.task_spec import validate_task
 
         result = validate_task({
             "id": "ATR-001",

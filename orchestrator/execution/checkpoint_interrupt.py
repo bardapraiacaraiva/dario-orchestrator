@@ -37,7 +37,7 @@ sys.path.insert(0, str(ORCH_DIR))
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("checkpoint")
 
-from db import DB
+from core.db import DB
 
 
 def interrupt_task(task_id: str, reason: str = "", checkpoint_data: dict = None,

@@ -23,7 +23,7 @@ def temp_runs_file(tmp_path, monkeypatch):
     fake_db = tmp_path / "test_orchestrator.db"
     monkeypatch.setattr("scripts.record_polished_run.RUNS_FILE", fake)
     monkeypatch.setattr("scripts.aggregate_polished_metrics.RUNS_FILE", fake)
-    import db as _db_module
+    from core import db as _db_module
     monkeypatch.setattr(_db_module, "DB_PATH", fake_db)
     return fake
 

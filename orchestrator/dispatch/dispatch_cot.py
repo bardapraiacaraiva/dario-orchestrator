@@ -147,7 +147,7 @@ def _gather_signals(task: dict) -> dict:
 
     # Signal 4: Q-value memory
     try:
-        from qvalue_memory_wire import suggest_skill
+        from cognitive.qvalue_memory_wire import suggest_skill
         text = f"{task.get('title', '')} {task.get('description', '')}".strip()
         if text:
             suggestions = suggest_skill(text, project=task.get("project"), top_k=3)

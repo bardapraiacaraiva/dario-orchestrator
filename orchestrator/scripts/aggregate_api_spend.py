@@ -50,7 +50,7 @@ def load_entries() -> list[dict]:
     try:
         import sys as _sys
         _sys.path.insert(0, str(Path.home() / ".claude" / "orchestrator"))
-        from db import DB
+        from core.db import DB
         db_rows = DB().get_api_spend()
         if db_rows:
             sources.append(("sqlite", db_rows))

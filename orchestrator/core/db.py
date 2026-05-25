@@ -23,7 +23,7 @@ Valid task statuses:
     any → pending_approval → todo (approved) or blocked (rejected)
 
 Usage:
-    from db import DB
+    from core.db import DB
     db = DB()
     db.create_task({"id": "T-001", "title": "...", "skill": "dario-brand"})
     db.assign_task("T-001", "worker-brand")

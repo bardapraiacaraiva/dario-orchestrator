@@ -128,7 +128,7 @@ def save_state(state: dict):
     """Persist state to file with locking."""
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     try:
-        from filelock import atomic_yaml_write
+        from reliability.filelock import atomic_yaml_write
         atomic_yaml_write(state, str(STATE_FILE))
     except ImportError:
         dump_yaml(state, str(STATE_FILE))
@@ -183,7 +183,7 @@ def get_quality_metrics() -> dict:
 def get_task_metrics() -> dict:
     """Get task status counts and stale detection (DB-first)."""
     try:
-        from task_store import TaskStore
+        from core.task_store import TaskStore
         tasks = TaskStore().get_all()
     except Exception:
         tasks = []

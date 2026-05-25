@@ -93,7 +93,7 @@ def load_all_tasks() -> list:
     """Load tasks — DB first, YAML fallback (fixed: was YAML-only)."""
     try:
         sys.path.insert(0, str(ORCH_DIR))
-        from db import DB
+        from core.db import DB
         db = DB()
         tasks = db.get_tasks()
         if tasks:
@@ -134,7 +134,7 @@ def persist_task_changes(t: dict) -> bool:
     # DB-loaded task — update via DB API (respects column whitelist + transitions)
     try:
         sys.path.insert(0, str(ORCH_DIR))
-        from db import DB
+        from core.db import DB
         db_inst = DB()
         # Serialize depends_on if it's a list (DB stores TEXT JSON)
         fields = dict(t)

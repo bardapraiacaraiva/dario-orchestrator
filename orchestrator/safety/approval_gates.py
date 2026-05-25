@@ -37,7 +37,7 @@ sys.path.insert(0, str(ORCH_DIR))
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("approval_gates")
 
-from db import DB
+from core.db import DB
 
 # =============================================================================
 # APPROVAL CONFIGURATION

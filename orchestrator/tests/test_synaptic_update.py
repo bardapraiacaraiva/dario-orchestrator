@@ -8,7 +8,7 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-import synaptic_update
+from cognitive import synaptic_update
 
 
 def with_isolated_weights(test_fn):

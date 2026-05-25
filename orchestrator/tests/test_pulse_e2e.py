@@ -28,19 +28,19 @@ PYTHON = sys.executable
 
 # Restored Risk #7 modules — these must all import cleanly post-v12.4.0.
 RESTORED_MODULES = [
-    "dispatch.dispatch_engine",     # moved 2026-05-25 in Phase 4 stage 4
-    "confidence_engine",
-    "chain_graph",
-    "dispatch.dispatch_cot",        # moved 2026-05-25 in Phase 4 stage 4
-    "dynamic_branch",
-    "cognitive.episode_promoter",   # moved 2026-05-25 in Phase 4 stage 2
-    "safety.ethical_gate",          # moved 2026-05-25 in Phase 4 stage 1
-    "executor",
-    "quality.golden_eval",          # moved 2026-05-25 in Phase 4 stage 5
-    "prompt_hints",
-    "qvalue_memory_wire",
-    "dispatch.semantic_dispatch",   # moved 2026-05-25 in Phase 4 stage 4
-    "synaptic_update",
+    "dispatch.dispatch_engine",     # Phase 4 stage 4
+    "cognitive.confidence_engine",  # Phase 4 stage 9
+    "cognitive.chain_graph",        # Phase 4 stage 9
+    "dispatch.dispatch_cot",        # Phase 4 stage 4
+    "cognitive.dynamic_branch",     # Phase 4 stage 9
+    "cognitive.episode_promoter",   # Phase 4 stage 2
+    "safety.ethical_gate",          # Phase 4 stage 1
+    "execution.executor",           # Phase 4 stage 10
+    "quality.golden_eval",          # Phase 4 stage 5
+    "cognitive.prompt_hints",       # Phase 4 stage 9
+    "cognitive.qvalue_memory_wire", # Phase 4 stage 9
+    "dispatch.semantic_dispatch",   # Phase 4 stage 4
+    "cognitive.synaptic_update",    # Phase 4 stage 9
 ]
 
 
@@ -73,12 +73,12 @@ def test_restored_module_imports(mod_name):
 
 
 @pytest.mark.parametrize("module_file,help_arg", [
-    ("dispatch/dispatch_engine.py", "--help"),    # Phase 4 stage 4
+    ("dispatch/dispatch_engine.py", "--help"),       # Phase 4 stage 4
     ("cron_daily.py", "--help"),
-    ("quality/golden_eval.py", "--help"),         # Phase 4 stage 5
-    ("synaptic_update.py", "--help"),
-    ("cognitive/episode_promoter.py", "--help"),  # Phase 4 stage 2
-    ("dispatch/dispatch_cot.py", "--help"),       # Phase 4 stage 4
+    ("quality/golden_eval.py", "--help"),            # Phase 4 stage 5
+    ("cognitive/synaptic_update.py", "--help"),      # Phase 4 stage 9
+    ("cognitive/episode_promoter.py", "--help"),     # Phase 4 stage 2
+    ("dispatch/dispatch_cot.py", "--help"),          # Phase 4 stage 4
 ])
 def test_critical_cli_help(module_file, help_arg):
     """Each critical CLI must respond to --help with exit code 0.

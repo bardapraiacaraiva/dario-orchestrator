@@ -64,13 +64,13 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 from safety.approval_gates import get_approval_level, request_approval
-from artifact_schemas import SchemaValidationFilter
-from checkpoint_interrupt import interrupt_task, should_interrupt
-from db import DB
-from filter_pipeline import BudgetFilter, FilterPipeline, LoggingFilter, QualityGateFilter, TokenBudgetFilter
+from core.artifact_schemas import SchemaValidationFilter
+from execution.checkpoint_interrupt import interrupt_task, should_interrupt
+from core.db import DB
+from streaming.filter_pipeline import BudgetFilter, FilterPipeline, LoggingFilter, QualityGateFilter, TokenBudgetFilter
 from safety.guardrails import validate_task
 from dispatch.model_router import ModelRouterFilter
-from output_guardrails import OutputGuardrailFilter
+from reliability.output_guardrails import OutputGuardrailFilter
 
 PYTHON = sys.executable
 
@@ -159,7 +159,7 @@ def execute_task(task_id: str, dry_run: bool = False) -> dict:
 
     # ─── Step 0.9: LIFECYCLE HOOK — task_start (was ORPHAN) ────────────
     try:
-        from lifecycle_hooks import get_registry
+        from core.lifecycle_hooks import get_registry
         get_registry().emit("task_start", task=task)
     except Exception:
         pass
@@ -188,7 +188,7 @@ def execute_task(task_id: str, dry_run: bool = False) -> dict:
                             "threshold": rubric.get("pass_threshold", 60)})
 
     # ─── Step 4: TRACE START ─────────────────────────────────────────────
-    run_engine("tracer.py", ["--start", "--task", task_id, "--skill", skill,
+    run_engine("observability/tracer.py", ["--start", "--task", task_id, "--skill", skill,
                              "--worker", worker, "--project", project,
                              "--context", context_block[:200]])
     result["steps"].append({"step": "trace_start"})
@@ -271,10 +271,10 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
         # If tripwire fired, quarantine output and route to replanner
         if after_result.get("tripwire"):
             log.warning(f"[TRIPWIRE] {task_id}: {after_result.get('tripwire_reason', '?')}")
-            run_engine("tracer.py", ["--end", "--task", task_id, "--status", "tripwire",
+            run_engine("observability/tracer.py", ["--end", "--task", task_id, "--status", "tripwire",
                                       "--error", after_result.get("tripwire_reason", "")[:300]])
             failure_type = "output_guardrail_tripwire"
-            replan = run_engine("replanner.py", [
+            replan = run_engine("execution/replanner.py", [
                 "--task", task_id, "--failure", failure_type,
                 "--score", str(score),
                 "--error", after_result.get("tripwire_reason", "")[:200], "--json"
@@ -286,7 +286,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
             return result
 
         # ─── TRACE END (success) ─────────────────────────────────────────
-        run_engine("tracer.py", ["--end", "--task", task_id, "--status", "success",
+        run_engine("observability/tracer.py", ["--end", "--task", task_id, "--status", "success",
                                   "--tokens", str(tokens), "--score", str(score),
                                   "--output", output[:300]])
         result["steps"].append({"step": "trace_end", "status": "success"})
@@ -342,7 +342,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
         # updating co-activation weights immediately after task completion.
         if status == "done" and score > 0 and skill and project:
             try:
-                from synaptic_update import process_completion as _synaptic_update
+                from cognitive.synaptic_update import process_completion as _synaptic_update
                 _deltas = _synaptic_update(task_id=task_id, skill=skill,
                                             project=project, score=score)
                 if _deltas:
@@ -356,7 +356,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
         # semantic and keyword matching are inconclusive.
         if status == "done" and score > 0 and skill:
             try:
-                from qvalue_memory_wire import record_outcome as _qvm_record
+                from cognitive.qvalue_memory_wire import record_outcome as _qvm_record
                 _task = task if isinstance(task, dict) else {}
                 _ctx = f"{_task.get('title', '')} {_task.get('description', '')}".strip()
                 if _ctx:
@@ -403,7 +403,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
         # ─── REACTIVE SUBSCRIPTIONS (trigger downstream tasks) ───────────
         if status == "done":
             try:
-                from reactive_subscriptions import on_task_completed
+                from reliability.reactive_subscriptions import on_task_completed
                 created = on_task_completed(task, score=score, tokens=tokens)
                 if created:
                     result["reactive_tasks_created"] = len(created)
@@ -414,7 +414,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
         if tokens > 0:
             try:
                 model = result.get("recommended_model", "sonnet")
-                run_engine("token_meter.py", [
+                run_engine("observability/token_meter.py", [
                     "--input", str(int(tokens * 0.7)),
                     "--output", str(int(tokens * 0.3)),
                     "--model", model,
@@ -426,7 +426,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
 
         # ─── LIFECYCLE HOOKS (was ORPHAN — events never emitted) ──────
         try:
-            from lifecycle_hooks import get_registry
+            from core.lifecycle_hooks import get_registry
             registry = get_registry()
             registry.emit("task_complete", task=task, output=output[:200], score=score)
             if score >= 90:
@@ -457,13 +457,13 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
 
     else:
         # ─── TRACE END (failed) ──────────────────────────────────────────
-        run_engine("tracer.py", ["--end", "--task", task_id, "--status", "failed",
+        run_engine("observability/tracer.py", ["--end", "--task", task_id, "--status", "failed",
                                   "--error", error[:300]])
         result["steps"].append({"step": "trace_end", "status": "failed"})
 
         # ─── ERROR HANDLERS (was ORPHAN — per-skill recovery) ────────────
         try:
-            from error_handlers import get_error_registry
+            from reliability.error_handlers import get_error_registry
             handler = get_error_registry().get(skill)
             recovery = handler.handle(Exception(error), task, {"_retry_count": 0})
             result["steps"].append({"step": "error_handler", "action": recovery.action, "recovered": recovery.recovered})
@@ -476,7 +476,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
 
         # ─── REPLAN (auto-recovery fallback) ─────────────────────────────
         failure_type = "agent_timeout" if "timeout" in error.lower() else "quality_below_50" if score < 50 and score > 0 else "unknown"
-        replan = run_engine("replanner.py", [
+        replan = run_engine("execution/replanner.py", [
             "--task", task_id, "--failure", failure_type,
             "--score", str(score), "--error", error[:200], "--json"
         ])
@@ -486,7 +486,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
 
         # ─── LIFECYCLE HOOK — task_fail ──────────────────────────────────
         try:
-            from lifecycle_hooks import get_registry
+            from core.lifecycle_hooks import get_registry
             get_registry().emit("task_fail", task=task, error=error[:200])
         except Exception:
             pass
@@ -585,7 +585,7 @@ def execute_wave(dry_run: bool = False) -> dict:
         return {"wave_size": 0, "status": "idle", "message": "No tasks ready for execution"}
 
     # Limit to max 3 parallel
-    state = run_engine("state_machine.py", ["--json"])
+    state = run_engine("core/state_machine.py", ["--json"])
     max_parallel = state.get("max_parallel", 3)
     wave = ready[:max_parallel]
 
@@ -619,7 +619,7 @@ def execute_pulse(dry_run: bool = False) -> dict:
     }
 
     # 0. State check
-    state = run_engine("state_machine.py", ["--evaluate", "--json"])
+    state = run_engine("core/state_machine.py", ["--evaluate", "--json"])
     pulse["steps"]["state"] = state
     if state.get("state") == "GUARDIAN":
         pulse["status"] = "guardian_stop"
@@ -630,7 +630,7 @@ def execute_pulse(dry_run: bool = False) -> dict:
     pulse["steps"]["dispatch"] = dispatch
 
     # 2. AutoDiag
-    diag = run_engine("autodiag_runner.py", ["--fix", "--json"])
+    diag = run_engine("core/autodiag_runner.py", ["--fix", "--json"])
     pulse["steps"]["autodiag"] = {"passed": diag.get("passed", 0), "total": diag.get("total", 0)}
 
     # 3. Execute wave

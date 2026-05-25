@@ -163,7 +163,7 @@ def record_score(task_id: str, score: int, skill: str = None,
             _task_data = load_yaml(str(task_file))
             if _task_data:
                 execution_policy = _task_data.get("execution_policy", "default")
-        from confidence_engine import gate_decision
+        from cognitive.confidence_engine import gate_decision
         gate = gate_decision(
             score=score,
             dimensions=dimensions or {},

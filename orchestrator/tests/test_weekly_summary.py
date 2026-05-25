@@ -9,7 +9,7 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 
-import weekly_summary as ws
+from observability import weekly_summary as ws
 
 
 def test_week_bounds_default():

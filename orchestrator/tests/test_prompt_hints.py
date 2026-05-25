@@ -9,7 +9,7 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 from quality import golden_eval
-import prompt_hints as ph
+from cognitive import prompt_hints as ph
 
 SANDBOX_SKILL = "test-skill-hints-xyz"
 SANDBOX_EVAL = "test-eval-hints-xyz"

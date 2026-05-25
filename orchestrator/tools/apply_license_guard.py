@@ -4,7 +4,7 @@ Apply license_guard.enforce_or_exit() to all CLI main() entry points.
 One-shot script that modifies orchestrator scripts to add license enforcement.
 
 Adds at the top of each main():
-    from license_guard import enforce_or_exit
+    from licensing.license_guard import enforce_or_exit
     enforce_or_exit("<component>")
 
 Idempotent: detects if already present and skips.
@@ -60,7 +60,7 @@ MARKER = "# license_guard wired (v11.1+ hardening)"
 
 PATCH_BLOCK_TEMPLATE = '''    {marker}
     try:
-        from license_guard import enforce_or_exit
+        from licensing.license_guard import enforce_or_exit
         enforce_or_exit("{component}")
     except SystemExit:
         raise

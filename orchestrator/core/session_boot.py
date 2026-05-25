@@ -47,7 +47,7 @@ def main():
 
     # 0. WAL crash recovery (before anything else)
     try:
-        from filelock import wal_recover
+        from reliability.filelock import wal_recover
         recovered = wal_recover()
         output["wal_recovered"] = recovered
     except Exception:
@@ -58,11 +58,11 @@ def main():
     output["resumed_tasks"] = resume_result.get("resumed", 0)
 
     # 1. State machine evaluation
-    state_result = run_engine("state_machine.py", ["--evaluate", "--json"])
+    state_result = run_engine("core/state_machine.py", ["--evaluate", "--json"])
     output["state"] = state_result
 
     # 2. AutoDiag (silent, with auto-fix)
-    diag_result = run_engine("autodiag_runner.py", ["--fix", "--json"])
+    diag_result = run_engine("core/autodiag_runner.py", ["--fix", "--json"])
     output["autodiag"] = {
         "passed": diag_result.get("passed", 0),
         "total": diag_result.get("total", 0),
@@ -94,7 +94,7 @@ def main():
     output["summary"] = summary
 
     # 5. Log boot event to unified audit trail
-    run_engine("audit_logger.py", [
+    run_engine("core/audit_logger.py", [
         "-a", "session-boot", "-A", "session_start",
         "-e", "system", "-i", f"boot-{datetime.now(UTC).strftime('%H%M')}",
         "-d", summary

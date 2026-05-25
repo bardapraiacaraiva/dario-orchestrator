@@ -214,7 +214,7 @@ def evaluate_context_relevance(query: str, context: str) -> dict:
 
 def evaluate_completeness(output: str, skill: str) -> dict:
     """Does the output cover all expected sections for this skill?"""
-    from artifact_schemas import SCHEMAS
+    from core.artifact_schemas import SCHEMAS
     schema = SCHEMAS.get(skill)
     if not schema:
         return {"evaluator": "completeness", "score": -1, "error": f"No schema for skill '{skill}'"}

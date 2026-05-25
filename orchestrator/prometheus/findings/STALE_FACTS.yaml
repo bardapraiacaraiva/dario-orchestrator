@@ -1,35 +1,255 @@
-scan_at: '2026-05-20T19:09:28.406710+00:00'
+scan_at: '2026-05-24T21:00:32.601693+00:00'
 schema_version: '1.0'
-total_skills_scanned: 764
-total_findings: 2
+total_skills_scanned: 685
+total_findings: 23
 by_severity:
-  medium: 2
+  high: 23
 by_type:
-  deprecation: 2
-  version_drift: 0
+  deprecation: 0
+  version_drift: 23
   stale_fact: 0
 findings:
-- type: deprecation
-  file: .claude/skills/shadcn-ui/references/official-ui-reference.md
-  line: 1358
-  term: .eslintrc
-  context: This JSON configuration defines a shadcn/ui registry item named 'my-eslint-config'
-    for a custom ESLint configuration. It specifies a single file with an explicit
-    target path (~/.eslintrc.json), enabli
-  section: '### define universal registry item for eslint configuration (shadcn/ui)'
-  severity: medium
-  replacement: eslint.config.js (flat config)
-  source: ESLint v9 release notes — legacy config removed in v10
-  category: dev-tooling
-- type: deprecation
-  file: .claude/skills/shadcn-ui/references/ui-reference.md
-  line: 166
-  term: .eslintrc
-  context: This example shows a universal registry item for installing a custom ESLint
-    configuration. It uses an explicit `target` to place the `.eslintrc.json` file
-    in the user's home directory, ensuring framew
-  section: '### universal item for eslint configuration (json)'
-  severity: medium
-  replacement: eslint.config.js (flat config)
-  source: ESLint v9 release notes — legacy config removed in v10
-  category: dev-tooling
+- type: version_drift
+  file: .claude/skills/builder-analytics-setup/SKILL.md
+  line: 217
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '**Data:** 2024-11-15 | **Stack:** Next.js 14, App Router | **GA4 ID:**
+    G-4K9MR27TQV'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-analytics-setup/SKILL.md
+  line: 233
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '## GA4 Config — Next.js 14 App Router'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-architecture-doc/SKILL.md
+  line: 69
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '- [ ] Level 2 (Container) detalha cada processo/store/app separado com
+    tecnologia nomeada (ex: "Next.js 14 API", "PostgreSQL 15")'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-architecture-doc/SKILL.md
+  line: 74
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '- ✅ Delivery-ready: `API[Next.js 14 API Routes\n/api/*] --> DB[(PostgreSQL
+    15\nsupabase-prod)]`'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-architecture-doc/SKILL.md
+  line: 115
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '- ✅ Delivery-ready: `graph TB; Familia[Família\nWeb + iOS] --> LDC[Lisbon
+    Dog Care\nNext.js 14] --> DB[(PostgreSQL\nSupabase prod)]`'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-architecture-doc/SKILL.md
+  line: 131
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: API[Next.js 14 API] --> DB[(PostgreSQL 15)]
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-architecture-doc/SKILL.md
+  line: 139
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: 🔵 verified  — Next.js 14 (confirmado via package.json)
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-architecture-doc/SKILL.md
+  line: 163
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: Familia[👨‍👩‍👧 Família\nApp Web + PWA] --> Cuidai[CUIDAI Platform\nNext.js
+    14 / Vercel]
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-architecture-doc/SKILL.md
+  line: 178
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: Browser[Browser / PWA\nReact 18 + Next.js 14] -->|HTTPS REST + tRPC| API[Next.js
+    API Routes\n/api/* — Vercel Edge]
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-architecture-doc/SKILL.md
+  line: 178
+  framework: react
+  claimed_version: '18'
+  current_version: '19'
+  drift: 1 major behind
+  severity: high
+  context: Browser[Browser / PWA\nReact 18 + Next.js 14] -->|HTTPS REST + tRPC| API[Next.js
+    API Routes\n/api/* — Vercel Edge]
+  recommendation: Update reference to react 19
+- type: version_drift
+  file: .claude/skills/builder-nextjs-monorepo/SKILL.md
+  line: 174
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: │   ├── web/                          ← Next.js 14 (App Router)
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-sst-deploy/SKILL.md
+  line: 151
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '- Next.js 14 App Router'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-tech-stack/SKILL.md
+  line: 98
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '- ✅ Delivery-ready: "Stack final para SAQUEI v1.0: Next.js 14 + FastAPI
+    0.111 + PostgreSQL 16 (Neon) + Vercel. Custo mês 1: EUR 0."'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/builder-tech-stack/SKILL.md
+  line: 148
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '| Frontend | Next.js 14 (App Router) | Vercel Pro | EUR 20 |'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/dario-hr/SKILL.md
+  line: 337
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: React 18 · Next.js 14 (App Router) · TypeScript · WordPress 6.5
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/dario-hr/SKILL.md
+  line: 337
+  framework: react
+  claimed_version: '18'
+  current_version: '19'
+  drift: 1 major behind
+  severity: high
+  context: React 18 · Next.js 14 (App Router) · TypeScript · WordPress 6.5
+  recommendation: Update reference to react 19
+- type: version_drift
+  file: .claude/skills/dario-pentest-checklist/SKILL.md
+  line: 158
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '- ✅ Delivery-ready: `URL(s) tested: app.lusoconta.pt, api.lusoconta.pt
+    — Stack: Next.js 14 + Supabase + Vercel — Date: 2025-06-10 — Authorization: Carlos
+    Mendes (CTO) authorized via email 2025-06-09`'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/dario-pentest-checklist/SKILL.md
+  line: 244
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '- Stack: Next.js 14.2 + Supabase (PostgreSQL) + Vercel Edge'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/dario-product/SKILL.md
+  line: 338
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '✅ Delivery-ready: `"Owner: Pedro Alves | Stack: Next.js 14 + Supabase
+    + Vercel | Date: 2025-02-03"`'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/dario-product/SKILL.md
+  line: 453
+  framework: react
+  claimed_version: '18'
+  current_version: '19'
+  drift: 1 major behind
+  severity: high
+  context: '- **Stack:** React 18 + TypeScript (existente), styled-components, deploy
+    Vercel'
+  recommendation: Update reference to react 19
+- type: version_drift
+  file: .claude/skills/dario-projeto/SKILL.md
+  line: 137
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '✅ Delivery-ready: "**Status:** Beta fechado, onboarding 3 clientes-piloto
+    | **Stack:** Next.js 14, Supabase, Stripe | **Last updated:** 2025-06-01 (14 dias
+    — contexto fresco)"'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/dario-projeto/SKILL.md
+  line: 225
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '**Stack:** Next.js 14, Supabase, Stripe Connect, Vercel'
+  recommendation: Update reference to next.js 15
+- type: version_drift
+  file: .claude/skills/seo-technical/SKILL.md
+  line: 370
+  framework: next.js
+  claimed_version: '14'
+  current_version: '15'
+  drift: 1 major behind
+  severity: high
+  context: '- **Framework:** Next.js 14 (SSR + ISR confirmado via headers `x-nextjs-cache`)'
+  recommendation: Update reference to next.js 15

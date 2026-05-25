@@ -6,7 +6,7 @@ Safe abstraction over DB. Column whitelist prevents SQL injection.
 All state transitions go through DB methods with proper guards.
 
 Usage:
-    from task_store import TaskStore
+    from core.task_store import TaskStore
     store = TaskStore()
     tasks = store.get_all()
     store.create({"id": "T-001", "title": "...", "skill": "dario-brand"})
@@ -32,7 +32,7 @@ class TaskStore:
         self._db = None
         self._use_db = False
         try:
-            from db import DB
+            from core.db import DB
             self._db = DB()
             self._use_db = True
         except Exception as e:

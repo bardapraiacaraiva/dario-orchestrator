@@ -30,7 +30,7 @@ def isolated_budget(tmp_path, monkeypatch):
     fake_budgets.mkdir()
     fake_db = tmp_path / "test_orch.db"
     monkeypatch.setattr("enforcement.budget_gate.BUDGETS_DIR", fake_budgets)
-    import db as _db_module
+    from core import db as _db_module
     monkeypatch.setattr(_db_module, "DB_PATH", fake_db)
     return fake_budgets
 
@@ -87,7 +87,7 @@ class TestBudgetGate:
     def test_picks_higher_source_value(self, isolated_budget):
         """Defensive: YAML says 50%, SQLite says 99% → must use 99%."""
         from enforcement.budget_gate import current_budget_state
-        from db import DB
+        from core.db import DB
         self._write_budget(isolated_budget, "2099-07", pct=50.0)
         with DB()._conn() as conn:
             conn.execute(

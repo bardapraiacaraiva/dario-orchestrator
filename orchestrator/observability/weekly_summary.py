@@ -255,7 +255,7 @@ def collect_integrity_events(cron_days: list) -> list:
 def collect_qvalue_snapshot() -> dict:
     """End-of-week Q-value state."""
     try:
-        from qvalue_memory_wire import stats, top_strategies
+        from cognitive.qvalue_memory_wire import stats, top_strategies
         s = stats()
         return {**s, "top_5": top_strategies(5)}
     except Exception as e:
@@ -265,7 +265,7 @@ def collect_qvalue_snapshot() -> dict:
 def collect_synaptic_snapshot() -> dict:
     """End-of-week synaptic graph."""
     try:
-        from synaptic_update import stats
+        from cognitive.synaptic_update import stats
         return stats()
     except Exception as e:
         return {"error": str(e)[:100]}

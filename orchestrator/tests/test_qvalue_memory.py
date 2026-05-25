@@ -8,7 +8,7 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-import qvalue_memory_wire as qvm_wire
+from cognitive import qvalue_memory_wire as qvm_wire
 
 
 def test_stop_word_filter():

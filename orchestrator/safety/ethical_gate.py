@@ -323,7 +323,7 @@ def _load_task(task_id: str) -> dict:
     # Try DB first, fall back to YAML
     try:
         sys.path.insert(0, str(ORCH_DIR))
-        from db import DB
+        from core.db import DB
         db = DB()
         t = db.get_task(task_id)
         if t:

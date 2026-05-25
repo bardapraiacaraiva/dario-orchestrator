@@ -27,7 +27,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path.home() / ".claude" / "orchestrator"))
-from db import DB
+from core.db import DB
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 TEMPLATES_DIR = ORCH_DIR / "tasks" / "templates"

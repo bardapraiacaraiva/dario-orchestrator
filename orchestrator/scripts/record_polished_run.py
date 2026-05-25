@@ -123,7 +123,7 @@ def append_run(
 
     # Primary write: SQLite (concurrent-safe via WAL + busy_timeout)
     try:
-        from db import DB
+        from core.db import DB
         DB().record_polished_run(
             skill=skill, client=client,
             v1_score=v1_score, v2_score=v2_score,

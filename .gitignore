@@ -91,6 +91,24 @@
 # (orchestrator/quality/ already whitelisted for .yaml; now also for .py)
 !orchestrator/quality/*.py
 
+# --- Allow observability + parsers + streaming + reliability (Stage 6-8) ---
+!orchestrator/observability/
+!orchestrator/observability/*.py
+!orchestrator/parsers/
+!orchestrator/parsers/*.py
+!orchestrator/streaming/
+!orchestrator/streaming/*.py
+!orchestrator/reliability/
+!orchestrator/reliability/*.py
+
+# --- Allow execution + core + meta (Stage 9-11, 2026-05-25) ---
+!orchestrator/execution/
+!orchestrator/execution/*.py
+!orchestrator/core/
+!orchestrator/core/*.py
+!orchestrator/meta/
+!orchestrator/meta/*.py
+
 # --- Allow test suite + pytest config ---
 !orchestrator/tests/
 !orchestrator/tests/*.py

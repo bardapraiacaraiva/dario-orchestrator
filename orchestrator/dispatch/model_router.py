@@ -150,7 +150,7 @@ def classify_complexity(task: dict = None, skill: str = "", priority: str = "med
 def get_historical_quality(skill: str, model: str = "") -> dict:
     """Get historical quality data for a skill on a specific model."""
     try:
-        from db import DB
+        from core.db import DB
         db = DB()
         scores = db.get_scores(skill=skill)
         if not scores:
@@ -251,7 +251,7 @@ def route_model(task: dict = None, skill: str = "", priority: str = "medium",
 # =============================================================================
 
 try:
-    from filter_pipeline import ExecutionFilter
+    from streaming.filter_pipeline import ExecutionFilter
 
     class ModelRouterFilter(ExecutionFilter):
         """Pre-execution filter that selects the optimal model."""
@@ -295,7 +295,7 @@ def main():
     task = None
     if args.task:
         try:
-            from db import DB
+            from core.db import DB
             task = DB().get_task(args.task)
         except Exception:
             pass

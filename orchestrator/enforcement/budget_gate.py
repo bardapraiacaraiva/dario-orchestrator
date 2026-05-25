@@ -50,7 +50,7 @@ def _load_budget_sqlite(month: str) -> dict:
     try:
         import sys
         sys.path.insert(0, str(ORCH_DIR))
-        from db import DB
+        from core.db import DB
         with DB()._conn() as conn:
             row = conn.execute(
                 "SELECT tokens_used, token_limit FROM budget WHERE month = ?",

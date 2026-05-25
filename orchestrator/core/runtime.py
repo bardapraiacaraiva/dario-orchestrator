@@ -51,7 +51,7 @@ from pydantic import BaseModel
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-from db import DB
+from core.db import DB
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("runtime")
@@ -98,14 +98,14 @@ class Scheduler:
         # Zombie task reaper
         self._reap_zombies()
         # State check
-        _run_engine("state_machine.py", ["--evaluate", "--json"])
+        _run_engine("core/state_machine.py", ["--evaluate", "--json"])
         # Dispatch
         _run_engine("dispatch_engine.py", ["--json"])
         # AutoDiag
-        _run_engine("autodiag_runner.py", ["--fix", "--json"])
+        _run_engine("core/autodiag_runner.py", ["--fix", "--json"])
         # Evolution cycle (was ORPHAN — the system's differentiator, never ran)
         if self.pulse_count > 0 and self.pulse_count % 48 == 0:  # Every ~24h (48 * 30min)
-            _run_engine("evolution_runner.py", ["--json"])
+            _run_engine("execution/evolution_runner.py", ["--json"])
             log.info("[EVOLUTION] Daily cycle executed")
         # Budget tracker
         _run_engine("budget_tracker.py", ["--check", "--quiet"])
@@ -116,7 +116,7 @@ class Scheduler:
     def _reap_zombies(self, max_age_minutes: int = 60):
         """Find tasks stuck in in_progress and block them (new: zombie reaper)."""
         try:
-            from db import DB
+            from core.db import DB
             db = DB()
             tasks = db.get_tasks(status="in_progress")
             now = datetime.now(UTC)
@@ -222,7 +222,7 @@ app = FastAPI(
 
 # OpenTelemetry tracing (v12.1 / Onda 1 #4 — real OTel, exports to Langfuse if env set)
 try:
-    from otel_setup import instrument_fastapi, setup_tracing
+    from observability.otel_setup import instrument_fastapi, setup_tracing
     setup_tracing(service_name="dario-orchestrator-runtime")
     instrument_fastapi(app)
 except Exception as e:
@@ -316,7 +316,7 @@ class TransitionRequest(BaseModel):
 
 @app.get("/health", response_model=HealthResponse)
 async def health():
-    state_result = _run_engine("state_machine.py", ["--json"])
+    state_result = _run_engine("core/state_machine.py", ["--json"])
     return HealthResponse(
         status="ok",
         state=state_result.get("state", "?"),
@@ -389,12 +389,12 @@ async def dispatch_execute():
 
 @app.get("/state", response_model=StateResponse)
 async def get_state():
-    return _run_engine("state_machine.py", ["--json"])
+    return _run_engine("core/state_machine.py", ["--json"])
 
 
 @app.post("/state/transition", response_model=StateResponse)
 async def force_transition(req: TransitionRequest):
-    result = _run_engine("state_machine.py", ["--transition", req.target_state, "--json"])
+    result = _run_engine("core/state_machine.py", ["--transition", req.target_state, "--json"])
     return result
 
 
@@ -432,7 +432,7 @@ async def trigger_pulse(request: Request = None):
 @app.get("/chains")
 async def list_chains():
     """List available chains — now via chain_graph directly (Onda 3 #3)."""
-    from chain_graph import list_chains as _list_chains
+    from cognitive.chain_graph import list_chains as _list_chains
     return _list_chains()
 
 
@@ -448,7 +448,7 @@ async def start_chain(chain_name: str, project: str = "", context: str = ""):
     """
     from datetime import datetime
 
-    from chain_graph import ChainGraph, load_chain_def
+    from cognitive.chain_graph import ChainGraph, load_chain_def
 
     chain_def = load_chain_def(chain_name)
     if chain_def is None:
@@ -488,7 +488,7 @@ from fastapi.responses import StreamingResponse
 
 # SSE Streaming — now uses full EventBus (was ORPHAN inline version)
 try:
-    from sse_streaming import get_bus, stream_task_events
+    from streaming.sse_streaming import get_bus, stream_task_events
     _sse_bus = get_bus()
     log.info("[SSE] EventBus active (was inline orphan)")
 except ImportError:
@@ -549,8 +549,8 @@ async def compose_chain(req: ComposeRequest):
     """Dynamically compose a skill chain. Validates schemas and saves."""
     # Onda 5 #2: DEFAULT_SCHEMAS now lives in chain_schemas.py (extracted).
     # build_execution_plan lives in chain_graph (Onda 3 #3).
-    from chain_graph import build_execution_plan
-    from chain_schemas import DEFAULT_SCHEMAS
+    from cognitive.chain_graph import build_execution_plan
+    from execution.chain_schemas import DEFAULT_SCHEMAS
 
     # Validate all skills have schemas
     validated = []
@@ -917,7 +917,7 @@ async def cfo_data():
 # ─── TIER 3 Registration ────────────────────────────────────────────────────
 
 try:
-    from tier3 import register_tier3_endpoints
+    from core.tier3 import register_tier3_endpoints
     register_tier3_endpoints(app)
     log.info("TIER 3 endpoints registered (10 differentiation features)")
 except ImportError as e:

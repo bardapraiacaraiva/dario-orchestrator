@@ -103,7 +103,7 @@ def mock_ollama_embed(request, monkeypatch):
 @pytest.fixture
 def test_db(tmp_path):
     """Fresh SQLite DB for each test."""
-    from db import DB
+    from core.db import DB
     db_path = str(tmp_path / "test.db")
     db = DB(db_path=db_path)
     return db

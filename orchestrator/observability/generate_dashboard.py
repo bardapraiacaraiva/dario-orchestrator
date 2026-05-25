@@ -179,7 +179,7 @@ def generate():
     # Model drift events (v4 schema, Risk #10 stamp+warn)
     drift_events = None
     try:
-        from db import DB
+        from core.db import DB
         drift_events = DB().get_drift_events()
     except Exception:
         drift_events = None

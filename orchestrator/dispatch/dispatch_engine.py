@@ -155,7 +155,7 @@ class CompanyHierarchy:
 def load_tasks() -> list:
     """Load all active tasks (DB-first, YAML fallback)."""
     try:
-        from task_store import TaskStore
+        from core.task_store import TaskStore
         return TaskStore().get_all()
     except Exception:
         # Fallback to YAML
@@ -185,7 +185,7 @@ def get_unassigned_tasks(tasks: list) -> list:
 def get_worker_workload(tasks: list) -> dict:
     """Calculate current workload per worker (fixed: was calling wrong signature)."""
     try:
-        from db import DB
+        from core.db import DB
         db = DB()
         active = db.get_tasks(status="in_progress") + db.get_tasks(status="todo") + db.get_tasks(status="in_review")
         workload = {}
@@ -405,7 +405,7 @@ def _try_qvalue_match(task: dict) -> str | None:
     episodes with similar context; None otherwise.
     """
     try:
-        from qvalue_memory_wire import suggest_skill
+        from cognitive.qvalue_memory_wire import suggest_skill
         text = f"{task.get('title', '')} {task.get('description', '')}".strip()
         if not text:
             return None
@@ -615,7 +615,7 @@ def assign_task(task: dict, worker_id: str, reasons: list) -> bool:
         return False
 
     try:
-        from filelock import YAMLLock
+        from reliability.filelock import YAMLLock
         with YAMLLock(task_file, timeout=5) as lock:
             data = lock.read()
             if not data:

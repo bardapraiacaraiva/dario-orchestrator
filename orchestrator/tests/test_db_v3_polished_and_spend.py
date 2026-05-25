@@ -17,7 +17,7 @@ sys.path.insert(0, str(ORCH_DIR))
 @pytest.fixture
 def fresh_db(tmp_path):
     """Fresh SQLite DB per test — no shared state."""
-    from db import DB
+    from core.db import DB
     db_path = tmp_path / "test_orchestrator.db"
     return DB(db_path=str(db_path))
 
@@ -284,7 +284,7 @@ class TestConcurrentInsertsSafe:
     def test_concurrent_inserts_via_threads(self, fresh_db, tmp_path):
         """Multiple threads writing concurrently — sanity check WAL mode."""
         import threading
-        from db import DB
+        from core.db import DB
 
         def worker(thread_id: int):
             local_db = DB(db_path=fresh_db.db_path)

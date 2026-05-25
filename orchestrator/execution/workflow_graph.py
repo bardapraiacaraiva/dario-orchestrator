@@ -8,7 +8,7 @@ with schema validation between steps.
 Replaces raw DAG adjacency lists with a fluent, typed API.
 
 Usage:
-    from workflow_graph import Workflow
+    from execution.workflow_graph import Workflow
 
     wf = (Workflow("brand_launch")
         .then("dario-brand", output_schema={"posicionamento": str, "archetype": str})
@@ -230,7 +230,7 @@ class Workflow:
 
         # Check for missing skills
         try:
-            from artifact_schemas import SCHEMAS
+            from core.artifact_schemas import SCHEMAS
             for step in self.steps:
                 if step.skill and step.skill not in SCHEMAS and not step.output_schema:
                     pass  # Warning only, not error

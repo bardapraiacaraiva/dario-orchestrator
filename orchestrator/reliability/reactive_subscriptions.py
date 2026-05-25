@@ -125,7 +125,7 @@ def on_task_completed(task: dict, score: int = 0, tokens: int = 0) -> list[dict]
     React to a completed task. Check watchers and create downstream tasks.
     Returns list of created tasks.
     """
-    from db import DB
+    from core.db import DB
     db = DB()
 
     skill = task.get("skill", "")
@@ -239,7 +239,7 @@ def main():
 
     if args.event == "task_completed" and args.task:
         try:
-            from db import DB
+            from core.db import DB
             task = DB().get_task(args.task)
             if not task:
                 print(f"Task {args.task} not found")

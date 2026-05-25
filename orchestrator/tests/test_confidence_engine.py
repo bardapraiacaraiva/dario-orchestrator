@@ -8,7 +8,7 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 
-from confidence_engine import compute_confidence, gate_decision
+from cognitive.confidence_engine import compute_confidence, gate_decision
 
 
 def test_high_confidence_tight_dimensions():

@@ -6,7 +6,7 @@ from pathlib import Path
 import yaml
 
 sys.path.insert(0, str(Path.home() / ".claude" / "orchestrator"))
-from task_store import TaskStore
+from core.task_store import TaskStore
 
 ts = TaskStore()
 NOW = datetime.now(UTC).isoformat()

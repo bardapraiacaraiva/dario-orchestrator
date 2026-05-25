@@ -18,7 +18,7 @@ Events:
     on_interrupt(task, reason)        — When task awaits human
 
 Usage:
-    from lifecycle_hooks import HookRegistry, Hook
+    from core.lifecycle_hooks import HookRegistry, Hook
 
     registry = HookRegistry()
 

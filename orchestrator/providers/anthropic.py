@@ -44,11 +44,11 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-from artifact_schemas import SchemaValidationFilter
-from db import DB
-from filter_pipeline import BudgetFilter, FilterPipeline, LoggingFilter, QualityGateFilter, TokenBudgetFilter
+from core.artifact_schemas import SchemaValidationFilter
+from core.db import DB
+from streaming.filter_pipeline import BudgetFilter, FilterPipeline, LoggingFilter, QualityGateFilter, TokenBudgetFilter
 from dispatch.model_router import ModelRouterFilter
-from output_guardrails import OutputGuardrailFilter
+from reliability.output_guardrails import OutputGuardrailFilter
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("api_exec")
@@ -406,10 +406,10 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
     project = task.get("project", "")
 
     # 0. TASK-FORMAT-SPEC-V1: Enrich + Pre-conditions
-    spec_enrich = run_engine("task_spec.py", ["--enrich", task_id, "--json"])
+    spec_enrich = run_engine("core/task_spec.py", ["--enrich", task_id, "--json"])
     result["steps"].append({"step": "spec_enrich", "fields": spec_enrich.get("enriched_fields", [])})
 
-    spec_pre = run_engine("task_spec.py", ["--check-pre", task_id, "--json"])
+    spec_pre = run_engine("core/task_spec.py", ["--check-pre", task_id, "--json"])
     if not spec_pre.get("pass", True) and spec_pre.get("blockers"):
         result["status"] = "blocked"
         result["error"] = f"Pre-conditions: {spec_pre['blockers']}"
@@ -455,7 +455,7 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
     result["steps"].append({"step": "rubric", "dimensions": rubric.get("dimensions_count", 5)})
 
     # 4. Build prompt
-    from executor import build_execution_prompt
+    from execution.executor import build_execution_prompt
     prompt = build_execution_prompt(task, context_block, rubric)
 
     # 5. Select model
@@ -466,7 +466,7 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
     result["steps"].append({"step": "model_selected", "model": model})
 
     # 6. Trace start
-    run_engine("tracer.py", ["--start", "--task", task_id, "--skill", skill,
+    run_engine("observability/tracer.py", ["--start", "--task", task_id, "--skill", skill,
                               "--worker", task.get("assignee", ""), "--project", project])
 
     if dry_run:
@@ -521,7 +521,7 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
         ])
 
         # 11. Trace end
-        run_engine("tracer.py", ["--end", "--task", task_id, "--status", "success",
+        run_engine("observability/tracer.py", ["--end", "--task", task_id, "--status", "success",
                                   "--tokens", str(total_tokens), "--score", str(score),
                                   "--output", output[:200]])
 
@@ -531,7 +531,7 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
                          output=output, status=final_status)
 
         # 12.5 TASK-FORMAT-SPEC-V1: Post-conditions check
-        spec_post = run_engine("task_spec.py", ["--check-post", task_id, "--json"])
+        spec_post = run_engine("core/task_spec.py", ["--check-post", task_id, "--json"])
         result["steps"].append({"step": "post_conditions", "pass": spec_post.get("pass", True),
                                 "issues": spec_post.get("issues", [])})
 
@@ -549,11 +549,11 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
         error = api_result.get("error", "Unknown API error")
 
         # Trace end (failed)
-        run_engine("tracer.py", ["--end", "--task", task_id, "--status", "failed",
+        run_engine("observability/tracer.py", ["--end", "--task", task_id, "--status", "failed",
                                   "--error", error[:200]])
 
         # Replan
-        replan = run_engine("replanner.py", [
+        replan = run_engine("execution/replanner.py", [
             "--task", task_id, "--failure", "agent_timeout", "--error", error[:200], "--json"
         ])
 
@@ -718,7 +718,7 @@ def autonomous_pulse(dry_run: bool = False, max_tasks: int = 3) -> dict:
     pulse = {"timestamp": datetime.now(UTC).isoformat(), "steps": {}, "tasks_executed": []}
 
     # State check
-    state = run_engine("state_machine.py", ["--evaluate", "--json"])
+    state = run_engine("core/state_machine.py", ["--evaluate", "--json"])
     pulse["steps"]["state"] = {"state": state.get("state"), "health": state.get("system_health")}
     if state.get("state") == "GUARDIAN":
         pulse["status"] = "guardian_stop"
@@ -729,7 +729,7 @@ def autonomous_pulse(dry_run: bool = False, max_tasks: int = 3) -> dict:
     pulse["steps"]["dispatch"] = {"dispatched": dispatch.get("dispatched", 0)}
 
     # AutoDiag
-    diag = run_engine("autodiag_runner.py", ["--fix", "--json"])
+    diag = run_engine("core/autodiag_runner.py", ["--fix", "--json"])
     pulse["steps"]["autodiag"] = {"passed": diag.get("passed", 0), "total": diag.get("total", 0)}
 
     # Get ready tasks

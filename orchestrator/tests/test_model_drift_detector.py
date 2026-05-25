@@ -13,7 +13,7 @@ sys.path.insert(0, str(ORCH_DIR))
 
 @pytest.fixture
 def fresh_db(tmp_path):
-    from db import DB
+    from core.db import DB
     return DB(db_path=str(tmp_path / "test_v4.db"))
 
 

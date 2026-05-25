@@ -268,7 +268,7 @@ def validate_output(output: str, skill: str = "", strict: bool = False) -> dict:
 # =============================================================================
 
 try:
-    from filter_pipeline import ExecutionFilter
+    from streaming.filter_pipeline import ExecutionFilter
 
     class OutputGuardrailFilter(ExecutionFilter):
         """Post-execution guardrail filter. Tripwire on critical issues."""

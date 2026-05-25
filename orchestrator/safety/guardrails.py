@@ -71,7 +71,7 @@ def validate_task(task_id: str, strict: bool = False) -> dict:
     task = None
     try:
         sys.path.insert(0, str(ORCH_DIR))
-        from db import DB
+        from core.db import DB
         db = DB()
         task = db.get_task(task_id)
     except Exception:

@@ -94,7 +94,7 @@ def _save_weights(data: dict) -> None:
     # Atomic write via filelock if available, plain write as fallback
     try:
         sys.path.insert(0, str(ORCH_DIR))
-        from filelock import YAMLLock
+        from reliability.filelock import YAMLLock
         with YAMLLock(str(WEIGHTS_FILE), timeout=5) as lock:
             lock.write(data)
             return

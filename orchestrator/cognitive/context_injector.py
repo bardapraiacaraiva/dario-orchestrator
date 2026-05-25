@@ -93,7 +93,7 @@ def get_previous_outputs(project: str, current_task_id: str) -> list:
     # Try DB first (has full outputs stored)
     try:
         sys.path.insert(0, str(ORCH_DIR))
-        from db import DB
+        from core.db import DB
         db = DB()
         with db._conn() as conn:
             rows = conn.execute(
@@ -287,7 +287,7 @@ def get_skill_hints(skill: str) -> str:
     try:
         import sys as _sys
         _sys.path.insert(0, str(ORCH_DIR))
-        from prompt_hints import get_hints_for_skill
+        from cognitive.prompt_hints import get_hints_for_skill
         learned = get_hints_for_skill(skill)
         if learned:
             parts.append(learned)

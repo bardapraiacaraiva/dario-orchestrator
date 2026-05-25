@@ -16,7 +16,7 @@ sys.path.insert(0, str(ORCH_DIR))
 
 import pytest
 
-import cognitive_dashboard as cd
+from observability import cognitive_dashboard as cd
 
 # Setup cost is ~56s (Ollama embedding round-trips for goldens).
 # Even though individual tests cache via the `collected` fixture, the FIRST

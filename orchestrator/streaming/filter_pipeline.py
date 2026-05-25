@@ -156,7 +156,7 @@ class BudgetFilter(ExecutionFilter):
         try:
             import sys
             sys.path.insert(0, str(ORCH_DIR))
-            from db import DB
+            from core.db import DB
             budget = DB().get_budget()
             if budget:
                 used = budget.get("tokens_used", 0)
@@ -210,7 +210,7 @@ class TokenBudgetFilter(ExecutionFilter):
             try:
                 import sys
                 sys.path.insert(0, str(ORCH_DIR))
-                from db import DB
+                from core.db import DB
                 DB().update_budget(tokens)
                 log.info(f"[BUDGET] +{tokens} tokens recorded")
             except Exception as e:

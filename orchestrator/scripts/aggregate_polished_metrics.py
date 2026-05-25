@@ -46,7 +46,7 @@ def load_runs() -> list[dict]:
     try:
         import sys as _sys
         _sys.path.insert(0, str(Path.home() / ".claude" / "orchestrator"))
-        from db import DB
+        from core.db import DB
         db_rows = DB().get_polished_runs()
         if db_rows:
             sources.append(db_rows)

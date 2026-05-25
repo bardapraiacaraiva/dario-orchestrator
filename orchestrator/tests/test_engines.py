@@ -129,13 +129,13 @@ class TestChainGraph:
     tests/test_chain_graph.py (8 dedicated tests)."""
 
     def test_chain_listing_via_chain_graph(self):
-        from chain_graph import list_chains
+        from cognitive.chain_graph import list_chains
         chains = list_chains()
         assert "brand_to_market" in chains
         assert chains["brand_to_market"]["total_steps"] >= 1
 
     def test_build_execution_plan_via_chain_graph(self):
-        from chain_graph import build_execution_plan, load_chain_def
+        from cognitive.chain_graph import build_execution_plan, load_chain_def
         defn = load_chain_def("brand_to_market")
         assert defn is not None
         plan = build_execution_plan(defn)

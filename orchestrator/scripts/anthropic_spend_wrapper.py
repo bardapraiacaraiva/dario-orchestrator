@@ -94,7 +94,7 @@ def _append_entry(entry: dict) -> None:
 
     # Primary: SQLite (concurrent-safe via WAL)
     try:
-        from db import DB
+        from core.db import DB
         DB().record_api_spend(
             caller=entry["caller"],
             model=entry["model"],

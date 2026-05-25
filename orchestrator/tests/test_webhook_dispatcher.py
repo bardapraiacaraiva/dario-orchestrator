@@ -10,7 +10,7 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 
-import webhook_dispatcher as wd
+from streaming import webhook_dispatcher as wd
 
 
 def _backup_log():
