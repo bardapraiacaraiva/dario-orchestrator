@@ -67,11 +67,25 @@ keep license server + token validation (cheap signal); delete Cython pipeline
 
 ---
 
-## Risk #7 — VIP stubs as product strategy
+## Risk #7 — VIP stubs as product strategy ✅ RESOLVED 2026-05-25
+
+**Decision:** Open everything. Restored 6,057 LOC across 13 modules + 21
+files in upgrades/ package from commit 5bba778. Both origin (trial) and
+full (VIP) now ship identical, working implementations. The "VIP-only"
+ImportError theater is gone. `vip_only` test marker deprecated. pre-push
+hook no longer tolerates collection errors.
+
+Aligned with framing C (consulting accelerator): value is in the
+installation/curation/workflow, not in withholding Python files. Buyers
+of "DARIO Install" (R$ 997) get the working system, not a partial one.
+
+Test surface: 449 → 545 (+96 tests now run). 0 collection errors.
+
+### Historical analysis (kept for context)
 
 ### Current state
 ```python
-# dispatch_engine.py, dispatch_cot.py, semantic_dispatch.py
+# dispatch_engine.py, dispatch_cot.py, semantic_dispatch.py — REMOVED
 raise ImportError(
     f"{_MODULE_NAME!r} is a VIP-only module. "
     "Buy a Professional or Enterprise license..."

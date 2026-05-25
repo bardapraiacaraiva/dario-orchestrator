@@ -2,9 +2,8 @@
 # DARIO Orchestrator pre-push hook
 # ──────────────────────────────────────────────────────────────────────
 # Runs the fast (non-slow-marked) test suite before any push.
-# Blocks the push on any actual test failure.
-# Tolerates pre-existing collection errors caused by VIP-only stub
-# modules (trial repo limitation, not regressions).
+# Blocks the push on any actual test failure or collection error.
+# (VIP stubs removed 2026-05-25, Risk #7 — no more tolerated import errors.)
 #
 # Install via:
 #   git config core.hooksPath orchestrator/scripts/hooks
@@ -37,17 +36,13 @@ fi
 
 cd "$ORCH_DIR"
 
-echo "[pre-push] Running fast test suite (markers: not slow and not vip_only)…"
+echo "[pre-push] Running fast test suite (marker: not slow)…"
 START=$(date +%s)
 
 # Marker deselection:
-#   not slow     — skip tests >5s (subprocess, LLM, embeddings)
-#   not vip_only — skip tests requiring VIP modules (trial repo limitation)
-# --continue-on-collection-errors: tolerates module ImportError during
-# collection from other VIP stubs we haven't marked yet.
-# Actual test failures still block the push.
-OUTPUT=$("$PYTHON" -m pytest -m "not slow and not vip_only" \
-    --continue-on-collection-errors \
+#   not slow — skip tests >5s (subprocess, LLM, embeddings)
+# Collection errors now fail the push (no more VIP stubs to tolerate).
+OUTPUT=$("$PYTHON" -m pytest -m "not slow" \
     -q --no-header --tb=line 2>&1)
 STATUS=$?
 
@@ -69,8 +64,11 @@ PASSED=$(echo "$SUMMARY_LINE" | grep -oE "[0-9]+ passed" | head -1 | grep -oE "[
 ERRORS=$(echo "$SUMMARY_LINE" | grep -oE "[0-9]+ errors?" | head -1 | grep -oE "[0-9]+" || echo "0")
 
 if [ "$ERRORS" -gt 0 ]; then
-    echo "[pre-push] PASS — ${PASSED} tests passed, ${ERRORS} collection errors (pre-existing VIP-stub) (${ELAPSED}s)"
-else
-    echo "[pre-push] PASS — ${PASSED} tests passed (${ELAPSED}s)"
+    echo "$OUTPUT" | tail -25
+    echo ""
+    echo "[pre-push] FAIL — ${ERRORS} collection error(s) (${ELAPSED}s)"
+    echo "[pre-push] Fix the import/syntax issue, then re-run the push."
+    exit 1
 fi
+echo "[pre-push] PASS — ${PASSED} tests passed (${ELAPSED}s)"
 exit 0

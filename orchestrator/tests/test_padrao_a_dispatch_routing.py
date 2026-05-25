@@ -30,9 +30,8 @@ def load() -> dict:
     """Direct yaml.safe_load of company.yaml.
 
     Bypasses config.company_loader (which transitively imports
-    semantic_dispatch — a VIP-only stub that raises on import).
-    For this test we only need the static workers dict, so the
-    legacy monolith file is sufficient.
+    semantic_dispatch). For this test we only need the static
+    workers dict, so the legacy monolith file is sufficient.
     """
     with open(COMPANY_YAML, encoding="utf-8") as f:
         return yaml.safe_load(f)

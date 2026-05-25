@@ -81,7 +81,7 @@ def mock_ollama_embed(request, monkeypatch):
     try:
         import semantic_dispatch
     except ImportError:
-        # VIP-only module not available in this install — fixture becomes no-op
+        # Module not available in this install — fixture becomes no-op
         yield
         return
 
