@@ -84,32 +84,68 @@ GENESIS_PREFIX = "DARIO-AUDIT-CHAIN-2026-05-25"
 
 
 def _ensure_keypair() -> tuple[Ed25519PrivateKey, Ed25519PublicKey]:
-    """Load existing keypair or generate + persist a new one."""
+    """Load existing keypair or generate + persist a new one.
+
+    Resolution order for private key (Faixa 1 #2 update 2026-05-25):
+      1. OS keyring as AUDIT_PRIVKEY_PEM (preferred — OS-encrypted)
+      2. file PRIVATE_KEY_PATH (legacy, chmod 600)
+      3. generate new + persist (defaults to keyring if available, file fallback)
+    """
     SECURITY_DIR.mkdir(parents=True, exist_ok=True)
 
-    if PRIVATE_KEY_PATH.exists():
-        priv = load_pem_private_key(PRIVATE_KEY_PATH.read_bytes(), password=None)
+    # 1. Keyring
+    try:
+        from core.secrets import get_secret, is_keyring_available, set_secret
+        keyring_available = is_keyring_available()
+    except ImportError:
+        keyring_available = False
+        get_secret = set_secret = None  # type: ignore
+
+    pem_bytes: bytes | None = None
+
+    if keyring_available:
+        pem_str = get_secret("AUDIT_PRIVKEY_PEM", caller="audit_signing",
+                             fallback_file=str(PRIVATE_KEY_PATH))
+        if pem_str:
+            pem_bytes = pem_str.encode("utf-8")
+
+    # 2. File (only if keyring path didn't yield)
+    if pem_bytes is None and PRIVATE_KEY_PATH.exists():
+        pem_bytes = PRIVATE_KEY_PATH.read_bytes()
+
+    if pem_bytes:
+        priv = load_pem_private_key(pem_bytes, password=None)
         if not isinstance(priv, Ed25519PrivateKey):
-            raise TypeError(f"Existing key at {PRIVATE_KEY_PATH} is not Ed25519")
+            raise TypeError("Existing audit private key is not Ed25519")
         pub = priv.public_key()
+        # Ensure public key file exists (committed for verification)
+        if not PUBLIC_KEY_PATH.exists():
+            PUBLIC_KEY_PATH.write_bytes(
+                pub.public_bytes(
+                    encoding=Encoding.PEM,
+                    format=PublicFormat.SubjectPublicKeyInfo,
+                )
+            )
         return priv, pub
 
-    # Generate new
+    # 3. Generate new
     priv = Ed25519PrivateKey.generate()
     pub = priv.public_key()
-
-    PRIVATE_KEY_PATH.write_bytes(
-        priv.private_bytes(
-            encoding=Encoding.PEM,
-            format=PrivateFormat.PKCS8,
-            encryption_algorithm=NoEncryption(),
-        )
+    pem = priv.private_bytes(
+        encoding=Encoding.PEM,
+        format=PrivateFormat.PKCS8,
+        encryption_algorithm=NoEncryption(),
     )
-    # Tighten perms — Windows ignores, POSIX honours.
-    try:
-        PRIVATE_KEY_PATH.chmod(0o600)
-    except (OSError, NotImplementedError):
-        pass
+
+    # Persist preferentially to keyring; fall back to file.
+    if keyring_available:
+        set_secret("AUDIT_PRIVKEY_PEM", pem.decode("utf-8"), caller="audit_signing")
+    else:
+        PRIVATE_KEY_PATH.write_bytes(pem)
+        try:
+            PRIVATE_KEY_PATH.chmod(0o600)
+        except (OSError, NotImplementedError):
+            pass
 
     PUBLIC_KEY_PATH.write_bytes(
         pub.public_bytes(

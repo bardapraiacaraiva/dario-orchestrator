@@ -121,16 +121,35 @@ TIERS = {
 
 
 def _load_master_secret() -> bytes:
-    """Load HMAC master secret from env or file. Returns insecure default
-    if neither available (logs warning)."""
+    """Load HMAC master secret. Resolution order (Faixa 1 #2 update 2026-05-25):
+      1. OS keyring (preferred, OS-encrypted via DPAPI/Keychain/SecretService)
+      2. env DARIO_MASTER_SECRET (backward compat)
+      3. file .master_secret in orchestrator dir (legacy, gitignored)
+      4. INSECURE default (logs warning)
+    """
+    try:
+        from core.secrets import get_secret
+        v = get_secret(
+            "MASTER_SECRET",
+            caller="license_manager",
+            fallback_env="DARIO_MASTER_SECRET",
+            fallback_file=str(MASTER_SECRET_FILE),
+        )
+        if v:
+            return v.encode("utf-8")
+    except ImportError:
+        # core.secrets unavailable — fall through to legacy path
+        pass
+
+    # Legacy fallbacks if keyring layer missing entirely.
     env = os.getenv("DARIO_MASTER_SECRET", "").strip()
     if env:
         return env.encode("utf-8")
     if MASTER_SECRET_FILE.exists():
         return MASTER_SECRET_FILE.read_bytes().strip()
     logging.warning(
-        "DARIO_MASTER_SECRET not set and no .master_secret file — "
-        "using INSECURE default. Set env or write ~/.claude/orchestrator/.master_secret"
+        "DARIO_MASTER_SECRET not in keyring/env/file — INSECURE default in use. "
+        "Run: python scripts/migrate_secrets_to_keyring.py --apply"
     )
     return DEFAULT_INSECURE_SECRET.encode("utf-8")
 

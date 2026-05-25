@@ -31,6 +31,8 @@ dependencies = [
     "langgraph-checkpoint-sqlite>=2.0",
     # Cryptography — Ed25519 audit trail signing (Faixa 1 #5, 2026-05-25)
     "cryptography>=45.0,<50.0",
+    # OS keyring — secrets manager (Faixa 1 #2, 2026-05-25)
+    "keyring>=25.0,<27.0",
 ]
 
 [project.optional-dependencies]
