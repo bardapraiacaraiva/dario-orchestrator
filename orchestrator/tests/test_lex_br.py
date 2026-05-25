@@ -22,7 +22,6 @@ def test_lex_br_directory_exists():
     assert (LEX_DIR / "compliance").is_dir()
     assert (LEX_DIR / "memory").is_dir()
     assert (LEX_DIR / "mcp_servers").is_dir()
-    return True
 
 
 def test_manifesto_loads():
@@ -32,7 +31,6 @@ def test_manifesto_loads():
     assert m["identity"]["name"] == "LEX-BR"
     assert m["identity"]["jurisdiction"] == "Brasil"
     assert len(m["coverage"]) == 15
-    return True
 
 
 def test_all_15_skills_exist():
@@ -49,7 +47,6 @@ def test_all_15_skills_exist():
                 found.add(d.name)
     missing = expected - found
     assert not missing, f"missing skills: {missing}"
-    return True
 
 
 def test_skills_have_compliance_in_frontmatter():
@@ -58,7 +55,6 @@ def test_skills_have_compliance_in_frontmatter():
         content = skill_md.read_text(encoding="utf-8")
         assert "compliance:" in content, f"{skill_name} missing compliance field"
         assert "oab_205" in content, f"{skill_name} missing oab_205"
-    return True
 
 
 # ─── Compliance modules ────────────────────────────────────
@@ -71,7 +67,6 @@ def test_oab_205_gate_blocks_external_without_review():
     assert r["passed"] is False
     assert r["verdict"] == "REQUIRES_HUMAN_REVIEW"
     assert r["blocking"] is True
-    return True
 
 
 def test_oab_205_gate_allows_external_with_review():
@@ -82,7 +77,6 @@ def test_oab_205_gate_allows_external_with_review():
     r = check(task)
     assert r["passed"] is True
     assert r["verdict"] == "PASS"
-    return True
 
 
 def test_oab_205_gate_skips_non_lex_skills():
@@ -90,7 +84,6 @@ def test_oab_205_gate_skips_non_lex_skills():
     task = {"skill": "dario-brand", "output_type": "tribunal"}
     r = check(task)
     assert r["verdict"] == "NOT_APPLICABLE"
-    return True
 
 
 def test_oab_205_internal_outputs_pass():
@@ -98,7 +91,6 @@ def test_oab_205_internal_outputs_pass():
     task = {"skill": "lex-trabalhista", "output_type": "draft_interno"}
     r = check(task)
     assert r["passed"] is True
-    return True
 
 
 def test_lgpd_marker_adds_rodape():
@@ -108,7 +100,6 @@ def test_lgpd_marker_adds_rodape():
     assert "DARIO/LEX-BR" in out
     assert "Controlador: Test Adv" in out
     assert "ZDR" in out
-    return True
 
 
 def test_lgpd_marker_idempotent():
@@ -118,7 +109,6 @@ def test_lgpd_marker_idempotent():
     twice = add_marker(once, escritorio="X", dpo_contact="y")
     # Should not duplicate
     assert twice.count("DARIO/LEX-BR") == 1
-    return True
 
 
 def test_zdr_detects_cpf():
@@ -126,7 +116,6 @@ def test_zdr_detects_cpf():
     text = "Cliente João Silva, CPF 123.456.789-00"
     findings = detect_sensitive_data(text)
     assert "CPF" in findings
-    return True
 
 
 def test_zdr_detects_processo_cnj():
@@ -134,7 +123,6 @@ def test_zdr_detects_processo_cnj():
     text = "Processo 1234567-89.2026.5.02.0001 contra empresa"
     findings = detect_sensitive_data(text)
     assert "NUMERO_PROCESSO" in findings
-    return True
 
 
 def test_zdr_clean_text_passes():
@@ -142,14 +130,12 @@ def test_zdr_clean_text_passes():
     r = enforce("Mero texto sem dados sensíveis aqui.")
     assert r["passed"] is True
     assert r["verdict"] == "CLEAN"
-    return True
 
 
 def test_cite_checker_validates_codigos():
     from cite_checker import validate
     r = validate("Fundamento: art. 186 do CC e art. 927 CC.")
     assert r["total_citations"] >= 1
-    return True
 
 
 def test_cite_checker_flags_artigo_inexistente():
@@ -159,7 +145,6 @@ def test_cite_checker_flags_artigo_inexistente():
         not d["valid"] or d["flags"] for d in r["details"]
     )
     assert invalid_or_flagged, f"Should flag art. 9999 CC: {r}"
-    return True
 
 
 def test_privilege_marker_adds_banner():
@@ -168,7 +153,6 @@ def test_privilege_marker_adds_banner():
     out = mark(text, output_type="estrategia_processual")
     assert "SIGILOSO" in out
     assert "PRIVILÉGIO" in out
-    return True
 
 
 def test_privilege_marker_skips_non_privileged_type():
@@ -176,7 +160,6 @@ def test_privilege_marker_skips_non_privileged_type():
     text = "Conteúdo público"
     out = mark(text, output_type="publicacao")
     assert "SIGILOSO" not in out
-    return True
 
 
 def test_audit_oab_logs_event():
@@ -190,7 +173,6 @@ def test_audit_oab_logs_event():
     )
     after = count_today()
     assert after == before + 1
-    return True
 
 
 # ─── MCP Servers ────────────────────────────────────────────
@@ -205,7 +187,6 @@ def test_mcp_jusbrasil_search_returns_structure():
     r = mod.search_jurisprudence("rescisão indireta")
     assert "mode" in r
     assert "results" in r
-    return True
 
 
 def test_mcp_jusbrasil_sumula_lookup():
@@ -217,7 +198,6 @@ def test_mcp_jusbrasil_sumula_lookup():
     spec.loader.exec_module(mod)
     r = mod.get_sumula("STJ", "145")
     assert r.get("numero") == "145" or "error" in r
-    return True
 
 
 def test_mcp_stf_sumula_vinculante():
@@ -228,7 +208,6 @@ def test_mcp_stf_sumula_vinculante():
     spec.loader.exec_module(mod)
     r = mod.get_sumula_vinculante("14")
     assert r.get("numero") == "14"
-    return True
 
 
 def test_mcp_stf_repercussao_geral():
@@ -240,7 +219,6 @@ def test_mcp_stf_repercussao_geral():
     r = mod.get_repercussao_geral_temas()
     assert r["total"] > 0
     assert "temas" in r
-    return True
 
 
 def test_mcp_cnj_datajud_module_loads():
@@ -252,7 +230,6 @@ def test_mcp_cnj_datajud_module_loads():
     assert mod.TRIBUNAIS_VALIDOS
     assert "tjsp" in mod.TRIBUNAIS_VALIDOS
     assert "trt2" in mod.TRIBUNAIS_VALIDOS
-    return True
 
 
 # ─── Integration tests ────────────────────────────────────
@@ -264,7 +241,6 @@ def test_lex_skills_in_semantic_corpus():
     lex_skills_in_corpus = [s for s in corpus if s.startswith("lex-")]
     assert len(lex_skills_in_corpus) >= 15, \
         f"Expected 15+ lex skills, got {len(lex_skills_in_corpus)}: {lex_skills_in_corpus}"
-    return True
 
 
 @pytest.mark.vip_only
@@ -277,7 +253,6 @@ def test_semantic_dispatch_routes_to_lex_trabalhista():
     top_skills = [m[0] for m in matches]
     assert "lex-trabalhista" in top_skills, \
         f"lex-trabalhista should be in top 5: {top_skills}"
-    return True
 
 
 def test_company_yaml_includes_lex_br():
@@ -292,7 +267,6 @@ def test_company_yaml_includes_lex_br():
     workers = company.get("workers_lex", {})
     lex_workers = [k for k in workers if k.startswith("worker-lex-")]
     assert len(lex_workers) == 15
-    return True
 
 
 TESTS = [

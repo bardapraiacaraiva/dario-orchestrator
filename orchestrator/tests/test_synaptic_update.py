@@ -29,7 +29,6 @@ def test_simulate_new_pair():
     assert delta["combined_avg"] == 90.0, f"combined avg wrong: {delta['combined_avg']}"
     assert delta["rule_applied"] == "success_increment", f"rule wrong: {delta['rule_applied']}"
     assert delta["new_weight"] > delta["old_weight"], "weight should increase"
-    return True
 
 
 def test_simulate_existing_pair_success():
@@ -38,28 +37,24 @@ def test_simulate_existing_pair_success():
     assert delta["old_weight"] == 0.55
     assert delta["new_weight"] == 0.60
     assert delta["rule_applied"] == "success_increment"
-    return True
 
 
 def test_simulate_existing_pair_failure():
     delta = synaptic_update.update_pair("dario-brand", "dario-content", 40, 45, simulate=True)
     assert delta["rule_applied"] == "failure_decrement"
     assert delta["new_weight"] < delta["old_weight"]
-    return True
 
 
 def test_simulate_no_change_midrange():
     delta = synaptic_update.update_pair("dario-brand", "dario-content", 70, 75, simulate=True)
     assert delta["rule_applied"] == "no_change"
     assert delta["new_weight"] == delta["old_weight"]
-    return True
 
 
 def test_canonical_key_symmetry():
     a = synaptic_update.update_pair("seo-audit", "seo-plan", 85, 85, simulate=True)
     b = synaptic_update.update_pair("seo-plan", "seo-audit", 85, 85, simulate=True)
     assert a["pair"] == b["pair"], "pair key not canonical (alphabetical)"
-    return True
 
 
 def test_write_persists():
@@ -81,7 +76,6 @@ def test_self_pair_ignored():
     delta = synaptic_update.update_pair("dario-brand", "dario-brand", 90, 90, simulate=True)
     assert delta["rule_applied"] == "self_pair_ignored"
     assert delta["pair"] is None
-    return True
 
 
 def test_weight_capped():
@@ -100,7 +94,6 @@ def test_stats_returns_metrics():
     assert "active_pairs" in s
     assert "avg_weight" in s
     assert s["total_pairs"] > 0
-    return True
 
 
 TESTS = [

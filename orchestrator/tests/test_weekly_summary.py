@@ -20,14 +20,12 @@ def test_week_bounds_default():
     # Start should be Monday (weekday 0)
     assert start.weekday() == 0
     assert "W" in label
-    return True
 
 
 def test_week_bounds_specific():
     start, end, label = ws._week_bounds("2026-W21")
     assert label == "2026-W21"
     assert start.weekday() == 0
-    return True
 
 
 def test_collect_all_returns_structure():
@@ -36,7 +34,6 @@ def test_collect_all_returns_structure():
                 "new_memories", "new_rules", "new_hints", "drift", "cot",
                 "integrity", "qvalue_end_of_week", "synaptic_end_of_week"}
     assert set(data.keys()) >= required, f"missing: {required - set(data.keys())}"
-    return True
 
 
 def test_collect_cron_days_filters_by_window():
@@ -50,21 +47,18 @@ def test_collect_cron_days_filters_by_window():
             assert start <= dt < end
         except Exception:
             pass
-    return True
 
 
 def test_collect_new_memories_returns_list():
     start, end, _ = ws._week_bounds()
     out = ws.collect_new_memories(start, end)
     assert isinstance(out, list)
-    return True
 
 
 def test_collect_new_rules_returns_list():
     start, end, _ = ws._week_bounds()
     out = ws.collect_new_rules(start, end)
     assert isinstance(out, list)
-    return True
 
 
 def test_render_markdown_has_required_sections():
@@ -81,14 +75,12 @@ def test_render_markdown_has_required_sections():
     ]
     for s in required_sections:
         assert s in md, f"missing section: {s}"
-    return True
 
 
 def test_render_includes_iso_week_label():
     data = ws.collect_all()
     md = ws.render_markdown(data)
     assert data["iso_week"] in md
-    return True
 
 
 def test_collect_drift_events_aggregates():
@@ -107,7 +99,6 @@ def test_collect_drift_events_aggregates():
     assert r["alerts"][0]["eval"] == "eval-x"
     assert len(r["drift_only"]) == 1
     assert r["drift_only"][0]["eval"] == "eval-y"
-    return True
 
 
 def test_collect_cot_trend_aggregates_rates():
@@ -124,7 +115,6 @@ def test_collect_cot_trend_aggregates_rates():
     r = ws.collect_cot_trend(cron_days)
     assert r["avg_rate"] == 0.2
     assert r["total_traces_end_of_week"] == 10
-    return True
 
 
 def test_collect_integrity_events_only_fail_warn():
@@ -148,7 +138,6 @@ def test_collect_integrity_events_only_fail_warn():
     assert "FAIL" in verdicts
     assert "WARN" in verdicts
     assert "PASS" not in verdicts
-    return True
 
 
 def test_save_to_obsidian():
@@ -190,7 +179,6 @@ def test_render_handles_empty_data():
     assert "2026-W01" in md
     assert "No new semantic memories" in md
     assert "No drift events" in md
-    return True
 
 
 def test_qvalue_snapshot_has_keys():
@@ -198,13 +186,11 @@ def test_qvalue_snapshot_has_keys():
     assert isinstance(snap, dict)
     # Either has total_episodes or error
     assert "total_episodes" in snap or "error" in snap
-    return True
 
 
 def test_synaptic_snapshot_has_keys():
     snap = ws.collect_synaptic_snapshot()
     assert isinstance(snap, dict)
-    return True
 
 
 TESTS = [

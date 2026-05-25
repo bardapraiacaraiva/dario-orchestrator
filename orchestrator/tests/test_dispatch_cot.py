@@ -32,7 +32,6 @@ def test_explicit_skill_wins():
     trace = dispatch_cot.reason(task, persist=False)
     assert trace["decision"]["winner"] == "dario-brand"
     assert "explicit" in trace["signals"]
-    return True
 
 
 def test_signals_gathered():
@@ -47,7 +46,6 @@ def test_signals_gathered():
     # At least semantic + keyword should hit something
     has_signals = any(isinstance(s.get(k), dict) for k in ("semantic", "keyword", "qvalue"))
     assert has_signals, f"no signals fired: {s}"
-    return True
 
 
 def test_winner_has_rationale():
@@ -62,7 +60,6 @@ def test_winner_has_rationale():
         assert isinstance(d["rationale"], str) and len(d["rationale"]) > 20
         assert d["winner"] in d["rationale"]
         assert "confidence" in d["rationale"].lower()
-    return True
 
 
 def test_no_signal_no_winner():
@@ -75,7 +72,6 @@ def test_no_signal_no_winner():
     # Either no winner or LOW confidence
     d = trace["decision"]
     assert d.get("level") in ("NONE", "LOW", "MEDIUM"), f"unexpected level: {d}"
-    return True
 
 
 def test_persist_writes_trace_file():
@@ -90,7 +86,6 @@ def test_persist_writes_trace_file():
     expected = dispatch_cot.COT_DIR / f"{task_id}.yaml"
     assert expected.exists(), f"trace not persisted: {expected}"
     _cleanup()
-    return True
 
 
 def test_postmortem_vindicated_success():
@@ -107,7 +102,6 @@ def test_postmortem_vindicated_success():
     assert pm["status"] == "complete"
     assert pm["verdict"] == "VINDICATED"
     _cleanup()
-    return True
 
 
 def test_postmortem_overconfident():
@@ -125,13 +119,11 @@ def test_postmortem_overconfident():
     pm = dispatch_cot.postmortem(task_id, actual_score=45, actual_outcome="revision")
     assert pm["verdict"] == "OVERCONFIDENT", f"expected OVERCONFIDENT, got {pm['verdict']}"
     _cleanup()
-    return True
 
 
 def test_postmortem_no_trace_handled():
     pm = dispatch_cot.postmortem("nonexistent-task-id-12345", actual_score=50)
     assert pm["status"] == "no_trace"
-    return True
 
 
 def test_stats_returns_dict():
@@ -141,7 +133,6 @@ def test_stats_returns_dict():
     assert "by_winning_signal" in s
     assert "postmortems" in s
     assert "overconfidence_rate" in s
-    return True
 
 
 def test_disagreement_penalty():
@@ -150,7 +141,6 @@ def test_disagreement_penalty():
     # the penalty constant exists and is positive
     assert dispatch_cot.DISAGREEMENT_PENALTY > 0
     assert dispatch_cot.DISAGREEMENT_PENALTY < 0.5
-    return True
 
 
 def test_signal_weights_sum_reasonable():
@@ -159,7 +149,6 @@ def test_signal_weights_sum_reasonable():
     semantic_w = dispatch_cot.SIGNAL_WEIGHTS["semantic"]
     assert explicit_w >= semantic_w, "explicit should be strongest"
     assert all(0 < w <= 1.0 for w in dispatch_cot.SIGNAL_WEIGHTS.values())
-    return True
 
 
 def test_trace_includes_alternatives():
@@ -175,7 +164,6 @@ def test_trace_includes_alternatives():
     if d["winner"]:
         assert "alternatives" in d
         assert isinstance(d["alternatives"], list)
-    return True
 
 
 TESTS = [

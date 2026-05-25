@@ -15,7 +15,6 @@ def test_chains_loaded():
     chains = _load_chains()
     assert len(chains) > 0, "no chains loaded"
     assert "brand_to_market" in chains, "expected brand_to_market chain"
-    return True
 
 
 def test_step_with_all_fields_passes():
@@ -29,7 +28,6 @@ def test_step_with_all_fields_passes():
     assert r["valid"] is True, f"expected valid, got {r}"
     assert r["verdict"] == "PASS"
     assert r["missing"] == []
-    return True
 
 
 def test_step_with_missing_fields():
@@ -42,14 +40,12 @@ def test_step_with_missing_fields():
     assert "archetype" in r["missing"]
     assert r["verdict"] in ("INCOMPLETE", "EMPTY")
     assert r["escalation"] is not None
-    return True
 
 
 def test_step_with_empty_artifact():
     r = validate_step_output("brand_to_market", 0, {})
     assert r["verdict"] == "EMPTY"
     assert r["valid"] is False
-    return True
 
 
 def test_terminal_step_has_no_pass_to_next():
@@ -58,21 +54,18 @@ def test_terminal_step_has_no_pass_to_next():
     r = validate_step_output("brand_to_market", 4, {"some": "output"})
     assert r["verdict"] == "TERMINAL"
     assert r["valid"] is True
-    return True
 
 
 def test_unknown_chain():
     r = validate_step_output("nonexistent_chain", 0, {"x": 1})
     assert r["verdict"] == "UNKNOWN_CHAIN"
     assert r["valid"] is False
-    return True
 
 
 def test_step_out_of_range():
     r = validate_step_output("brand_to_market", 99, {"x": 1})
     assert r["verdict"] == "STEP_OUT_OF_RANGE"
     assert r["valid"] is False
-    return True
 
 
 def test_string_artifact_substring_match():
@@ -81,7 +74,6 @@ def test_string_artifact_substring_match():
     r = validate_step_output("brand_to_market", 0, artifact)
     # All four fields appear in the text
     assert r["valid"] is True, f"text substring matching failed: {r}"
-    return True
 
 
 def test_partial_string_artifact():
@@ -89,7 +81,6 @@ def test_partial_string_artifact():
     r = validate_step_output("brand_to_market", 0, artifact)
     assert r["verdict"] == "INCOMPLETE"
     assert "archetype" in r["missing"]
-    return True
 
 
 def test_none_values_treated_as_missing():
@@ -104,7 +95,6 @@ def test_none_values_treated_as_missing():
     assert "archetype" in r["missing"]
     assert "tom_de_voz" in r["missing"]
     assert "diferenciadores" in r["present"]
-    return True
 
 
 def test_full_chain_validation_aggregate():
@@ -119,7 +109,6 @@ def test_full_chain_validation_aggregate():
     r = validate_full_chain("brand_to_market", artifacts)
     assert r["valid"] is True, f"full chain should validate: {r}"
     assert r["total_steps"] == 5
-    return True
 
 
 def test_list_chains_returns_structure():
@@ -127,7 +116,6 @@ def test_list_chains_returns_structure():
     assert isinstance(s, dict)
     assert "brand_to_market" in s
     assert "steps" in s["brand_to_market"]
-    return True
 
 
 TESTS = [

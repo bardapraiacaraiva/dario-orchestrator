@@ -18,7 +18,6 @@ def test_stop_word_filter():
     assert "uma" not in words, "uma should be stop word"
     assert "marca" in words
     assert "cliente" in words
-    return True
 
 
 def test_suggest_returns_empty_for_no_overlap():
@@ -27,13 +26,11 @@ def test_suggest_returns_empty_for_no_overlap():
     suggestions = qvm_wire.suggest_skill("xyzabc nonsense gibberish whatever12345")
     assert isinstance(suggestions, list)
     assert len(suggestions) == 0, f"expected empty, got {suggestions}"
-    return True
 
 
 def test_suggest_empty_text():
     assert qvm_wire.suggest_skill("") == []
     assert qvm_wire.suggest_skill("   ") == []
-    return True
 
 
 def test_record_outcome_roundtrip():
@@ -60,19 +57,16 @@ def test_record_outcome_roundtrip():
     conn.execute("DELETE FROM q_episodes WHERE episode_id = ?", (r["episode_id"],))
     conn.commit()
     conn.close()
-    return True
 
 
 def test_record_rejects_zero_score():
     r = qvm_wire.record_outcome(context="some context", skill="some-skill", score=0)
     assert r["recorded"] is False
-    return True
 
 
 def test_record_rejects_missing_skill():
     r = qvm_wire.record_outcome(context="ctx", skill="", score=80)
     assert r["recorded"] is False
-    return True
 
 
 def test_stats_returns_dict():
@@ -81,7 +75,6 @@ def test_stats_returns_dict():
     if s["total_episodes"] > 0:
         assert "distinct_skills" in s
         assert "avg_q_value" in s
-    return True
 
 
 def test_bootstrap_idempotent():
@@ -93,7 +86,6 @@ def test_bootstrap_idempotent():
     # All re-runs should skip — no new inserts
     assert total1 == total2, f"bootstrap not idempotent: {total1} -> {total2}"
     assert s2["skipped"] > 0
-    return True
 
 
 def test_td_learning_updates_qvalue():
@@ -119,7 +111,6 @@ def test_td_learning_updates_qvalue():
     conn.execute("DELETE FROM q_episodes WHERE skill = ?", ("test-skill-td",))
     conn.commit()
     conn.close()
-    return True
 
 
 def test_dispatch_integration_does_not_crash():
@@ -132,7 +123,6 @@ def test_dispatch_integration_does_not_crash():
     })
     # May be None, may be something — just must not crash
     assert result is None or isinstance(result, str)
-    return True
 
 
 TESTS = [

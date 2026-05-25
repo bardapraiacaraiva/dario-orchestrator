@@ -15,7 +15,6 @@ def test_load_episodes_returns_list():
     eps = ep_module._load_episodes(days=365)
     assert isinstance(eps, list)
     assert len(eps) > 0, "expected episodes from filesystem"
-    return True
 
 
 def test_classify_separates_excellence_and_clusters():
@@ -38,7 +37,6 @@ def test_classify_separates_excellence_and_clusters():
     assert not any(e["episode_id"] == "E5" for e in c["excellence"])
     # Cluster (X, P1) has 3 episodes
     assert len(c["clusters"][("X", "P1")]) == 3
-    return True
 
 
 def test_candidate_patterns_threshold():
@@ -63,7 +61,6 @@ def test_candidate_patterns_threshold():
     assert "X" in skill_names, "X with avg 87.7 should pattern"
     assert "Y" not in skill_names, "Y below avg threshold"
     assert "Z" not in skill_names, "Z has too few episodes"
-    return True
 
 
 def test_excellence_content_builder():
@@ -80,7 +77,6 @@ def test_excellence_content_builder():
     assert "excellence" in name
     assert "92/100" in content or "92" in content
     assert "Brand positioning" in content
-    return True
 
 
 def test_pattern_content_builder():
@@ -103,7 +99,6 @@ def test_pattern_content_builder():
     assert "3 episodes" in content
     assert "87.7" in content
     assert "Recommendation" in content
-    return True
 
 
 def test_scan_is_dry_run():
@@ -114,7 +109,6 @@ def test_scan_is_dry_run():
     assert len(before) == len(after), "scan should NOT promote"
     assert "would_promote_excellence" in r
     assert "would_promote_patterns" in r
-    return True
 
 
 def test_promote_idempotent():
@@ -125,7 +119,6 @@ def test_promote_idempotent():
     promoted2 = r2.get("promoted_excellence", 0) + r2.get("promoted_patterns", 0)
     # Second run should promote 0 new (all already exist)
     assert promoted2 == 0, f"second promote produced {promoted2}, expected 0"
-    return True
 
 
 def test_stats_returns_counts():
@@ -135,7 +128,6 @@ def test_stats_returns_counts():
     assert "auto_rules" in s
     # We promoted earlier in this session, so should be > 0
     assert s["semantic_memories"] > 0
-    return True
 
 
 def test_existing_semantic_names_includes_promoted():
@@ -143,7 +135,6 @@ def test_existing_semantic_names_includes_promoted():
     assert isinstance(names, set)
     # We promoted dario-product cuidai pattern earlier
     assert any("dario-product" in n and "pattern" in n for n in names) or len(names) > 0
-    return True
 
 
 def test_rule_yaml_has_required_fields():
@@ -158,7 +149,6 @@ def test_rule_yaml_has_required_fields():
     sample = _y.safe_load(rule_files[0].read_text(encoding="utf-8"))
     for key in ("rule_id", "type", "skill", "rationale", "source_episodes"):
         assert key in sample, f"rule missing field: {key}"
-    return True
 
 
 TESTS = [

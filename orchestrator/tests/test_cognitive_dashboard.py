@@ -58,7 +58,6 @@ def test_cot_section_structure():
     assert "by_level" in data
     assert "postmortems" in data
     assert "overconfidence_rate" in data
-    return True
 
 
 def test_semantic_section_structure():
@@ -67,7 +66,6 @@ def test_semantic_section_structure():
     assert "by_type" in data
     assert "auto_rules" in data
     assert "recent_patterns" in data
-    return True
 
 
 def test_integrity_section_structure():
@@ -75,7 +73,6 @@ def test_integrity_section_structure():
     assert "verdict" in data
     assert "checks" in data
     assert data["verdict"] in ("PASS", "WARN", "FAIL")
-    return True
 
 
 def test_cron_section_structure():
@@ -83,7 +80,6 @@ def test_cron_section_structure():
     assert "last_run" in data
     assert "history" in data
     assert isinstance(data["history"], list)
-    return True
 
 
 def test_qvalue_section_structure():
@@ -91,14 +87,12 @@ def test_qvalue_section_structure():
     assert "total_episodes" in data
     assert "top" in data
     assert isinstance(data["top"], list)
-    return True
 
 
 def test_synaptic_section_structure():
     data = cd.collect_synaptic_health()
     assert "total_pairs" in data
     assert "top_pairs" in data
-    return True
 
 
 def test_embeddings_section_structure():
@@ -106,7 +100,6 @@ def test_embeddings_section_structure():
     assert "total_cached" in data
     assert "corpus_size" in data
     assert "coverage_pct" in data
-    return True
 
 
 def test_render_html_produces_full_document(rendered_html):
@@ -122,7 +115,6 @@ def test_badge_helper_produces_valid_html():
     assert "<span" in badge
     assert "</span>" in badge
     assert "PASS" in badge
-    return True
 
 
 def test_verdict_kind_mapping():
@@ -131,7 +123,6 @@ def test_verdict_kind_mapping():
     assert cd._verdict_kind("FAIL") == "alert"
     assert cd._verdict_kind("DRIFT") == "alert"
     assert cd._verdict_kind("WARN") == "warn"
-    return True
 
 
 def test_generate_writes_file(collected, rendered_html):

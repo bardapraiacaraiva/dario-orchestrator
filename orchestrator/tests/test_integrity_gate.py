@@ -23,7 +23,6 @@ def test_run_all_returns_structure():
     assert "checks" in r
     assert len(r["checks"]) == len(integrity_gate.CHECKS)
     assert r["verdict"] in ("PASS", "WARN", "FAIL")
-    return True
 
 
 def test_production_state_is_clean():
@@ -31,60 +30,51 @@ def test_production_state_is_clean():
     r = integrity_gate.run_all()
     failed = [c["name"] for c in r["checks"] if c["status"] == "FAIL"]
     assert not failed, f"production has failing checks: {failed}"
-    return True
 
 
 def test_check_eval_skills_exist():
     r = integrity_gate.check_eval_skills_exist()
     assert r["status"] in ("PASS", "FAIL")
     assert "total" in r
-    return True
 
 
 def test_check_skill_frontmatter_valid():
     r = integrity_gate.check_skill_frontmatter_valid()
     assert r["status"] in ("PASS", "FAIL")
-    return True
 
 
 def test_check_embeddings_coverage():
     r = integrity_gate.check_embeddings_coverage()
     assert "corpus_size" in r
     assert "cached" in r
-    return True
 
 
 def test_check_embeddings_freshness():
     r = integrity_gate.check_embeddings_freshness()
     assert "stale_count" in r
-    return True
 
 
 def test_check_golden_skills_alive():
     r = integrity_gate.check_golden_skills_alive()
     assert r["status"] in ("PASS", "FAIL")
-    return True
 
 
 def test_check_chain_skills_resolve():
     r = integrity_gate.check_chain_skills_resolve()
     assert r["status"] in ("PASS", "FAIL")
     assert "total_steps" in r
-    return True
 
 
 def test_check_synaptic_pairs_valid():
     r = integrity_gate.check_synaptic_pairs_valid()
     assert r["status"] in ("PASS", "WARN")
     assert "total_pairs" in r
-    return True
 
 
 def test_skill_lookup_helper():
     """_has_skill should correctly detect existence."""
     assert integrity_gate._has_skill("dario-brand") is True
     assert integrity_gate._has_skill("nonexistent-skill-xyz-9999") is False
-    return True
 
 
 def test_strict_mode_treats_warn_as_fail():
@@ -131,7 +121,6 @@ def test_exit_code_matches_verdict():
     r = integrity_gate.run_all()
     expected = {"PASS": 0, "WARN": 1, "FAIL": 2}.get(r["verdict"])
     assert r["exit_code"] == expected
-    return True
 
 
 def test_format_output_is_string():
@@ -139,13 +128,11 @@ def test_format_output_is_string():
     text = integrity_gate._format(r)
     assert isinstance(text, str)
     assert "Integrity Gate" in text
-    return True
 
 
 def test_check_count_constant():
     """7 checks documented — verify all are wired."""
     assert len(integrity_gate.CHECKS) == 7
-    return True
 
 
 TESTS = [

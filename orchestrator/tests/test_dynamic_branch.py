@@ -17,7 +17,6 @@ def test_excellence_foundational_continues_serial():
     assert r["action"] == db.CONTINUE_SERIAL
     assert r["next_steps"] == [1]
     assert r["metadata"].get("foundational") is True
-    return True
 
 
 def test_below_gate_triggers_revision():
@@ -25,25 +24,21 @@ def test_below_gate_triggers_revision():
     assert r["action"] == db.REVISION_LOOP
     assert r["next_steps"] == [0]
     assert r["metadata"]["revision_count"] == 1
-    return True
 
 
 def test_revision_exhausted_escalates():
     r = db.decide_next_action("brand_to_market", 0, score=55, revision_count=1)
     assert r["action"] == db.ESCALATE
-    return True
 
 
 def test_catastrophic_first_attempt_escalates():
     r = db.decide_next_action("brand_to_market", 1, score=25)
     assert r["action"] == db.ESCALATE
-    return True
 
 
 def test_catastrophic_after_revision_stops():
     r = db.decide_next_action("brand_to_market", 1, score=25, revision_count=1)
     assert r["action"] == db.EARLY_STOP
-    return True
 
 
 def test_low_confidence_escalates_even_with_good_score():
@@ -51,7 +46,6 @@ def test_low_confidence_escalates_even_with_good_score():
                                confidence_level="LOW", dimension_variance=0.35)
     assert r["action"] == db.ESCALATE
     assert "LOW" in r["rationale"]
-    return True
 
 
 def test_excellence_non_foundational_parallelizes():
@@ -60,7 +54,6 @@ def test_excellence_non_foundational_parallelizes():
     # dario-offer is NOT in FOUNDATIONAL_SKILLS, so excellence may parallelize
     # if steps 3 and 4 are independent (sales-letter and email-seq)
     assert r["action"] in (db.PARALLELIZE_NEXT, db.CONTINUE_SERIAL)
-    return True
 
 
 def test_last_step_terminal():
@@ -68,20 +61,17 @@ def test_last_step_terminal():
     r = db.decide_next_action("brand_to_market", 4, score=85)
     assert r["action"] == db.CONTINUE_SERIAL
     assert r["metadata"]["terminal"] is True
-    return True
 
 
 def test_unknown_chain_escalates():
     r = db.decide_next_action("nonexistent_chain", 0, score=90)
     assert r["action"] == db.ESCALATE
     assert "not found" in r["rationale"]
-    return True
 
 
 def test_step_out_of_range():
     r = db.decide_next_action("brand_to_market", 99, score=85)
     assert r["action"] == db.EARLY_STOP
-    return True
 
 
 def test_decision_is_pure_function():
@@ -90,14 +80,12 @@ def test_decision_is_pure_function():
     r2 = db.decide_next_action("brand_to_market", 0, score=85)
     assert r1["action"] == r2["action"]
     assert r1["next_steps"] == r2["next_steps"]
-    return True
 
 
 def test_rationale_includes_score_and_decision():
     r = db.decide_next_action("brand_to_market", 1, score=82)
     assert "82" in r["rationale"]
     assert isinstance(r["rationale"], str)
-    return True
 
 
 def test_steps_independent_helper():
@@ -111,14 +99,12 @@ def test_steps_independent_helper():
 
     step_b2 = {"receives": "headline plus lead from previous step"}
     assert db._steps_independent(step_a, step_b2) is False
-    return True
 
 
 def test_revision_metadata_increments():
     r = db.decide_next_action("brand_to_market", 0, score=60, revision_count=0)
     assert r["action"] == db.REVISION_LOOP
     assert r["metadata"]["revision_count"] == 1
-    return True
 
 
 TESTS = [

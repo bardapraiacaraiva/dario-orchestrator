@@ -29,7 +29,6 @@ EXPECTED_SKILLS = {
 def test_demeter_directory_exists():
     assert DEMETER_DIR.exists(), "demeter dir missing"
     assert (DEMETER_DIR / "manifesto.yaml").exists(), "manifesto missing"
-    return True
 
 
 def test_manifesto_loads_and_has_15_areas():
@@ -38,7 +37,6 @@ def test_manifesto_loads_and_has_15_areas():
         m = yaml.safe_load(f)
     assert m["identity"]["name"] == "DEMETER"
     assert len(m["coverage"]) == 15, f"expected 15 areas, got {len(m['coverage'])}"
-    return True
 
 
 def test_manifesto_has_pricing_tiers():
@@ -49,7 +47,6 @@ def test_manifesto_has_pricing_tiers():
     assert "solo" in tiers
     assert "team" in tiers
     assert "enterprise" in tiers
-    return True
 
 
 # ─── Skills tests ───────────────────────────────────────────
@@ -64,7 +61,6 @@ def test_all_15_skills_exist():
     assert not missing, f"missing skills: {missing}"
     extra = found - EXPECTED_SKILLS
     assert not extra, f"unexpected skills: {extra}"
-    return True
 
 
 def test_skills_have_valid_frontmatter():
@@ -76,7 +72,6 @@ def test_skills_have_valid_frontmatter():
         assert "description:" in content, f"{skill_name} missing description"
         assert "parent_agent: demeter-director" in content, \
             f"{skill_name} missing parent_agent"
-    return True
 
 
 def test_skills_have_triggers_in_description():
@@ -85,7 +80,6 @@ def test_skills_have_triggers_in_description():
         content = skill_md.read_text(encoding="utf-8")
         assert "Triggers" in content or "triggers" in content, \
             f"{skill_name} missing triggers"
-    return True
 
 
 def test_skills_have_cross_references():
@@ -97,7 +91,6 @@ def test_skills_have_cross_references():
             skills_with_xref += 1
     assert skills_with_xref >= 12, \
         f"only {skills_with_xref}/15 skills have cross-references"
-    return True
 
 
 # ─── Compliance/governance ──────────────────────────────────
@@ -111,7 +104,6 @@ def test_skills_have_compliance_field():
             skills_with_compliance += 1
     assert skills_with_compliance == 15, \
         f"only {skills_with_compliance}/15 skills have compliance field"
-    return True
 
 
 def test_lgpd_mentioned_in_data_skills():
@@ -123,7 +115,6 @@ def test_lgpd_mentioned_in_data_skills():
         content = skill_md.read_text(encoding="utf-8")
         assert "lgpd" in content.lower() or "LGPD" in content, \
             f"{skill_name} doesn't mention LGPD despite handling PII"
-    return True
 
 
 # ─── License integration ────────────────────────────────────
@@ -134,7 +125,6 @@ def test_license_tiers_include_demeter():
     assert "demeter_solo" in TIERS
     assert "demeter_team" in TIERS
     assert "demeter_enterprise" in TIERS
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -145,7 +135,6 @@ def test_demeter_solo_pricing():
     assert solo["max_parallel"] == 1
     assert solo["demeter_skills_count"] == 8
     assert solo["demeter_dashboards_month"] == 5
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -157,7 +146,6 @@ def test_demeter_team_pricing():
     assert team["demeter_skills_count"] == 15
     assert team["features"]["ml_pipelines"] is True
     assert team["features"]["realtime_streaming"] is True
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -168,7 +156,6 @@ def test_demeter_enterprise_pricing():
     assert ent["max_parallel"] == 5
     assert ent["features"]["sla_4h_support"] is True
     assert ent["features"]["data_lineage"] is True
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -179,7 +166,6 @@ def test_demeter_tier_suffixes_registered():
     assert TIER_SUFFIXES["demeter_enterprise"] == "DME"
     # Reverse map should also be populated
     assert TIER_MAP["DMS"] == "demeter_solo"
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -192,7 +178,6 @@ def test_demeter_key_generation_and_validation():
     r = validate_key(key)
     assert r["valid"] is True, f"key validation failed: {r}"
     assert r["tier"] == "demeter_team"
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -206,7 +191,6 @@ def test_demeter_key_tamper_rejected():
     tampered = "-".join(parts)
     r = validate_key(tampered)
     assert r["valid"] is False, "tampered key should be rejected"
-    return True
 
 
 # ─── Company.yaml integration ───────────────────────────────
@@ -226,7 +210,6 @@ def test_company_yaml_has_demeter_section():
         f"expected 15 workers, got {len(c['workers_demeter'])}"
     # Must have squads
     assert "squads_demeter" in c, "company.yaml missing squads_demeter"
-    return True
 
 
 # ─── Test runner ─────────────────────────────────────────────

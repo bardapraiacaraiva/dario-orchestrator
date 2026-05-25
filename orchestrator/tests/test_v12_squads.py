@@ -35,7 +35,6 @@ def test_all_manifestos_exist():
         with open(path, encoding="utf-8") as f:
             m = yaml.safe_load(f)
         assert m["skills_count"] == 15, f"{name}: skills_count={m['skills_count']}"
-    return True
 
 
 def test_all_skills_exist_105():
@@ -48,7 +47,6 @@ def test_all_skills_exist_105():
         assert count == 15, f"{name}: {count}/15 skills"
         total += count
     assert total == 105, f"expected 105 total, got {total}"
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -57,7 +55,6 @@ def test_license_tiers_21_new():
     for tier in NEW_TIERS:
         assert tier in TIERS, f"{tier} missing in TIERS"
         assert tier in TIER_SUFFIXES, f"{tier} missing in TIER_SUFFIXES"
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -68,7 +65,6 @@ def test_hmac_roundtrip_all_21():
         r = validate_key(key)
         assert r["valid"], f"{tier} HMAC failed"
         assert r["tier"] == tier
-    return True
 
 
 def test_company_yaml_has_7_sections():
@@ -81,7 +77,6 @@ def test_company_yaml_has_7_sections():
         workers_key = f"workers_{name.replace('-', '_')}"
         assert workers_key in c, f"{workers_key} missing"
         assert len(c[workers_key]) == 15, f"{workers_key}: {len(c[workers_key])}/15 workers"
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -91,7 +86,6 @@ def test_total_tiers_59():
     assert len(TIERS) == 59, f"expected 59 tiers (54 + 5 bundles), got {len(TIERS)}"
     bundles = [k for k, v in TIERS.items() if "bundle_components" in v]
     assert len(bundles) == 5, f"expected 5 bundles, got {len(bundles)}"
-    return True
 
 
 def run_all():

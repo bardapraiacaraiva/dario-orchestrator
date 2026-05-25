@@ -52,6 +52,8 @@
 !orchestrator/quality/domain-playbooks.yaml
 !orchestrator/quality/eval-baseline.yaml
 !orchestrator/quality/client-revenue.yaml.example
+!orchestrator/quality/INVENTORY.md
+!orchestrator/quality/RESTORATION_AUDIT_2026_05_25.md
 
 # --- Allow Padrão A pre-flight validator config (Tier 2 briefing rules) ---
 !orchestrator/config/padrao_a_briefing_validators.yaml

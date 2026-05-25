@@ -21,7 +21,6 @@ def test_all_eval_cases_have_golden():
     captured = {g["eval_id"] for g in golden_eval.list_goldens()}
     missing = eval_ids - captured
     assert not missing, f"missing goldens: {missing}"
-    return True
 
 
 def test_seed_list_matches_eval_suite():
@@ -33,14 +32,12 @@ def test_seed_list_matches_eval_suite():
     assert not not_seeded, f"eval cases without seed entry: {not_seeded}"
     extra = seed_ids - eval_ids
     assert not extra, f"seed entries with no matching eval: {extra}"
-    return True
 
 
 def test_human_scores_in_reasonable_range():
     """Every seeded golden should have human_score in [70, 95]."""
     for eval_id, score, text, notes in seed_goldens.GOLDENS:
         assert 70 <= score <= 95, f"{eval_id} human_score={score} outside [70,95]"
-    return True
 
 
 def test_seeded_goldens_meet_minimum_length():
@@ -55,7 +52,6 @@ def test_seeded_goldens_meet_minimum_length():
         assert len(text) >= min_len, (
             f"{eval_id} golden length {len(text)} < min_length {min_len}"
         )
-    return True
 
 
 def test_seeded_goldens_contain_expected_keywords():
@@ -75,7 +71,6 @@ def test_seeded_goldens_contain_expected_keywords():
         assert ratio >= 0.50, (
             f"{eval_id} only {found}/{len(kws)} expected keywords present ({ratio:.0%})"
         )
-    return True
 
 
 def test_self_comparison_yields_match():
@@ -93,7 +88,6 @@ def test_self_comparison_yields_match():
         )
         assert r["lexical_jaccard"] == 1.0
         assert r["score_delta"] == 0
-    return True
 
 
 def test_calibration_log_has_entries():
@@ -102,7 +96,6 @@ def test_calibration_log_has_entries():
     assert status["total_entries"] >= 12, (
         f"only {status['total_entries']} calibration entries"
     )
-    return True
 
 
 def test_drift_simulation_triggers_alert():
@@ -115,7 +108,6 @@ def test_drift_simulation_triggers_alert():
     )
     assert r["drift_severity"] == "alert"
     assert r["verdict"] in ("DRIFT", "DEGRADED")
-    return True
 
 
 TESTS = [

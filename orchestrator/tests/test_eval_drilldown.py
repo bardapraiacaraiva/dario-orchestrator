@@ -28,7 +28,6 @@ def test_no_golden_returns_status():
     _cleanup()
     diff = ed.diff_dimensions("nonexistent-eval-xxx", "any candidate text")
     assert diff["status"] == "no_golden"
-    return True
 
 
 def test_identical_candidate_yields_match():
@@ -46,7 +45,6 @@ More content with relevant terms."""
     assert diff["tokens"]["lost_count"] == 0
     assert diff["tokens"]["gained_count"] == 0
     _cleanup()
-    return True
 
 
 def test_degraded_candidate_detects_lost_tokens():
@@ -59,7 +57,6 @@ def test_degraded_candidate_detects_lost_tokens():
     assert "delta" in diff["tokens"]["lost"]
     assert "epsilon" in diff["tokens"]["lost"]
     _cleanup()
-    return True
 
 
 def test_section_diff_detects_missing_headers():
@@ -90,7 +87,6 @@ content one with several words
     assert "Section Two" in missing
     assert "Section Three" in missing
     _cleanup()
-    return True
 
 
 def test_paragraph_echo_detection():
@@ -101,7 +97,6 @@ def test_paragraph_echo_detection():
     diff = ed.diff_dimensions(SANDBOX_EVAL, candidate, candidate_score=70)
     assert diff["paragraphs"]["missing_count"] >= 1
     _cleanup()
-    return True
 
 
 def test_recovery_hints_for_score_drop():
@@ -115,7 +110,6 @@ def test_recovery_hints_for_score_drop():
     assert "score" in hints.lower()
     assert "regression" in hints.lower() or "below" in hints.lower()
     _cleanup()
-    return True
 
 
 def test_recovery_hints_for_short_output():
@@ -127,7 +121,6 @@ def test_recovery_hints_for_short_output():
     hints = " ".join(diff["recovery_hints"])
     assert "shorter" in hints.lower() or "expand" in hints.lower()
     _cleanup()
-    return True
 
 
 def test_recovery_hints_for_long_output():
@@ -139,7 +132,6 @@ def test_recovery_hints_for_long_output():
     hints = " ".join(diff["recovery_hints"])
     assert "longer" in hints.lower() or "trim" in hints.lower() or "verbose" in hints.lower()
     _cleanup()
-    return True
 
 
 def test_format_human_includes_all_sections():
@@ -154,7 +146,6 @@ def test_format_human_includes_all_sections():
     assert "PARAGRAPHS" in text
     assert "RECOVERY HINTS" in text
     _cleanup()
-    return True
 
 
 def test_top_lost_ordered_by_frequency():
@@ -172,7 +163,6 @@ def test_top_lost_ordered_by_frequency():
     if "freq_alpha" in tokens_ordered and "freq_beta" in tokens_ordered:
         assert tokens_ordered.index("freq_alpha") < tokens_ordered.index("freq_beta")
     _cleanup()
-    return True
 
 
 def test_paragraph_count_accurate():
@@ -184,7 +174,6 @@ def test_paragraph_count_accurate():
     assert diff["paragraphs"]["golden_count"] == 3
     assert diff["paragraphs"]["candidate_count"] == 1
     _cleanup()
-    return True
 
 
 def test_tokens_helper_filters_stop_words():
@@ -192,7 +181,6 @@ def test_tokens_helper_filters_stop_words():
     assert "the" not in toks
     assert "brand" in toks
     assert "restaurant" in toks
-    return True
 
 
 def test_sections_helper_finds_headers():
@@ -201,7 +189,6 @@ def test_sections_helper_finds_headers():
     assert "H1" in secs
     assert "H2 With Space" in secs
     assert "H3" in secs
-    return True
 
 
 def test_drilldown_drifting_handles_no_runs_dir():
@@ -210,7 +197,6 @@ def test_drilldown_drifting_handles_no_runs_dir():
     if not runs_dir.exists():
         r = ed.drilldown_drifting()
         assert r["status"] == "no_runs_dir"
-    return True
 
 
 def test_real_golden_drilldown():
@@ -226,7 +212,6 @@ def test_real_golden_drilldown():
     assert diff["tokens"]["lost_count"] > 10
     assert len(diff["sections"]["missing_in_candidate"]) > 0
     assert len(diff["recovery_hints"]) > 0
-    return True
 
 
 TESTS = [

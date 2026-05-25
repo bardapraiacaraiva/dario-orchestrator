@@ -107,7 +107,6 @@ def test_all_manifestos_load():
         expected = cfg.get("expected_skills", 15)
         assert m["skills_count"] == expected, \
             f"{name} skills_count={m['skills_count']} != expected {expected}"
-    return True
 
 
 def test_all_skills_exist():
@@ -116,7 +115,6 @@ def test_all_skills_exist():
         for skill in cfg["skills"]:
             skill_md = SKILLS_DIR / f"{prefix}{skill}" / "SKILL.md"
             assert skill_md.exists(), f"{name}: {prefix}{skill}/SKILL.md missing"
-    return True
 
 
 def test_all_skills_have_valid_frontmatter():
@@ -129,7 +127,6 @@ def test_all_skills_have_valid_frontmatter():
             assert "name:" in content
             assert "description:" in content
             assert "parent_agent:" in content
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -141,7 +138,6 @@ def test_license_tiers_all_present():
         for tier_key, suffix in zip(cfg["tier_keys"], cfg["tier_suffixes"]):
             assert TIER_SUFFIXES[tier_key] == suffix, \
                 f"{tier_key} suffix mismatch: {TIER_SUFFIXES[tier_key]} != {suffix}"
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -153,7 +149,6 @@ def test_hmac_keys_roundtrip_all_squads():
             r = validate_key(key)
             assert r["valid"] is True, f"{tier_key} key validation failed"
             assert r["tier"] == tier_key
-    return True
 
 
 def test_company_yaml_has_all_squads():
@@ -169,7 +164,6 @@ def test_company_yaml_has_all_squads():
         expected_workers = cfg.get("expected_workers", 15)
         assert len(c[workers_key]) == expected_workers, \
             f"{workers_key} has {len(c[workers_key])} workers, expected {expected_workers}"
-    return True
 
 
 def test_compliance_fields_in_critical_skills():
@@ -186,7 +180,6 @@ def test_compliance_fields_in_critical_skills():
                 # At least mentions compliance frontmatter
                 assert "compliance:" in content, \
                     f"{skill_dir.name} missing compliance"
-    return True
 
 
 def test_total_new_skills_is_93():
@@ -199,7 +192,6 @@ def test_total_new_skills_is_93():
                     and (d / "SKILL.md").exists())
         total += found
     assert total == 93, f"expected 93 new skills, got {total}"
-    return True
 
 
 def run_all():

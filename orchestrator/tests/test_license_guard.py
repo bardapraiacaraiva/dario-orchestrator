@@ -103,7 +103,6 @@ def test_bypass_requires_both_env_and_flag():
     # Cleanup
     os.environ.pop("DARIO_LICENSE_BYPASS")
     license_guard.DEV_FLAG.unlink()
-    return True
 
 
 def test_bypass_lets_expired_through():
@@ -170,7 +169,6 @@ def test_whitelist_paths_includes_health_license():
     assert "/health" in license_guard.WHITELIST_PATHS
     assert "/license" in license_guard.WHITELIST_PATHS
     assert "/license/activate" in license_guard.WHITELIST_PATHS
-    return True
 
 
 def test_enforce_or_exit_exits_on_expired():
@@ -218,14 +216,12 @@ def test_enforce_or_exit_passes_on_pro():
 def test_fastapi_middleware_callable():
     """Just verify the middleware function exists and is callable."""
     assert callable(license_guard.fastapi_middleware)
-    return True
 
 
 def test_check_returns_dict():
     lic = license_guard._check()
     assert isinstance(lic, dict)
     assert "valid" in lic
-    return True
 
 
 def test_cli_check_smoke():
@@ -236,7 +232,6 @@ def test_cli_check_smoke():
     )
     # Either 0 (valid) or 2 (invalid) — both acceptable, just confirming no crash
     assert result.returncode in (0, 2)
-    return True
 
 
 TESTS = [

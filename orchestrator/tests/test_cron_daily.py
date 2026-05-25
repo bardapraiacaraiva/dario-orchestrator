@@ -35,7 +35,6 @@ def test_dry_run_returns_skipped_jobs():
     assert len(r["jobs"]) == 6  # cognitive + integrity + prompt hints
     for job in r["jobs"]:
         assert "skipped" in job["status"]
-    return True
 
 
 def test_run_all_executes_6_jobs():
@@ -140,7 +139,6 @@ def test_alert_evaluation_detects_drift():
     }
     alerts, warnings = cron_daily._evaluate_alerts(fake_report)
     assert any(a["source"] == "regression_check" for a in alerts)
-    return True
 
 
 def test_alert_evaluation_detects_overconfidence():
@@ -156,7 +154,6 @@ def test_alert_evaluation_detects_overconfidence():
     }
     alerts, warnings = cron_daily._evaluate_alerts(fake_report)
     assert any(a["source"] == "dispatch_cot" for a in alerts)
-    return True
 
 
 def test_alert_evaluation_detects_qvalue_drop():
@@ -173,7 +170,6 @@ def test_alert_evaluation_detects_qvalue_drop():
     }
     alerts, warnings = cron_daily._evaluate_alerts(fake_report)
     assert any(w["source"] == "qvalue_memory" for w in warnings)
-    return True
 
 
 def test_job_error_becomes_alert():
@@ -191,7 +187,6 @@ def test_job_error_becomes_alert():
     alerts, _ = cron_daily._evaluate_alerts(fake_report)
     assert any(a["source"] == "promote_episodes" for a in alerts)
     assert any("job failed" in a["message"] for a in alerts)
-    return True
 
 
 def test_hours_since_last_run_calculation():

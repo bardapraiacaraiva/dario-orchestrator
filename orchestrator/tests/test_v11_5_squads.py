@@ -54,7 +54,6 @@ def test_all_manifestos_load():
         assert m["identity"]["name"] == name.upper(), \
             f"{name} identity wrong: {m['identity']['name']}"
         assert m["skills_count"] == 15
-    return True
 
 
 def test_all_skills_exist():
@@ -63,7 +62,6 @@ def test_all_skills_exist():
         for skill in cfg["skills"]:
             skill_md = SKILLS_DIR / f"{prefix}{skill}" / "SKILL.md"
             assert skill_md.exists(), f"{name}: {prefix}{skill}/SKILL.md missing"
-    return True
 
 
 def test_all_skills_have_frontmatter():
@@ -76,7 +74,6 @@ def test_all_skills_have_frontmatter():
             assert "name:" in content
             assert "description:" in content
             assert "parent_agent:" in content
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -87,7 +84,6 @@ def test_license_tiers_present():
             assert tier_key in TIERS, f"tier {tier_key} missing"
             assert TIER_SUFFIXES[tier_key] == suffix, \
                 f"{tier_key} suffix mismatch"
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -99,7 +95,6 @@ def test_pricing_correct():
             actual = tier.get("price_brl_month") or tier.get("price_brl_month_from")
             assert actual == expected_price, \
                 f"{tier_key} price {actual} != expected {expected_price}"
-    return True
 
 
 @pytest.mark.skip(reason="Tier model simplified 2026-05-24 (RFC_STRATEGIC_DECISIONS Risk #4): 59 tiers reduced to 3 (trial/pro/enterprise). Squad foundation still tested.")
@@ -111,7 +106,6 @@ def test_hmac_keys_roundtrip():
             r = validate_key(key)
             assert r["valid"] is True, f"{tier_key} key validation failed"
             assert r["tier"] == tier_key
-    return True
 
 
 def test_company_yaml_has_squads():
@@ -125,7 +119,6 @@ def test_company_yaml_has_squads():
         assert workers_key in c
         assert len(c[workers_key]) == 15, \
             f"{workers_key} has {len(c[workers_key])}, expected 15"
-    return True
 
 
 def test_total_30_skills():
@@ -137,7 +130,6 @@ def test_total_30_skills():
                     and (d / "SKILL.md").exists())
         total += found
     assert total == 30, f"expected 30 new skills, got {total}"
-    return True
 
 
 def test_jurisdiction_metadata():
@@ -147,7 +139,6 @@ def test_jurisdiction_metadata():
         content = skill_md.read_text(encoding="utf-8")
         assert "jurisdiction" in content.lower(), \
             f"nomos-{skill} missing jurisdiction declaration"
-    return True
 
 
 def run_all():

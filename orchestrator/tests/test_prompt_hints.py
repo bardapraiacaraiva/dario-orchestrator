@@ -53,7 +53,6 @@ def test_save_and_load_hint():
     assert loaded["skill"] == SANDBOX_SKILL
     assert len(loaded["hints"]) == 1
     _cleanup_skill()
-    return True
 
 
 def test_get_hints_for_skill_renders():
@@ -72,13 +71,11 @@ def test_get_hints_for_skill_renders():
     assert "test-skill-hints-xyz" in text
     assert "[3x" in text
     _cleanup_skill()
-    return True
 
 
 def test_get_hints_empty_for_unknown_skill():
     text = ph.get_hints_for_skill("never-existed-skill-xyz-9999")
     assert text == ""
-    return True
 
 
 def test_merge_hint_existing():
@@ -100,7 +97,6 @@ def test_merge_hint_existing():
     assert len(merged) == 1  # didn't duplicate
     assert merged[0]["occurrences"] == 4
     assert merged[0]["last_seen"] == "new-ts"
-    return True
 
 
 def test_merge_hint_new_pattern():
@@ -111,7 +107,6 @@ def test_merge_hint_new_pattern():
     new = {"pattern_key": "section::b", "occurrences": 3}
     merged = ph._merge_hint(existing, new)
     assert len(merged) == 2
-    return True
 
 
 def test_clear_skill():
@@ -121,7 +116,6 @@ def test_clear_skill():
     assert ok is True
     assert not (ph.HINTS_DIR / f"{SANDBOX_SKILL}.yaml").exists()
     assert ph.clear_skill(SANDBOX_SKILL) is False  # already gone
-    return True
 
 
 def test_section_hint_builder():
@@ -131,7 +125,6 @@ def test_section_hint_builder():
     assert "Tom de Voz" in h["hint"]
     assert h["occurrences"] == 4
     assert h["confidence"] > 0.5
-    return True
 
 
 def test_token_hint_builder():
@@ -139,20 +132,17 @@ def test_token_hint_builder():
     assert h["type"] == "lost_token_recurrence"
     assert "archetype" in h["hint"]
     assert h["occurrences"] == 5
-    return True
 
 
 def test_analyse_returns_dict_even_without_runs():
     """Should not crash when evals/last_runs/ is empty."""
     r = ph.analyse()
     assert isinstance(r, dict)
-    return True
 
 
 def test_list_hints_returns_list():
     out = ph.list_hints()
     assert isinstance(out, list)
-    return True
 
 
 def test_promote_with_synthetic_runs():
@@ -263,7 +253,6 @@ def test_max_hints_per_skill_cap():
     # Top should be sec14 (occurrence 15)
     assert hints[0]["pattern_key"] == "section::sec14"
     _cleanup_skill()
-    return True
 
 
 TESTS = [

@@ -20,7 +20,6 @@ def test_high_confidence_tight_dimensions():
     assert conf["sigma"] < 0.15, f"σ should be tight: {conf['sigma']}"
     # Without good tier, even tight σ only gets to MEDIUM/HIGH range
     assert conf["level"] in ("HIGH", "MEDIUM"), f"expected HIGH/MEDIUM, got {conf['level']}"
-    return True
 
 
 def test_low_confidence_high_variance():
@@ -30,7 +29,6 @@ def test_low_confidence_high_variance():
     conf = compute_confidence(dims, skill="nonexistent-skill", score=60)
     assert conf["sigma"] >= 0.25, f"σ should be wide: {conf['sigma']}"
     assert conf["level"] in ("LOW", "MEDIUM"), f"expected LOW/MEDIUM, got {conf['level']}"
-    return True
 
 
 def test_ship_decision_high_conf():
@@ -39,7 +37,6 @@ def test_ship_decision_high_conf():
     gate = gate_decision(score=85, dimensions=dims, skill="nonexistent",
                          pass_threshold=60)
     assert gate["action"] in ("ship", "review"), f"got {gate['action']}"
-    return True
 
 
 def test_revision_below_threshold():
@@ -48,7 +45,6 @@ def test_revision_below_threshold():
     gate = gate_decision(score=45, dimensions=dims, skill="some-skill",
                          pass_threshold=60, revision_count=0)
     assert gate["action"] == "revision", f"got {gate['action']}"
-    return True
 
 
 def test_escalate_revision_exhausted():
@@ -57,7 +53,6 @@ def test_escalate_revision_exhausted():
     gate = gate_decision(score=55, dimensions=dims, skill="some-skill",
                          pass_threshold=60, revision_count=3)
     assert gate["action"] == "escalate", f"got {gate['action']}"
-    return True
 
 
 def test_critical_low_confidence_escalates():
@@ -68,7 +63,6 @@ def test_critical_low_confidence_escalates():
                          pass_threshold=60, execution_policy="critical")
     assert gate["action"] == "escalate", f"expected escalate, got {gate['action']}"
     assert "critical+LOW" in gate["rationale"]
-    return True
 
 
 def test_medium_confidence_below_buffer_reviews():
@@ -80,7 +74,6 @@ def test_medium_confidence_below_buffer_reviews():
     # With these mid-range dimensions, σ is moderate -> MEDIUM
     if gate["confidence"]["level"] == "MEDIUM":
         assert gate["action"] == "review", f"MED conf near threshold should review, got {gate['action']}"
-    return True
 
 
 def test_success_pattern_for_excellence():
@@ -89,7 +82,6 @@ def test_success_pattern_for_excellence():
     gate = gate_decision(score=92, dimensions=dims, skill="some-skill",
                          pass_threshold=60)
     assert gate["action"] == "success_pattern", f"got {gate['action']}"
-    return True
 
 
 def test_no_dimensions_provided():
@@ -97,7 +89,6 @@ def test_no_dimensions_provided():
     gate = gate_decision(score=75, dimensions={}, skill=None, pass_threshold=60)
     assert "action" in gate
     assert "confidence" in gate
-    return True
 
 
 def test_rationale_string_present():
@@ -106,7 +97,6 @@ def test_rationale_string_present():
     assert "score=80" in gate["rationale"]
     assert "threshold=60" in gate["rationale"]
     assert "confidence=" in gate["rationale"]
-    return True
 
 
 TESTS = [

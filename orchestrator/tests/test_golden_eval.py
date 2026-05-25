@@ -29,7 +29,6 @@ def test_capture_creates_files():
     assert (golden_eval.GOLDEN_DIR / f"{TEST_EVAL_ID}.golden.txt").exists()
     assert (golden_eval.GOLDEN_DIR / f"{TEST_EVAL_ID}.golden.json").exists()
     _cleanup()
-    return True
 
 
 def test_capture_idempotent_unchanged():
@@ -40,7 +39,6 @@ def test_capture_idempotent_unchanged():
     assert r1["status"] == "captured"
     assert r2["status"] == "unchanged", f"second capture should be unchanged: {r2}"
     _cleanup()
-    return True
 
 
 def test_capture_force_re_captures():
@@ -51,14 +49,12 @@ def test_capture_force_re_captures():
     assert r["status"] == "captured"
     assert r["version"] == 2, f"version should bump on force: {r['version']}"
     _cleanup()
-    return True
 
 
 def test_compare_no_golden_returns_status():
     _cleanup()
     r = golden_eval.compare_against_golden(TEST_EVAL_ID, "any candidate")
     assert r["status"] == "no_golden"
-    return True
 
 
 def test_compare_match_when_identical():
@@ -74,7 +70,6 @@ def test_compare_match_when_identical():
     assert r["score_delta"] == 0
     assert r["verdict"] in ("MATCH", "DEGRADED"), f"identical should match: {r}"
     _cleanup()
-    return True
 
 
 def test_compare_drift_score_delta():
@@ -88,7 +83,6 @@ def test_compare_drift_score_delta():
     assert r["drift_severity"] == "alert"
     assert any("score_drift" in f for f in r["flags"])
     _cleanup()
-    return True
 
 
 def test_compare_low_lexical_overlap():
@@ -102,7 +96,6 @@ def test_compare_low_lexical_overlap():
     assert r["verdict"] == "DRIFT"
     assert any("low_lexical_overlap" in f for f in r["flags"])
     _cleanup()
-    return True
 
 
 def test_compare_length_too_short():
@@ -114,7 +107,6 @@ def test_compare_length_too_short():
     assert r["length_ratio"] < golden_eval.LENGTH_RATIO_MIN
     assert any("output_too_short" in f for f in r["flags"])
     _cleanup()
-    return True
 
 
 def test_compare_length_too_long():
@@ -126,7 +118,6 @@ def test_compare_length_too_long():
     assert r["length_ratio"] > golden_eval.LENGTH_RATIO_MAX
     assert any("output_too_long" in f for f in r["flags"])
     _cleanup()
-    return True
 
 
 def test_calibration_log_appends():
@@ -140,13 +131,11 @@ def test_calibration_log_appends():
     post = golden_eval.calibration_status()
     assert post["total_entries"] >= pre_count + 2, f"log not appending: {pre_count} -> {post['total_entries']}"
     _cleanup()
-    return True
 
 
 def test_list_goldens_returns_list():
     out = golden_eval.list_goldens()
     assert isinstance(out, list)
-    return True
 
 
 def test_token_filter_strips_stop_words():
@@ -156,7 +145,6 @@ def test_token_filter_strips_stop_words():
     assert "of" not in tokens
     assert "brand" in tokens
     assert "restaurant" in tokens
-    return True
 
 
 TESTS = [

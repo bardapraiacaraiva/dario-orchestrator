@@ -87,7 +87,6 @@ def test_slack_formatter():
     assert "text" in p
     assert "attachments" in p
     assert "ALERT" in p["text"]
-    return True
 
 
 def test_discord_formatter():
@@ -97,7 +96,6 @@ def test_discord_formatter():
     assert "embeds" in p
     assert len(p["embeds"]) == 1
     assert p["embeds"][0]["color"] == 15158332  # red
-    return True
 
 
 def test_generic_formatter():
@@ -106,7 +104,6 @@ def test_generic_formatter():
     assert p["service"] == "dario-orchestrator"
     assert p["severity"] == "warn"
     assert p["event"] == "drift"
-    return True
 
 
 def test_hook_should_fire_severity_gating():
@@ -115,19 +112,16 @@ def test_hook_should_fire_severity_gating():
     event_info = {"event": "x", "severity": "info"}
     assert wd._hook_should_fire(hook, event_alert) is True
     assert wd._hook_should_fire(hook, event_info) is False
-    return True
 
 
 def test_hook_should_fire_disabled():
     hook = {"enabled": False, "url": "http://x", "min_severity": "info", "events": "*"}
     assert wd._hook_should_fire(hook, {"event": "x", "severity": "alert"}) is False
-    return True
 
 
 def test_hook_should_fire_unset_url():
     hook = {"enabled": True, "url": "REPLACE_WITH_URL", "min_severity": "info", "events": "*"}
     assert wd._hook_should_fire(hook, {"event": "x", "severity": "alert"}) is False
-    return True
 
 
 def test_hook_should_fire_event_filter_list():
@@ -135,7 +129,6 @@ def test_hook_should_fire_event_filter_list():
             "events": ["wanted_event"]}
     assert wd._hook_should_fire(hook, {"event": "wanted_event", "severity": "info"}) is True
     assert wd._hook_should_fire(hook, {"event": "other_event", "severity": "info"}) is False
-    return True
 
 
 def test_event_key_deterministic():
@@ -144,7 +137,6 @@ def test_event_key_deterministic():
     assert k1 == k2
     k3 = wd._event_key("e1", "sub", "different msg")
     assert k1 != k3
-    return True
 
 
 def test_dedup_skips_recent():
@@ -258,20 +250,17 @@ def test_status_returns_structure():
     assert "config_exists" in s
     assert "total_hooks" in s
     assert "recent_sends" in s
-    return True
 
 
 def test_severity_levels_complete():
     """Ensure all expected severities are mapped."""
     for sev in ("info", "warn", "warning", "alert", "critical"):
         assert sev in wd.SEVERITY_LEVELS
-    return True
 
 
 def test_formatters_registered():
     for kind in ("slack", "discord", "generic_json"):
         assert kind in wd.FORMATTERS
-    return True
 
 
 TESTS = [

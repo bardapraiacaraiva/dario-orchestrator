@@ -1,17 +1,31 @@
-# DARIO Orchestrator v12.1
+# DARIO Orchestrator v12.4.0
 
-> **The AI Enterprise Operating System** — 536+ skills, 32 squads, 18 cognitive modules, from idea to deployed product.
+> **AI Consulting Accelerator** — 568 skill files across 32 squad themes, orchestrated by a Python engine with enforced quality gates.
 
-[![Skills](https://img.shields.io/badge/skills-536%2B-blue)](#skills)
-[![Tests](https://img.shields.io/badge/tests-259%20pass-green)](#testing)
-[![License](https://img.shields.io/badge/license-proprietary-red)](#license)
-[![VPS](https://img.shields.io/badge/demo-LIVE-brightgreen)](http://31.97.53.231:8422)
+[![Skills](https://img.shields.io/badge/skills-568_total_·_44_active-blue)](orchestrator/quality/INVENTORY.md)
+[![Tests](https://img.shields.io/badge/tests-545_pass-green)](#testing)
+[![Tag](https://img.shields.io/badge/release-v12.4.0_open_everything-brightgreen)](#release)
+[![License](https://img.shields.io/badge/license-3_tiers-blue)](#license)
 
 ## What is DARIO?
 
-DARIO is not a chatbot. It's a **complete virtual C-suite** — 536+ AI specialists organized in 32 squads, orchestrated by a self-evolving engine with 66+ Python modules, 90+ API endpoints, 18 cognitive modules (Memory & Dreaming + PROMETHEUS Meta-Evolution), and OWASP 10/10 security.
+DARIO is a **Python orchestrator + library of agent skills** for consulting-style AI work. Solo operator (or small team) uses it to run dispatches, score outputs, track budget/spend, and learn patterns across sessions.
 
-**One system. Every department. From idea to deployed product.**
+**Honest inventory (per `quality/INVENTORY.md`):**
+- **44 skills** (Tier C) actively dispatched via orchestrator (verified by `memory/episodes/*.yaml`)
+- **8 polished wrappers** (Padrão A) with measured client-facing lift in A/B tests
+- **524 skills** with SKILL.md never dispatched via orchestrator — many ARE used via Claude Code's native `Skill` tool directly (not instrumented), but the rest is library/cold-storage padding. See `INVENTORY.md` for caveats.
+
+**Strategic framing (decided 2026-05-22):**
+- Framing C: **consulting accelerator**, not gated SaaS product
+- License = consulting/support tier signal, not code-gating (Risk #7 closed 2026-05-25, see RFC_STRATEGIC_DECISIONS.md)
+- Trial repo (`origin`) and VIP repo (`full`) ship IDENTICAL code
+
+**Engineering hygiene:**
+- 545 tests pass in ~45s · pre-push hook gating · CI on GitHub Actions
+- Real Python enforcement layer (`orchestrator/enforcement/`) — budget gate + dispatch validator + cross-process parallelism guard
+- Weekly automated backup (`scripts/backup_weekly.sh` + Windows Task Scheduler)
+- Honest metrics: `delivery_ready_rate` first-class (not vanity mean scores)
 
 ## Live Demo
 
@@ -21,7 +35,9 @@ Dashboard:  http://31.97.53.231:8422/cfo
 API:        http://31.97.53.231:8422/core/status
 ```
 
-## Domains (17)
+(Endpoints may be intermittent — VPS is shared with other client projects, see automation-solution-ai LP at :9090.)
+
+## Skill domains (themes — counts are SKILL.md files on disk, NOT all production-validated)
 
 | Domain | Skills | What it does |
 |--------|--------|-------------|
