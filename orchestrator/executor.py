@@ -177,13 +177,13 @@ def execute_task(task_id: str, dry_run: bool = False) -> dict:
         return result
 
     # ─── Step 2: CONTEXT INJECTION ───────────────────────────────────────
-    context = run_engine("context_injector.py", ["--task", task_id, "--json"])
+    context = run_engine("cognitive/context_injector.py", ["--task", task_id, "--json"])
     context_block = context.get("context_block", "")
     result["steps"].append({"step": "context", "sources": context.get("sources_used", 0),
                             "tokens_est": context.get("total_tokens_est", 0)})
 
     # ─── Step 3: ADAPTIVE RUBRIC ────────────────────────────────────────
-    rubric = run_engine("adaptive_rubric.py", ["--task", task_id, "--json"])
+    rubric = run_engine("quality/adaptive_rubric.py", ["--task", task_id, "--json"])
     result["steps"].append({"step": "rubric", "dimensions": rubric.get("dimensions_count", 5),
                             "threshold": rubric.get("pass_threshold", 60)})
 
@@ -293,7 +293,7 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
 
         # ─── QUALITY SCORE ───────────────────────────────────────────────
         if score > 0:
-            run_engine("quality_scorer.py", [
+            run_engine("quality/quality_scorer.py", [
                 "--task", task_id, "--score", str(score),
                 "--skill", skill, "--project", project, "--json"
             ])
@@ -626,7 +626,7 @@ def execute_pulse(dry_run: bool = False) -> dict:
         return pulse
 
     # 1. Dispatch
-    dispatch = run_engine("dispatch_engine.py", ["--json"])
+    dispatch = run_engine("dispatch/dispatch_engine.py", ["--json"])
     pulse["steps"]["dispatch"] = dispatch
 
     # 2. AutoDiag

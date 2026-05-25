@@ -171,7 +171,7 @@ def cmd_resolved(args) -> int:
         # Re-record in skill-metrics as human-polished
         try:
             sys.path.insert(0, str(ORCH))
-            from score_real_output import record_score
+            from quality.score_real_output import record_score
             result = record_score(
                 meta["skill"], int(args.polished_score), "yes",
                 {}, meta.get("context", ""), polished_path.read_text(encoding="utf-8")[:200],

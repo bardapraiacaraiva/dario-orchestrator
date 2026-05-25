@@ -79,7 +79,7 @@ def _ensure_dirs():
 def _load_eval_skill_map() -> dict:
     """Map eval_id -> skill from eval_suite.EVAL_CASES."""
     try:
-        from eval_suite import EVAL_CASES
+        from quality.eval_suite import EVAL_CASES
         return {c["id"]: c.get("skill") for c in EVAL_CASES}
     except Exception:
         return {}
@@ -102,7 +102,7 @@ def _collect_drilldown_patterns() -> dict:
             "last_seen": datetime,
         }}
     """
-    from eval_drilldown import diff_dimensions
+    from quality.eval_drilldown import diff_dimensions
     eval_skill = _load_eval_skill_map()
     runs = _drilldown_runs_dir()
     by_skill = defaultdict(lambda: {

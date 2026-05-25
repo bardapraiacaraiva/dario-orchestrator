@@ -36,7 +36,7 @@ RESTORED_MODULES = [
     "cognitive.episode_promoter",   # moved 2026-05-25 in Phase 4 stage 2
     "safety.ethical_gate",          # moved 2026-05-25 in Phase 4 stage 1
     "executor",
-    "golden_eval",
+    "quality.golden_eval",          # moved 2026-05-25 in Phase 4 stage 5
     "prompt_hints",
     "qvalue_memory_wire",
     "dispatch.semantic_dispatch",   # moved 2026-05-25 in Phase 4 stage 4
@@ -75,7 +75,7 @@ def test_restored_module_imports(mod_name):
 @pytest.mark.parametrize("module_file,help_arg", [
     ("dispatch/dispatch_engine.py", "--help"),    # Phase 4 stage 4
     ("cron_daily.py", "--help"),
-    ("golden_eval.py", "--help"),
+    ("quality/golden_eval.py", "--help"),         # Phase 4 stage 5
     ("synaptic_update.py", "--help"),
     ("cognitive/episode_promoter.py", "--help"),  # Phase 4 stage 2
     ("dispatch/dispatch_cot.py", "--help"),       # Phase 4 stage 4

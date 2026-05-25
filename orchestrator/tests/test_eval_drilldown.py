@@ -9,8 +9,8 @@ sys.path.insert(0, str(ORCH_DIR))
 
 import pytest
 
-import eval_drilldown as ed
-import golden_eval
+from quality import eval_drilldown as ed
+from quality import golden_eval
 
 pytestmark = pytest.mark.slow
 

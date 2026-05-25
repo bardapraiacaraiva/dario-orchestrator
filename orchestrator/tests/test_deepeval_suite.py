@@ -42,7 +42,7 @@ from deepeval.metrics import (
 from deepeval.test_case import LLMTestCase
 
 # Import DARIO's existing golden test cases
-from eval_suite import EVAL_CASES
+from quality.eval_suite import EVAL_CASES
 
 pytestmark = pytest.mark.slow
 

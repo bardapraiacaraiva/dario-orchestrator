@@ -146,7 +146,7 @@ def record_score(task_id: str, score: int, skill: str = None,
     # 2. Determine action (now uses per-skill threshold from adaptive_rubric)
     pass_threshold = SHIP_THRESHOLD
     try:
-        from adaptive_rubric import SKILL_PROFILES
+        from quality.adaptive_rubric import SKILL_PROFILES
         if skill and skill in SKILL_PROFILES:
             pass_threshold = SKILL_PROFILES[skill].get("pass_threshold", SHIP_THRESHOLD)
     except ImportError:

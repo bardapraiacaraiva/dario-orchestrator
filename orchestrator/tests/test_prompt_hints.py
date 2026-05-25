@@ -8,7 +8,7 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-import golden_eval
+from quality import golden_eval
 import prompt_hints as ph
 
 SANDBOX_SKILL = "test-skill-hints-xyz"

@@ -58,7 +58,7 @@ except ImportError:
 
 def collect_drift_status() -> dict:
     """Per-eval golden status — last known comparison result for each."""
-    from golden_eval import GOLDEN_DIR, compare_against_golden, list_goldens
+    from quality.golden_eval import GOLDEN_DIR, compare_against_golden, list_goldens
     goldens = list_goldens()
     rows = []
     for g in goldens:

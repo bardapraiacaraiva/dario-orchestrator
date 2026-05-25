@@ -451,7 +451,7 @@ def cmd_full_cycle(args):
 
     # 4.5. Regression test via eval_suite (new: was not wired)
     try:
-        from eval_suite import run_suite
+        from quality.eval_suite import run_suite
         eval_result = run_suite()
         results["eval_suite"] = {
             "total": eval_result.get("total", 0),

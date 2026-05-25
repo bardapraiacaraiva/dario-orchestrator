@@ -33,7 +33,7 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-import golden_eval
+from quality import golden_eval
 
 # Stop words (shared with golden_eval / qvalue_memory)
 _STOP = set(golden_eval._STOP) if hasattr(golden_eval, "_STOP") else set()

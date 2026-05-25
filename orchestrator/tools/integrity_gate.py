@@ -79,7 +79,7 @@ def _skill_frontmatter(name: str) -> dict:
 def check_eval_skills_exist() -> dict:
     """Check 1: Each eval_suite skill exists on disk."""
     try:
-        from eval_suite import EVAL_CASES
+        from quality.eval_suite import EVAL_CASES
     except Exception as e:
         return {"status": "ERROR", "message": f"eval_suite unavailable: {e}"}
 
@@ -107,7 +107,7 @@ def check_eval_skills_exist() -> dict:
 def check_skill_frontmatter_valid() -> dict:
     """Check 2: Each referenced SKILL.md has name + description in frontmatter."""
     try:
-        from eval_suite import EVAL_CASES
+        from quality.eval_suite import EVAL_CASES
     except Exception as e:
         return {"status": "ERROR", "message": f"eval_suite unavailable: {e}"}
 
@@ -229,8 +229,8 @@ def _is_dspy_pilot_golden(eval_id: str) -> bool:
 def check_golden_skills_alive() -> dict:
     """Check 5: Each captured golden's eval references a still-existing skill."""
     try:
-        from eval_suite import EVAL_CASES
-        from golden_eval import list_goldens
+        from quality.eval_suite import EVAL_CASES
+        from quality.golden_eval import list_goldens
     except Exception as e:
         return {"status": "ERROR", "message": str(e)[:200]}
 

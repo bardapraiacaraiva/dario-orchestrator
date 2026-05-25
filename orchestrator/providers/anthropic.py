@@ -436,7 +436,7 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
         model_override = filter_ctx.get("recommended_model", "sonnet")
 
     # 1. Guardrails
-    guard = run_engine("guardrails.py", ["--task", task_id, "--json"])
+    guard = run_engine("safety/guardrails.py", ["--task", task_id, "--json"])
     verdict = guard.get("verdict", "FAIL")
     result["steps"].append({"step": "guardrails", "verdict": verdict})
 
@@ -446,12 +446,12 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
         return result
 
     # 2. Context injection
-    context = run_engine("context_injector.py", ["--task", task_id, "--json"])
+    context = run_engine("cognitive/context_injector.py", ["--task", task_id, "--json"])
     context_block = context.get("context_block", "")
     result["steps"].append({"step": "context", "sources": context.get("sources_used", 0)})
 
     # 3. Adaptive rubric
-    rubric = run_engine("adaptive_rubric.py", ["--task", task_id, "--json"])
+    rubric = run_engine("quality/adaptive_rubric.py", ["--task", task_id, "--json"])
     result["steps"].append({"step": "rubric", "dimensions": rubric.get("dimensions_count", 5)})
 
     # 4. Build prompt
@@ -515,7 +515,7 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
         result["steps"].append({"step": "scored", "score": score, "cost": cost})
 
         # 10. Record in quality scorer
-        run_engine("quality_scorer.py", [
+        run_engine("quality/quality_scorer.py", [
             "--task", task_id, "--score", str(score),
             "--skill", skill, "--project", project, "--json"
         ])
@@ -725,7 +725,7 @@ def autonomous_pulse(dry_run: bool = False, max_tasks: int = 3) -> dict:
         return pulse
 
     # Dispatch
-    dispatch = run_engine("dispatch_engine.py", ["--json"])
+    dispatch = run_engine("dispatch/dispatch_engine.py", ["--json"])
     pulse["steps"]["dispatch"] = {"dispatched": dispatch.get("dispatched", 0)}
 
     # AutoDiag

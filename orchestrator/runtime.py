@@ -752,7 +752,7 @@ async def instantiate_template(name: str, variables: dict = {}, create: bool = F
 
 @app.get("/rubric/{task_id}", response_model=RubricResponse)
 async def get_rubric(task_id: str):
-    result = _run_engine("adaptive_rubric.py", ["--task", task_id, "--json"])
+    result = _run_engine("quality/adaptive_rubric.py", ["--task", task_id, "--json"])
     if "task_id" not in result:
         result["task_id"] = task_id
     return result

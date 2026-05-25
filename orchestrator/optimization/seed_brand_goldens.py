@@ -16,7 +16,7 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-from golden_eval import capture_golden
+from quality.golden_eval import capture_golden
 
 GOLDENS = [
     {

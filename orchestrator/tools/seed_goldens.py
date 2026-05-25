@@ -31,7 +31,7 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-import golden_eval
+from quality import golden_eval
 
 # Each entry: (eval_id, human_score, golden_output_text, notes)
 GOLDENS = [

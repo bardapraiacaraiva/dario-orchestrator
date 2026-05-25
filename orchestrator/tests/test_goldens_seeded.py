@@ -10,13 +10,13 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-import golden_eval
+from quality import golden_eval
 from tools import seed_goldens
 
 
 def test_all_eval_cases_have_golden():
     """Every EVAL_CASES entry in eval_suite must have a seeded golden."""
-    from eval_suite import EVAL_CASES
+    from quality.eval_suite import EVAL_CASES
     eval_ids = {c["id"] for c in EVAL_CASES}
     captured = {g["eval_id"] for g in golden_eval.list_goldens()}
     missing = eval_ids - captured
@@ -25,7 +25,7 @@ def test_all_eval_cases_have_golden():
 
 def test_seed_list_matches_eval_suite():
     """The seed_goldens GOLDENS list should cover every EVAL_CASES entry."""
-    from eval_suite import EVAL_CASES
+    from quality.eval_suite import EVAL_CASES
     eval_ids = {c["id"] for c in EVAL_CASES}
     seed_ids = {eid for eid, _, _, _ in seed_goldens.GOLDENS}
     not_seeded = eval_ids - seed_ids
@@ -42,7 +42,7 @@ def test_human_scores_in_reasonable_range():
 
 def test_seeded_goldens_meet_minimum_length():
     """Each golden should match or exceed the min_length declared in its eval case."""
-    from eval_suite import EVAL_CASES
+    from quality.eval_suite import EVAL_CASES
     case_lookup = {c["id"]: c for c in EVAL_CASES}
     for eval_id, score, text, notes in seed_goldens.GOLDENS:
         case = case_lookup.get(eval_id)
@@ -56,7 +56,7 @@ def test_seeded_goldens_meet_minimum_length():
 
 def test_seeded_goldens_contain_expected_keywords():
     """Each golden should contain at least 50% of its eval's expected_keywords."""
-    from eval_suite import EVAL_CASES
+    from quality.eval_suite import EVAL_CASES
     case_lookup = {c["id"]: c for c in EVAL_CASES}
     for eval_id, score, text, notes in seed_goldens.GOLDENS:
         case = case_lookup.get(eval_id)

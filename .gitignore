@@ -87,6 +87,10 @@
 !orchestrator/dispatch/
 !orchestrator/dispatch/*.py
 
+# --- Allow quality .py modules (Recommendation #2 stage 5, 2026-05-25) ---
+# (orchestrator/quality/ already whitelisted for .yaml; now also for .py)
+!orchestrator/quality/*.py
+
 # --- Allow test suite + pytest config ---
 !orchestrator/tests/
 !orchestrator/tests/*.py

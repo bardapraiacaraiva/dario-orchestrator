@@ -101,7 +101,7 @@ def test_strict_mode_treats_warn_as_fail():
 
 def test_synthetic_orphan_golden_detected():
     """If we capture a golden for a fake eval id, golden_skills_alive flags it."""
-    import golden_eval
+    from quality import golden_eval
     fake_id = "test-fake-eval-orphan-xyz-123"
     try:
         golden_eval.capture_golden(fake_id, "test content " * 30, human_score=80)

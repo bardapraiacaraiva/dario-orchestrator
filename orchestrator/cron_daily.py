@@ -162,7 +162,7 @@ def job_promote_episodes() -> dict:
 def job_regression_check() -> dict:
     """Golden eval regression detection."""
     sys.path.insert(0, str(ORCH_DIR))
-    from golden_eval import list_goldens, regression_check
+    from quality.golden_eval import list_goldens, regression_check
     r = regression_check()
     goldens = list_goldens()
     return {
