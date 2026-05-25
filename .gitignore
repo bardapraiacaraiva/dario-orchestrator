@@ -109,6 +109,12 @@
 !orchestrator/meta/
 !orchestrator/meta/*.py
 
+# --- Allow dream subsystem .py (whitelisted 2026-05-25) ---
+# Runtime artifacts (cron.log, reports/, cache/) remain ignored via dir-level
+# patterns (not matched by *.py whitelist).
+!orchestrator/dream/
+!orchestrator/dream/*.py
+
 # --- Allow test suite + pytest config ---
 !orchestrator/tests/
 !orchestrator/tests/*.py
