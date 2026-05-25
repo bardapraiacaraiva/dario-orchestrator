@@ -1,0 +1,62 @@
+# DARIO dependabot — automated dependency updates with security focus.
+# Faixa 1 #4 (Supply chain), 2026-05-25.
+#
+# Rationale:
+#   - Python deps: pyproject.toml is source of truth (PEP 621)
+#   - JS deps: orchestrator-installer is the only npm package we control
+#   - GitHub Actions: pinning + auto-update reduces supply-chain risk
+#
+# All PRs are auto-labelled `dependencies` + `security` for triage.
+
+version: 2
+updates:
+  # ─── Python (pyproject.toml) ─────────────────────────────────────────
+  - package-ecosystem: "pip"
+    directory: "/orchestrator"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Lisbon"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    # Group patch + minor updates to reduce PR noise. Majors always solo.
+    groups:
+      patch-and-minor:
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Pin major versions of foundational libs that need integration testing.
+      - dependency-name: "anthropic"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "pydantic"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "fastapi"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "langgraph*"
+        update-types: ["version-update:semver-major"]
+
+  # ─── GitHub Actions ──────────────────────────────────────────────────
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Lisbon"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "ci"
+
+# Note: the installer repo (bardapraiacaraiva/dario-orchestrator-installer)
+# has its own dependabot config (see that repo). This file covers only
+# the orchestrator repo.

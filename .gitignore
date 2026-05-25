@@ -115,6 +115,14 @@
 !orchestrator/dream/
 !orchestrator/dream/*.py
 
+# --- Allow security artefacts (Faixa 1 #4, 2026-05-25) ---
+# TRIAGE docs versioned; baseline JSON/XML versioned for compliance audit
+# trail (90d CI retention + persistent in repo for any-time reference).
+!orchestrator/security/
+!orchestrator/security/*.md
+!orchestrator/security/*.json
+!orchestrator/security/*.xml
+
 # --- Allow test suite + pytest config ---
 !orchestrator/tests/
 !orchestrator/tests/*.py
