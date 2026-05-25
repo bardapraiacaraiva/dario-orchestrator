@@ -122,6 +122,11 @@
 !orchestrator/security/*.md
 !orchestrator/security/*.json
 !orchestrator/security/*.xml
+# Audit signing keys (Faixa 1 #5): public yes, private NEVER.
+!orchestrator/security/audit_pubkey.pem
+# .audit_privkey is captured by the leading `*` ignore rule + dotfile pattern;
+# explicitly re-deny just in case anyone whitelists *.* by accident:
+orchestrator/security/.audit_privkey
 
 # --- Allow test suite + pytest config ---
 !orchestrator/tests/

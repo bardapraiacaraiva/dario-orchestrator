@@ -90,7 +90,13 @@ def get_today_file() -> Path:
 
 def log_event(actor: str, action: str, entity_type: str = "",
               entity_id: str = "", details: str = "") -> dict:
-    """Append a structured event to today's audit log."""
+    """Append a structured event to today's audit log.
+
+    Faixa 1 #5 (2026-05-25): entries are now Ed25519-signed and chained
+    via prev_hash for tamper-evidence. If the signing module is unavailable
+    (e.g., cryptography package not installed), falls back to unsigned
+    append (logged with warning) to avoid breaking critical mutations.
+    """
     entry = {
         "timestamp": datetime.now(UTC).isoformat(),
         "actor": actor,
@@ -115,6 +121,29 @@ def log_event(actor: str, action: str, entity_type: str = "",
                 entries = data
         except Exception:
             pass
+
+    # Sign + chain (Faixa 1 #5). Fail-soft on import errors so a missing
+    # cryptography dep doesn't break mutation logging.
+    try:
+        from core.audit_signing import entry_hash, genesis_hash, sign_entry
+
+        today_str = datetime.now(UTC).strftime("%Y-%m-%d")
+        # Find the prev_hash: hash of last signed entry, or genesis if first.
+        prev = genesis_hash(today_str)
+        for e in entries:
+            if "sig" in e:
+                prev = entry_hash(e)
+        entry = sign_entry(entry, prev_hash=prev)
+    except ImportError:
+        # cryptography not installed — log unsigned, surface to logger
+        logging.getLogger(__name__).warning(
+            "audit_signing unavailable; appending unsigned entry"
+        )
+    except Exception as e:
+        # Signing failed unexpectedly — don't lose the entry, log + continue
+        logging.getLogger(__name__).warning(
+            "audit signing failed (%s); appending unsigned entry", e
+        )
 
     entries.append(entry)
     dump_yaml_list(entries, str(log_file))
