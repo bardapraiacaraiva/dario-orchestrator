@@ -86,9 +86,33 @@ def save_budget(budget, month=None):
         f.write("# Schema v2 — Token Capture Contract compliant\n\n")
         yaml.dump(budget, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
 
-def scan_tasks_for_tokens():
-    """Scan all active+done tasks and sum actual_tokens."""
-    totals = {"total": 0, "by_project": {}, "by_skill": {}}
+def _task_month(task: dict) -> str | None:
+    """Return YYYY-MM the task belongs to, using best-effort field precedence.
+
+    Priority:
+      1. completed_at (preferred — when work finished)
+      2. checked_out_at (when dispatched — for in-progress tasks)
+      3. last_token_capture_at (when tokens were captured — LAST resort because
+         backfill sets this to current month and would inflate budget)
+    Returns None if no usable timestamp found.
+    """
+    for field in ("completed_at", "checked_out_at", "last_token_capture_at"):
+        ts = task.get(field)
+        if isinstance(ts, str) and len(ts) >= 7:
+            month = ts[:7]
+            if len(month) == 7 and month[4] == "-":
+                return month
+    return None
+
+
+def scan_tasks_for_tokens(month: str | None = None):
+    """Scan all active+done tasks and sum actual_tokens.
+
+    Args:
+        month: If set (YYYY-MM), only include tasks whose timestamp falls in
+            that month. If None, sum everything (legacy behavior).
+    """
+    totals = {"total": 0, "by_project": {}, "by_skill": {}, "tasks_counted": 0, "tasks_skipped_month": 0}
 
     for task_dir in [TASKS_ACTIVE, TASKS_DONE]:
         if not task_dir.exists():
@@ -100,12 +124,19 @@ def scan_tasks_for_tokens():
                 if not task:
                     continue
                 tokens = task.get("actual_tokens") or 0
-                if tokens > 0:
-                    project = task.get("project", "unallocated")
-                    skill = task.get("skill", "unknown")
-                    totals["total"] += tokens
-                    totals["by_project"][project] = totals["by_project"].get(project, 0) + tokens
-                    totals["by_skill"][skill] = totals["by_skill"].get(skill, 0) + tokens
+                if tokens <= 0:
+                    continue
+                if month is not None:
+                    task_month = _task_month(task)
+                    if task_month != month:
+                        totals["tasks_skipped_month"] += 1
+                        continue
+                project = task.get("project", "unallocated")
+                skill = task.get("skill", "unknown")
+                totals["total"] += tokens
+                totals["tasks_counted"] += 1
+                totals["by_project"][project] = totals["by_project"].get(project, 0) + tokens
+                totals["by_skill"][skill] = totals["by_skill"].get(skill, 0) + tokens
             except (OSError, yaml.YAMLError, TypeError) as e:
                 print(f"Warning: skipping {task_file.name} — {e}", file=sys.stderr)
                 continue
@@ -257,22 +288,27 @@ def main():
             log.warning(f"[{a['level']}] {a['message']}")
         return
 
-    # Default: full scan + update
-    budget = load_budget(args.month)
-    task_totals = scan_tasks_for_tokens()
+    # Default: full scan + update (filtered by the budget's month)
+    target_month = args.month or get_current_month()
+    budget = load_budget(target_month)
+    task_totals = scan_tasks_for_tokens(month=target_month)
 
     if task_totals["total"] > 0:
-        budget["total_tokens_used"] = max(budget["total_tokens_used"], task_totals["total"])
-        for proj, tokens in task_totals["by_project"].items():
-            budget["by_project"][proj] = max(budget["by_project"].get(proj, 0), tokens)
-        for skill_name, tokens in task_totals["by_skill"].items():
-            budget["by_skill"][skill_name] = max(budget["by_skill"].get(skill_name, 0), tokens)
+        # Authoritative: scan result IS the truth for this month. No max() — that
+        # was the pre-Faixa-3-#1b bug that let cross-month historical inflate the
+        # current month.
+        budget["total_tokens_used"] = task_totals["total"]
+        budget["by_project"] = dict(task_totals["by_project"])
+        budget["by_skill"] = dict(task_totals["by_skill"])
 
-    save_budget(budget, args.month)
+    save_budget(budget, target_month)
     alerts = check_thresholds(budget)
-    save_budget(budget, args.month)
+    save_budget(budget, target_month)
 
-    log.info(f"Budget updated: {budget['total_tokens_used']:,} / {budget['limit']:,} ({budget['percentage']:.2f}%)")
+    log.info(f"Budget updated [{target_month}]: {budget['total_tokens_used']:,} / "
+             f"{budget['limit']:,} ({budget['percentage']:.2f}%) "
+             f"· {task_totals['tasks_counted']} tasks counted, "
+             f"{task_totals['tasks_skipped_month']} skipped (other months)")
     for a in alerts:
         log.warning(f"[{a['level']}] {a['message']}")
 

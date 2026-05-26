@@ -220,6 +220,29 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# CORS — dashboards served from :8766 (http) or opened via file:// (origin=null)
+# fetch this API on :8422. Without CORS, every browser XHR is blocked and the UI
+# stays in "awaiting telemetry" forever. Localhost-only by design.
+#
+# `allow_origins=["null"]` is intentional: browsers send `Origin: null` for
+# file:// pages. Risk is acceptable since the API listens only on 127.0.0.1
+# (loopback) — no external attacker can reach it. The threat is "user opens
+# malicious local .html that calls our API" which already implies prior
+# compromise of the user's filesystem.
+try:
+    from fastapi.middleware.cors import CORSMiddleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["null"],
+        allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    log.info("[CORS] Middleware installed (localhost/127.0.0.1 any port + file:// null origin)")
+except Exception as e:
+    log.warning(f"[CORS] Middleware install failed: {e}")
+
 # OpenTelemetry tracing (v12.1 / Onda 1 #4 — real OTel, exports to Langfuse if env set)
 try:
     from observability.otel_setup import instrument_fastapi, setup_tracing
@@ -390,6 +413,21 @@ async def dispatch_execute():
 @app.get("/state", response_model=StateResponse)
 async def get_state():
     return _run_engine("core/state_machine.py", ["--json"])
+
+
+@app.get("/org")
+async def get_org_tree():
+    """Return the org hierarchy from company.yaml with live task load.
+
+    Powers agent-visualizer.html — replaces the previously hardcoded tree.
+    Status (`active`/`idle`) per node derives from active tasks of workers
+    under that subtree. Single source of truth: company.yaml + orchestrator.db.
+    """
+    try:
+        from core.org_tree import build_tree
+        return build_tree()
+    except Exception as e:
+        return {"error": str(e)[:200], "tree": None, "nodes": [], "stats": {}}
 
 
 @app.post("/state/transition", response_model=StateResponse)

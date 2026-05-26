@@ -18,16 +18,27 @@ import argparse
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
-RUNTIME = ORCH_DIR / "runtime.py"
+VENV_PY = ORCH_DIR / ".venv" / "Scripts" / "python.exe"
+LOG_FILE = ORCH_DIR / "runtime_startup.log"
 STARTUP_DIR = Path.home() / "AppData" / "Roaming" / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Startup"
 
 
 def install_startup_shortcut():
-    """Create a .bat in Windows Startup folder."""
-    bat_content = f'@echo off\nstart /min "" python "{RUNTIME}" --port 8422\n'
+    """Create a .bat in Windows Startup folder.
+
+    Uses `-m core.runtime` (module invocation) instead of script path to avoid
+    sys.path shadowing where core/secrets.py would block stdlib `secrets` import.
+    Pins to the venv python so FastAPI/uvicorn deps resolve.
+    """
+    bat_content = (
+        '@echo off\r\n'
+        f'cd /d "{ORCH_DIR}"\r\n'
+        f'start /min "" "{VENV_PY}" -m core.runtime --port 8422 >> "{LOG_FILE}" 2>&1\r\n'
+    )
     bat_path = STARTUP_DIR / "dario_runtime.bat"
-    bat_path.write_text(bat_content)
+    bat_path.write_text(bat_content, encoding="utf-8")
     print(f"Startup shortcut created: {bat_path}")
+    print(f"Startup log will be written to: {LOG_FILE}")
     return True
 
 
@@ -72,7 +83,7 @@ def main():
         # Auto: install startup shortcut (works without admin)
         install_startup_shortcut()
         print("\nRuntime will auto-start on next login.")
-        print("To start now: python runtime.py --port 8422")
+        print(f'To start now: cd "{ORCH_DIR}" && "{VENV_PY}" -m core.runtime --port 8422')
 
 
 if __name__ == "__main__":

@@ -214,7 +214,7 @@ class HealthResponse(BaseModel):
     status: str
     state: str = "?"
     autonomy: str = "?"
-    health: int = 0
+    health: float = 0.0
     timestamp: str
 
 
