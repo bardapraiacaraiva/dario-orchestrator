@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>DARIO Agent Operations Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -766,6 +769,9 @@ body::after {
   90% { opacity: 0.1; }
   100% { opacity: 0; transform: translateY(-200px) scale(1); }
 }
+
+.skip-link{position:absolute;left:-9999px;top:8px;padding:8px 16px;background:var(--cyan);color:var(--bg);text-decoration:none;font-weight:700;border-radius:6px;z-index:10000}
+.skip-link:focus{left:8px}
 </style>
 </head>
 <body>
@@ -781,14 +787,14 @@ body::after {
 .dario-nav-label{color:#8896b3;font-size:10px;text-transform:uppercase;letter-spacing:.1em;padding:5px 4px 5px 8px;font-weight:700}
 @media(max-width:760px){.dario-nav{position:static;margin:8px}}
 </style>
-<nav class="dario-nav">
-  <span class="dario-nav-label">DARIO &#9656;</span>
-  <a href="dashboard.html" data-page="dashboard">&#128202; Live</a>
-  <a href="mission-control.html" data-page="mission-control">&#128640; Mission</a>
-  <a href="agent-visualizer.html" data-page="agent-visualizer">&#129504; Visualizer</a>
-  <a href="agent_display.html" data-page="agent_display">&#127760; Display</a>
-  <a href="cognitive_dashboard.html" data-page="cognitive_dashboard">&#129516; Cognitive</a>
-  <a href="cfo_dashboard.html" data-page="cfo_dashboard">&#128176; CFO</a>
+<nav class="dario-nav" aria-label="Dashboards DARIO">
+  <span class="dario-nav-label">DARIO <span aria-hidden="true">&#9656;</span></span>
+  <a href="dashboard.html" data-page="dashboard"><span aria-hidden="true">&#128202;</span> Live</a>
+  <a href="mission-control.html" data-page="mission-control"><span aria-hidden="true">&#128640;</span> Mission</a>
+  <a href="agent-visualizer.html" data-page="agent-visualizer"><span aria-hidden="true">&#129504;</span> Visualizer</a>
+  <a href="agent_display.html" data-page="agent_display"><span aria-hidden="true">&#127760;</span> Display</a>
+  <a href="cognitive_dashboard.html" data-page="cognitive_dashboard"><span aria-hidden="true">&#129516;</span> Cognitive</a>
+  <a href="cfo_dashboard.html" data-page="cfo_dashboard"><span aria-hidden="true">&#128176;</span> CFO</a>
 </nav>
 <script>
 (function(){
@@ -800,6 +806,9 @@ body::after {
 </script>
 
 
+
+<a href="#main-content" class="skip-link">Saltar para conteúdo principal</a>
+<main id="main-content">
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-text">INITIALIZING AGENT OPERATIONS CENTER</div>
   <div class="loading-bar"><div class="loading-bar-inner"></div></div>
@@ -811,9 +820,9 @@ body::after {
 </div>
 
 <!-- HEADER -->
-<div class="header">
+<header class="header">
   <div class="header-left">
-    <div class="logo"><span>D.A.R.I.O.</span> AGENT OPS CENTER</div>
+    <h1 class="logo"><span>D.A.R.I.O.</span> AGENT OPS CENTER</h1>
     <div class="logo-sub">Real-Time Execution Display</div>
   </div>
   <div class="header-center">
@@ -843,7 +852,7 @@ body::after {
     <div class="live-badge"><div class="live-dot"></div>LIVE</div>
     <div class="clock" id="clock">--:--:--</div>
   </div>
-</div>
+</header>
 
 <!-- MAIN -->
 <div class="main-container">
@@ -890,7 +899,13 @@ body::after {
 // DARIO AGENT OPERATIONS CENTER — Core Engine
 // ============================================================================
 
-const API_BASE = window.location.origin;
+// API_BASE: runtime is on :8422. Only use window.location.origin when the page
+// is genuinely served from there (rare — e.g. embedded behind a reverse proxy).
+// Static-server hosting on :8766 was hitting itself for /tasks/audit/health,
+// and file:// would give origin=null. Default to absolute :8422.
+const API_BASE = (window.location.protocol.startsWith('http') && window.location.port === '8422')
+  ? window.location.origin
+  : 'http://localhost:8422';
 const POLL_INTERVAL = 5000;
 
 // ---- HIERARCHY ----
@@ -1845,5 +1860,6 @@ async function init() {
 
 init();
 </script>
+</main>
 </body>
 </html>

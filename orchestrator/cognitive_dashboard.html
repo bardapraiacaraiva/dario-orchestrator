@@ -20,7 +20,7 @@ display:inline-block;}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:24px}
 .card{background:var(--card);border:1px solid var(--border);
 border-radius:14px;padding:20px}
-.card h3{font-size:14px;color:var(--dim);margin-bottom:16px;
+.card h2{font-size:14px;color:var(--dim);margin-bottom:16px;
 text-transform:uppercase;letter-spacing:.08em;display:flex;
 align-items:center;justify-content:space-between;}
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -35,6 +35,9 @@ td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}
 .footer{text-align:center;color:var(--dim);font-size:11px;padding-top:16px;
 border-top:1px solid var(--border);margin-top:20px}
 @media(max-width:1000px){.grid,.grid-3{grid-template-columns:1fr}}
+
+.skip-link{position:absolute;left:-9999px;top:8px;padding:8px 16px;background:var(--cyan);color:var(--bg);text-decoration:none;font-weight:700;border-radius:6px;z-index:10000}
+.skip-link:focus{left:8px}
 </style></head><body>
 <!-- DARIO Dashboards Navigation (v12.1 — integrated 2026-05-22) -->
 <style>
@@ -48,14 +51,14 @@ border-top:1px solid var(--border);margin-top:20px}
 .dario-nav-label{color:#8896b3;font-size:10px;text-transform:uppercase;letter-spacing:.1em;padding:5px 4px 5px 8px;font-weight:700}
 @media(max-width:760px){.dario-nav{position:static;margin:8px}}
 </style>
-<nav class="dario-nav">
-  <span class="dario-nav-label">DARIO &#9656;</span>
-  <a href="dashboard.html" data-page="dashboard">&#128202; Live</a>
-  <a href="mission-control.html" data-page="mission-control">&#128640; Mission</a>
-  <a href="agent-visualizer.html" data-page="agent-visualizer">&#129504; Visualizer</a>
-  <a href="agent_display.html" data-page="agent_display">&#127760; Display</a>
-  <a href="cognitive_dashboard.html" data-page="cognitive_dashboard">&#129516; Cognitive</a>
-  <a href="cfo_dashboard.html" data-page="cfo_dashboard">&#128176; CFO</a>
+<nav class="dario-nav" aria-label="Dashboards DARIO">
+  <span class="dario-nav-label">DARIO <span aria-hidden="true">&#9656;</span></span>
+  <a href="dashboard.html" data-page="dashboard"><span aria-hidden="true">&#128202;</span> Live</a>
+  <a href="mission-control.html" data-page="mission-control"><span aria-hidden="true">&#128640;</span> Mission</a>
+  <a href="agent-visualizer.html" data-page="agent-visualizer"><span aria-hidden="true">&#129504;</span> Visualizer</a>
+  <a href="agent_display.html" data-page="agent_display"><span aria-hidden="true">&#127760;</span> Display</a>
+  <a href="cognitive_dashboard.html" data-page="cognitive_dashboard"><span aria-hidden="true">&#129516;</span> Cognitive</a>
+  <a href="cfo_dashboard.html" data-page="cfo_dashboard"><span aria-hidden="true">&#128176;</span> CFO</a>
 </nav>
 <script>
 (function(){
@@ -66,20 +69,23 @@ border-top:1px solid var(--border);margin-top:20px}
 })();
 </script>
 
-<div class="header">
-  <div class="logo">DARIO <span>Cognitive Health</span> Dashboard</div>
+
+<a href="#main-content" class="skip-link">Saltar para conteúdo principal</a>
+<main id="main-content">
+<header class="header">
+  <h1 class="logo">DARIO <span>Cognitive Health</span> Dashboard</h1>
   <div class="meta">
     <span>Generated: 2026-05-19 10:11:32 UTC</span>
     <span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">System: PASS</span>
   </div>
-</div>
+</header>
 
 <div class="grid">
   
 <div class="card">
-  <h3>Golden Eval Drift Status <span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">12 MATCH · 0 DEGRADED · 0 DRIFT</span></h3>
+  <h2>Golden Eval Drift Status <span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">12 MATCH · 0 DEGRADED · 0 DRIFT</span></h2>
   <table>
-    <thead><tr><th>Eval</th><th>Verdict</th><th>Human</th><th>Lexical</th><th>Semantic</th><th>v</th></tr></thead>
+    <thead><tr><th scope="col">Eval</th><th scope="col">Verdict</th><th scope="col">Human</th><th scope="col">Lexical</th><th scope="col">Semantic</th><th scope="col">v</th></tr></thead>
     <tbody><tr><td style='font-weight:600;color:var(--cyan);'>eval-brand-01</td><td><span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">MATCH</span></td><td>88</td><td>1.0</td><td>1.0</td><td>v1</td></tr>
 <tr><td style='font-weight:600;color:var(--cyan);'>eval-brand-02</td><td><span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">MATCH</span></td><td>86</td><td>1.0</td><td>1.0</td><td>v1</td></tr>
 <tr><td style='font-weight:600;color:var(--cyan);'>eval-diagnose-01</td><td><span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">MATCH</span></td><td>80</td><td>1.0</td><td>1.0</td><td>v1</td></tr>
@@ -96,7 +102,7 @@ border-top:1px solid var(--border);margin-top:20px}
 </div>
   
 <div class="card">
-  <h3>Integrity Gate <span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">PASS</span></h3>
+  <h2>Integrity Gate <span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">PASS</span></h2>
   <div class='health-row'><span style='flex:1;font-weight:500;'>eval_skills_exist</span><span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">PASS</span></div><div style='font-size:11px;color:var(--dim);margin:2px 0 8px 0;padding-left:2px;'>all 12 eval skills exist</div><div class='health-row'><span style='flex:1;font-weight:500;'>skill_frontmatter_valid</span><span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">PASS</span></div><div style='font-size:11px;color:var(--dim);margin:2px 0 8px 0;padding-left:2px;'>all skill frontmatters valid</div><div class='health-row'><span style='flex:1;font-weight:500;'>embeddings_coverage</span><span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">PASS</span></div><div style='font-size:11px;color:var(--dim);margin:2px 0 8px 0;padding-left:2px;'>all 292 skills have embeddings</div><div class='health-row'><span style='flex:1;font-weight:500;'>embeddings_freshness</span><span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">PASS</span></div><div style='font-size:11px;color:var(--dim);margin:2px 0 8px 0;padding-left:2px;'>all embeddings fresh</div><div class='health-row'><span style='flex:1;font-weight:500;'>golden_skills_alive</span><span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">PASS</span></div><div style='font-size:11px;color:var(--dim);margin:2px 0 8px 0;padding-left:2px;'>all goldens reference live skills</div><div class='health-row'><span style='flex:1;font-weight:500;'>chain_skills_resolve</span><span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">PASS</span></div><div style='font-size:11px;color:var(--dim);margin:2px 0 8px 0;padding-left:2px;'>all 29 chain steps resolve</div><div class='health-row'><span style='flex:1;font-weight:500;'>synaptic_pairs_valid</span><span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">PASS</span></div><div style='font-size:11px;color:var(--dim);margin:2px 0 8px 0;padding-left:2px;'>all 30 synaptic pairs valid</div>
 </div>
 </div>
@@ -104,7 +110,7 @@ border-top:1px solid var(--border);margin-top:20px}
 <div class="grid">
   
 <div class="card">
-  <h3>Dispatch Chain-of-Thought <span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">OC rate 0%</span></h3>
+  <h2>Dispatch Chain-of-Thought <span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">OC rate 0%</span></h2>
   <div style="display:flex;gap:20px;flex-wrap:wrap;">
     <div><div class="big-num">0</div>
          <div style="color:var(--dim);font-size:11px;">TOTAL TRACES</div></div>
@@ -124,7 +130,7 @@ border-top:1px solid var(--border);margin-top:20px}
 </div>
   
 <div class="card">
-  <h3>Semantic Memory & Auto-Rules</h3>
+  <h2>Semantic Memory & Auto-Rules</h2>
   <div style="display:flex;gap:20px;margin-bottom:16px;">
     <div><div class="big-num">20</div>
          <div style="color:var(--dim);font-size:11px;">MEMORIES</div></div>
@@ -143,7 +149,7 @@ border-top:1px solid var(--border);margin-top:20px}
 <div class="grid">
   
 <div class="card">
-  <h3>Q-Value Memory — Top Strategies</h3>
+  <h2>Q-Value Memory — Top Strategies</h2>
   <div style="display:flex;gap:20px;margin-bottom:14px;">
     <div><div class="big-num">31</div>
          <div style="color:var(--dim);font-size:11px;">EPISODES</div></div>
@@ -153,7 +159,7 @@ border-top:1px solid var(--border);margin-top:20px}
          <div style="color:var(--dim);font-size:11px;">AVG Q-VALUE</div></div>
   </div>
   <table>
-    <thead><tr><th>Skill</th><th>Q-Value</th><th>Avg Score</th><th>Visits</th></tr></thead>
+    <thead><tr><th scope="col">Skill</th><th scope="col">Q-Value</th><th scope="col">Avg Score</th><th scope="col">Visits</th></tr></thead>
     <tbody><tr><td style='font-weight:600;color:var(--cyan);'>dario-product</td><td>0.990</td><td>99.0</td><td>1</td></tr>
 <tr><td style='font-weight:600;color:var(--cyan);'>a360-nicho</td><td>0.990</td><td>99.0</td><td>1</td></tr>
 <tr><td style='font-weight:600;color:var(--cyan);'>dario-product</td><td>0.980</td><td>98.0</td><td>1</td></tr>
@@ -163,7 +169,7 @@ border-top:1px solid var(--border);margin-top:20px}
 </div>
   
 <div class="card">
-  <h3>Synaptic Affinity Graph</h3>
+  <h2>Synaptic Affinity Graph</h2>
   <div style="display:flex;gap:20px;margin-bottom:14px;">
     <div><div class="big-num">30</div>
          <div style="color:var(--dim);font-size:11px;">TOTAL PAIRS</div></div>
@@ -175,7 +181,7 @@ border-top:1px solid var(--border);margin-top:20px}
          <div style="color:var(--dim);font-size:11px;">CO-ACT TOTAL</div></div>
   </div>
   <table>
-    <thead><tr><th>Pair</th><th>Weight</th><th>Co-Act</th><th>Avg</th></tr></thead>
+    <thead><tr><th scope="col">Pair</th><th scope="col">Weight</th><th scope="col">Co-Act</th><th scope="col">Avg</th></tr></thead>
     <tbody><tr><td style='font-weight:500;'>diva-moodboard + diva-materials</td><td>1.0</td><td>2</td><td>85.0</td></tr>
 <tr><td style='font-weight:500;'>dario-brand + dario-content</td><td>0.55</td><td>4</td><td>82.5</td></tr>
 <tr><td style='font-weight:500;'>dario-brand + dario-naming</td><td>0.55</td><td>7</td><td>82.4</td></tr>
@@ -188,15 +194,15 @@ border-top:1px solid var(--border);margin-top:20px}
 <div class="grid">
   
 <div class="card">
-  <h3>Cron Daily History — Last ran 2026-05-19T10:01:35</h3>
+  <h2>Cron Daily History — Last ran 2026-05-19T10:01:35</h2>
   <table>
-    <thead><tr><th>Date</th><th>Status</th><th>Alerts</th><th>Warnings</th><th>Duration</th></tr></thead>
+    <thead><tr><th scope="col">Date</th><th scope="col">Status</th><th scope="col">Alerts</th><th scope="col">Warnings</th><th scope="col">Duration</th></tr></thead>
     <tbody><tr><td>2026-05-19</td><td><span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">OK</span></td><td>0</td><td>0</td><td>0.6s</td></tr></tbody>
   </table>
 </div>
   
 <div class="card">
-  <h3>Semantic Embeddings Cache <span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">coverage 100.0%</span></h3>
+  <h2>Semantic Embeddings Cache <span class="badge" style="background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);">coverage 100.0%</span></h2>
   <div style="display:flex;gap:20px;">
     <div><div class="big-num">292</div>
          <div style="color:var(--dim);font-size:11px;">CACHED</div></div>
@@ -209,7 +215,8 @@ border-top:1px solid var(--border);margin-top:20px}
 </div>
 </div>
 
-<div class="footer">
+</main>
+<footer class="footer">
   DARIO Orchestrator — Cognitive subsystems audit · Sprints 1-4 + U11/U12/U14 wiring
-</div>
+</footer>
 </body></html>

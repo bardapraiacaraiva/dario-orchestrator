@@ -30,6 +30,9 @@ td { padding: 5px 4px; border-bottom: 1px solid #21262d; }
 .badge { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 4px 12px; font-size: 0.8em; }
 .alert-banner { background: #1c0f0f; border: 1px solid var(--red); border-radius: 8px; padding: 12px; margin-bottom: 16px; }
 .alert-banner.warning { background: #1c1a0f; border-color: var(--orange); }
+
+.skip-link{position:absolute;left:-9999px;top:8px;padding:8px 16px;background:var(--cyan);color:var(--bg);text-decoration:none;font-weight:700;border-radius:6px;z-index:10000}
+.skip-link:focus{left:8px}
 </style>
 </head>
 <body>
@@ -45,14 +48,14 @@ td { padding: 5px 4px; border-bottom: 1px solid #21262d; }
 .dario-nav-label{color:#8896b3;font-size:10px;text-transform:uppercase;letter-spacing:.1em;padding:5px 4px 5px 8px;font-weight:700}
 @media(max-width:760px){.dario-nav{position:static;margin:8px}}
 </style>
-<nav class="dario-nav">
-  <span class="dario-nav-label">DARIO &#9656;</span>
-  <a href="dashboard.html" data-page="dashboard">&#128202; Live</a>
-  <a href="mission-control.html" data-page="mission-control">&#128640; Mission</a>
-  <a href="agent-visualizer.html" data-page="agent-visualizer">&#129504; Visualizer</a>
-  <a href="agent_display.html" data-page="agent_display">&#127760; Display</a>
-  <a href="cognitive_dashboard.html" data-page="cognitive_dashboard">&#129516; Cognitive</a>
-  <a href="cfo_dashboard.html" data-page="cfo_dashboard">&#128176; CFO</a>
+<nav class="dario-nav" aria-label="Dashboards DARIO">
+  <span class="dario-nav-label">DARIO <span aria-hidden="true">&#9656;</span></span>
+  <a href="dashboard.html" data-page="dashboard"><span aria-hidden="true">&#128202;</span> Live</a>
+  <a href="mission-control.html" data-page="mission-control"><span aria-hidden="true">&#128640;</span> Mission</a>
+  <a href="agent-visualizer.html" data-page="agent-visualizer"><span aria-hidden="true">&#129504;</span> Visualizer</a>
+  <a href="agent_display.html" data-page="agent_display"><span aria-hidden="true">&#127760;</span> Display</a>
+  <a href="cognitive_dashboard.html" data-page="cognitive_dashboard"><span aria-hidden="true">&#129516;</span> Cognitive</a>
+  <a href="cfo_dashboard.html" data-page="cfo_dashboard"><span aria-hidden="true">&#128176;</span> CFO</a>
 </nav>
 <script>
 (function(){
@@ -63,7 +66,10 @@ td { padding: 5px 4px; border-bottom: 1px solid #21262d; }
 })();
 </script>
 
-<div class="header">
+
+<a href="#main-content" class="skip-link">Saltar para conteúdo principal</a>
+<main id="main-content">
+<header class="header">
     <div>
         <h1>DARIO CFO Dashboard</h1>
         <div class="subtitle">Financial Command Center — 2026-05 — Generated 2026-05-08T13:15:08</div>
@@ -73,7 +79,7 @@ td { padding: 5px 4px; border-bottom: 1px solid #21262d; }
         <span class="badge">Tasks: 67/67</span>
         <span class="badge">Quality: 81.9</span>
     </div>
-</div>
+</header>
 
 <div class='alert-banner'><strong>TAX ALERT:</strong> 1 obrigacao(oes) em ATRASO + 3 URGENTE(S)</div>
 
@@ -117,7 +123,7 @@ td { padding: 5px 4px; border-bottom: 1px solid #21262d; }
     <div class="card">
         <h2>Calendario Fiscal</h2>
         <table>
-            <tr><th>Obrigacao</th><th>Deadline</th><th>Dias</th><th>Status</th></tr>
+            <tr><th scope="col">Obrigacao</th><th scope="col">Deadline</th><th scope="col">Dias</th><th scope="col">Status</th></tr>
             <tr>
             <td>Relatório Único (Anexo A) — GEP/MTSSS</td>
             <td>2026-04-15</td>
@@ -150,7 +156,7 @@ td { padding: 5px 4px; border-bottom: 1px solid #21262d; }
     <div class="card">
         <h2>Custo por Projecto</h2>
         <table>
-            <tr><th>Projecto</th><th>Tokens</th><th>Custo Est.</th></tr>
+            <tr><th scope="col">Projecto</th><th scope="col">Tokens</th><th scope="col">Custo Est.</th></tr>
             <tr><td>vivenda-test</td><td>334,270</td><td>EUR 3.27</td></tr><tr><td>mar-brasa</td><td>30,000</td><td>EUR 0.29</td></tr><tr><td>vivenda</td><td>12,800</td><td>EUR 0.13</td></tr><tr><td>demo</td><td>8,300</td><td>EUR 0.08</td></tr><tr><td>atrium-golden-visa</td><td>8,300</td><td>EUR 0.08</td></tr><tr><td>vivenda-pilot</td><td>6,117</td><td>EUR 0.06</td></tr><tr><td>lucas-lusoconta</td><td>3,200</td><td>EUR 0.03</td></tr><tr><td>test</td><td>2,000</td><td>EUR 0.02</td></tr><tr><td>audit</td><td>2,000</td><td>EUR 0.02</td></tr><tr><td></td><td>1,800</td><td>EUR 0.02</td></tr>
         </table>
     </div>
@@ -160,7 +166,7 @@ td { padding: 5px 4px; border-bottom: 1px solid #21262d; }
     <div class="card">
         <h2>Quality por Skill</h2>
         <table>
-            <tr><th>Skill</th><th>Avg Score</th><th>Execucoes</th></tr>
+            <tr><th scope="col">Skill</th><th scope="col">Avg Score</th><th scope="col">Execucoes</th></tr>
             <tr><td>dario-saas-metrics</td><td>65.0</td><td>1</td></tr><tr><td>seo-geo</td><td>83.0</td><td>1</td></tr><tr><td>dario-brand</td><td>83.5</td><td>4</td></tr><tr><td>seo-audit</td><td>82.5</td><td>2</td></tr><tr><td>dario-diagnose</td><td>88.0</td><td>1</td></tr><tr><td>cfo-agency-pnl</td><td>72.0</td><td>1</td></tr><tr><td>cfo-token-roi</td><td>78.0</td><td>1</td></tr><tr><td>dario-pricing-calculator</td><td>85.0</td><td>1</td></tr><tr><td>cfo-tax-autopilot</td><td>92.0</td><td>1</td></tr><tr><td>dario-naming</td><td>85.0</td><td>1</td></tr>
         </table>
     </div>
@@ -176,10 +182,11 @@ td { padding: 5px 4px; border-bottom: 1px solid #21262d; }
     </div>
 </div>
 
-<div style="text-align:center;color:#8b949e;margin-top:20px;font-size:0.8em">
+</main>
+<footer style="text-align:center;color:#8b949e;margin-top:20px;font-size:0.8em">
     DARIO CFO v1.0 — Wave 5 Dashboard — Auto-refresh: <a href="/cfo" style="color:var(--accent)">reload</a> |
     <a href="/cfo/data" style="color:var(--accent)">JSON API</a> |
     <a href="/dashboard" style="color:var(--accent)">Orchestrator Dashboard</a>
-</div>
+</footer>
 </body>
 </html>

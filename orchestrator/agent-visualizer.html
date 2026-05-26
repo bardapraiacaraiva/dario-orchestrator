@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>DARIO Orchestrator — Agent Command Center</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -128,6 +131,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 /* Scanline effect */
 .scanline{position:fixed;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.15),transparent);z-index:100;pointer-events:none;animation:scanline 8s linear infinite}
 @keyframes scanline{0%{transform:translateY(-2px)}100%{transform:translateY(100vh)}}
+
+.skip-link{position:absolute;left:-9999px;top:8px;padding:8px 16px;background:var(--cyan);color:var(--bg);text-decoration:none;font-weight:700;border-radius:6px;z-index:10000}
+.skip-link:focus{left:8px}
 </style></head><body>
 <!-- DARIO Dashboards Navigation (v12.1 — integrated 2026-05-22) -->
 <style>
@@ -141,14 +147,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .dario-nav-label{color:#8896b3;font-size:10px;text-transform:uppercase;letter-spacing:.1em;padding:5px 4px 5px 8px;font-weight:700}
 @media(max-width:760px){.dario-nav{position:static;margin:8px}}
 </style>
-<nav class="dario-nav">
-  <span class="dario-nav-label">DARIO &#9656;</span>
-  <a href="dashboard.html" data-page="dashboard">&#128202; Live</a>
-  <a href="mission-control.html" data-page="mission-control">&#128640; Mission</a>
-  <a href="agent-visualizer.html" data-page="agent-visualizer">&#129504; Visualizer</a>
-  <a href="agent_display.html" data-page="agent_display">&#127760; Display</a>
-  <a href="cognitive_dashboard.html" data-page="cognitive_dashboard">&#129516; Cognitive</a>
-  <a href="cfo_dashboard.html" data-page="cfo_dashboard">&#128176; CFO</a>
+<nav class="dario-nav" aria-label="Dashboards DARIO">
+  <span class="dario-nav-label">DARIO <span aria-hidden="true">&#9656;</span></span>
+  <a href="dashboard.html" data-page="dashboard"><span aria-hidden="true">&#128202;</span> Live</a>
+  <a href="mission-control.html" data-page="mission-control"><span aria-hidden="true">&#128640;</span> Mission</a>
+  <a href="agent-visualizer.html" data-page="agent-visualizer"><span aria-hidden="true">&#129504;</span> Visualizer</a>
+  <a href="agent_display.html" data-page="agent_display"><span aria-hidden="true">&#127760;</span> Display</a>
+  <a href="cognitive_dashboard.html" data-page="cognitive_dashboard"><span aria-hidden="true">&#129516;</span> Cognitive</a>
+  <a href="cfo_dashboard.html" data-page="cfo_dashboard"><span aria-hidden="true">&#128176;</span> CFO</a>
 </nav>
 <script>
 (function(){
@@ -160,18 +166,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </script>
 
 
+
+<a href="#main-content" class="skip-link">Saltar para conteúdo principal</a>
+<main id="main-content">
 <div class="scanline"></div>
 
 <!-- HEADER -->
-<div class="header">
-  <div class="logo">DARIO <span>Orchestrator</span> — Agent Command Center</div>
+<header class="header">
+  <h1 class="logo">DARIO <span>Orchestrator</span> — Agent Command Center</h1>
   <div class="hdr-badges">
     <div class="hdr-badge" style="background:rgba(0,229,255,.1);color:var(--cyan);border:1px solid rgba(0,229,255,.3)"><span class="pulse-dot"></span> Pulse: active</div>
     <div class="hdr-badge" style="background:rgba(179,136,255,.1);color:var(--purple);border:1px solid rgba(179,136,255,.3)">Agents: 131</div>
     <div class="hdr-badge" style="background:rgba(255,171,0,.1);color:var(--amber);border:1px solid rgba(255,171,0,.3)">Tasks: 6</div>
     <div class="hdr-badge" style="background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.3)">Budget: 0.3%</div>
   </div>
-</div>
+</header>
 
 <!-- MAIN -->
 <div class="main">
@@ -197,13 +206,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="feed-header">
       <div class="panel-title" style="margin-bottom:0">Live Activity Feed</div>
     </div>
-    <div class="feed-list" id="feedList"></div>
+    <div class="feed-list" id="feedList" role="log" aria-live="polite" aria-label="Audit feed (eventos recentes do orchestrator)"></div>
   </div>
 
 </div>
 
 <!-- FOOTER -->
-<div class="footer">
+</main>
+<footer class="footer">
   <div class="pipe-stage pipe-backlog">backlog: <b>0</b></div>
   <span class="pipe-arrow">&#10132;</span>
   <div class="pipe-stage pipe-todo">todo: <b id="fTodo">0</b></div>
@@ -219,42 +229,72 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div class="footer-stat">Budget: <b style="color:var(--green)">0.3%</b></div>
   <div class="footer-sep"></div>
   <div class="footer-stat">Last pulse: <b id="lastPulse">--:--</b></div>
-</div>
+</footer>
 
 <script>
 // ==================== DATA ====================
-const hierarchy = [
-  { id:'ceo', name:'D.A.R.I.O.', title:'CEO', type:'ceo', status:'active', children:[
-    { id:'diva-vp', name:'D.I.V.A.', title:'VP Architecture', type:'vp', status:'idle', children:[
-      { id:'dir-design', name:'Design Dir', title:'Director of Design', type:'dir', status:'idle', workers:10, children:[] },
-      { id:'dir-construction', name:'Construction Dir', title:'Director of Construction', type:'dir', status:'idle', workers:10, children:[] },
-      { id:'dir-regulatory', name:'Regulatory Dir', title:'Director of Regulatory', type:'dir', status:'idle', workers:2, children:[] }
-    ]},
-    { id:'lucas-vp', name:'L.U.C.A.S.', title:'VP Operations', type:'vp', status:'active', children:[
-      { id:'dir-cost-control', name:'Cost Control Dir', title:'Director of Cost Control', type:'dir', status:'idle', workers:4, children:[] },
-      { id:'dir-quality', name:'Quality Dir', title:'Director of Quality', type:'dir', status:'idle', workers:4, children:[] },
-      { id:'dir-monitoring', name:'Monitoring Dir', title:'Director of Monitoring', type:'dir', status:'active', workers:4, children:[] },
-      { id:'dir-analytics', name:'Analytics Dir', title:'Director of Analytics', type:'dir', status:'idle', workers:4, children:[] },
-      { id:'dir-saas-eng', name:'SaaS Eng Dir', title:'Director of SaaS Engineering', type:'dir', status:'idle', workers:4, children:[] },
-      { id:'dir-accounting', name:'Accounting Dir', title:'Director of Accounting', type:'dir', status:'idle', workers:3, children:[] }
-    ]},
-    { id:'a360-vp', name:'Accelera 360', title:'VP Business Accel', type:'vp', status:'idle', children:[
-      { id:'dir-a360-research', name:'A360 Research Dir', title:'Director of Research', type:'dir', status:'idle', workers:3, children:[] },
-      { id:'dir-a360-production', name:'A360 Production Dir', title:'Director of Production', type:'dir', status:'idle', workers:5, children:[] }
-    ]},
-    { id:'dir-marketing', name:'Marketing Dir', title:'Director of Marketing', type:'dir', status:'active', workers:12, children:[] },
-    { id:'dir-technical', name:'Technical Dir', title:'Director of Technical', type:'dir', status:'idle', workers:7, children:[] },
-    { id:'dir-seo', name:'SEO Dir', title:'Director of SEO', type:'dir', status:'active', workers:16, children:[] },
-    { id:'dir-finance', name:'Finance Dir', title:'Director of Finance', type:'dir', status:'idle', workers:3, children:[] },
-    { id:'dir-legal', name:'Legal Dir', title:'Director of Legal', type:'dir', status:'idle', workers:1, children:[] },
-    { id:'dir-hr', name:'HR Dir', title:'Director of HR', type:'dir', status:'idle', workers:1, children:[] },
-    { id:'dir-content', name:'Content Dir', title:'Director of Content', type:'dir', status:'idle', workers:2, children:[] },
-    { id:'dir-support', name:'Support Dir', title:'Director of Support', type:'dir', status:'idle', workers:1, children:[] },
-    { id:'dir-product', name:'Product Dir', title:'Director of Product', type:'dir', status:'idle', workers:1, children:[] },
-    { id:'dir-pr', name:'PR Dir', title:'Director of PR', type:'dir', status:'idle', workers:1, children:[] },
-    { id:'dir-client-success', name:'Client Success Dir', title:'Director of Client Success', type:'dir', status:'idle', workers:3, children:[] }
-  ]}
+// Hierarchy is populated dynamically from /org (built from company.yaml + live task load).
+// Previously hardcoded — see git history if you need the old snapshot.
+let hierarchy = [
+  { id:'dario-ceo', name:'D.A.R.I.O.', title:'CEO', type:'ceo', status:'idle', children:[] }
 ];
+let orgFlat = [];  // flat list of all nodes from /org
+
+async function fetchOrg() {
+  try {
+    const r = await fetch('http://localhost:8422/org');
+    if (!r.ok) return null;
+    return await r.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+// Convert the /org tree (level: ceo/vp/dir/worker) to the shape renderTree expects.
+function adaptOrgToTree(node) {
+  return {
+    id: node.id,
+    name: node.name,
+    title: node.title || node.id,
+    type: node.level === 'ceo' ? 'ceo' : node.level === 'vp' ? 'vp' : node.level === 'dir' ? 'dir' : 'worker',
+    status: node.status || 'idle',
+    workers: node.workers_under || 0,
+    active: node.active_under || 0,
+    children: (node.children || [])
+      // Tree view: only show CEO → VPs → Directors (skip individual workers — too many)
+      .filter(c => c.level !== 'worker')
+      .map(adaptOrgToTree)
+  };
+}
+
+// Build the flat array used by layoutMap() — only top 3 levels for the bubble map.
+function adaptOrgToFlat(tree) {
+  const flat = [];
+  function walk(n, parentId) {
+    if (n.level === 'worker') return;  // bubbles too crowded if we include workers
+    flat.push({
+      id: n.id,
+      name: n.name,
+      title: n.title || n.id,
+      level: n.level,
+      parent: parentId,
+      workers_under: n.workers_under || 0,
+      active_under: n.active_under || 0,
+      status: n.status || 'idle',
+    });
+    (n.children || []).forEach(c => walk(c, n.id));
+  }
+  walk(tree, null);
+  return flat;
+}
+
+async function loadOrgData() {
+  const data = await fetchOrg();
+  if (!data || !data.tree) return false;
+  hierarchy = [adaptOrgToTree(data.tree)];
+  orgFlat = adaptOrgToFlat(data.tree);
+  return true;
+}
 
 const feedEvents = [
   { type:'system', msg:'Heartbeat pulse initiated - scanning taskboard' },
@@ -336,7 +376,7 @@ function buildTreeHTML(node, depth, isLast) {
     html += `<div class="tree-toggle" style="padding-left:${depth>0?4:0}px">`;
     html += `<div class="tree-node" data-id="${node.id}">${indent}${branch}<span class="arrow">\u25BC</span><span class="node-dot ${dotClass}"></span><span class="node-label">${node.name}</span>${badge}</div>`;
     html += `</div>`;
-    html += `<div class="tree-group" style="max-height:1000px">`;
+    html += `<div class="tree-group" style="max-height:none">`;
     node.children.forEach((child, i) => {
       html += buildTreeHTML(child, depth + 1, i === node.children.length - 1);
     });
@@ -353,6 +393,24 @@ function buildTreeHTML(node, depth, isLast) {
 const mapNodeData = [];
 let mapW, mapH, cx, cy;
 
+// Build a short 3-letter label from a node id or name.
+function _shortLabel(node) {
+  const src = (node.name || node.id || '').replace(/^(dir-|vp-|worker-)/, '').replace(/-/g, ' ');
+  const parts = src.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0] + (parts[2]?.[0] || '')).toUpperCase().slice(0, 3);
+  return src.replace(/[^a-zA-Z]/g, '').slice(0, 3).toUpperCase() || 'NOD';
+}
+
+// Friendly display name (strip the "dir-" / "vp-" prefix for the label).
+function _friendlyName(node) {
+  if (node.name && node.name !== node.id) return node.name;
+  return (node.id || '')
+    .replace(/^dir-/, '')
+    .replace(/^vp-/, '')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
 function layoutMap() {
   const panel = document.querySelector('.panel-center');
   mapW = panel.clientWidth;
@@ -361,62 +419,73 @@ function layoutMap() {
   cy = mapH / 2;
   mapNodeData.length = 0;
 
-  // CEO center
-  mapNodeData.push({ id:'ceo', x:cx, y:cy, type:'ceo', name:'D.A.R.I.O.', label:'CEO', title:'Chief Executive Officer', status:'active' });
+  if (!orgFlat.length) return;  // Wait until /org loads
 
-  // VPs ring (adaptive — fills space but caps at max)
-  const baseR = Math.min(mapW * 0.45, mapH * 0.45, 420);
-  const vpRx = baseR * 0.52;
-  const vpRy = baseR * 0.52;
-  const vps = [
-    { id:'diva-vp', name:'D.I.V.A.', label:'DIVA', title:'VP Architecture & Design', status:'idle' },
-    { id:'lucas-vp', name:'L.U.C.A.S.', label:'LUCAS', title:'VP Operations & Intelligence', status:'active' },
-    { id:'a360-vp', name:'Accelera 360', label:'A360', title:'VP Business Acceleration', status:'idle' }
-  ];
-  vps.forEach((vp, i) => {
-    const angle = -Math.PI/2 + (i * 2 * Math.PI / 3);
-    mapNodeData.push({ ...vp, x: cx + vpRx * Math.cos(angle), y: cy + vpRy * Math.sin(angle), type:'vp' });
+  const ceo = orgFlat.find(n => n.level === 'ceo');
+  if (!ceo) return;
+
+  // CEO center
+  mapNodeData.push({
+    id: ceo.id, x: cx, y: cy, type: 'ceo',
+    name: ceo.name, label: 'CEO',
+    title: ceo.title || 'Chief Executive Officer',
+    status: ceo.status,
+    workers: ceo.workers_under,
+    active: ceo.active_under,
   });
 
-  // Directors ring (adaptive — same base)
-  const dirRx = baseR * 0.95;
-  const dirRy = baseR * 0.92;
-  const dirs = [
-    // DIVA directors
-    { id:'dir-design', name:'Design', label:'DES', parent:'diva-vp', workers:10, status:'idle', title:'Director of Design' },
-    { id:'dir-construction', name:'Construction', label:'CON', parent:'diva-vp', workers:10, status:'idle', title:'Director of Construction' },
-    { id:'dir-regulatory', name:'Regulatory', label:'REG', parent:'diva-vp', workers:2, status:'idle', title:'Director of Regulatory' },
-    // LUCAS directors
-    { id:'dir-cost-control', name:'Cost Ctrl', label:'CST', parent:'lucas-vp', workers:4, status:'idle', title:'Director of Cost Control' },
-    { id:'dir-quality', name:'Quality', label:'QUA', parent:'lucas-vp', workers:4, status:'idle', title:'Director of Quality' },
-    { id:'dir-monitoring', name:'Monitoring', label:'MON', parent:'lucas-vp', workers:4, status:'active', title:'Director of Monitoring' },
-    { id:'dir-analytics', name:'Analytics', label:'ANA', parent:'lucas-vp', workers:4, status:'idle', title:'Director of Analytics' },
-    { id:'dir-saas-eng', name:'SaaS Eng', label:'SAS', parent:'lucas-vp', workers:4, status:'idle', title:'Director of SaaS Eng' },
-    { id:'dir-accounting', name:'Accounting', label:'ACC', parent:'lucas-vp', workers:3, status:'idle', title:'Director of Accounting' },
-    // A360 directors
-    { id:'dir-a360-research', name:'A360 Research', label:'RES', parent:'a360-vp', workers:3, status:'idle', title:'Director of Research' },
-    { id:'dir-a360-production', name:'A360 Prod', label:'PRD', parent:'a360-vp', workers:5, status:'idle', title:'Director of Production' },
-    // CEO direct directors
-    { id:'dir-marketing', name:'Marketing', label:'MKT', parent:'ceo', workers:12, status:'active', title:'Director of Marketing' },
-    { id:'dir-technical', name:'Technical', label:'TEC', parent:'ceo', workers:7, status:'idle', title:'Director of Technical' },
-    { id:'dir-seo', name:'SEO', label:'SEO', parent:'ceo', workers:16, status:'active', title:'Director of SEO' },
-    { id:'dir-finance', name:'Finance', label:'FIN', parent:'ceo', workers:3, status:'idle', title:'Director of Finance' },
-    { id:'dir-legal', name:'Legal', label:'LEG', parent:'ceo', workers:1, status:'idle', title:'Director of Legal' },
-    { id:'dir-hr', name:'HR', label:'HR', parent:'ceo', workers:1, status:'idle', title:'Director of HR' },
-    { id:'dir-content', name:'Content', label:'CNT', parent:'ceo', workers:2, status:'idle', title:'Director of Content' },
-    { id:'dir-support', name:'Support', label:'SUP', parent:'ceo', workers:1, status:'idle', title:'Director of Support' },
-    { id:'dir-product', name:'Product', label:'PRO', parent:'ceo', workers:1, status:'idle', title:'Director of Product' },
-    { id:'dir-pr', name:'PR', label:'PR', parent:'ceo', workers:1, status:'idle', title:'Director of PR' },
-    { id:'dir-client-success', name:'Client Suc', label:'CLI', parent:'ceo', workers:3, status:'idle', title:'Director of Client Success' }
-  ];
+  // CEO direct children: split into VPs (inner ring) and Directors (outer ring)
+  const directKids = orgFlat.filter(n => n.parent === ceo.id);
+  const vps = directKids.filter(n => n.level === 'vp');
+  const dirs = directKids.filter(n => n.level === 'dir');
 
-  dirs.forEach((d, i) => {
-    const angle = -Math.PI/2 + (i * 2 * Math.PI / dirs.length);
+  const baseR = Math.min(mapW * 0.45, mapH * 0.45, 420);
+
+  // VPs inner ring
+  const vpRx = baseR * 0.50;
+  const vpRy = baseR * 0.50;
+  vps.forEach((vp, i) => {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI / Math.max(vps.length, 1));
     mapNodeData.push({
-      ...d,
-      x: cx + dirRx * Math.cos(angle),
-      y: cy + dirRy * Math.sin(angle),
-      type:'dir'
+      id: vp.id,
+      x: cx + vpRx * Math.cos(angle),
+      y: cy + vpRy * Math.sin(angle),
+      type: 'vp',
+      name: vp.name,
+      label: _shortLabel(vp),
+      title: vp.title,
+      status: vp.status,
+      workers: vp.workers_under,
+      active: vp.active_under,
+      parent: ceo.id,
+    });
+  });
+
+  // Outer ring: dirs reporting to VP placed near their VP, dirs reporting to CEO spread on outer ring
+  const outerRx = baseR * 0.97;
+  const outerRy = baseR * 0.93;
+  // Combined ordered set: each VP followed by its dir-children, then CEO-direct dirs
+  const ordered = [];
+  vps.forEach(vp => {
+    const subDirs = orgFlat.filter(n => n.parent === vp.id && n.level === 'dir');
+    subDirs.forEach(d => ordered.push({ ...d, vpAnchor: vp.id }));
+  });
+  dirs.forEach(d => ordered.push({ ...d, vpAnchor: null }));
+
+  ordered.forEach((d, i) => {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI / Math.max(ordered.length, 1));
+    mapNodeData.push({
+      id: d.id,
+      x: cx + outerRx * Math.cos(angle),
+      y: cy + outerRy * Math.sin(angle),
+      type: 'dir',
+      name: _friendlyName(d),
+      label: _shortLabel(d),
+      title: d.title,
+      status: d.status,
+      workers: d.workers_under,
+      active: d.active_under,
+      parent: d.vpAnchor || ceo.id,
     });
   });
 
@@ -471,15 +540,15 @@ function renderConnections() {
 // ==================== TOOLTIP ====================
 const tooltip = document.getElementById('tooltip');
 function showTooltip(e, node) {
-  const statusLabel = node.status === 'active' ? '<span style="color:var(--green)">ACTIVE</span>' : '<span style="color:var(--dim)">IDLE</span>';
+  const statusLabel = node.status === 'active'
+    ? '<span style="color:var(--green)">ACTIVE</span>'
+    : '<span style="color:var(--dim)">IDLE</span>';
   let html = `<div class="tt-title">${node.name}</div>`;
   html += `<div class="tt-line">${node.title || node.type.toUpperCase()}</div>`;
   html += `<div class="tt-line">Status: ${statusLabel}</div>`;
-  if (node.workers) html += `<div class="tt-line">Workers: ${node.workers}</div>`;
-  if (node.id === 'ceo') html += `<div class="tt-line">Heartbeat: 30 min</div><div class="tt-line">131 entities managed</div>`;
-  if (node.id === 'lucas-vp') html += `<div class="tt-line">Heartbeat: 15 min</div><div class="tt-line">Budget enforcement: ON</div>`;
-  if (node.id === 'dir-marketing') html += `<div class="tt-line">Active: worker-brand, worker-naming</div>`;
-  if (node.id === 'dir-seo') html += `<div class="tt-line">Active: worker-seo-local, worker-seo-plan</div>`;
+  if (node.workers) html += `<div class="tt-line">Workers under: ${node.workers}</div>`;
+  if (node.active) html += `<div class="tt-line">Tasks active/queued: ${node.active}</div>`;
+  html += `<div class="tt-line tt-id">${node.id}</div>`;
   tooltip.innerHTML = html;
   tooltip.classList.add('show');
 
@@ -540,22 +609,22 @@ function fireTaskDot(fromId, toId, type) {
 
 // Cycle through task dot animations
 const dotSequences = [
-  { from:'ceo', to:'dir-marketing', type:'dispatch' },
+  { from:'dario-ceo', to:'dir-marketing', type:'dispatch' },
   { from:'dir-marketing', to:'dir-seo', type:'dispatch' },
-  { from:'dir-seo', to:'ceo', type:'success' },
-  { from:'ceo', to:'lucas-vp', type:'dispatch' },
+  { from:'dir-seo', to:'dario-ceo', type:'success' },
+  { from:'dario-ceo', to:'lucas-vp', type:'dispatch' },
   { from:'lucas-vp', to:'dir-monitoring', type:'dispatch' },
   { from:'dir-monitoring', to:'lucas-vp', type:'success' },
-  { from:'lucas-vp', to:'ceo', type:'success' },
-  { from:'ceo', to:'diva-vp', type:'dispatch' },
+  { from:'lucas-vp', to:'dario-ceo', type:'success' },
+  { from:'dario-ceo', to:'diva-vp', type:'dispatch' },
   { from:'diva-vp', to:'dir-design', type:'dispatch' },
   { from:'dir-design', to:'diva-vp', type:'success' },
-  { from:'ceo', to:'dir-marketing', type:'dispatch' },
-  { from:'dir-marketing', to:'ceo', type:'revision' },
-  { from:'ceo', to:'a360-vp', type:'dispatch' },
+  { from:'dario-ceo', to:'dir-marketing', type:'dispatch' },
+  { from:'dir-marketing', to:'dario-ceo', type:'revision' },
+  { from:'dario-ceo', to:'a360-vp', type:'dispatch' },
   { from:'a360-vp', to:'dir-a360-research', type:'dispatch' },
   { from:'dir-a360-research', to:'a360-vp', type:'success' },
-  { from:'a360-vp', to:'ceo', type:'success' },
+  { from:'a360-vp', to:'dario-ceo', type:'success' },
 ];
 let dotIdx = 0;
 setInterval(() => {
@@ -564,37 +633,102 @@ setInterval(() => {
   dotIdx++;
 }, 2200);
 
-// ==================== ACTIVITY FEED ====================
+// ==================== ACTIVITY FEED — wired to /audit ====================
 const feedList = document.getElementById('feedList');
-let feedIdx = 0;
-let feedHour = 14, feedMin = 30, feedSec = 0;
+const API_BASE = 'http://localhost:8422';
+let lastAuditId = 0;  // highest entry.id we've already rendered
 
-function addFeedItem() {
-  const ev = feedEvents[feedIdx % feedEvents.length];
-  feedIdx++;
+function classifyAction(action, details) {
+  // Map audit action → feed type (drives CSS class via feed-${type})
+  if (!action) return 'system';
+  if (action.includes('completed')) return 'complete';
+  if (action.includes('interrupted') || action.includes('blocked') || action.includes('failed')) return 'execute';
+  if (action.includes('assigned') || action.includes('dispatched') || action.includes('checkout')) return 'dispatch';
+  if (action.includes('score') || (details && /score=/.test(details))) return 'quality';
+  if (action.includes('budget') || action.includes('tokens')) return 'budget';
+  return 'system';
+}
 
-  feedSec += Math.floor(Math.random() * 4) + 1;
-  if (feedSec >= 60) { feedSec -= 60; feedMin++; }
-  if (feedMin >= 60) { feedMin -= 60; feedHour++; }
-  if (feedHour >= 24) feedHour = 0;
+function formatEntry(entry) {
+  // Build the message string from the audit record.
+  const taskId = entry.task_id || entry.entity_id || '';
+  const actor = entry.actor || 'orchestrator';
+  const action = (entry.action || 'event').replace(/_/g, ' ');
+  const details = entry.details || '';
+  const parts = [actor, action];
+  if (taskId) parts.push(taskId);
+  let msg = parts.join(' ');
+  if (details) msg += ` — ${details}`;
+  return msg;
+}
 
-  const ts = `${String(feedHour).padStart(2,'0')}:${String(feedMin).padStart(2,'0')}:${String(feedSec).padStart(2,'0')}`;
-
-  const item = document.createElement('div');
-  item.className = 'feed-item';
-  item.innerHTML = `<span class="feed-time">${ts}</span><span class="feed-msg feed-${ev.type}">${ev.msg}</span>`;
-
-  feedList.insertBefore(item, feedList.firstChild);
-
-  // Keep max 50 entries
-  while (feedList.children.length > 50) {
-    feedList.removeChild(feedList.lastChild);
+function fmtTime(isoTs) {
+  try {
+    const d = new Date(isoTs);
+    const now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    const time = d.toLocaleTimeString('pt-PT', { hour12: false });
+    if (sameDay) return time;
+    // Older than today — include MM-DD so 21:35 doesn't look like it happened today
+    const md = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return `${md} ${time}`;
+  } catch (e) {
+    return '??:??:??';
   }
 }
 
-// Seed initial items
-for (let i = 0; i < 8; i++) addFeedItem();
-setInterval(addFeedItem, 2500);
+function renderEntry(entry, prepend) {
+  const type = classifyAction(entry.action, entry.details);
+  const item = document.createElement('div');
+  item.className = 'feed-item';
+  const msg = formatEntry(entry).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  item.innerHTML = `<span class="feed-time">${fmtTime(entry.timestamp)}</span><span class="feed-msg feed-${type}">${msg}</span>`;
+  if (prepend) {
+    feedList.insertBefore(item, feedList.firstChild);
+  } else {
+    feedList.appendChild(item);
+  }
+}
+
+async function fetchAudit(limit) {
+  try {
+    const r = await fetch(`${API_BASE}/audit?limit=${limit}`);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+async function refreshFeed() {
+  const data = await fetchAudit(50);
+  if (!data || !Array.isArray(data.entries)) return;
+  // entries returned newest first; render only those with id > lastAuditId
+  const fresh = data.entries.filter(e => (e.id || 0) > lastAuditId);
+  if (!fresh.length) return;
+  // Reverse so we insert oldest→newest, leaving newest at top
+  fresh.slice().reverse().forEach(e => renderEntry(e, true));
+  lastAuditId = Math.max(lastAuditId, ...data.entries.map(e => e.id || 0));
+  while (feedList.children.length > 50) feedList.removeChild(feedList.lastChild);
+}
+
+async function seedFeed() {
+  const data = await fetchAudit(50);
+  feedList.innerHTML = '';
+  if (!data || !Array.isArray(data.entries) || !data.entries.length) {
+    const empty = document.createElement('div');
+    empty.className = 'feed-item';
+    empty.innerHTML = '<span class="feed-time">--:--:--</span><span class="feed-msg feed-system">No audit entries yet — feed will populate as the orchestrator dispatches work</span>';
+    feedList.appendChild(empty);
+    return;
+  }
+  // entries are newest-first; render in that order (newest at top)
+  data.entries.forEach(e => renderEntry(e, false));
+  lastAuditId = Math.max(...data.entries.map(e => e.id || 0));
+}
+
+seedFeed();
+setInterval(refreshFeed, 5000);
 
 // ==================== HIGHLIGHT ====================
 function highlightNode(id) {
@@ -621,7 +755,7 @@ function highlightNode(id) {
         if (pel) { pel.style.opacity = '1'; pel.style.filter = ''; }
       }
       // Highlight children
-      mapNodeData.filter(n => n.parent === id || (id === 'ceo' && n.type === 'vp')).forEach(child => {
+      mapNodeData.filter(n => n.parent === id || (id === 'dario-ceo' && n.type === 'vp')).forEach(child => {
         const cel = document.getElementById(`mn-${child.id}`);
         if (cel) { cel.style.opacity = '1'; cel.style.filter = ''; }
       });
@@ -669,11 +803,43 @@ setInterval(() => {
 }, 5000);
 
 // ==================== INIT ====================
-window.addEventListener('load', () => {
+async function bootOrg() {
+  const ok = await loadOrgData();
+  if (!ok) {
+    // /org unreachable — keep the placeholder and surface a hint
+    console.warn('[agent-visualizer] /org fetch failed; map will stay empty.');
+  }
   renderTree();
   layoutMap();
-});
+}
+
+async function refreshOrgStatus() {
+  // Re-fetch /org and update node status/active counts in place (no re-layout
+  // unless the structure changed — re-layouting would jitter the bubbles).
+  const ok = await loadOrgData();
+  if (!ok) return;
+  // Update existing mapNodeData entries from orgFlat
+  const flatById = new Map(orgFlat.map(n => [n.id, n]));
+  let structureChanged = false;
+  mapNodeData.forEach(mn => {
+    const src = flatById.get(mn.id);
+    if (!src) { structureChanged = true; return; }
+    mn.status = src.status;
+    mn.active = src.active_under;
+    mn.workers = src.workers_under;
+  });
+  if (structureChanged || mapNodeData.length === 0) {
+    layoutMap();
+  } else {
+    renderMapNodes();
+    renderConnections();
+  }
+  renderTree();
+}
+
+window.addEventListener('load', bootOrg);
 window.addEventListener('resize', layoutMap);
+setInterval(refreshOrgStatus, 10000);  // poll real status every 10s
 
 // Deselect on map click
 document.querySelector('.panel-center').addEventListener('click', (e) => {

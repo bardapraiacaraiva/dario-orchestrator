@@ -228,6 +228,9 @@ body {
   .widget-row { grid-template-columns: 1fr; }
   .status-bar { grid-template-columns: 1fr 1fr; }
 }
+
+.skip-link{position:absolute;left:-9999px;top:8px;padding:8px 16px;background:var(--cyan);color:var(--bg);text-decoration:none;font-weight:700;border-radius:6px;z-index:10000}
+.skip-link:focus{left:8px}
 </style>
 </head>
 <body>
@@ -243,14 +246,14 @@ body {
 .dario-nav-label{color:#8896b3;font-size:10px;text-transform:uppercase;letter-spacing:.1em;padding:5px 4px 5px 8px;font-weight:700}
 @media(max-width:760px){.dario-nav{position:static;margin:8px}}
 </style>
-<nav class="dario-nav">
-  <span class="dario-nav-label">DARIO &#9656;</span>
-  <a href="dashboard.html" data-page="dashboard">&#128202; Live</a>
-  <a href="mission-control.html" data-page="mission-control">&#128640; Mission</a>
-  <a href="agent-visualizer.html" data-page="agent-visualizer">&#129504; Visualizer</a>
-  <a href="agent_display.html" data-page="agent_display">&#127760; Display</a>
-  <a href="cognitive_dashboard.html" data-page="cognitive_dashboard">&#129516; Cognitive</a>
-  <a href="cfo_dashboard.html" data-page="cfo_dashboard">&#128176; CFO</a>
+<nav class="dario-nav" aria-label="Dashboards DARIO">
+  <span class="dario-nav-label">DARIO <span aria-hidden="true">&#9656;</span></span>
+  <a href="dashboard.html" data-page="dashboard"><span aria-hidden="true">&#128202;</span> Live</a>
+  <a href="mission-control.html" data-page="mission-control"><span aria-hidden="true">&#128640;</span> Mission</a>
+  <a href="agent-visualizer.html" data-page="agent-visualizer"><span aria-hidden="true">&#129504;</span> Visualizer</a>
+  <a href="agent_display.html" data-page="agent_display"><span aria-hidden="true">&#127760;</span> Display</a>
+  <a href="cognitive_dashboard.html" data-page="cognitive_dashboard"><span aria-hidden="true">&#129516;</span> Cognitive</a>
+  <a href="cfo_dashboard.html" data-page="cfo_dashboard"><span aria-hidden="true">&#128176;</span> CFO</a>
 </nav>
 <script>
 (function(){
@@ -262,10 +265,13 @@ body {
 </script>
 
 
+
+<a href="#main-content" class="skip-link">Saltar para conteúdo principal</a>
+<main id="main-content">
 <!-- ── HEADER ───────────────────────────────────────────────── -->
-<div class="header">
+<header class="header">
   <div class="brand">
-    <div class="brand-logo">D.A.R.I.O. ▸ MISSION CONTROL</div>
+    <h1 class="brand-logo">D.A.R.I.O. <span aria-hidden="true">▸</span> MISSION CONTROL</h1>
     <div class="brand-sub">v12.1 · DARIO ORCHESTRATOR FULL · CONFIDENTIAL</div>
   </div>
   <div class="header-clocks">
@@ -286,7 +292,7 @@ body {
       <div class="clock-value" id="next-cron">--d --h --m</div>
     </div>
   </div>
-</div>
+</header>
 
 <!-- ── STATUS BAR (Row 1) ───────────────────────────────────── -->
 <div class="status-bar" id="status-bar">
@@ -341,7 +347,7 @@ body {
       <div class="panel-title">TELEMETRY FEED</div>
       <div class="panel-meta" id="tele-meta">live</div>
     </div>
-    <div class="panel-body" id="telemetry">
+    <div class="panel-body" id="telemetry" role="log" aria-live="polite" aria-label="Telemetria do sistema (últimas 40 entradas)">
       <div class="loading">Stand by for telemetry…</div>
     </div>
   </div>
@@ -405,7 +411,8 @@ body {
 </div>
 
 <!-- ── FOOTER ───────────────────────────────────────────────── -->
-<div class="footer">
+</main>
+<footer class="footer">
   <div class="footer-stats">
     <div class="footer-stat"><span>DB</span><span id="footer-db">--</span></div>
     <div class="footer-stat"><span>RAG</span><span id="footer-rag">--</span></div>
@@ -418,7 +425,7 @@ body {
     <span id="footer-refresh">refreshing every 5s</span> ·
     <span style="color: var(--green);">●</span> LIVE
   </div>
-</div>
+</footer>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
