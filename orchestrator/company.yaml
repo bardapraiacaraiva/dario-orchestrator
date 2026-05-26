@@ -512,6 +512,9 @@ agents:
     - worker-builder-design-system
     - worker-builder-brand-identity
     - worker-builder-wireframe
+    - worker-ui-ux-pro-max
+    - worker-emil-design-eng
+    - worker-dario-design-shotgun
     capabilities:
     - design_tokens
     - color_palettes
@@ -520,8 +523,13 @@ agents:
     - wireframing
     - brand_guidelines
     - tailwind_config
+    - ui_styles_catalog        # ui-ux-pro-max (67 styles, 161 palettes, 57 font pairings)
+    - animation_craft           # emil-design-eng (decisions, easing, durations)
+    - multi_variant_exploration # dario-design-shotgun (N-variant comparison)
+    - mobile_design_systems     # ui-ux-pro-max (SwiftUI, Flutter, React Native)
     squads:
     - Design Squad
+    - Design Intelligence Squad  # added 2026-05-26 v12.1
   dir_frontend:
     id: dir-frontend
     name: Frontend Director
@@ -2280,6 +2288,47 @@ workers:
     - user_flow
     - sitemap
     - page_structure
+  # === DESIGN INTELLIGENCE WORKERS (added 2026-05-26 v12.1) ===
+  worker-ui-ux-pro-max:
+    type: worker
+    skill: ui-ux-pro-max:ui-ux-pro-max
+    reports_to: dir-design-visual
+    layer: reference_db   # not a generator — feeds upstream catalogs
+    capabilities:
+    - ui_styles_catalog          # 67 styles: glassmorphism, brutalism, bento, etc.
+    - industry_color_palettes    # 161 palettes by product category
+    - font_pairings              # 57 Google Fonts curated combos
+    - chart_recommendations      # 25 chart types for dashboards
+    - product_type_matching      # 161 product types → style/palette suggestions
+    - ux_guidelines              # 99 best practices + anti-patterns
+    - multi_stack_support        # React, Next, Vue, Svelte, SwiftUI, Flutter, RN, etc.
+    integrations:
+    - shadcn_ui_mcp              # component search + examples
+  worker-emil-design-eng:
+    type: worker
+    skill: emil-design-eng
+    reports_to: dir-design-visual
+    layer: decision_framework    # not a generator — informs builders
+    capabilities:
+    - animation_decision_framework  # should this animate? frequency-based
+    - easing_rules                  # ease-out enter/exit, never ease-in
+    - duration_guidelines           # button 100-160ms, modal 200-500ms
+    - component_polish_principles   # scale(0.97) active, origin-aware popovers
+    - css_transform_mastery         # 3D, clip-path, GPU rules
+    - performance_animation_rules   # only transform+opacity, GPU-accelerated
+    - prefers_reduced_motion        # a11y gating
+    - before_after_why_review       # mandatory review format
+  worker-dario-design-shotgun:
+    type: worker
+    skill: dario-design-shotgun
+    reports_to: dir-design-visual
+    layer: exploration              # generates N variants before single-shot
+    capabilities:
+    - multi_variant_generation      # 3-8 parallel design directions
+    - taste_profile_persistence     # 5%/week confidence decay
+    - comparison_board_html         # side-by-side iframes
+    - krug_ux_principles            # Three Laws of Usability
+    - conflict_aware_generation     # flags request vs taste-profile conflicts
   worker-builder-landing-page:
     type: worker
     skill: builder-landing-page

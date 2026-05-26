@@ -48,13 +48,16 @@ procedural workflows.
 When invoked, execute (PowerShell on Windows):
 
 ```powershell
-python "$env:USERPROFILE\.claude\orchestrator\dream_cli.py" $args
+python "$env:USERPROFILE\.claude\orchestrator\meta\dream_cli.py" $args
 ```
+
+(Path updated 2026-05-25 after Phase 4 refactor — dream_cli.py is now in
+the `meta/` package alongside assemble_bundle.py.)
 
 Or via Bash:
 
 ```bash
-python ~/.claude/orchestrator/dream_cli.py "$@"
+python ~/.claude/orchestrator/meta/dream_cli.py "$@"
 ```
 
 Default subcommand is `run` (full cycle). Pass `health`, `episodes`, or `workflows` to inspect without consolidating.
