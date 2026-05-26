@@ -503,6 +503,9 @@ agents:
     - worker-builder-design-system
     - worker-builder-brand-identity
     - worker-builder-wireframe
+    - worker-ui-ux-pro-max
+    - worker-emil-design-eng
+    - worker-dario-design-shotgun
     capabilities:
     - design_tokens
     - color_palettes
@@ -511,8 +514,13 @@ agents:
     - wireframing
     - brand_guidelines
     - tailwind_config
+    - ui_styles_catalog        # ui-ux-pro-max (67 styles, 161 palettes, 57 font pairings)
+    - animation_craft           # emil-design-eng (decisions, easing, durations)
+    - multi_variant_exploration # dario-design-shotgun (N-variant comparison)
+    - mobile_design_systems     # ui-ux-pro-max (SwiftUI, Flutter, React Native)
     squads:
     - Design Squad
+    - Design Intelligence Squad  # added 2026-05-26 v12.1
   dir_frontend:
     id: dir-frontend
     name: Frontend Director

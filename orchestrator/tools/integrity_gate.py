@@ -60,7 +60,19 @@ def _skill_path(name: str) -> Path:
 
 
 def _has_skill(name: str) -> bool:
-    return _skill_path(name).exists()
+    if _skill_path(name).exists():
+        return True
+    # Claude Code plugin format: "plugin:skill". Resolve via plugin marketplace/cache.
+    if ":" in name:
+        plugin, skill = name.split(":", 1)
+        plugins_dir = SKILLS_DIR.parent / "plugins"
+        candidates = [
+            plugins_dir / "marketplaces" / plugin / ".claude" / "skills" / skill / "SKILL.md",
+            plugins_dir / "marketplaces" / f"{plugin}-skill" / ".claude" / "skills" / skill / "SKILL.md",
+            plugins_dir / "cache" / f"{plugin}-skill" / skill / "SKILL.md",
+        ]
+        return any(p.exists() for p in candidates)
+    return False
 
 
 def _skill_frontmatter(name: str) -> dict:
