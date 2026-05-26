@@ -29,6 +29,74 @@ chains:
 
   # ── MARKETING ──
 
+  # ═══════════════════════════════════════════════════════════
+  # ── DESIGN INTELLIGENCE STACK v12.1 (added 2026-05-26) ──
+  # 3-layer design pipeline: Decision (emil) → Reference (ui-ux-pro-max) → Generator (builder-*)
+  # See: ~/.claude/orchestrator/UPGRADE-v12.1-design-stack.md
+  # ═══════════════════════════════════════════════════════════
+
+  design_reference_chain:
+    name: "Design Reference Pipeline (catalog → tokens → page)"
+    description: "ui-ux-pro-max catalog consult → design system tokens → landing/components"
+    trigger_keywords: ["landing page novo cliente", "novo design system", "criar website", "rebrand visual", "design intelligence", "design opcoes catalog", "explorar estilos UI"]
+    steps:
+      - skill: ui-ux-pro-max:ui-ux-pro-max
+        receives: "briefing (industria, audience, vibe desejado, stack tech)"
+        produces: "3 candidates per dimension: styles, palettes, fonts, chart types"
+        pass_to_next: [recommended_styles, recommended_palettes, recommended_fonts, ux_guidelines_relevant]
+
+      - skill: dario-design-shotgun
+        receives: "candidates do step anterior + briefing original"
+        produces: "3-5 visual variants HTML side-by-side, user picks one"
+        pass_to_next: [chosen_variant, chosen_palette, chosen_fonts, chosen_style]
+
+      - skill: builder-design-system
+        receives: "variant escolhido (palette + fonts + style) + projecto stack"
+        produces: "Tailwind tokens + theme config + component specs"
+        pass_to_next: [tokens, theme_config, component_specs]
+
+      - skill: builder-landing-page
+        receives: "tokens + theme + variant escolhido + briefing"
+        produces: "Landing page React/Next production-ready"
+        pass_to_next: null  # end of chain
+
+    on_complete: "Pacote: catalog brief + 3-5 variants + escolha + tokens + landing"
+    estimated_tokens: 28000
+    quality_gate: "score >= 70 por step. Variant escolhido obrigatorio antes de design-system."
+    output_target: "client_facing"
+
+  design_decision_chain:
+    name: "Animation Craft Pipeline (taste → implementation)"
+    description: "emil-design-eng decision framework → builder-animated-ui ou framer-motion implementation"
+    trigger_keywords: ["adicionar animacao", "polish micro-interactions", "transicoes premium", "should this animate", "animacao certa", "motion design"]
+    steps:
+      - skill: emil-design-eng
+        receives: "componente/screen alvo + frequencia de uso + objetivo"
+        produces: "decision (animate? sim/nao), easing rule, duration (ms), purpose"
+        pass_to_next: [should_animate, easing, duration_ms, purpose, prefers_reduced_motion_handling]
+
+      - skill: builder-animated-ui
+        receives: "decision spec do emil + componente alvo + stack"
+        produces: "Codigo Framer Motion ou Magic UI implementando exactamente o spec"
+        pass_to_next: [code, demo_url]
+        condition: "should_animate == true AND component_type IN [hero, marketing, premium_ui]"
+
+      - skill: framer-motion-animator
+        receives: "decision spec do emil + componente alvo + stack"
+        produces: "Framer Motion variants/gestures/scroll triggers"
+        pass_to_next: [code, demo_url]
+        condition: "should_animate == true AND component_type IN [interaction, gesture, page_transition]"
+
+      - skill: builder-accessibility-check
+        receives: "codigo animado + decision spec"
+        produces: "Verificacao prefers-reduced-motion + WCAG 2.1 AA compliance"
+        pass_to_next: null
+
+    on_complete: "Pacote: animation spec + implementation code + a11y verification"
+    estimated_tokens: 18000
+    quality_gate: "emil-design-eng output deve incluir Before|After|Why table. A11y check obrigatorio."
+    output_target: "client_facing"
+
   brand_to_market:
     name: "Da Marca ao Mercado"
     description: "Posicionamento → Naming → Oferta → Sales Letter → Email Sequence"

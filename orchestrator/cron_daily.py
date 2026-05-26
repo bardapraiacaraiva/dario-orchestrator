@@ -268,6 +268,33 @@ def job_compute_client_stats() -> dict:
         return {"error": str(e)[:300]}
 
 
+def job_snapshot_quality_daily() -> dict:
+    """Daily snapshot of global quality avg + delivery rate.
+
+    Powers the 30d sparkline in dashboard.html. Idempotent for the same day:
+    re-running overwrites today's entry (so the final value of the day is what
+    persists). Writes to quality/quality_daily.yaml.
+    """
+    try:
+        import subprocess
+        script = ORCH_DIR / "scripts" / "snapshot_quality_daily.py"
+        if not script.exists():
+            return {"error": "snapshot_quality_daily.py not found"}
+        proc = subprocess.run(
+            [sys.executable, str(script)],
+            capture_output=True, text=True, timeout=30,
+            cwd=str(ORCH_DIR),
+        )
+        return {
+            "returncode": proc.returncode,
+            "summary": proc.stdout.strip()[:200] if proc.stdout else "",
+        }
+    except subprocess.TimeoutExpired:
+        return {"error": "timeout"}
+    except Exception as e:
+        return {"error": str(e)[:300]}
+
+
 def job_auto_capture_obsidian() -> dict:
     """Auto-capture new Obsidian outputs into the scoring pipeline.
 
@@ -502,6 +529,7 @@ def run_all(dry_run: bool = False) -> dict:
     report["jobs"].append(_run_job("delivery_rate_recompute", job_delivery_rate_recompute))
     report["jobs"].append(_run_job("auto_capture_obsidian", job_auto_capture_obsidian))
     report["jobs"].append(_run_job("compute_client_stats", job_compute_client_stats))
+    report["jobs"].append(_run_job("snapshot_quality_daily", job_snapshot_quality_daily))
 
     report["duration_seconds"] = (_now() - start).total_seconds()
 

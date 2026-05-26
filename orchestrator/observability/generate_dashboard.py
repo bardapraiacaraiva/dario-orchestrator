@@ -44,13 +44,28 @@ def load_yaml_safe(path):
 
 def get_tasks():
     tasks = []
-    active = ORCH / "tasks" / "active"
-    if active.exists():
-        for f in active.glob("*.yaml"):
+    for subdir in ("active", "backlog_blocked", "done"):
+        d = ORCH / "tasks" / subdir
+        if not d.exists():
+            continue
+        for f in d.glob("*.yaml"):
             t = load_yaml_safe(f)
-            if t and isinstance(t, dict):
-                tasks.append(t)
-    return sorted(tasks, key=lambda x: x.get("priority", "low") == "critical", reverse=True)
+            if not t or not isinstance(t, dict):
+                continue
+            t.setdefault("_source_dir", subdir)
+            t.setdefault("_mtime", f.stat().st_mtime)
+            tasks.append(t)
+
+    status_rank = {"in_progress": 0, "in_review": 1, "todo": 2, "blocked": 3, "done": 4}
+    prio_rank = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+
+    def sort_key(t):
+        s = status_rank.get(t.get("status"), 9)
+        p = prio_rank.get(t.get("priority", "low"), 9)
+        # Newer first within same status
+        return (s, p, -t.get("_mtime", 0))
+
+    return sorted(tasks, key=sort_key)
 
 def get_budget():
     month = datetime.now().strftime("%Y-%m")
@@ -161,6 +176,49 @@ def generate():
     except Exception:
         spend_by_type = None
 
+    # Subagent token capture (Faixa 3 #1 — SubagentStop hook → subagent_runs/)
+    subagent_capture = None
+    try:
+        import json as _json
+        runs_dir = ORCH / "subagent_runs"
+        if runs_dir.exists():
+            now_month = datetime.now().strftime("%Y-%m")
+            agg = {
+                "all_time": {"runs": 0, "msgs": 0, "tokens": 0, "cost_usd": 0.0,
+                             "attributed_runs": 0, "by_task": {}, "by_model": {}},
+                "this_month": {"runs": 0, "msgs": 0, "tokens": 0, "cost_usd": 0.0},
+                "last_run_ts": None,
+            }
+            for f in runs_dir.rglob("*.json"):
+                try:
+                    rec = _json.loads(f.read_text(encoding="utf-8"))
+                except Exception:
+                    continue
+                t = rec.get("totals", {})
+                agg["all_time"]["runs"] += 1
+                agg["all_time"]["msgs"] += rec.get("message_count", 0)
+                agg["all_time"]["tokens"] += t.get("total_tokens", 0)
+                agg["all_time"]["cost_usd"] += t.get("cost_usd", 0)
+                if rec.get("task_id"):
+                    agg["all_time"]["attributed_runs"] += 1
+                    by_t = agg["all_time"]["by_task"]
+                    by_t[rec["task_id"]] = by_t.get(rec["task_id"], 0) + t.get("cost_usd", 0)
+                for model, mt in t.get("by_model", {}).items():
+                    by_m = agg["all_time"]["by_model"]
+                    by_m[model] = by_m.get(model, 0) + mt.get("cost_usd", 0)
+                if f.parent.name == now_month:
+                    agg["this_month"]["runs"] += 1
+                    agg["this_month"]["msgs"] += rec.get("message_count", 0)
+                    agg["this_month"]["tokens"] += t.get("total_tokens", 0)
+                    agg["this_month"]["cost_usd"] += t.get("cost_usd", 0)
+                ts = rec.get("captured_at")
+                if ts and (agg["last_run_ts"] is None or ts > agg["last_run_ts"]):
+                    agg["last_run_ts"] = ts
+            if agg["all_time"]["runs"] > 0:
+                subagent_capture = agg
+    except Exception:
+        subagent_capture = None
+
     # Direct-script API spend (anthropic SDK calls via TrackedAnthropic wrapper)
     api_spend = None
     try:
@@ -178,11 +236,135 @@ def generate():
 
     # Model drift events (v4 schema, Risk #10 stamp+warn)
     drift_events = None
+    drift_coverage = None  # (runs_with_model, runs_total)
     try:
+        import sqlite3
         from core.db import DB
-        drift_events = DB().get_drift_events()
+        _db = DB()
+        drift_events = _db.get_drift_events()
+        # Coverage: how many polished_runs actually carry model_used? If 0,
+        # the widget cannot honestly say "no drift" — it's a telemetry gap.
+        try:
+            con = sqlite3.connect(_db.db_path)
+            cur = con.cursor()
+            total = cur.execute("SELECT COUNT(*) FROM polished_runs").fetchone()[0]
+            with_model = cur.execute(
+                "SELECT COUNT(*) FROM polished_runs WHERE model_used IS NOT NULL AND model_used != ''"
+            ).fetchone()[0]
+            drift_coverage = (with_model, total)
+            con.close()
+        except Exception:
+            drift_coverage = None
     except Exception:
         drift_events = None
+
+    # Stale tasks (in_progress for >24h — schema v2 SLA breach) + top blockers
+    stale_tasks = []
+    blocker_tasks = []
+    try:
+        from datetime import timedelta
+        now_utc = datetime.now(UTC)
+        stale_threshold = now_utc - timedelta(hours=24)
+        for t in tasks:
+            status = t.get("status")
+            if status == "in_progress":
+                co = t.get("checked_out_at") or t.get("updated_at") or t.get("created_at")
+                if co:
+                    try:
+                        co_dt = datetime.fromisoformat(str(co).replace("Z", "+00:00"))
+                        if co_dt < stale_threshold:
+                            age_h = int((now_utc - co_dt).total_seconds() // 3600)
+                            stale_tasks.append({**t, "_age_h": age_h})
+                    except Exception:
+                        pass
+            elif status == "blocked":
+                ts = t.get("updated_at") or t.get("created_at")
+                if ts:
+                    try:
+                        ts_dt = datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
+                        age_h = int((now_utc - ts_dt).total_seconds() // 3600)
+                        blocker_tasks.append({**t, "_age_h": age_h})
+                    except Exception:
+                        blocker_tasks.append({**t, "_age_h": None})
+                else:
+                    blocker_tasks.append({**t, "_age_h": None})
+        stale_tasks.sort(key=lambda x: -x["_age_h"])
+        blocker_tasks.sort(key=lambda x: -(x.get("_age_h") or 0))
+    except Exception:
+        stale_tasks = []
+        blocker_tasks = []
+
+    # Burn rate forecast — extrapolate current spend to end of month
+    burn_forecast = None
+    try:
+        import calendar
+        today = datetime.now()
+        days_in_month = calendar.monthrange(today.year, today.month)[1]
+        day_of_month = today.day
+        used = budget.get("total_tokens_used", 0)
+        limit = budget.get("limit", 50000000)
+        if day_of_month > 0 and limit > 0:
+            daily_avg = used / day_of_month
+            projected_eom = daily_avg * days_in_month
+            projected_pct = (projected_eom / limit) * 100
+            current_pct_local = (used / limit) * 100
+            burn_forecast = {
+                "daily_avg": daily_avg,
+                "projected_eom_tokens": projected_eom,
+                "projected_eom_pct": projected_pct,
+                "current_pct": current_pct_local,
+                "days_left": days_in_month - day_of_month,
+                "alert": projected_pct >= 95,
+                "warn": projected_pct >= 80,
+            }
+    except Exception:
+        burn_forecast = None
+
+    # Quality 30d sparkline data (from quality_daily.yaml, populated by cron)
+    sparkline_points = []
+    try:
+        snap_file = ORCH / "quality" / "quality_daily.yaml"
+        if snap_file.exists():
+            with open(snap_file, encoding="utf-8") as f:
+                snap_data = yaml.safe_load(f) or {}
+            entries = snap_data.get("entries", [])
+            from datetime import timedelta as _td
+            cutoff = (datetime.now(UTC) - _td(days=30)).date().isoformat()
+            sparkline_points = [
+                {"date": e["date"], "avg": float(e.get("global_avg", 0))}
+                for e in entries
+                if isinstance(e, dict) and e.get("date", "") >= cutoff
+                and isinstance(e.get("global_avg"), (int, float))
+            ]
+    except Exception:
+        sparkline_points = []
+
+    # Per-skill regression alerts — compare current avg vs baseline (>=15pt drop = alert)
+    regression_alerts = []
+    try:
+        skills_data = (quality or {}).get("skills", {})
+        if isinstance(skills_data, dict):
+            for skill_name, s in skills_data.items():
+                if not isinstance(s, dict):
+                    continue
+                cur_avg = s.get("avg") or s.get("score") or s.get("current_avg")
+                baseline = s.get("baseline") or s.get("baseline_avg")
+                if cur_avg is None or baseline is None:
+                    continue
+                try:
+                    delta = float(cur_avg) - float(baseline)
+                except (TypeError, ValueError):
+                    continue
+                if delta <= -15:
+                    regression_alerts.append({
+                        "skill": skill_name,
+                        "current": float(cur_avg),
+                        "baseline": float(baseline),
+                        "delta": delta,
+                    })
+        regression_alerts.sort(key=lambda x: x["delta"])  # most negative first
+    except Exception:
+        regression_alerts = []
 
     # Enforcement layer state (Risk #1 thin layer)
     enforcement_state = None
@@ -321,14 +503,22 @@ def generate():
             f'</div>'
         )
 
-    # Task rows
+    # Task rows — prioritise active/blocked, fill with recent done
     task_rows = ""
     for t in tasks[:10]:
+        # Age: completed_at for done, created_at otherwise, mtime as fallback
+        ref_ts = t.get("completed_at") if t.get("status") == "done" else t.get("created_at")
         age = ""
-        if t.get("created_at"):
+        if ref_ts:
             try:
-                created = datetime.fromisoformat(t["created_at"].replace("Z", "+00:00"))
-                delta = datetime.now(UTC) - created
+                ts = datetime.fromisoformat(str(ref_ts).replace("Z", "+00:00"))
+                delta = datetime.now(UTC) - ts
+                age = f"{delta.days}d" if delta.days > 0 else f"{delta.seconds//3600}h"
+            except:
+                age = "?"
+        if not age and t.get("_mtime"):
+            try:
+                delta = datetime.now(UTC) - datetime.fromtimestamp(t["_mtime"], UTC)
                 age = f"{delta.days}d" if delta.days > 0 else f"{delta.seconds//3600}h"
             except:
                 age = "?"
@@ -342,7 +532,7 @@ def generate():
 </tr>"""
 
     if not task_rows:
-        task_rows = '<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:20px;">Nenhuma tarefa activa</td></tr>'
+        task_rows = '<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:20px;">Sem tasks no taskboard</td></tr>'
 
     # Budget by project (top 3)
     by_proj = budget.get("by_project", {})
@@ -565,14 +755,105 @@ def generate():
             f'{callers_html}'
         )
 
+    # Subagent token capture widget (Faixa 3 #1)
+    if subagent_capture is None:
+        subagent_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:16px;">'
+            'Sem subagent runs capturadas<br>'
+            '<span style="font-size:10px;">Hook <code>SubagentStop</code> dispara em '
+            '<code>enforcement/token_capture.py</code> e escreve em '
+            '<code>subagent_runs/YYYY-MM/</code></span></div>'
+        )
+        subagent_summary = "n=0"
+    else:
+        sm = subagent_capture["this_month"]
+        sa = subagent_capture["all_time"]
+        attribution_pct = (sa["attributed_runs"] / sa["runs"] * 100) if sa["runs"] else 0
+        att_color = "var(--green)" if attribution_pct >= 70 else \
+                    "var(--amber)" if attribution_pct >= 40 else "var(--red)"
+        subagent_summary = f"{sa['runs']} runs · ${sa['cost_usd']:.2f}"
+
+        top_tasks = sorted(sa["by_task"].items(), key=lambda kv: kv[1], reverse=True)[:5]
+        tasks_html = ""
+        for tid, cost in top_tasks:
+            tasks_html += (
+                f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px;">'
+                f'<span style="flex:1;color:var(--cyan);font-weight:600;">{tid}</span>'
+                f'<span style="color:var(--text);font-weight:600;width:70px;text-align:right;">${cost:.2f}</span>'
+                f'</div>'
+            )
+        if not tasks_html:
+            tasks_html = '<div style="color:var(--dim);font-size:11px;text-align:center;padding:8px;">Sem task IDs detectados</div>'
+
+        models_html = ""
+        for model, cost in sorted(sa["by_model"].items(), key=lambda kv: kv[1], reverse=True):
+            models_html += (
+                f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px;">'
+                f'<span style="flex:1;color:var(--dim);">{model}</span>'
+                f'<span style="color:var(--text);font-weight:600;width:70px;text-align:right;">${cost:.2f}</span>'
+                f'</div>'
+            )
+
+        last_capture = subagent_capture.get("last_run_ts") or "—"
+        if last_capture != "—" and len(last_capture) >= 16:
+            last_capture = last_capture[:16].replace("T", " ")
+
+        subagent_html = (
+            f'<div style="display:flex;gap:16px;justify-content:center;margin-bottom:14px;">'
+            f'<div style="text-align:center;">'
+            f'<div class="big-num" style="font-size:1.6rem;color:var(--cyan);">${sm["cost_usd"]:.2f}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Mês {datetime.now().strftime("%Y-%m")}</div>'
+            f'<div style="font-size:9px;color:var(--dim);">{sm["runs"]} runs · {sm["tokens"]/1_000_000:.1f}M tok</div>'
+            f'</div>'
+            f'<div style="text-align:center;border-left:1px solid var(--border);padding-left:16px;">'
+            f'<div class="big-num" style="font-size:1.6rem;">${sa["cost_usd"]:.2f}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">All-time</div>'
+            f'<div style="font-size:9px;color:var(--dim);">{sa["runs"]} runs · {sa["tokens"]/1_000_000:.1f}M tok</div>'
+            f'</div>'
+            f'<div style="text-align:center;border-left:1px solid var(--border);padding-left:16px;">'
+            f'<div class="big-num" style="font-size:1.6rem;color:{att_color};">{attribution_pct:.0f}%</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Attribution</div>'
+            f'<div style="font-size:9px;color:var(--dim);">{sa["attributed_runs"]}/{sa["runs"]} with task_id</div>'
+            f'</div>'
+            f'</div>'
+            f'<div style="font-size:10px;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Top tasks (all-time) · cost USD</div>'
+            f'{tasks_html}'
+            f'<div style="font-size:10px;color:var(--dim);margin:10px 0 6px;text-transform:uppercase;letter-spacing:.06em;">By model · cost USD</div>'
+            f'{models_html}'
+            f'<div style="font-size:10px;color:var(--dim);margin-top:10px;text-align:right;">Last capture: {last_capture}</div>'
+        )
+
     # Model drift widget (Risk #10)
-    if drift_events is None or len(drift_events) == 0:
+    n_events = 0 if drift_events is None else len(drift_events)
+    with_model, total_runs = (drift_coverage or (0, 0))
+    coverage_pct = (with_model / total_runs * 100) if total_runs else 0
+
+    if n_events == 0 and total_runs > 0 and with_model == 0:
+        # Telemetry gap: runs exist but none capture model_used
+        drift_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:14px;">'
+            '<span style="color:var(--amber);">●</span> Telemetry gap — model_used not captured<br>'
+            f'<span style="font-size:10px;">0/{total_runs} polished runs carry model identifier · '
+            'wrappers need to pass <code>--model-used</code> to <code>record_polished_run</code></span>'
+            '</div>'
+        )
+        drift_summary = f"0/{total_runs} runs stamped"
+    elif n_events == 0 and total_runs == 0:
+        # No telemetry at all
+        drift_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:14px;">'
+            '<span style="color:var(--dim);">●</span> No polished runs recorded yet<br>'
+            '<span style="font-size:10px;">Awaiting first <code>record_polished_run</code> call</span></div>'
+        )
+        drift_summary = "no data"
+    elif n_events == 0:
+        # Real "no drift" — coverage exists and all match
         drift_html = (
             '<div style="color:var(--dim);font-size:12px;text-align:center;padding:14px;">'
             '<span style="color:var(--green);">●</span> No drift detected<br>'
-            '<span style="font-size:10px;">All polished runs match declared model</span></div>'
+            f'<span style="font-size:10px;">{with_model}/{total_runs} runs stamped · all match declared model</span></div>'
         )
-        drift_summary = "0 events"
+        drift_summary = f"0 events · {coverage_pct:.0f}% coverage"
     else:
         # Group by skill
         from collections import Counter as _Counter
@@ -646,6 +927,188 @@ def generate():
         )
         enforcement_summary = f"{slots_used}/{slots_max} slots, budget {budget_label}"
 
+    # --- Stale tasks widget ---
+    if not stale_tasks:
+        stale_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:14px;">'
+            '<span style="color:var(--green);">●</span> No stale tasks<br>'
+            '<span style="font-size:10px;">No in_progress task has been checked out >24h</span>'
+            '</div>'
+        )
+        stale_summary = "0"
+    else:
+        rows_html = ""
+        for t in stale_tasks[:5]:
+            tid = t.get("id", "?")
+            title = (t.get("title", "?") or "")[:40]
+            ass = t.get("assignee", "—") or "—"
+            age_h = t.get("_age_h", 0)
+            rows_html += (
+                f'<div style="display:flex;justify-content:space-between;align-items:center;'
+                f'padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;">'
+                f'<span style="flex:1;min-width:0;">'
+                f'<span style="color:var(--cyan);font-weight:600;">{tid}</span> '
+                f'<span style="color:var(--dim);">{title}</span><br>'
+                f'<span style="font-size:10px;color:var(--dim);">{ass}</span></span>'
+                f'<span style="color:var(--red);font-weight:600;margin-left:8px;">{age_h}h</span>'
+                f'</div>'
+            )
+        stale_html = (
+            f'<div style="text-align:center;margin-bottom:10px;">'
+            f'<div class="big-num" style="font-size:1.6rem;color:var(--red);">{len(stale_tasks)}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">stale (>24h in_progress)</div>'
+            f'</div>{rows_html}'
+        )
+        stale_summary = str(len(stale_tasks))
+
+    # --- Top blockers widget ---
+    if not blocker_tasks:
+        blockers_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:14px;">'
+            '<span style="color:var(--green);">●</span> No blocked tasks'
+            '</div>'
+        )
+        blockers_summary = "0"
+    else:
+        rows_html = ""
+        for t in blocker_tasks[:5]:
+            tid = t.get("id", "?")
+            title = (t.get("title", "?") or "")[:40]
+            reason = (t.get("blocked_reason") or "—")[:50]
+            age_h = t.get("_age_h")
+            age_lbl = f"{age_h}h" if age_h is not None else "?"
+            rows_html += (
+                f'<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;">'
+                f'<div style="display:flex;justify-content:space-between;">'
+                f'<span><span style="color:var(--cyan);font-weight:600;">{tid}</span> '
+                f'<span style="color:var(--dim);">{title}</span></span>'
+                f'<span style="color:var(--amber);font-weight:600;">{age_lbl}</span></div>'
+                f'<div style="font-size:10px;color:var(--dim);margin-top:2px;">↳ {reason}</div>'
+                f'</div>'
+            )
+        blockers_html = (
+            f'<div style="text-align:center;margin-bottom:10px;">'
+            f'<div class="big-num" style="font-size:1.6rem;color:var(--amber);">{len(blocker_tasks)}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">blocked tasks</div>'
+            f'</div>{rows_html}'
+        )
+        blockers_summary = str(len(blocker_tasks))
+
+    # --- Burn rate forecast widget ---
+    if burn_forecast is None:
+        burn_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:14px;">'
+            'No burn data available'
+            '</div>'
+        )
+        burn_summary = "n/a"
+    else:
+        bf = burn_forecast
+        proj_color = 'var(--red)' if bf['alert'] else 'var(--amber)' if bf['warn'] else 'var(--green)'
+        proj_status = '⚠ WILL BREACH 95%' if bf['alert'] else '⚠ trending hot' if bf['warn'] else '● on track'
+        burn_html = (
+            f'<div style="display:flex;gap:16px;justify-content:center;margin-bottom:10px;">'
+            f'<div style="text-align:center;">'
+            f'<div class="big-num" style="font-size:1.6rem;">{bf["current_pct"]:.1f}%</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Used today</div>'
+            f'</div>'
+            f'<div style="text-align:center;border-left:1px solid var(--border);padding-left:16px;">'
+            f'<div class="big-num" style="font-size:1.6rem;color:{proj_color};">{bf["projected_eom_pct"]:.1f}%</div>'
+            f'<div style="font-size:10px;color:var(--dim);">Forecast EOM</div>'
+            f'</div>'
+            f'</div>'
+            f'<div style="font-size:11px;color:var(--dim);text-align:center;margin-bottom:6px;">'
+            f'{bf["daily_avg"]:,.0f} tokens/day · {bf["days_left"]} days remaining'
+            f'</div>'
+            f'<div style="text-align:center;font-size:11px;color:{proj_color};font-weight:600;">{proj_status}</div>'
+        )
+        burn_summary = f"{bf['projected_eom_pct']:.1f}% forecast"
+
+    # --- Quality 30d sparkline widget ---
+    if not sparkline_points:
+        sparkline_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:14px;">'
+            '<span style="color:var(--dim);">●</span> No history yet<br>'
+            '<span style="font-size:10px;">Daily snapshot runs at 03:00 BRT cron · populates over 30 days</span>'
+            '</div>'
+        )
+        sparkline_summary = "no data"
+    elif len(sparkline_points) < 2:
+        p = sparkline_points[0]
+        sparkline_html = (
+            f'<div style="text-align:center;padding:14px;">'
+            f'<div class="big-num" style="font-size:1.8rem;">{p["avg"]:.1f}</div>'
+            f'<div style="font-size:11px;color:var(--dim);">Single data point · {p["date"]}</div>'
+            f'<div style="font-size:10px;color:var(--dim);margin-top:6px;">Need ≥2 days for trend</div>'
+            f'</div>'
+        )
+        sparkline_summary = f"1 day · avg {p['avg']:.1f}"
+    else:
+        # Build inline SVG sparkline
+        vals = [p["avg"] for p in sparkline_points]
+        v_min = min(vals)
+        v_max = max(vals)
+        v_span = max(v_max - v_min, 1)  # avoid /0 on flat line
+        w, h = 280, 60
+        pad = 4
+        n = len(sparkline_points)
+        coords = []
+        for i, p in enumerate(sparkline_points):
+            x = pad + (i / max(n - 1, 1)) * (w - 2 * pad)
+            y = h - pad - ((p["avg"] - v_min) / v_span) * (h - 2 * pad)
+            coords.append(f"{x:.1f},{y:.1f}")
+        polyline = " ".join(coords)
+        first = sparkline_points[0]["avg"]
+        last = sparkline_points[-1]["avg"]
+        delta = last - first
+        delta_color = 'var(--green)' if delta >= 0 else 'var(--red)'
+        sparkline_html = (
+            f'<div style="text-align:center;margin-bottom:8px;">'
+            f'<div style="display:inline-flex;gap:14px;align-items:baseline;">'
+            f'<div><span class="big-num" style="font-size:1.6rem;">{last:.1f}</span>'
+            f'<span style="color:var(--dim);font-size:11px;margin-left:4px;">today</span></div>'
+            f'<div style="color:{delta_color};font-weight:600;">{delta:+.1f}</div>'
+            f'<div style="color:var(--dim);font-size:11px;">vs {sparkline_points[0]["date"][5:]}</div>'
+            f'</div></div>'
+            f'<svg width="100%" height="{h}" viewBox="0 0 {w} {h}" preserveAspectRatio="none" style="display:block;">'
+            f'<polyline points="{polyline}" fill="none" stroke="var(--cyan)" stroke-width="2"/>'
+            f'</svg>'
+            f'<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:4px;">'
+            f'<span>{sparkline_points[0]["date"]}</span>'
+            f'<span>min {v_min:.0f} · max {v_max:.0f}</span>'
+            f'<span>{sparkline_points[-1]["date"]}</span>'
+            f'</div>'
+        )
+        sparkline_summary = f"{n} days · {delta:+.1f}"
+
+    # --- Regression alerts widget ---
+    if not regression_alerts:
+        regression_html = (
+            '<div style="color:var(--dim);font-size:12px;text-align:center;padding:14px;">'
+            '<span style="color:var(--green);">●</span> No regressions detected<br>'
+            '<span style="font-size:10px;">All skills within 15pts of baseline</span>'
+            '</div>'
+        )
+        regression_summary = "0"
+    else:
+        rows_html = ""
+        for r in regression_alerts[:5]:
+            rows_html += (
+                f'<div style="display:flex;justify-content:space-between;align-items:center;'
+                f'padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;">'
+                f'<span style="color:var(--text);">{r["skill"]}</span>'
+                f'<span><span style="color:var(--dim);">{r["baseline"]:.0f}→{r["current"]:.0f}</span> '
+                f'<span style="color:var(--red);font-weight:600;margin-left:6px;">{r["delta"]:+.0f}</span></span>'
+                f'</div>'
+            )
+        regression_html = (
+            f'<div style="text-align:center;margin-bottom:10px;">'
+            f'<div class="big-num" style="font-size:1.6rem;color:var(--red);">{len(regression_alerts)}</div>'
+            f'<div style="font-size:10px;color:var(--dim);">skills regressed >15pts</div>'
+            f'</div>{rows_html}'
+        )
+        regression_summary = str(len(regression_alerts))
+
     # Pulse time
     pulse_time = pulse.get("pulse_time", "nunca")
     if isinstance(pulse_time, str) and "T" in pulse_time:
@@ -655,6 +1118,13 @@ def generate():
     active_count = sum(1 for t in tasks if t.get("status") in ("todo", "in_progress", "in_review"))
     blocked_count = sum(1 for t in tasks if t.get("status") == "blocked")
     done_count = sum(1 for t in tasks if t.get("status") == "done")
+
+    # Shared nav fragment (same nav as other dashboards — keeps page in sync
+    # whenever _nav_fragment.html is updated). Substituted via {nav_html}
+    # placeholder, so its braces are inserted literally without f-string
+    # re-interpretation (no double-escaping needed).
+    nav_path = ORCH / "_nav_fragment.html"
+    nav_html = nav_path.read_text(encoding="utf-8") if nav_path.exists() else ""
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     head_short = git_head_short() or "no-git"
@@ -686,7 +1156,7 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
 .footer{{text-align:center;color:var(--dim);font-size:11px;padding-top:16px;border-top:1px solid var(--border)}}
 @media(max-width:900px){{.grid{{grid-template-columns:1fr}}}}
 </style></head><body>
-
+{nav_html}
 <div class="header">
   <div class="logo">DARIO <span>Orchestrator</span> — Dashboard Live</div>
   <div class="meta">
@@ -701,7 +1171,7 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
 <div class="grid">
   <!-- TASKS -->
   <div class="card">
-    <h3>Tarefas Activas ({len(tasks)} total | {active_count} activas | {blocked_count} bloqueadas | {done_count} done)</h3>
+    <h3>Taskboard ({len(tasks)} total | {active_count} activas | {blocked_count} bloqueadas | {done_count} done)</h3>
     <table>
       <thead><tr><th>ID</th><th>Tarefa</th><th>Status</th><th>Assignee</th><th>Prioridade</th><th>Idade</th></tr></thead>
       <tbody>{task_rows}</tbody>
@@ -785,6 +1255,15 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
     {api_spend_html}
   </div>
 
+  <!-- SUBAGENT TOKEN CAPTURE — Faixa 3 #1 (SubagentStop hook) -->
+  <div class="card">
+    <h3>Subagent Token Capture ({subagent_summary})</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Tokens consumidos por Agent tool (sidechain) · fonte: <code>subagent_runs/YYYY-MM/*.json</code> · hook: <code>enforcement/token_capture.py</code>
+    </div>
+    {subagent_html}
+  </div>
+
   <!-- MODEL DRIFT — Risk #10 stamp + warn -->
   <div class="card">
     <h3>Model Drift ({drift_summary})</h3>
@@ -801,6 +1280,51 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
       Real Python guards on critical invariants · parallelism + budget hard-stop
     </div>
     {enforcement_html}
+  </div>
+
+  <!-- STALE TASKS (Phase 0.5 SLA breach surfacer) -->
+  <div class="card">
+    <h3>Stale Tasks ({stale_summary})</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Tasks stuck in_progress for >24h · checked_out_at vs now · sorted by age desc
+    </div>
+    {stale_html}
+  </div>
+
+  <!-- TOP BLOCKERS -->
+  <div class="card">
+    <h3>Top Blockers ({blockers_summary})</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Tasks with status=blocked · sorted by age desc · shows blocked_reason
+    </div>
+    {blockers_html}
+  </div>
+
+  <!-- BURN RATE FORECAST -->
+  <div class="card">
+    <h3>Burn Rate Forecast ({burn_summary})</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Linear projection of monthly token spend · current pace × days remaining
+    </div>
+    {burn_html}
+  </div>
+
+  <!-- SKILL REGRESSION ALERTS -->
+  <div class="card">
+    <h3>Skill Regressions ({regression_summary})</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Skills whose current avg is ≥15pts below their baseline · per CONVENTIONS Phase 8
+    </div>
+    {regression_html}
+  </div>
+
+  <!-- QUALITY SPARKLINE 30d -->
+  <div class="card">
+    <h3>Quality Avg — Last 30 days ({sparkline_summary})</h3>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:12px;">
+      Daily snapshot of global avg quality · populated by cron at 03:00 BRT
+    </div>
+    {sparkline_html}
   </div>
 
   <!-- SYSTEM HEALTH -->
@@ -823,6 +1347,81 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
   Regenerar: <code>python3 ~/.claude/orchestrator/generate_dashboard.py</code>
 </div>
 
+<!-- LIVE OVERLAYS — fetch from runtime API on :8422 every 10s -->
+<div id="dario-live-now" style="position:fixed;top:60px;right:12px;display:none;
+  background:rgba(10,14,26,.92);border:1px solid #2a3a5a;border-radius:10px;padding:10px 14px;
+  backdrop-filter:blur(8px);font-size:11px;color:#f0f4ff;z-index:9998;max-width:260px;">
+  <div style="color:#8896b3;font-size:9px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Now Running</div>
+  <div id="dario-live-now-list"></div>
+</div>
+
+<div id="dario-live-ticker" style="position:fixed;bottom:0;left:0;right:0;
+  background:rgba(10,14,26,.88);border-top:1px solid #2a3a5a;padding:6px 12px;
+  font-size:11px;color:#8896b3;display:none;z-index:9997;font-family:monospace;
+  white-space:nowrap;overflow:hidden;">
+  <span id="dario-live-ticker-text">Awaiting events…</span>
+</div>
+
+<script>
+(function() {{
+  const API = 'http://localhost:8422';
+  const nowBox = document.getElementById('dario-live-now');
+  const nowList = document.getElementById('dario-live-now-list');
+  const ticker = document.getElementById('dario-live-ticker');
+  const tickerText = document.getElementById('dario-live-ticker-text');
+
+  async function refreshNowRunning() {{
+    try {{
+      const r = await fetch(API + '/tasks');
+      if (!r.ok) return;
+      const data = await r.json();
+      const live = (data.tasks || []).filter(t =>
+        t.status === 'in_progress' || t.status === 'in_review'
+      );
+      if (!live.length) {{
+        nowBox.style.display = 'none';
+        return;
+      }}
+      nowBox.style.display = 'block';
+      nowList.innerHTML = live.slice(0, 4).map(t => {{
+        const tid = (t.id || '').slice(0, 10);
+        const title = (t.title || '').slice(0, 30);
+        const dot = t.status === 'in_progress' ? '#00e5ff' : '#ffab00';
+        return `<div style="padding:3px 0;">
+          <span style="color:${{dot}};">●</span>
+          <span style="color:#00e5ff;font-weight:600;">${{tid}}</span>
+          <span style="color:#8896b3;">${{title}}</span>
+        </div>`;
+      }}).join('');
+    }} catch (e) {{}}
+  }}
+
+  let lastAuditId = 0;
+  async function refreshTicker() {{
+    try {{
+      const r = await fetch(API + '/audit?limit=10');
+      if (!r.ok) return;
+      const data = await r.json();
+      const entries = data.entries || [];
+      if (!entries.length) return;
+      const newest = entries[0];
+      if ((newest.id || 0) <= lastAuditId) return;
+      lastAuditId = newest.id || 0;
+      const time = new Date(newest.timestamp).toLocaleTimeString('pt-PT', {{ hour12: false }});
+      const action = (newest.action || 'event').replace(/_/g, ' ');
+      const tid = newest.task_id || '';
+      const details = (newest.details || '').slice(0, 80);
+      tickerText.innerHTML = `<span style="color:#00e5ff;">${{time}}</span> · ${{action}} ${{tid}} · <span style="color:#f0f4ff;">${{details}}</span>`;
+      ticker.style.display = 'block';
+    }} catch (e) {{}}
+  }}
+
+  refreshNowRunning();
+  refreshTicker();
+  setInterval(refreshNowRunning, 10000);
+  setInterval(refreshTicker, 5000);
+}})();
+</script>
 </body></html>"""
 
     with open(DASHBOARD, "w", encoding="utf-8") as f:

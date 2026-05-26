@@ -93,7 +93,7 @@ affinity_graph:
     notes: Diagnostic + SEO audit = complete picture
     weight: 0.5
   dario-funnel + dario-ads-blueprint:
-    avg_combined_score: 84.2
+    avg_combined_score: 84.8
     co_activations: 8
     notes: Ads drive traffic into funnel
     weight: 0.5
@@ -212,6 +212,11 @@ affinity_graph:
     co_activations: 0
     notes: Floor plan data needed for energy certification
     weight: 0.5
+  diva-materials + diva-moodboard:
+    avg_combined_score: 87.4
+    co_activations: 2
+    notes: auto-discovered via execution
+    weight: 1.0
   diva-moodboard + diva-materials:
     avg_combined_score: 87.4
     co_activations: 2
