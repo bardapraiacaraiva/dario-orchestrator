@@ -30,6 +30,9 @@ def isolated_tasks(tmp_path, monkeypatch):
     import finance.budget_tracker as bt
     monkeypatch.setattr(bt, "TASKS_ACTIVE", fake_active)
     monkeypatch.setattr(bt, "TASKS_DONE", fake_done)
+    # budget_tracker is DB-first in production (2026-06-01 divergence fix). These
+    # tests control input via YAML fixtures, so force the YAML loader here.
+    monkeypatch.setattr(bt, "_load_budget_tasks", bt._load_tasks_from_yaml)
     return tmp_path
 
 

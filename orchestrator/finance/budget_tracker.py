@@ -105,6 +105,42 @@ def _task_month(task: dict) -> str | None:
     return None
 
 
+def _load_tasks_from_yaml():
+    """Load tasks from the YAML task dirs (legacy / DB-unavailable fallback)."""
+    tasks = []
+    for task_dir in [TASKS_ACTIVE, TASKS_DONE]:
+        if not task_dir.exists():
+            continue
+        for task_file in task_dir.glob("*.yaml"):
+            try:
+                with open(task_file, encoding="utf-8") as f:
+                    t = yaml.safe_load(f)
+                if t:
+                    tasks.append(t)
+            except (OSError, yaml.YAMLError, TypeError) as e:
+                print(f"Warning: skipping {task_file.name} — {e}", file=sys.stderr)
+                continue
+    return tasks
+
+
+def _load_budget_tasks():
+    """DB-FIRST (2026-06-01): SQLite is the source of truth (CONVENTIONS.md).
+
+    The YAML tasks/ dirs are empty post-migration, so globbing them attributed
+    0 tokens while the DB held actual_tokens for 70+ tasks. Falls back to YAML
+    only when the DB is unavailable. Tests force the YAML path by monkeypatching
+    this function to _load_tasks_from_yaml.
+    """
+    try:
+        from core.task_store import TaskStore
+        tasks = TaskStore().get_all()
+        if tasks:
+            return tasks
+    except Exception:
+        pass
+    return _load_tasks_from_yaml()
+
+
 def scan_tasks_for_tokens(month: str | None = None):
     """Scan all active+done tasks and sum actual_tokens.
 
@@ -114,32 +150,23 @@ def scan_tasks_for_tokens(month: str | None = None):
     """
     totals = {"total": 0, "by_project": {}, "by_skill": {}, "tasks_counted": 0, "tasks_skipped_month": 0}
 
-    for task_dir in [TASKS_ACTIVE, TASKS_DONE]:
-        if not task_dir.exists():
+    for task in _load_budget_tasks():
+        if not task:
             continue
-        for task_file in task_dir.glob("*.yaml"):
-            try:
-                with open(task_file, encoding="utf-8") as f:
-                    task = yaml.safe_load(f)
-                if not task:
-                    continue
-                tokens = task.get("actual_tokens") or 0
-                if tokens <= 0:
-                    continue
-                if month is not None:
-                    task_month = _task_month(task)
-                    if task_month != month:
-                        totals["tasks_skipped_month"] += 1
-                        continue
-                project = task.get("project", "unallocated")
-                skill = task.get("skill", "unknown")
-                totals["total"] += tokens
-                totals["tasks_counted"] += 1
-                totals["by_project"][project] = totals["by_project"].get(project, 0) + tokens
-                totals["by_skill"][skill] = totals["by_skill"].get(skill, 0) + tokens
-            except (OSError, yaml.YAMLError, TypeError) as e:
-                print(f"Warning: skipping {task_file.name} — {e}", file=sys.stderr)
+        tokens = task.get("actual_tokens") or 0
+        if tokens <= 0:
+            continue
+        if month is not None:
+            task_month = _task_month(task)
+            if task_month != month:
+                totals["tasks_skipped_month"] += 1
                 continue
+        project = task.get("project", "unallocated")
+        skill = task.get("skill", "unknown")
+        totals["total"] += tokens
+        totals["tasks_counted"] += 1
+        totals["by_project"][project] = totals["by_project"].get(project, 0) + tokens
+        totals["by_skill"][skill] = totals["by_skill"].get(skill, 0) + tokens
     return totals
 
 def add_tokens(budget, tokens, project=None, skill=None, model="opus"):

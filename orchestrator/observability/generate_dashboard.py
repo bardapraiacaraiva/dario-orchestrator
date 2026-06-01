@@ -42,19 +42,58 @@ def load_yaml_safe(path):
     except:
         return {}
 
+def _status_to_subdir(status):
+    """Map a task status to the legacy subdir bucket the dashboard groups by."""
+    if status == "done":
+        return "done"
+    if status == "blocked":
+        return "backlog_blocked"
+    return "active"  # todo, in_progress, in_review
+
+
+def _iso_to_ts(value):
+    """Best-effort ISO-8601 -> epoch seconds for sort; 0 if unparseable."""
+    if not value:
+        return 0
+    try:
+        from datetime import datetime as _dt
+        return _dt.fromisoformat(str(value).replace("Z", "+00:00")).timestamp()
+    except Exception:
+        return 0
+
+
 def get_tasks():
+    # DB-FIRST (2026-06-01): CONVENTIONS.md declares SQLite the source of truth.
+    # The dashboard previously globbed tasks/*.yaml only, so it reported 0 tasks
+    # while the engine/runtime acted on the DB (divergence fix). YAML stays as
+    # fallback for environments without the DB.
     tasks = []
-    for subdir in ("active", "backlog_blocked", "done"):
-        d = ORCH / "tasks" / subdir
-        if not d.exists():
-            continue
-        for f in d.glob("*.yaml"):
-            t = load_yaml_safe(f)
-            if not t or not isinstance(t, dict):
+    try:
+        if str(ORCH) not in sys.path:
+            sys.path.insert(0, str(ORCH))
+        from core.task_store import TaskStore
+        for t in TaskStore().get_all():
+            if not isinstance(t, dict):
                 continue
-            t.setdefault("_source_dir", subdir)
-            t.setdefault("_mtime", f.stat().st_mtime)
+            t.setdefault("_source_dir", _status_to_subdir(t.get("status")))
+            t.setdefault("_mtime", _iso_to_ts(t.get("updated_at") or t.get("created")))
             tasks.append(t)
+    except Exception:
+        tasks = []
+
+    if not tasks:
+        # YAML fallback (DB unavailable or empty)
+        for subdir in ("active", "backlog_blocked", "done"):
+            d = ORCH / "tasks" / subdir
+            if not d.exists():
+                continue
+            for f in d.glob("*.yaml"):
+                t = load_yaml_safe(f)
+                if not t or not isinstance(t, dict):
+                    continue
+                t.setdefault("_source_dir", subdir)
+                t.setdefault("_mtime", f.stat().st_mtime)
+                tasks.append(t)
 
     status_rank = {"in_progress": 0, "in_review": 1, "todo": 2, "blocked": 3, "done": 4}
     prio_rank = {"critical": 0, "high": 1, "medium": 2, "low": 3}
