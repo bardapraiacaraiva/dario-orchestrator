@@ -42,8 +42,22 @@ try:
             return _y.load(f)
 
     def dump_y(d, p):
-        with open(p, "w", encoding="utf-8") as f:
-            _y.dump(d, f)
+        # Atomic write (2026-06-02): cron_daily uses this to write skill-metrics.yaml;
+        # under the parallel pre-push gate it raced quality_scorer's writes and
+        # corrupted the file. temp + os.replace makes it last-writer-wins, never partial.
+        import os, tempfile
+        dd = os.path.dirname(str(p)) or "."
+        fd, tmp = tempfile.mkstemp(dir=dd, suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                _y.dump(d, f)
+            os.replace(tmp, p)
+        except BaseException:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
 except ImportError:
     import yaml
 
@@ -52,8 +66,19 @@ except ImportError:
             return yaml.safe_load(f)
 
     def dump_y(d, p):
-        with open(p, "w", encoding="utf-8") as f:
-            yaml.safe_dump(d, f, sort_keys=False)
+        import os, tempfile
+        dd = os.path.dirname(str(p)) or "."
+        fd, tmp = tempfile.mkstemp(dir=dd, suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                yaml.safe_dump(d, f, sort_keys=False)
+            os.replace(tmp, p)
+        except BaseException:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
 
 
 def compute() -> dict:
