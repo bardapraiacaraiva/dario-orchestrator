@@ -1424,6 +1424,60 @@ td{{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.03)}}
 </script>
 </body></html>"""
 
+    # --- Live JSON feed (2026-06-01): widgets auto-refresh from dashboard-data.json ---
+    # The generator bakes a snapshot into HTML; this small JSON lets the open page
+    # poll for fresh budget/tasks/quality every 20s without a regen/reload. Served
+    # same-origin by the http.server (port 8766). Requires http:// (file:// blocks fetch).
+    import json as _json_feed
+    from datetime import datetime as _dt_feed
+    _active = sum(1 for _t in tasks if str(_t.get("status", "")).lower()
+                  not in ("done", "cancelled", "archived"))
+    _feed = {
+        "generated_at": _dt_feed.now().astimezone().isoformat(timespec="seconds"),
+        "budget_pct": round(pct, 2),
+        "active_tasks": _active,
+        "total_tasks": len(tasks),
+        "quality_avg": round(avg_quality, 1),
+        "skills": total_skills,
+    }
+    try:
+        (ORCH / "dashboard-data.json").write_text(
+            _json_feed.dumps(_feed, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+
+    _live_strip = (
+        '<div id="live-strip" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;'
+        'padding:8px 18px;margin:0;background:#0d1320;border-bottom:1px solid #1c2740;'
+        'font-size:12px;color:#8896b3;">'
+        '<span style="color:#00e676;font-weight:700;">● LIVE</span>'
+        '<span>Budget <b id="live-budget" style="color:#f0f4ff;">—</b></span>'
+        '<span>Active tasks <b id="live-tasks" style="color:#f0f4ff;">—</b></span>'
+        '<span>Quality <b id="live-quality" style="color:#f0f4ff;">—</b></span>'
+        '<span>Skills <b id="live-skills" style="color:#f0f4ff;">—</b></span>'
+        '<span id="live-updated" style="margin-left:auto;">updated —</span>'
+        '</div>'
+    )
+    _live_script = (
+        "<script>(function(){"
+        "var $=function(i){return document.getElementById(i);};"
+        "function r(){fetch('./dashboard-data.json?t='+Date.now())"
+        ".then(function(x){return x.ok?x.json():null;})"
+        ".then(function(d){if(!d)return;"
+        "if($('live-budget'))$('live-budget').textContent=d.budget_pct+'%';"
+        "if($('live-tasks'))$('live-tasks').textContent=d.active_tasks+'/'+d.total_tasks;"
+        "if($('live-quality'))$('live-quality').textContent=d.quality_avg;"
+        "if($('live-skills'))$('live-skills').textContent=d.skills;"
+        "var u=$('live-updated');if(u&&d.generated_at){"
+        "var age=(Date.now()-new Date(d.generated_at).getTime())/60000;"
+        "u.textContent='updated '+new Date(d.generated_at).toLocaleTimeString('pt-PT',{hour12:false})+(age>30?' (stale)':'');"
+        "u.style.color=age>30?'#ff5252':(age>10?'#ffab00':'#00e676');}"
+        "}).catch(function(){});}"
+        "r();setInterval(r,20000);})();</script>"
+    )
+    html = html.replace('<div class="header">', _live_strip + '<div class="header">', 1)
+    html = html.replace('</body></html>', _live_script + '</body></html>', 1)
+
     with open(DASHBOARD, "w", encoding="utf-8") as f:
         f.write(html)
 
