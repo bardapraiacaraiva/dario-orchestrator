@@ -71,16 +71,27 @@ SUMMARY_LINE=$(echo "$OUTPUT" | tail -1)
 
 # Parallel runs can flake on the few tests that mutate global state
 # (orchestrator.db, evals/, tasks/) — they pass in isolation but race across
-# workers. If a parallel run reports failures, re-verify SERIALLY (the
-# authoritative source of truth): a serial pass means it was a parallel race
-# (allow the push); a serial failure is a real bug (block). Common case stays
-# ~70s; only a flaky parallel failure pays the serial cost.
+# workers. If a parallel run reports failures, re-verify ONLY THOSE tests
+# SERIALLY (authoritative + fast, a few seconds). A serial pass means it was a
+# parallel race (allow the push); a serial failure is a real bug (block).
 if [ -n "$PAR_FLAGS" ] && echo "$SUMMARY_LINE" | grep -qE "(^| )[0-9]+ (failed|error)"; then
-    echo "[pre-push] Parallel run had failures — re-verifying serially (shared-state race check)…"
-    OUTPUT=$("$PYTHON" -m pytest -m "not slow" -q --no-header --tb=line 2>&1)
-    STATUS=$?
-    SUMMARY_LINE=$(echo "$OUTPUT" | tail -1)
-    ELAPSED=$(($(date +%s) - START))
+    FAILED_IDS=$(echo "$OUTPUT" | grep -oE "^FAILED [^ ]+" | sed 's/^FAILED //' | tr '\n' ' ')
+    PAR_PASSED=$(echo "$SUMMARY_LINE" | grep -oE "[0-9]+ passed" | head -1 | grep -oE "[0-9]+" || echo 0)
+    if [ -n "$FAILED_IDS" ]; then
+        echo "[pre-push] Parallel run flagged failures — re-verifying them serially (shared-state race check):"
+        echo "[pre-push]   $FAILED_IDS"
+        RECHECK=$("$PYTHON" -m pytest $FAILED_IDS -q --no-header --tb=line 2>&1)
+        ELAPSED=$(($(date +%s) - START))
+        if echo "$RECHECK" | tail -1 | grep -qE "(^| )[0-9]+ (failed|error)"; then
+            echo "$RECHECK" | tail -25
+            echo ""
+            echo "[pre-push] FAIL — failures confirmed on serial re-run (real bug, not a race) (${ELAPSED}s)"
+            echo "[pre-push] Fix the failing tests, then re-run the push."
+            exit 1
+        fi
+        echo "[pre-push] PASS — ${PAR_PASSED} passed in parallel; re-verified serially as parallel race(s) (${ELAPSED}s)"
+        exit 0
+    fi
 fi
 
 if echo "$SUMMARY_LINE" | grep -qE "(^| )[0-9]+ failed"; then
