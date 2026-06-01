@@ -148,7 +148,32 @@ task:
 
 For each task, determine the best executor:
 
-1. **Read company.yaml** — Match task capabilities to agent capabilities
+**0. PRIMARY — query the learned router (added 2026-06-01, closes interactive-bypass gap).**
+
+   The Python dispatch engine fuses signals the static table below cannot:
+   semantic embedding match, Q-value memory (past successful episodes),
+   synaptic weight boost (evolution affinity), CoT deliberation, and live
+   worker availability. It was previously bypassed in the interactive path —
+   ALWAYS consult it first:
+
+   ```bash
+   cd ~/.claude/orchestrator && \
+   .venv/Scripts/python.exe -m dispatch.dispatch_engine \
+       --suggest "<task title>" --desc "<task description>" --json
+   ```
+   Returns: `{inferred_skill, worker, queued, reasons}`. The first reason line
+   carries the CoT confidence, e.g. `COT: winner=... conf=0.883(HIGH) ...`.
+
+   **Confidence gate (prevents misroutes like WordPress→medik):**
+   - **HIGH (conf ≥ 0.70):** trust the engine's `worker` + `inferred_skill`. Skip the table.
+   - **MEDIUM (0.45–0.70):** use the engine's pick but note it as 🟡 assumed in the dispatch log; sanity-check against the table.
+   - **LOW (< 0.45) OR `queued: true` OR `worker: null`:** DO NOT auto-assign.
+     Fall back to the static table (steps 1–2). If the table is also
+     ambiguous, ask the user to disambiguate the skill. A low-confidence
+     semantic match across the 584-skill surface is how unrelated industry
+     skills (medik/campus/helios) hijack agency tasks — never ship it silently.
+
+1. **Read company.yaml** — Match task capabilities to agent capabilities (FALLBACK path when step 0 is low-confidence)
 2. **Apply routing rules:**
 
 | Task Domain | Primary Agent | Fallback | Parallel Squad |

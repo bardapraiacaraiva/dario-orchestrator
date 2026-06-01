@@ -774,6 +774,48 @@ def cmd_dispatch(args):
     return 0 if dispatched > 0 or queued == 0 else 2
 
 
+def cmd_suggest(args):
+    """Suggest routing for free-text task WITHOUT persisting it (read-only).
+
+    Lets the interactive orchestrator skill query the learned router
+    (semantic + Q-value + synaptic + availability) before a task YAML/DB
+    row exists. The ephemeral task has no 'id', so the CoT layer does not
+    persist a trace (find_best_worker → dispatch_cot persists only when
+    task.get('id') is truthy).
+    """
+    if not COMPANY_FILE.exists():
+        log.error("company.yaml not found")
+        return 1
+
+    company_data = load_yaml(str(COMPANY_FILE))
+    hierarchy = CompanyHierarchy(company_data)
+    tasks = load_tasks()
+    workload = get_worker_workload(tasks)
+
+    task = {"title": args.suggest, "description": args.desc or args.suggest}
+    inferred_skill = infer_skill_from_task(task)
+    worker_id, reasons = find_best_worker(task, hierarchy, workload, explain=True)
+
+    if args.json:
+        import json
+        print(json.dumps({
+            "title": args.suggest,
+            "inferred_skill": inferred_skill,
+            "worker": worker_id,
+            "queued": worker_id is None,
+            "reasons": reasons,
+        }))
+    else:
+        print(f"=== ROUTING SUGGESTION (read-only) ===\n")
+        print(f"Title: {args.suggest}")
+        print(f"Inferred skill: {inferred_skill}")
+        print(f"Routing decision: {'→ ' + worker_id if worker_id else 'QUEUED (no available worker)'}")
+        print("\nReasoning chain:")
+        for i, r in enumerate(reasons, 1):
+            print(f"  {i}. {r}")
+    return 0
+
+
 def cmd_status(args):
     """Show worker availability status."""
     if not COMPANY_FILE.exists():
@@ -877,6 +919,8 @@ def main():
     parser.add_argument("--dry-run", "-n", action="store_true", help="Show routing without assigning")
     parser.add_argument("--status", "-s", action="store_true", help="Show worker availability")
     parser.add_argument("--explain", "-e", help="Explain routing for a task ID")
+    parser.add_argument("--suggest", help="Suggest routing for free-text task (read-only, no persist)")
+    parser.add_argument("--desc", help="Optional description to accompany --suggest")
     parser.add_argument("--json", "-j", action="store_true", help="Output results as JSON (for autopilot integration)")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
 
@@ -889,6 +933,8 @@ def main():
 
     if args.status:
         return cmd_status(args)
+    elif args.suggest:
+        return cmd_suggest(args)
     elif args.explain:
         return cmd_explain(args)
     else:
