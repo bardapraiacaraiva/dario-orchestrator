@@ -374,6 +374,28 @@ def assemble_context(task_id: str, skill: str = "", project: str = "") -> dict:
             "avg_relevance": round(sum(r["score"] for r in rag_results) / len(rag_results), 3),
         })
 
+    # 4.5 Consolidated semantic memories (P1 — audit 2026-06-01).
+    # Closes the dream→inference loop: retrieves the most relevant Dream-
+    # consolidated SemanticMemory items by embedding similarity and injects
+    # them. Silent no-op if Ollama/embeddings are unavailable (never blocks).
+    try:
+        from memory.semantic_search import search_memories
+        sem_hits = search_memories(task_desc, top_k=3)
+        if sem_hits:
+            content = "\n".join(
+                f"- ({h['score']:.2f}, conf {h['confidence']}) {h['name']}: {(h['content'] or '')[:200]}"
+                for h in sem_hits
+            )
+            result["sections"].append({
+                "source": "semantic_memory",
+                "content": content,
+                "priority": "high",
+                "memories": len(sem_hits),
+                "avg_relevance": round(sum(h["score"] for h in sem_hits) / len(sem_hits), 3),
+            })
+    except Exception:
+        pass
+
     # 5. Skill hints
     hints = get_skill_hints(skill)
     if hints:

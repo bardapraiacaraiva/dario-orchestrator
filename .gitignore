@@ -81,6 +81,11 @@
 !orchestrator/cognitive/
 !orchestrator/cognitive/*.py
 
+# Memory module CODE (the data subdirs episodes/semantic/retrieval/... stay ignored).
+# Fixes a pre-existing allowlist gap: the memory package was never tracked.
+!orchestrator/memory/
+!orchestrator/memory/*.py
+
 # --- Allow licensing package (Recommendation #2 stage 3, 2026-05-25) ---
 !orchestrator/licensing/
 !orchestrator/licensing/*.py

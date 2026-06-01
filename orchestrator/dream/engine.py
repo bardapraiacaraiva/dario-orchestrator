@@ -98,6 +98,37 @@ class DreamEngine:
         except Exception as e:
             report.warnings.append(f"legacy_cleanup_failed: {type(e).__name__}")
 
+        # P1 (audit 2026-06-01) — close two feedback loops at the daily cycle:
+        #  (a) refresh semantic-memory embeddings so newly consolidated/merged
+        #      memories become retrievable in task context (memory/semantic_search);
+        #  (b) run the golden regression check to surface quality drift.
+        # Both guarded + skipped in dry-run; never abort the dream.
+        if not self.dry_run:
+            try:
+                from memory.semantic_search import bootstrap_memory_embeddings
+                emb = bootstrap_memory_embeddings()
+                if emb.get("ok"):
+                    report.notes.append(
+                        f"Refreshed memory embeddings: {emb['embedded']} new, "
+                        f"{emb['skipped']} unchanged (of {emb['total_memories']})"
+                    )
+                else:
+                    report.warnings.append(f"memory_embeddings_skipped: {emb.get('reason', '?')}")
+            except Exception as e:
+                report.warnings.append(f"memory_embeddings_failed: {type(e).__name__}")
+
+            try:
+                from quality.golden_eval import regression_check
+                rc = regression_check()
+                report.notes.append(
+                    f"Golden regression check: {len(rc.get('alerts', []))} alert(s), "
+                    f"{len(rc.get('drifting', []))} drifting of {rc.get('with_golden', 0)} goldens"
+                )
+                if rc.get("alerts"):
+                    report.warnings.append(f"golden_regression_alerts: {rc['alerts']}")
+            except Exception as e:
+                report.warnings.append(f"golden_regression_failed: {type(e).__name__}")
+
         report.duration_seconds = round(time.monotonic() - t0, 3)
         report.finished_at = utcnow()
 
