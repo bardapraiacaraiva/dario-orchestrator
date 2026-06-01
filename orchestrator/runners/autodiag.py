@@ -587,6 +587,24 @@ def check_metrics_invariant(tasks: list, fix: bool) -> dict:
     return {"id": "metrics_invariant", "severity": "critical", "passed": len(issues) == 0, "issues": issues}
 
 
+# Single source of truth for the registered autodiag checks. Tests assert the
+# runtime check count equals len(CHECK_NAMES), so adding/removing a check can no
+# longer silently drift the test (the 8->9->10 count-drift class). Keep this in
+# sync with all_checks below — the assert in run_all_checks enforces it.
+CHECK_NAMES = (
+    "coherence_check",
+    "orphan_detection",
+    "dependency_integrity",
+    "false_cascade_correction",
+    "budget_drift",
+    "stale_review",
+    "quality_regression",
+    "skill_regression",
+    "metrics_invariant",
+    "memory_staleness",
+)
+
+
 def run_all_checks(fix: bool = False, single: str = None) -> list:
     tasks = load_all_tasks()
     workers = load_company_workers()
@@ -604,6 +622,8 @@ def run_all_checks(fix: bool = False, single: str = None) -> list:
         "metrics_invariant": lambda: check_metrics_invariant(tasks, fix),
         "memory_staleness": lambda: check_memory_staleness(fix),
     }
+    # Enforce registry <-> CHECK_NAMES sync (cheap, catches future drift)
+    assert tuple(all_checks.keys()) == CHECK_NAMES, "autodiag registry drifted from CHECK_NAMES"
 
     if single:
         if single not in all_checks:

@@ -4,9 +4,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
-pytestmark = pytest.mark.slow
+# NOT marked slow (2026-06-01): these engine CLI tests are the ones that rotted
+# unnoticed (24 perma-red) precisely because `slow` excluded them from the
+# routine `-m "not slow"` pre-push gate. ~25s is an acceptable gate cost to keep
+# the engine contracts continuously verified.
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 PY = sys.executable
@@ -90,7 +91,10 @@ class TestAutodiag:
     def test_all_checks_run(self):
         r = run("autodiag_runner.py", ["--json"])
         data = json.loads(r.stdout)
-        assert data["total"] == 10  # autodiag protocol: 10 checks (metrics_invariant added 31d0a25)
+        # Self-validating: derive expected count from the runner's own registry
+        # so adding/removing a check never silently rots this test.
+        from runners.autodiag import CHECK_NAMES
+        assert data["total"] == len(CHECK_NAMES)
         assert "passed" in data
 
     def test_single_check(self):

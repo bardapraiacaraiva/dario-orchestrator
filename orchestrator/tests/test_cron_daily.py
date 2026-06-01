@@ -9,11 +9,10 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-import pytest
-
 import cron_daily
 
-pytestmark = pytest.mark.slow
+# NOT marked slow (2026-06-01): cron dry-run/job-count tests rotted unnoticed
+# while excluded from the routine `-m "not slow"` gate. Keep them in the gate.
 
 def _backup_last_run():
     if cron_daily.LAST_RUN_FILE.exists():
