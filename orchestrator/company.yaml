@@ -613,7 +613,7 @@ agents:
       enable_on_demand: true
       cooldown_minutes: 10
     context_mode: full
-    own_coordinator: a360-framework-lite
+    own_coordinator: a360-director
     pipelines:
     - prospect-meeting
     - business-foundation
