@@ -34,29 +34,52 @@ AUDIT_DIR = ORCH_DIR / "audit"
 DONE_DIR = ORCH_DIR / "tasks" / "done"
 
 
+def _load_done_tasks() -> list:
+    """DB-FIRST (2026-06-01): SQLite is the source of truth (CONVENTIONS.md).
+
+    Previously this only globbed tasks/done/*.yaml, which is empty post-migration
+    — so the episodic backfill silently did nothing. Read done tasks from the DB;
+    fall back to YAML only when the DB is unavailable.
+    """
+    try:
+        from core.task_store import TaskStore
+        tasks = TaskStore().get_all(status="done")
+        if tasks:
+            return tasks
+    except Exception:
+        pass
+    out = []
+    for path in sorted(DONE_DIR.glob("*.yaml")):
+        try:
+            with open(path, encoding="utf-8") as f:
+                t = yaml.safe_load(f) or {}
+            if t:
+                t.setdefault("id", path.stem)
+                out.append(t)
+        except Exception:
+            continue
+    return out
+
+
 def backfill_from_done(dry_run: bool = False) -> dict:
-    """Read tasks/done/*.yaml and create one Episode per completed task.
+    """Create one Episode per completed task (DB-first, YAML fallback).
 
     Idempotent: skips tasks that already have an Episode record.
     """
     written = 0
     skipped = 0
     skipped_existing = 0
-    files = sorted(DONE_DIR.glob("*.yaml"))
-    for path in files:
-        try:
-            with open(path, encoding="utf-8") as f:
-                t = yaml.safe_load(f) or {}
-        except Exception:
-            skipped += 1
-            continue
-
+    done_tasks = _load_done_tasks()
+    for t in done_tasks:
         skill = t.get("skill", "")
         if not skill:
             skipped += 1
             continue
 
-        task_id = t.get("id", path.stem)
+        task_id = t.get("id", "")
+        if not task_id:
+            skipped += 1
+            continue
         if episodic.episode_exists_for_task(task_id):
             skipped_existing += 1
             continue
@@ -81,14 +104,14 @@ def backfill_from_done(dry_run: bool = False) -> dict:
             episode_id="",
             task_id=task_id,
             timestamp=timestamp,
-            agent=t.get("assignee", ""),
+            agent=t.get("assignee") or "",   # DB rows may have explicit None
             skill=skill,
             outcome=outcome,
             score=t.get("quality_score"),
             duration_seconds=duration,
             tokens_used=t.get("actual_tokens") or 0,
             model="opus",
-            project=t.get("project", ""),
+            project=t.get("project") or "",  # DB rows may have explicit None
             output_summary=(t.get("completion_comment") or t.get("description") or "")[:500],
             tags=t.get("tags", []) if isinstance(t.get("tags"), list) else [],
         )
@@ -97,8 +120,8 @@ def backfill_from_done(dry_run: bool = False) -> dict:
         written += 1
 
     return {
-        "source": "tasks/done",
-        "files_processed": len(files),
+        "source": "db:done (yaml fallback)",
+        "files_processed": len(done_tasks),
         "episodes_written": written,
         "skipped_no_skill": skipped,
         "skipped_already_existed": skipped_existing,
