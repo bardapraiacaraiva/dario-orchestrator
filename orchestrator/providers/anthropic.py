@@ -35,6 +35,7 @@ Exit codes:
 import argparse
 import json
 import logging
+import random
 import subprocess
 import sys
 import time
@@ -574,6 +575,20 @@ def call_claude_api(prompt: str, skill: str, model: str, retries: int = 2) -> di
     except ImportError:
         return {"success": False, "error": "anthropic SDK not installed"}
 
+    # R1 (audit 2026-06-01): circuit breaker — if the Anthropic API has failed
+    # repeatedly (5xx/connection), fail fast instead of hammering it, which
+    # protects budget and avoids worsening an outage. Guarded import → no-op if
+    # the upgrades package is unavailable. Rate-limits do NOT trip the breaker
+    # (they're expected under load and handled by retry+jitter below).
+    try:
+        from upgrades.state import circuit_breaker as _cb
+    except Exception:
+        _cb = None
+    if _cb is not None and not _cb.can_execute():
+        log.warning(f"Circuit breaker OPEN (state={_cb.get_state()}) — failing fast, not calling API")
+        return {"success": False, "error": f"circuit_breaker_open (state={_cb.get_state()})",
+                "circuit_open": True}
+
     client = TrackedAnthropic(caller=f"providers/anthropic/call_claude_api/{skill}")
     model_config = MODELS.get(model, MODELS["sonnet"])
     system_prompt = get_system_prompt(skill)
@@ -600,6 +615,9 @@ def call_claude_api(prompt: str, skill: str, model: str, retries: int = 2) -> di
             cache_read = getattr(response.usage, 'cache_read_input_tokens', 0)
             cache_creation = getattr(response.usage, 'cache_creation_input_tokens', 0)
 
+            if _cb is not None:
+                _cb.record_success()  # R1: healthy call closes the breaker
+
             return {
                 "success": True,
                 "output": output,
@@ -612,20 +630,28 @@ def call_claude_api(prompt: str, skill: str, model: str, retries: int = 2) -> di
             }
 
         except anthropic.RateLimitError:
+            # Rate limits are flow control, not an outage → retry with jitter,
+            # do NOT trip the circuit breaker.
             if attempt < retries:
-                wait = 2 ** (attempt + 1)
-                log.warning(f"Rate limited, retry in {wait}s (attempt {attempt+1}/{retries})")
+                wait = 2 ** (attempt + 1) + random.uniform(0, 1)  # R2: jitter avoids thundering herd
+                log.warning(f"Rate limited, retry in {wait:.1f}s (attempt {attempt+1}/{retries})")
                 time.sleep(wait)
                 continue
             return {"success": False, "error": "Rate limited after retries"}
 
         except anthropic.APIError as e:
-            if attempt < retries and e.status_code >= 500:
-                time.sleep(2 ** attempt)
+            # 5xx = real API trouble → count toward the circuit breaker.
+            if getattr(e, "status_code", 0) and e.status_code >= 500 and _cb is not None:
+                _cb.record_failure()
+            if attempt < retries and getattr(e, "status_code", 0) and e.status_code >= 500:
+                time.sleep(2 ** attempt + random.uniform(0, 1))  # R2: jitter
                 continue
-            return {"success": False, "error": f"API error: {e.message}"}
+            return {"success": False, "error": f"API error: {getattr(e, 'message', str(e))}"}
 
         except Exception as e:
+            # Connection/timeout/unknown = real trouble → count toward breaker.
+            if _cb is not None:
+                _cb.record_failure()
             return {"success": False, "error": str(e)[:300]}
 
     return {"success": False, "error": "Max retries exceeded"}
