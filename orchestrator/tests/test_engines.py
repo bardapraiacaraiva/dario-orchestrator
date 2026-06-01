@@ -90,7 +90,7 @@ class TestAutodiag:
     def test_all_checks_run(self):
         r = run("autodiag_runner.py", ["--json"])
         data = json.loads(r.stdout)
-        assert data["total"] == 9  # autodiag protocol: 9 checks (was 8 pre-2026-06)
+        assert data["total"] == 10  # autodiag protocol: 10 checks (metrics_invariant added 31d0a25)
         assert "passed" in data
 
     def test_single_check(self):
