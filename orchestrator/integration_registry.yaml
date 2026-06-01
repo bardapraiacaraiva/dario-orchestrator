@@ -330,10 +330,10 @@ registry:
     module: state
     target_engine: [suspend_resume.py, checkpoint_interrupt.py]
     pattern: "@workflow/@step decorators — 20 lines durability"
-    status: not_started
-    priority: P0
+    status: deprecated
+    priority: none
     effort: low
-    notes: "Cleanest durable execution pattern found"
+    notes: "DEPRECATED 2026-06-01 (audit P0-3): single-session CC-native model uses lighter durability (WAL + checkout + stale recovery). See durable/DEPRECATED.md."
 
   agent-chaos:
     url: https://github.com/deepankarm/agent-chaos
@@ -362,7 +362,7 @@ registry:
     module: state
     target_engine: suspend_resume.py
     pattern: "Durable execution gold standard"
-    status: not_started
+    status: deprecated  # 2026-06-01 audit P0-3 — overkill for single-session CC-native model; durable/ pilot quarantined
     priority: P3
     effort: high
     notes: "Future — when DARIO goes multi-tenant"
