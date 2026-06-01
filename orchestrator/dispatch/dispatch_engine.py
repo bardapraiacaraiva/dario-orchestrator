@@ -580,12 +580,20 @@ def find_best_worker(task: dict, hierarchy: CompanyHierarchy, workload: dict, ex
         task_caps = hierarchy.worker_capabilities.get(worker_id, set())
 
     siblings = hierarchy.get_siblings(worker_id)
+    candidates = []
     for sibling_id in siblings:
         sibling_caps = hierarchy.worker_capabilities.get(sibling_id, set())
         overlap = task_caps & sibling_caps
         if overlap and is_worker_available(sibling_id, workload):
-            reasons.append(f"FALLBACK_SIBLING: {sibling_id} (overlap: {overlap})")
-            return sibling_id, reasons
+            candidates.append((sibling_id, overlap))
+    if candidates:
+        # GAP #3 fix (audit 2026-06-01): pick the BEST-FIT available sibling —
+        # largest capability overlap, then least loaded, then deterministic by id
+        # — instead of the first one encountered.
+        candidates.sort(key=lambda c: (-len(c[1]), workload.get(c[0], 0), c[0]))
+        best_id, best_overlap = candidates[0]
+        reasons.append(f"FALLBACK_SIBLING: {best_id} (best-fit overlap: {best_overlap})")
+        return best_id, reasons
 
     reasons.append("NO_SIBLING_AVAILABLE: All siblings busy or no capability overlap")
 

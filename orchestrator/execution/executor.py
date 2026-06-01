@@ -72,6 +72,55 @@ from safety.guardrails import validate_task
 from dispatch.model_router import ModelRouterFilter
 from reliability.output_guardrails import OutputGuardrailFilter
 
+import functools
+
+# ─── OpenTelemetry tracing (P0-4: wire real spans into the execution path) ───
+# Guarded + opt-in: observability deps are an optional extra. Tracing only
+# activates when an export target is configured (Langfuse / OTLP) or DARIO_OTEL=1,
+# so a default install gets a silent no-op (no console span spam) while a
+# configured deployment gets real distributed traces. Never affects execution.
+import os as _os_otel
+_OTEL_TARGET = (
+    _os_otel.environ.get("DARIO_OTEL") == "1"
+    or _os_otel.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT")
+    or _os_otel.environ.get("LANGFUSE_PUBLIC_KEY")
+)
+if _OTEL_TARGET:
+    try:
+        from observability.otel_setup import setup_tracing, trace_agent_invoke
+        from opentelemetry import trace as _otel_trace
+        setup_tracing("dario-orchestrator")
+        _OTEL_OK = True
+    except Exception:
+        _OTEL_OK = False
+else:
+    _OTEL_OK = False
+
+
+def _span_set(**attrs) -> None:
+    """Set attributes on the current OTel span, if tracing is active. No-op otherwise."""
+    if not _OTEL_OK:
+        return
+    try:
+        span = _otel_trace.get_current_span()
+        for key, value in attrs.items():
+            if value is not None and value != "":
+                span.set_attribute(f"dario.{key}", value)
+    except Exception:
+        pass
+
+
+def _traced_task(fn):
+    """Wrap a single-task execution in an OTel span (P0-4). Captures timing + exceptions."""
+    @functools.wraps(fn)
+    def wrapper(task_id, *args, **kwargs):
+        if not _OTEL_OK:
+            return fn(task_id, *args, **kwargs)
+        with trace_agent_invoke(task_id=task_id, skill="(pending)", agent="executor"):
+            return fn(task_id, *args, **kwargs)
+    return wrapper
+
+
 PYTHON = sys.executable
 
 # TIER 1 Filter Pipeline — composable middleware for every execution
@@ -112,6 +161,7 @@ def run_engine(script: str, args: list) -> dict:
 # CORE: Execute a single task through the full lifecycle
 # =============================================================================
 
+@_traced_task
 def execute_task(task_id: str, dry_run: bool = False) -> dict:
     """
     Full lifecycle execution of a single task.
@@ -135,6 +185,9 @@ def execute_task(task_id: str, dry_run: bool = False) -> dict:
     project = task.get("project", "")
     worker = task.get("assignee", "")
 
+    # P0-4: enrich the OTel span now that we know the task's real attributes.
+    _span_set(skill=skill, project=project, worker=worker)
+
     # ─── Step 0: FILTER PIPELINE — BEFORE ────────────────────────────────
     # Runs: LoggingFilter → ModelRouter → BudgetFilter
     filter_ctx = PIPELINE.before(task)
@@ -156,6 +209,7 @@ def execute_task(task_id: str, dry_run: bool = False) -> dict:
     result["recommended_model"] = filter_ctx.get("recommended_model", "sonnet")
     result["model_id"] = filter_ctx.get("model_id", "claude-sonnet-4-6")
     result["_filter_ctx"] = filter_ctx  # Pass to after-pipeline
+    _span_set(model=result["model_id"], recommended_model=result["recommended_model"])  # P0-4
 
     # ─── Step 0.9: LIFECYCLE HOOK — task_start (was ORPHAN) ────────────
     try:
