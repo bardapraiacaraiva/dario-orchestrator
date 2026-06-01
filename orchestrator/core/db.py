@@ -272,18 +272,23 @@ class DB:
                 self._log(conn, "executor", "task_checked_out", task_id=task_id)
             return cursor.rowcount > 0
 
-    def complete_task(self, task_id: str, score: int = 0, tokens: int = 0,
+    def complete_task(self, task_id: str, score: int = None, tokens: int = 0,
                       output: str = "", status: str = "done") -> bool:
         """Complete a task. Only from in_progress."""
         if status not in ("done", "in_review"):
             status = "done"
+        # An unscored completion must store NULL, never 0. Scores are 1-100;
+        # 0 is a sentinel that silently craters any DB-side average (root cause
+        # of the DB<->YAML divergence fixed 2026-06-01 — see
+        # quality/reconcile_skill_metrics.py).
+        db_score = score if (score and score > 0) else None
         now = datetime.now(UTC).isoformat()
         with self._conn() as conn:
             cursor = conn.execute("""
                 UPDATE tasks SET status = ?, quality_score = ?, actual_tokens = ?,
                     completion_comment = ?, completed_at = ?, updated_at = ?
                 WHERE id = ? AND status IN ('in_progress', 'in_review')
-            """, (status, score, tokens, output[:2000], now, now, task_id))
+            """, (status, db_score, tokens, output[:2000], now, now, task_id))
             if cursor.rowcount > 0:
                 if tokens > 0:
                     self._add_budget(conn, tokens, task_id)

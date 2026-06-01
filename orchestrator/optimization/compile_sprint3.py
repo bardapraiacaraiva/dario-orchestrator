@@ -375,14 +375,22 @@ def main():
             "avg_score": old, "n_runs": meta.get("total_executions", 0),
         }
         meta["live_scores_compiled_sprint3"] = data["scores"]
-        meta["avg_quality_score"] = round(new, 1)
-        meta["best_score"] = max(int(new), int(meta.get("best_score", 0)))
-        meta["compile_artifact"] = f"optimization/compiled/{skill_name}.json"
-        meta["tier"] = "A" if new >= 90 else "B" if new >= 70 else "C"
-        meta["improvement_trend"] = "improving" if new > old else "stable"
-        meta["last_scored_at"] = datetime.now(UTC).isoformat()
-        meta["total_executions"] = meta.get("total_executions", 0) + len(data["scores"])
-        print(f"  {skill_name}: {old} -> {new:.1f}  ({'+' if new>old else ''}{new-old:.1f})")
+        # ARCHIVED (DSPy sprint3). These results are SYNTHETIC-golden evals and
+        # MUST NOT overwrite the canonical production fields (avg_quality_score,
+        # total_executions, tier, best_score) — doing so was the root cause of
+        # the DB<->YAML divergence fixed 2026-06-01. quality_scorer.py is the
+        # SINGLE writer of canonical fields. We record compile results in a
+        # dedicated namespace only.
+        meta["sprint3_compiled"] = {
+            "avg": round(new, 1),
+            "best": max(int(new), int(meta.get("sprint3_compiled", {}).get("best", 0))),
+            "artifact": f"optimization/compiled/{skill_name}.json",
+            "tier": "A" if new >= 90 else "B" if new >= 70 else "C",
+            "trend": "improving" if new > old else "stable",
+            "compiled_at": datetime.now(UTC).isoformat(),
+            "n_compiled": len(data["scores"]),
+        }
+        print(f"  {skill_name}: [compiled-namespace] {old} -> {new:.1f}  ({'+' if new>old else ''}{new-old:.1f})")
 
     # Recompute global avg
     scored = [(n, float(m.get("avg_quality_score", 0)))

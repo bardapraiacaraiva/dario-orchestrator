@@ -541,6 +541,52 @@ def check_memory_staleness(fix: bool) -> dict:
 # MAIN
 # =============================================================================
 
+def check_metrics_invariant(tasks: list, fix: bool) -> dict:
+    """Invariant: avg_quality_score must equal mean(scores[-20:]) and
+    total_executions must equal len(scores). Drift means a non-canonical writer
+    (e.g. the archived DSPy compile) corrupted the aggregate — this was the root
+    cause of the DB<->YAML divergence fixed 2026-06-01. quality_scorer.py is the
+    SINGLE legitimate writer of these fields. With fix=True, recompute from the
+    trustworthy scores[] array (mirrors quality/reconcile_skill_metrics.py)."""
+    if not QUALITY_FILE.exists():
+        return {"id": "metrics_invariant", "severity": "critical", "passed": True, "issues": [], "note": "no metrics"}
+
+    metrics = load_yaml(str(QUALITY_FILE))
+    issues, dirty = [], False
+    for name, sd in (metrics.get("skills") or {}).items():
+        if not isinstance(sd, dict):
+            continue
+        scores = [s.get("score") if isinstance(s, dict) else s for s in (sd.get("scores") or [])]
+        scores = [x for x in scores if isinstance(x, (int, float))]
+        if not scores:
+            continue
+        expect_avg = round(sum(scores[-20:]) / len(scores[-20:]), 1)
+        expect_n = len(scores)
+        cur_avg = sd.get("avg_quality_score")
+        cur_n = sd.get("total_executions")
+        if (cur_avg is None or abs(cur_avg - expect_avg) > 1.0) or (cur_n != expect_n):
+            issues.append({"skill": name, "stored_avg": cur_avg, "expected_avg": expect_avg,
+                           "stored_n": cur_n, "expected_n": expect_n})
+            if fix:
+                sd["avg_quality_score"] = expect_avg
+                sd["avg_quality_alltime"] = round(sum(scores) / len(scores), 1)
+                sd["total_executions"] = expect_n
+                sd["revision_rate"] = round(sum(1 for s in scores if s < 60) / len(scores), 2)
+                sd["best_score"], sd["worst_score"] = max(scores), min(scores)
+                sd["tier"] = "A" if expect_avg >= 85 else "B" if expect_avg >= 75 else "C"
+                dirty = True
+    if fix and dirty:
+        scored = [m["avg_quality_score"] for m in metrics["skills"].values()
+                  if isinstance(m, dict) and m.get("avg_quality_score")]
+        if scored:
+            metrics["global_avg_quality"] = round(sum(scored) / len(scored), 1)
+        try:
+            dump_yaml(metrics, str(QUALITY_FILE))
+        except Exception as e:
+            log.warning(f"metrics_invariant: failed to write skill-metrics.yaml: {e}")
+    return {"id": "metrics_invariant", "severity": "critical", "passed": len(issues) == 0, "issues": issues}
+
+
 def run_all_checks(fix: bool = False, single: str = None) -> list:
     tasks = load_all_tasks()
     workers = load_company_workers()
@@ -555,6 +601,7 @@ def run_all_checks(fix: bool = False, single: str = None) -> list:
         "stale_review": lambda: check_stale_review(tasks, fix),
         "quality_regression": lambda: check_quality_regression(tasks, fix),
         "skill_regression": lambda: check_skill_regression(tasks, fix),
+        "metrics_invariant": lambda: check_metrics_invariant(tasks, fix),
         "memory_staleness": lambda: check_memory_staleness(fix),
     }
 

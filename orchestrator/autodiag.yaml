@@ -58,6 +58,13 @@ checks:
     auto_fix: true
     fix_action: "Append flagged skill to quality/pending-review.yaml regression_queue"
 
+  - id: metrics_invariant
+    name: "Skill-Metrics Aggregate Invariant"
+    description: "Assert avg_quality_score == mean(scores[-20:]) and total_executions == len(scores) per skill. Drift means a non-canonical writer corrupted the aggregate (root cause of DB<->YAML divergence fixed 2026-06-01). SOURCE OF TRUTH: skill-metrics.yaml scores[] (written ONLY by quality_scorer.py). DB tasks.quality_score is per-task operational — never aggregate it without filtering NULL/0."
+    severity: critical
+    auto_fix: true
+    fix_action: "Recompute avg/n/revision_rate/tier from scores[] (mirrors quality/reconcile_skill_metrics.py)"
+
   - id: memory_staleness
     name: "Memory Staleness Check"
     description: "Check if project memories are >30 days old without update"
