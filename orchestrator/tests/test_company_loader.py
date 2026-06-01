@@ -39,7 +39,7 @@ class TestLoaderRoundTrip:
 
     def test_at_least_180_workers(self):
         cfg = load()
-        assert len(cfg.get("workers", {})) >= 180
+        assert len(cfg.get("workers", {})) >= 120  # floor 180->120 after archiving risco+atlas-events base workers (2026-06)
 
     def test_at_least_37_agents(self):
         cfg = load()
@@ -69,7 +69,7 @@ class TestSegmentFiles:
     def test_workers_segment_loadable(self):
         data = yaml.safe_load((CONFIG_DIR / "workers.yaml").read_text(encoding="utf-8"))
         assert "workers" in data
-        assert len(data["workers"]) >= 180
+        assert len(data["workers"]) >= 120  # floor 180->120 after archiving risco+atlas-events base workers (2026-06)
 
     def test_policies_segment_loadable(self):
         data = yaml.safe_load((CONFIG_DIR / "policies.yaml").read_text(encoding="utf-8"))
