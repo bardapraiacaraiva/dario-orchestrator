@@ -291,7 +291,10 @@ class StateResponse(BaseModel):
 
     state: str = "?"
     autonomy_level: str = "?"
-    system_health: int = Field(default=0, ge=0, le=100)
+    # system_health is a 0..1 ratio from state_machine (e.g. 0.882). Was typed
+    # int(ge=0,le=100) which 500'd GET /state on any fractional value (fixed
+    # 2026-06-01). Mirrors HealthResponse.health (float).
+    system_health: float = Field(default=0.0, ge=0.0)
 
 
 class AuditEntry(BaseModel):

@@ -32,21 +32,38 @@ def _restore_last_run(backup):
 def test_dry_run_returns_skipped_jobs():
     r = cron_daily.run_all(dry_run=True)
     assert r["dry_run"] is True
-    assert len(r["jobs"]) == 6  # cognitive + integrity + prompt hints
+    assert len(r["jobs"]) == len(EXPECTED_JOBS)
     for job in r["jobs"]:
         assert "skipped" in job["status"]
 
 
-def test_run_all_executes_6_jobs():
+# Single source of truth for the test, mirrors cron_daily.run_all's job list.
+EXPECTED_JOBS = {
+    "promote_episodes", "regression_check", "dispatch_cot_stats",
+    "state_snapshot", "integrity_gate", "prompt_hints_promote",
+    "delivery_rate_recompute", "auto_capture_obsidian",
+    "compute_client_stats", "snapshot_quality_daily",
+}
+
+
+def test_dry_run_and_real_run_have_identical_job_sets():
+    """Regression guard: dry-run must mirror real execution (was 6 vs 10)."""
+    dry = cron_daily.run_all(dry_run=True)
+    backup = _backup_last_run()
+    try:
+        real = cron_daily.run_all(dry_run=False)
+        assert {j["name"] for j in dry["jobs"]} == {j["name"] for j in real["jobs"]}
+    finally:
+        _restore_last_run(backup)
+
+
+def test_run_all_executes_all_jobs():
     backup = _backup_last_run()
     try:
         r = cron_daily.run_all(dry_run=False)
-        assert len(r["jobs"]) == 6
+        assert len(r["jobs"]) == len(EXPECTED_JOBS)
         job_names = {j["name"] for j in r["jobs"]}
-        expected = {"promote_episodes", "regression_check",
-                    "dispatch_cot_stats", "state_snapshot", "integrity_gate",
-                    "prompt_hints_promote"}
-        assert job_names == expected, f"got {job_names}"
+        assert job_names == EXPECTED_JOBS, f"got {job_names}"
         assert "status" in r
         assert r["status"] in ("ok", "warn", "alert")
         return True
@@ -218,7 +235,8 @@ def test_never_run_returns_infinity():
 
 TESTS = [
     ("dry-run returns skipped jobs", test_dry_run_returns_skipped_jobs),
-    ("run_all executes 6 jobs (incl. prompt hints)", test_run_all_executes_6_jobs),
+    ("run_all executes all jobs", test_run_all_executes_all_jobs),
+    ("dry-run mirrors real run job set", test_dry_run_and_real_run_have_identical_job_sets),
     ("run persists report file", test_run_persists_report_file),
     ("maybe_run skips within cooldown", test_maybe_run_skips_within_cooldown),
     ("maybe_run executes when stale", test_maybe_run_executes_when_stale),

@@ -505,31 +505,32 @@ def run_all(dry_run: bool = False) -> dict:
         "jobs": [],
     }
 
+    # SINGLE SOURCE OF TRUTH (2026-06-01): both dry-run and real execution
+    # iterate this list, so dry-run can never again under-report what runs.
+    # Previously dry-run hardcoded 6 jobs while real execution ran 10.
+    jobs = [
+        ("promote_episodes", job_promote_episodes),
+        ("regression_check", job_regression_check),
+        ("dispatch_cot_stats", job_dispatch_cot_stats),
+        ("state_snapshot", job_state_snapshot),
+        ("integrity_gate", job_integrity_gate),
+        ("prompt_hints_promote", job_prompt_hints_promote),
+        ("delivery_rate_recompute", job_delivery_rate_recompute),
+        ("auto_capture_obsidian", job_auto_capture_obsidian),
+        ("compute_client_stats", job_compute_client_stats),
+        ("snapshot_quality_daily", job_snapshot_quality_daily),
+    ]
+
     if dry_run:
-        report["jobs"] = [
-            {"name": "promote_episodes", "status": "skipped (dry-run)"},
-            {"name": "regression_check", "status": "skipped (dry-run)"},
-            {"name": "dispatch_cot_stats", "status": "skipped (dry-run)"},
-            {"name": "state_snapshot", "status": "skipped (dry-run)"},
-            {"name": "integrity_gate", "status": "skipped (dry-run)"},
-            {"name": "prompt_hints_promote", "status": "skipped (dry-run)"},
-        ]
+        report["jobs"] = [{"name": name, "status": "skipped (dry-run)"} for name, _ in jobs]
         report["alerts"] = []
         report["warnings"] = []
         report["duration_seconds"] = (_now() - start).total_seconds()
         return report
 
     # Execute in sequence (not parallel — they share DB/file locks)
-    report["jobs"].append(_run_job("promote_episodes", job_promote_episodes))
-    report["jobs"].append(_run_job("regression_check", job_regression_check))
-    report["jobs"].append(_run_job("dispatch_cot_stats", job_dispatch_cot_stats))
-    report["jobs"].append(_run_job("state_snapshot", job_state_snapshot))
-    report["jobs"].append(_run_job("integrity_gate", job_integrity_gate))
-    report["jobs"].append(_run_job("prompt_hints_promote", job_prompt_hints_promote))
-    report["jobs"].append(_run_job("delivery_rate_recompute", job_delivery_rate_recompute))
-    report["jobs"].append(_run_job("auto_capture_obsidian", job_auto_capture_obsidian))
-    report["jobs"].append(_run_job("compute_client_stats", job_compute_client_stats))
-    report["jobs"].append(_run_job("snapshot_quality_daily", job_snapshot_quality_daily))
+    for name, fn in jobs:
+        report["jobs"].append(_run_job(name, fn))
 
     report["duration_seconds"] = (_now() - start).total_seconds()
 
