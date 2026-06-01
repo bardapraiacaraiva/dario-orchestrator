@@ -27,6 +27,27 @@ multi-tenant SaaS decision. No second orchestrator, no vertical-SaaS.
 KEPT ACTIVE: `atlas-fin-*` (15 fintech skills — PIX/open-banking-BR/KYC) —
 relevant to BR SaaS clients (SAQUEI/Tributário/ARRECADA), not events.
 
+## Phase 2 (2026-06-01) — 10 squads, 142 skills
+
+| Segment | Squad | Skills | Domain |
+|---|---|---|---|
+| seguranca-enterprise | aegis | 18 | enterprise security (SOC, SIEM, IAM, zero-trust) |
+| cyber-avancado | sphinx | 15 | advanced cyber (red-team, malware, APT, forensics) |
+| produto-mgmt | orion | 15 | product mgmt (PRD, roadmap, JTBD) — redundant w/ dario-product |
+| ai-research | oraculo | 15 | AI research (paper reading, model eval, fine-tuning) |
+| estrategia | zenith | 15 | strategy/board (M&A, monte carlo, war gaming) |
+| data-engineering | demeter | 15 | data eng (ETL, dbt, warehouse, ML pipelines) |
+| admin-office | adriana | 15 | office admin (calendar, reception, facilities) |
+| risco-gestao | risco | 14 | risk mgmt (AML, ISO27001, BCP, insurance) |
+| rh | pessoa | 12 | HR PT (recruitment, comp, DEI, succession) |
+| supply-chain | suply | 8 | supply chain (inventory, logistics, procurement) |
+
+Semantic index after Phase 2: 295 embeddings (was 437). Archived test_demeter.
+config/company/squads/*.yaml left in place (company_loader is tolerant; dispatch
+reads the monolithic company.yaml; archived workers are never selected).
+
+HELD (plausible ties, NOT archived): obsidian (heavy Obsidian use), nexus (infra/deploys).
+
 ## Revive a segment (demand-pulled — when a real client appears)
 
 ```bash
