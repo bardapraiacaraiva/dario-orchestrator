@@ -11,9 +11,28 @@ pytestmark = pytest.mark.slow
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 PY = sys.executable
 
+# Post-2026-05-25 package refactor (84->2 top-level .py): the engine CLIs moved
+# into packages and must be invoked as `-m <package.module>`. This map keeps the
+# legacy run("foo.py", ...) call sites intact while dispatching to the real module.
+SCRIPT_MODULE = {
+    "dispatch_engine.py": "dispatch.dispatch_engine",
+    "state_machine.py": "core.state_machine",
+    "guardrails.py": "safety.guardrails",
+    "autodiag_runner.py": "core.autodiag_runner",
+    "replanner.py": "execution.replanner",
+    "evolution_runner.py": "execution.evolution_runner",
+    "tracer.py": "observability.tracer",
+    "context_injector.py": "cognitive.context_injector",
+    "adaptive_rubric.py": "quality.adaptive_rubric",
+    "task_templates.py": "core.task_templates",
+    "quality_scorer.py": "quality.quality_scorer",
+}
+
 
 def run(script, args):
-    r = subprocess.run([PY, str(ORCH_DIR / script)] + args,
+    module = SCRIPT_MODULE.get(script)
+    assert module is not None, f"Unmapped engine script: {script}"
+    r = subprocess.run([PY, "-m", module] + args,
                        capture_output=True, text=True, timeout=15, cwd=str(ORCH_DIR))
     return r
 
@@ -71,7 +90,7 @@ class TestAutodiag:
     def test_all_checks_run(self):
         r = run("autodiag_runner.py", ["--json"])
         data = json.loads(r.stdout)
-        assert data["total"] == 8
+        assert data["total"] == 9  # autodiag protocol: 9 checks (was 8 pre-2026-06)
         assert "passed" in data
 
     def test_single_check(self):

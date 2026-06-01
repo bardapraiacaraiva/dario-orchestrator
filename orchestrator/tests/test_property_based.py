@@ -113,7 +113,8 @@ from safety.sandbox import (
     env_name=env_name_strategy,
     env_value=secret_value_strategy,
 )
-@settings(max_examples=10, deadline=None, suppress_health_check=[HealthCheck.too_slow])
+@settings(max_examples=10, deadline=None,
+          suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
 def test_arbitrary_unlisted_env_var_never_leaks(env_name, env_value, monkeypatch):
     """For ANY env var name not in allowlist, value must not reach subprocess.
 
