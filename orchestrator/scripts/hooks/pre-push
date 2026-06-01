@@ -36,13 +36,31 @@ fi
 
 cd "$ORCH_DIR"
 
-echo "[pre-push] Running fast test suite (marker: not slow)…"
+echo "[pre-push] Running fast test suite (marker: not slow, parallel)…"
 START=$(date +%s)
 
 # Marker deselection:
 #   not slow — skip tests >5s (subprocess, LLM, embeddings)
 # Collection errors now fail the push (no more VIP stubs to tolerate).
-OUTPUT=$("$PYTHON" -m pytest -m "not slow" \
+#
+# Parallel + reliable (2026-06-01): the serial "not slow" suite took ~15-25 min,
+# slow enough that it got bypassed with --no-verify. Now run across all cores
+# with xdist. `--dist loadscope` keeps same-module tests on one worker to
+# minimise shared-state races; `--reruns 2` re-runs the few cross-file flaky
+# tests (golden/calibration/cron touch global state) so transient parallel
+# races don't block a legitimate push. Runtime: ~70s. Override workers with
+# DARIO_PYTEST_WORKERS (default: auto).
+WORKERS="${DARIO_PYTEST_WORKERS:-auto}"
+# Use parallel flags only if the dev test extras (xdist + rerunfailures) are
+# present; otherwise fall back to a plain serial run so the hook still works on
+# a bare/client install that only has [project].dependencies.
+PAR_FLAGS=""
+if "$PYTHON" -c "import xdist, pytest_rerunfailures" 2>/dev/null; then
+    PAR_FLAGS="-n $WORKERS --dist loadscope --reruns 2 --reruns-delay 1"
+else
+    echo "[pre-push] (xdist/rerunfailures not installed — running serial)"
+fi
+OUTPUT=$("$PYTHON" -m pytest -m "not slow" $PAR_FLAGS \
     -q --no-header --tb=line 2>&1)
 STATUS=$?
 
@@ -50,6 +68,20 @@ ELAPSED=$(($(date +%s) - START))
 
 # Parse the pytest summary line to extract pass / fail / error counts.
 SUMMARY_LINE=$(echo "$OUTPUT" | tail -1)
+
+# Parallel runs can flake on the few tests that mutate global state
+# (orchestrator.db, evals/, tasks/) — they pass in isolation but race across
+# workers. If a parallel run reports failures, re-verify SERIALLY (the
+# authoritative source of truth): a serial pass means it was a parallel race
+# (allow the push); a serial failure is a real bug (block). Common case stays
+# ~70s; only a flaky parallel failure pays the serial cost.
+if [ -n "$PAR_FLAGS" ] && echo "$SUMMARY_LINE" | grep -qE "(^| )[0-9]+ (failed|error)"; then
+    echo "[pre-push] Parallel run had failures — re-verifying serially (shared-state race check)…"
+    OUTPUT=$("$PYTHON" -m pytest -m "not slow" -q --no-header --tb=line 2>&1)
+    STATUS=$?
+    SUMMARY_LINE=$(echo "$OUTPUT" | tail -1)
+    ELAPSED=$(($(date +%s) - START))
+fi
 
 if echo "$SUMMARY_LINE" | grep -qE "(^| )[0-9]+ failed"; then
     echo "$OUTPUT" | tail -25
