@@ -523,13 +523,13 @@ agents:
     - wireframing
     - brand_guidelines
     - tailwind_config
-    - ui_styles_catalog        # ui-ux-pro-max (67 styles, 161 palettes, 57 font pairings)
-    - animation_craft           # emil-design-eng (decisions, easing, durations)
-    - multi_variant_exploration # dario-design-shotgun (N-variant comparison)
-    - mobile_design_systems     # ui-ux-pro-max (SwiftUI, Flutter, React Native)
+    - ui_styles_catalog
+    - animation_craft
+    - multi_variant_exploration
+    - mobile_design_systems
     squads:
     - Design Squad
-    - Design Intelligence Squad  # added 2026-05-26 v12.1
+    - Design Intelligence Squad
   dir_frontend:
     id: dir-frontend
     name: Frontend Director
@@ -902,8 +902,8 @@ workers:
   worker-brand:
     type: worker
     skill: dario-brand
-    skill_client_facing: dario-brand-polished  # Padrão A wrapper, Tier 2 (validated 2026-05-24)
-    requires_briefing_validation: true         # Pre-flight: competitive context + tone + archetype hint
+    skill_client_facing: dario-brand-polished
+    requires_briefing_validation: true
     reports_to: dir-marketing
     capabilities:
     - brand_positioning
@@ -913,7 +913,7 @@ workers:
   worker-offer:
     type: worker
     skill: dario-offer
-    skill_client_facing: dario-offer-polished  # Padrão A wrapper, Tier 1 (validated 2026-05-24, +6.5 mean lift)
+    skill_client_facing: dario-offer-polished
     reports_to: dir-marketing
     capabilities:
     - offer_creation
@@ -926,8 +926,8 @@ workers:
   worker-sales-letter:
     type: worker
     skill: dario-sales-letter
-    skill_client_facing: dario-sales-letter-polished  # Padrão A wrapper, Tier 2 (validated 2026-05-24)
-    requires_briefing_validation: true                # Pre-flight: testimonials + offer terms + awareness level
+    skill_client_facing: dario-sales-letter-polished
+    requires_briefing_validation: true
     reports_to: dir-marketing
     capabilities:
     - long_form_copy
@@ -950,7 +950,7 @@ workers:
   worker-funnel:
     type: worker
     skill: dario-funnel
-    skill_client_facing: dario-funnel-polished  # Padrão A wrapper, Tier 1 (validated 2026-05-24, +6.5 mean lift)
+    skill_client_facing: dario-funnel-polished
     reports_to: dir-marketing
     capabilities:
     - funnel_design
@@ -1003,7 +1003,7 @@ workers:
   worker-pitch:
     type: worker
     skill: dario-pitch
-    skill_client_facing: dario-pitch-polished  # Padrão A wrapper, Tier 1 (POC validated 2026-05-24, +6.3 mean lift)
+    skill_client_facing: dario-pitch-polished
     reports_to: dir-marketing
     capabilities:
     - pitch_deck
@@ -1097,7 +1097,7 @@ workers:
   worker-product:
     type: worker
     skill: dario-product
-    skill_client_facing: dario-product-polished  # Padrão A wrapper, Tier 1 (validated 2026-05-24, +6.5 mean lift)
+    skill_client_facing: dario-product-polished
     reports_to: dir-product
     capabilities:
     - prd_generator
@@ -1121,7 +1121,7 @@ workers:
   worker-wp-audit:
     type: worker
     skill: dario-wp-audit
-    skill_client_facing: dario-wp-audit-polished  # Padrão A wrapper, Tier 1 (validated 2026-05-24, +6.0 mean lift, 3/3 pass)
+    skill_client_facing: dario-wp-audit-polished
     reports_to: dir-technical
     capabilities:
     - wordpress_audit
@@ -1340,7 +1340,7 @@ workers:
   worker-financial-model:
     type: worker
     skill: dario-financial-model
-    skill_client_facing: dario-financial-model-polished  # Padrão A wrapper, Tier 1 BEST LIFT (validated 2026-05-24, +8.0 mean lift, math-strict gate)
+    skill_client_facing: dario-financial-model-polished
     reports_to: dir-agency-finance
     capabilities:
     - pl_forecast
@@ -1367,7 +1367,6 @@ workers:
     - ltv_cac
     - nrr
     - unit_economics
-  # === CFO DIFFERENTIATORS (3 novos — Wave 3) ===
   worker-cfo-agency-pnl:
     type: worker
     skill: cfo-agency-pnl
@@ -1381,7 +1380,7 @@ workers:
     watches:
     - lucas-quality
     - lucas-finance
-    watch_condition: "always"
+    watch_condition: always
   worker-cfo-token-roi:
     type: worker
     skill: cfo-token-roi
@@ -1880,13 +1879,15 @@ workers:
     - client_profitability
     - tax_calendar_alerts
     - atcud_qr_saft
-  # === CONTABILIDADE PT (18 workers) ===
   worker-conta-facturacao:
     type: worker
     skill: conta-facturacao
     reports_to: dir-accounting
     security_tier: 3
-    allowed_tools: [Read, Write, Edit]
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
     output_schema: conta-facturacao
     validator: pt_validators.py
     capabilities:
@@ -1901,7 +1902,10 @@ workers:
     skill: conta-iva
     reports_to: dir-accounting
     security_tier: 2
-    allowed_tools: [Read, Grep, Glob]
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
     output_schema: conta-iva
     validator: pt_validators.py
     capabilities:
@@ -1916,7 +1920,10 @@ workers:
     skill: conta-irc
     reports_to: dir-accounting
     security_tier: 2
-    allowed_tools: [Read, Grep, Glob]
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
     output_schema: conta-irc
     validator: pt_validators.py
     capabilities:
@@ -1931,7 +1938,10 @@ workers:
     skill: conta-irs
     reports_to: dir-accounting
     security_tier: 2
-    allowed_tools: [Read, Grep, Glob]
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
     validator: pt_validators.py
     capabilities:
     - withholding_categories
@@ -1944,7 +1954,10 @@ workers:
     skill: conta-ss
     reports_to: dir-accounting
     security_tier: 2
-    allowed_tools: [Read, Grep, Glob]
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
     capabilities:
     - employer_contributions
     - employee_contributions
@@ -1957,7 +1970,10 @@ workers:
     skill: conta-payroll
     reports_to: dir-accounting
     security_tier: 2
-    allowed_tools: [Read, Grep, Glob]
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
     output_schema: conta-payroll
     validator: pt_validators.py
     capabilities:
@@ -1972,7 +1988,10 @@ workers:
     skill: conta-lancamentos
     reports_to: dir-accounting
     security_tier: 3
-    allowed_tools: [Read, Write, Edit]
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
     validator: pt_validators.py
     capabilities:
     - double_entry
@@ -1986,7 +2005,9 @@ workers:
     skill: conta-conciliacao
     reports_to: dir-accounting
     security_tier: 1
-    allowed_tools: [Read, Grep]
+    allowed_tools:
+    - Read
+    - Grep
     output_schema: conta-conciliacao
     validator: pt_validators.py
     capabilities:
@@ -1999,7 +2020,10 @@ workers:
     skill: conta-plano
     reports_to: dir-accounting
     security_tier: 3
-    allowed_tools: [Read, Write, Edit]
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
     validator: pt_validators.py
     capabilities:
     - snc_chart_of_accounts
@@ -2011,7 +2035,9 @@ workers:
     skill: conta-ap
     reports_to: dir-accounting
     security_tier: 1
-    allowed_tools: [Read, Grep]
+    allowed_tools:
+    - Read
+    - Grep
     validator: pt_validators.py
     capabilities:
     - three_way_match
@@ -2063,7 +2089,10 @@ workers:
     skill: conta-relatorios
     reports_to: dir-accounting
     security_tier: 3
-    allowed_tools: [Read, Write, Edit]
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
     output_schema: conta-relatorios
     validator: pt_validators.py
     capabilities:
@@ -2087,7 +2116,10 @@ workers:
     skill: conta-encerramento
     reports_to: dir-accounting
     security_tier: 3
-    allowed_tools: [Read, Write, Edit]
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
     validator: pt_validators.py
     capabilities:
     - closing_checklist
@@ -2101,20 +2133,23 @@ workers:
     skill: conta-auditoria
     reports_to: dir-accounting
     security_tier: 1
-    allowed_tools: [Read, Grep]
+    allowed_tools:
+    - Read
+    - Grep
     capabilities:
     - dossier_fiscal
     - working_papers
     - management_letter
     - roc_procedures
     - internal_controls
-  # === RISCO & COMPLIANCE (14 workers) ===
   worker-risco-rgpd:
     type: worker
     skill: risco-rgpd
     reports_to: dir-risk
     security_tier: 1
-    allowed_tools: [Read, Grep]
+    allowed_tools:
+    - Read
+    - Grep
     capabilities:
     - data_mapping
     - dpia
@@ -2128,7 +2163,9 @@ workers:
     skill: risco-aml
     reports_to: dir-risk
     security_tier: 1
-    allowed_tools: [Read, Grep]
+    allowed_tools:
+    - Read
+    - Grep
     capabilities:
     - customer_due_diligence
     - pep_screening
@@ -2139,7 +2176,10 @@ workers:
     skill: risco-matrix
     reports_to: dir-risk
     security_tier: 2
-    allowed_tools: [Read, Grep, Glob]
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
     capabilities:
     - likelihood_impact_scoring
     - heat_map
@@ -2160,7 +2200,10 @@ workers:
     skill: risco-esg
     reports_to: dir-risk
     security_tier: 2
-    allowed_tools: [Read, Grep, Glob]
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
     capabilities:
     - csrd_compliance
     - eu_taxonomy
@@ -2182,7 +2225,10 @@ workers:
     skill: risco-whistleblowing
     reports_to: dir-risk
     security_tier: 3
-    allowed_tools: [Read, Write, Edit]
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
     capabilities:
     - dl_93_2021
     - internal_reporting_channel
@@ -2201,7 +2247,10 @@ workers:
     skill: risco-etica
     reports_to: dir-risk
     security_tier: 3
-    allowed_tools: [Read, Write, Edit]
+    allowed_tools:
+    - Read
+    - Write
+    - Edit
     capabilities:
     - code_of_conduct
     - conflict_of_interest
@@ -2230,7 +2279,9 @@ workers:
     skill: risco-terceiros
     reports_to: dir-risk
     security_tier: 1
-    allowed_tools: [Read, Grep]
+    allowed_tools:
+    - Read
+    - Grep
     capabilities:
     - vendor_due_diligence
     - supply_chain_risk
@@ -2241,7 +2292,10 @@ workers:
     skill: risco-reporting
     reports_to: dir-risk
     security_tier: 2
-    allowed_tools: [Read, Grep, Glob]
+    allowed_tools:
+    - Read
+    - Grep
+    - Glob
     capabilities:
     - kri_dashboards
     - incident_log
@@ -2258,7 +2312,6 @@ workers:
     - findings_documentation
     - management_response
     - follow_up_tracking
-  # === BUILDER WORKERS (Sprint 1) ===
   worker-builder-design-system:
     type: worker
     skill: builder-design-system
@@ -2288,47 +2341,46 @@ workers:
     - user_flow
     - sitemap
     - page_structure
-  # === DESIGN INTELLIGENCE WORKERS (added 2026-05-26 v12.1) ===
   worker-ui-ux-pro-max:
     type: worker
     skill: ui-ux-pro-max:ui-ux-pro-max
     reports_to: dir-design-visual
-    layer: reference_db   # not a generator — feeds upstream catalogs
+    layer: reference_db
     capabilities:
-    - ui_styles_catalog          # 67 styles: glassmorphism, brutalism, bento, etc.
-    - industry_color_palettes    # 161 palettes by product category
-    - font_pairings              # 57 Google Fonts curated combos
-    - chart_recommendations      # 25 chart types for dashboards
-    - product_type_matching      # 161 product types → style/palette suggestions
-    - ux_guidelines              # 99 best practices + anti-patterns
-    - multi_stack_support        # React, Next, Vue, Svelte, SwiftUI, Flutter, RN, etc.
+    - ui_styles_catalog
+    - industry_color_palettes
+    - font_pairings
+    - chart_recommendations
+    - product_type_matching
+    - ux_guidelines
+    - multi_stack_support
     integrations:
-    - shadcn_ui_mcp              # component search + examples
+    - shadcn_ui_mcp
   worker-emil-design-eng:
     type: worker
     skill: emil-design-eng
     reports_to: dir-design-visual
-    layer: decision_framework    # not a generator — informs builders
+    layer: decision_framework
     capabilities:
-    - animation_decision_framework  # should this animate? frequency-based
-    - easing_rules                  # ease-out enter/exit, never ease-in
-    - duration_guidelines           # button 100-160ms, modal 200-500ms
-    - component_polish_principles   # scale(0.97) active, origin-aware popovers
-    - css_transform_mastery         # 3D, clip-path, GPU rules
-    - performance_animation_rules   # only transform+opacity, GPU-accelerated
-    - prefers_reduced_motion        # a11y gating
-    - before_after_why_review       # mandatory review format
+    - animation_decision_framework
+    - easing_rules
+    - duration_guidelines
+    - component_polish_principles
+    - css_transform_mastery
+    - performance_animation_rules
+    - prefers_reduced_motion
+    - before_after_why_review
   worker-dario-design-shotgun:
     type: worker
     skill: dario-design-shotgun
     reports_to: dir-design-visual
-    layer: exploration              # generates N variants before single-shot
+    layer: exploration
     capabilities:
-    - multi_variant_generation      # 3-8 parallel design directions
-    - taste_profile_persistence     # 5%/week confidence decay
-    - comparison_board_html         # side-by-side iframes
-    - krug_ux_principles            # Three Laws of Usability
-    - conflict_aware_generation     # flags request vs taste-profile conflicts
+    - multi_variant_generation
+    - taste_profile_persistence
+    - comparison_board_html
+    - krug_ux_principles
+    - conflict_aware_generation
   worker-builder-landing-page:
     type: worker
     skill: builder-landing-page
@@ -2955,14 +3007,375 @@ routines:
     timezone: Europe/Lisbon
     action: Check all active projects for stale tasks, pending client responses, approaching deadlines
     concurrency: skip_if_active
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# LEX-BR — Agente Especialista em Direito Brasileiro (v1.0.0, 2026-05-19)
-# Cross-division agent paralelo a DIVA. Cobre 15 áreas do Direito BR.
-# Manifesto: ~/.claude/orchestrator/lex-br/manifesto.yaml
-# ═══════════════════════════════════════════════════════════════════════════
-
+mcp_servers_br:
+- name: mcp-jusbrasil
+  api: api.jusbrasil.com.br/docs
+  domain: jurisprudencia
+  status: planned
+  repo: github.com/dario-legal-br/mcp-jusbrasil
+  priority: critical
+- name: mcp-cnj-datajud
+  api: datajud-wiki.cnj.jus.br
+  domain: dados_processuais_oficiais
+  status: planned
+  repo: github.com/dario-legal-br/mcp-cnj-datajud
+  priority: critical
+- name: mcp-stf
+  api: STF RSS + decisoes APIs
+  domain: precedentes_supremo
+  status: planned
+  repo: github.com/dario-legal-br/mcp-stf
+  priority: high
+- name: mcp-diario-oficial
+  api: DOU + diarios estaduais (PDF parsing)
+  domain: alertas_legislativos
+  status: planned
+  repo: github.com/dario-legal-br/mcp-diario-oficial
+  priority: high
+- name: mcp-anpd
+  api: site ANPD (scrape estruturado)
+  domain: sancoes_lgpd_orientacoes
+  status: planned
+  repo: github.com/dario-legal-br/mcp-anpd
+  priority: medium
+- name: mcp-receita-federal
+  api: eCAC + Consulta CNPJ
+  domain: due_diligence_empresas
+  status: planned
+  repo: github.com/dario-legal-br/mcp-receita-federal
+  priority: medium
+- name: mcp-advbox
+  api: api.softwareadvbox.com.br/docs
+  domain: gestao_processual
+  status: planned
+  repo: github.com/dario-legal-br/mcp-advbox
+  priority: medium
+- name: mcp-projuris
+  api: projurishelp.atlassian.net
+  domain: gestao_processual
+  status: planned
+  repo: github.com/dario-legal-br/mcp-projuris
+  priority: medium
+prometheus_governance:
+  wave: 1
+  autonomy_tier: 0
+  green_list_auto_actions: []
+  yellow_list_post_review: []
+  red_list_always_user_approval:
+  - edit_any_skill
+  - edit_company_yaml
+  - edit_skill_chains_yaml
+  - delete_memory_entry
+  - push_to_repos
+  - modify_license_files
+  write_allowed_paths:
+  - ~/.claude/orchestrator/prometheus/digests/*.md
+  - ~/.claude/orchestrator/prometheus/state/*.yaml
+  read_only_paths_external:
+  - https://api.github.com/*
+  - https://export.arxiv.org/*
+  - https://www.anthropic.com/*
+  - https://dre.pt/*
+  - https://eur-lex.europa.eu/*
+  - https://www.gov.br/anpd/*
+workers_a360:
+  worker-a360-nicho:
+    id: worker-a360-nicho
+    skill: a360-nicho
+    reports_to: a360-director
+    phase: discovery
+  worker-a360-avatar:
+    id: worker-a360-avatar
+    skill: a360-avatar
+    reports_to: a360-director
+    phase: discovery
+  worker-a360-validacao:
+    id: worker-a360-validacao
+    skill: a360-validacao
+    reports_to: a360-director
+    phase: validation
+  worker-a360-modelo:
+    id: worker-a360-modelo
+    skill: a360-modelo
+    reports_to: a360-director
+    phase: validation
+  worker-a360-oferta:
+    id: worker-a360-oferta
+    skill: a360-oferta
+    reports_to: a360-director
+    phase: offer
+  worker-a360-funil:
+    id: worker-a360-funil
+    skill: a360-funil
+    reports_to: a360-director
+    phase: offer
+  worker-a360-lancamento:
+    id: worker-a360-lancamento
+    skill: a360-lancamento
+    reports_to: a360-director
+    phase: launch
+  worker-a360-pitch:
+    id: worker-a360-pitch
+    skill: a360-pitch
+    reports_to: a360-director
+    phase: launch
+  worker-a360-metricas:
+    id: worker-a360-metricas
+    skill: a360-metricas
+    reports_to: a360-director
+    phase: growth
+  worker-a360-growth:
+    id: worker-a360-growth
+    skill: a360-growth
+    reports_to: a360-director
+    phase: growth
+  worker-a360-scale:
+    id: worker-a360-scale
+    skill: a360-scale
+    reports_to: a360-director
+    phase: scale
+  worker-a360-case-study:
+    id: worker-a360-case-study
+    skill: a360-case-study
+    reports_to: a360-director
+    phase: scale
+squads_a360:
+  discovery:
+    workers:
+    - worker-a360-nicho
+    - worker-a360-avatar
+    description: Niche research + ICP definition
+  validation:
+    workers:
+    - worker-a360-validacao
+    - worker-a360-modelo
+    description: Smoke tests + business model design
+  offer:
+    workers:
+    - worker-a360-oferta
+    - worker-a360-funil
+    description: Grand Slam Offer + acquisition funnel
+  launch:
+    workers:
+    - worker-a360-lancamento
+    - worker-a360-pitch
+    - worker-a360-metricas
+    description: PLF sequence + pitch deck + baseline metrics
+  growth:
+    workers:
+    - worker-a360-metricas
+    - worker-a360-growth
+    - worker-a360-case-study
+    description: Growth engine + retention + portfolio proof
+  scale:
+    workers:
+    - worker-a360-scale
+    - worker-a360-growth
+    - worker-a360-metricas
+    description: 0-to-1M ARR roadmap
+dispatch_a360:
+  valida minha ideia:
+    chain: a360_pre_pmf
+    fallback: a360-validacao
+  tenho uma ideia:
+    chain: a360_pre_pmf
+  qual o mercado:
+    skill: a360-nicho
+  quem e meu cliente:
+    skill: a360-avatar
+  modelo de negocio:
+    skill: a360-modelo
+  grand slam offer:
+    skill: a360-oferta
+  constroi minha oferta:
+    chain: a360_offer_pack
+  funil de aquisicao:
+    skill: a360-funil
+  lancamento plf:
+    chain: a360_launch_pack
+  pitch deck:
+    skill: a360-pitch
+  dashboard metricas saas:
+    skill: a360-metricas
+  growth engine:
+    skill: a360-growth
+  escalar para 1m arr:
+    chain: a360_scale_pack
+  case study cliente:
+    skill: a360-case-study
+  a360 completo:
+    chain: a360_full_lifecycle
+  diagnostica meu negocio:
+    skill: a360-director
+  ajuda com o meu negocio:
+    skill: a360-director
+agents_acceleration:
+  a360-director:
+    id: a360-director
+    name: A360 Director
+    title: Business Acceleration Squad Lead
+    parent: dario-ceo
+    capabilities:
+    - diagnostic_routing
+    - lifecycle_phase_detection
+    - niche_research
+    - avatar_research
+    - idea_validation
+    - business_modeling
+    - offer_construction
+    - funnel_design
+    - launch_sequencing
+    - pitch_deck
+    - metrics_dashboard
+    - growth_engineering
+    - scaling_roadmap
+    - case_study_generation
+    compliance_required:
+    - audit_immutable
+    bundle_anchor: founder
+    license_tier_min: starter
+workers_atlas_fin:
+  worker-atlas-fin-ob-br:
+    id: worker-atlas-fin-ob-br
+    skill: atlas-fin-open-banking-br
+    reports_to: atlas-fin-director
+  worker-atlas-fin-pix:
+    id: worker-atlas-fin-pix
+    skill: atlas-fin-pix-rules-bcb
+    reports_to: atlas-fin-director
+  worker-atlas-fin-psd2:
+    id: worker-atlas-fin-psd2
+    skill: atlas-fin-psd2-eu
+    reports_to: atlas-fin-director
+  worker-atlas-fin-orch:
+    id: worker-atlas-fin-orch
+    skill: atlas-fin-payment-orchestration
+    reports_to: atlas-fin-director
+  worker-atlas-fin-fraud:
+    id: worker-atlas-fin-fraud
+    skill: atlas-fin-fraud-prevention
+    reports_to: atlas-fin-director
+  worker-atlas-fin-cb:
+    id: worker-atlas-fin-cb
+    skill: atlas-fin-chargeback-management
+    reports_to: atlas-fin-director
+  worker-atlas-fin-kyc:
+    id: worker-atlas-fin-kyc
+    skill: atlas-fin-kyc-onboarding
+    reports_to: atlas-fin-director
+  worker-atlas-fin-aml:
+    id: worker-atlas-fin-aml
+    skill: atlas-fin-aml-monitoring
+    reports_to: atlas-fin-director
+  worker-atlas-fin-sanctions:
+    id: worker-atlas-fin-sanctions
+    skill: atlas-fin-sanctions-screening
+    reports_to: atlas-fin-director
+  worker-atlas-fin-fx:
+    id: worker-atlas-fin-fx
+    skill: atlas-fin-foreign-exchange
+    reports_to: atlas-fin-director
+  worker-atlas-fin-instant:
+    id: worker-atlas-fin-instant
+    skill: atlas-fin-instant-payments
+    reports_to: atlas-fin-director
+  worker-atlas-fin-baas:
+    id: worker-atlas-fin-baas
+    skill: atlas-fin-banking-as-a-service
+    reports_to: atlas-fin-director
+  worker-atlas-fin-embed:
+    id: worker-atlas-fin-embed
+    skill: atlas-fin-embedded-finance
+    reports_to: atlas-fin-director
+  worker-atlas-fin-bcb:
+    id: worker-atlas-fin-bcb
+    skill: atlas-fin-regulatory-reporting-bcb
+    reports_to: atlas-fin-director
+  worker-atlas-fin-lgpd:
+    id: worker-atlas-fin-lgpd
+    skill: atlas-fin-lgpd-financial
+    reports_to: atlas-fin-director
+squads_atlas_fin:
+  open_banking_full:
+    workers:
+    - worker-atlas-fin-ob-br
+    - worker-atlas-fin-psd2
+    - worker-atlas-fin-instant
+    - worker-atlas-fin-pix
+  payments_ops:
+    workers:
+    - worker-atlas-fin-orch
+    - worker-atlas-fin-fraud
+    - worker-atlas-fin-cb
+    - worker-atlas-fin-fx
+  kyc_aml_full:
+    workers:
+    - worker-atlas-fin-kyc
+    - worker-atlas-fin-aml
+    - worker-atlas-fin-sanctions
+    - worker-atlas-fin-lgpd
+  baas_embedded:
+    workers:
+    - worker-atlas-fin-baas
+    - worker-atlas-fin-embed
+    - worker-atlas-fin-bcb
+agents_fintech:
+  atlas_fin_director:
+    id: atlas-fin-director
+    name: ATLAS-FIN
+    title: Fintech Services Squad Lead
+    parent: dario-ceo
+    jurisdiction: Brasil + EU
+    capabilities:
+    - open_banking_br
+    - pix_rules_bcb
+    - psd2_eu
+    - payment_orchestration
+    - fraud_prevention
+    - chargeback_management
+    - kyc_onboarding
+    - aml_monitoring
+    - sanctions_screening
+    - foreign_exchange
+    - instant_payments
+    - banking_as_a_service
+    - embedded_finance
+    - regulatory_reporting_bcb
+    - lgpd_financial
+    compliance_required:
+    - bcb_compliance_gate
+    - ecb_compliance_gate
+    - audit_immutable
+    - pci_dss_scope
+    - sanctions_realtime
+agents_knowledge:
+  obsidian_director:
+    id: obsidian-director
+    name: OBSIDIAN-CORP
+    title: Knowledge Graph Squad Lead
+    type: domain_specialist
+    adapter: obsidian-agent
+    parent: dario-ceo
+    capabilities:
+    - knowledge_graph_design
+    - second_brain
+    - atomic_notes
+    - moc_design
+    - para_organization
+    - zettelkasten
+    - rag_corpus
+    - taxonomy
+    - ontology
+    - search_relevance
+    - semantic_search
+    - embedding_models
+    - kb_curation
+    - cross_referencing
+    - knowledge_compaction
+    compliance_required:
+    - data_classification
+    - access_control
+    - audit_trail
 agents_legal:
   lex_br_director:
     id: lex-br-director
@@ -2972,31 +3385,29 @@ agents_legal:
     adapter: lex-br-agent
     parent: dario-ceo
     capabilities:
-      - direito_civil_br
-      - direito_empresarial_br
-      - direito_trabalhista_br
-      - direito_tributario_br
-      - direito_consumidor_br
-      - lgpd_compliance
-      - ai_governance_legal
-      - direito_administrativo_br
-      - direito_imobiliario_br
-      - direito_familia_br
-      - direito_criminal_br
-      - propriedade_intelectual_br
-      - direito_regulatorio_br
-      - litigation_strategy_br
-      - oab_205_compliance
-      - audit_trail_juridico
+    - direito_civil_br
+    - direito_empresarial_br
+    - direito_trabalhista_br
+    - direito_tributario_br
+    - direito_consumidor_br
+    - lgpd_compliance
+    - ai_governance_legal
+    - direito_administrativo_br
+    - direito_imobiliario_br
+    - direito_familia_br
+    - direito_criminal_br
+    - propriedade_intelectual_br
+    - direito_regulatorio_br
+    - litigation_strategy_br
+    - oab_205_compliance
+    - audit_trail_juridico
     jurisdiction: Brasil
     language: pt-br-formal
     compliance_required:
-      - oab_provimento_205_2021
-      - lgpd_lei_13709_18
-      - zdr_zero_data_retention
-      - sigilo_profissional_eoab_36
-
-# 15 LEX skills (paralelas aos 12 plugins Anthropic, mas BR-native)
+    - oab_provimento_205_2021
+    - lgpd_lei_13709_18
+    - zdr_zero_data_retention
+    - sigilo_profissional_eoab_36
 workers_lex:
   worker-lex-civil:
     id: worker-lex-civil
@@ -3004,637 +3415,453 @@ workers_lex:
     reports_to: lex-br-director
     security_tier: 3
     domain: civil
-    legislation_primary: [CC/2002, Lei 10.406/02]
-
+    legislation_primary:
+    - CC/2002
+    - Lei 10.406/02
   worker-lex-commercial:
     id: worker-lex-commercial
     skill: lex-commercial
     reports_to: lex-br-director
     security_tier: 3
     domain: empresarial
-    legislation_primary: [CC livro II, Lei 8.955/94, Lei 13.874/19]
-
+    legislation_primary:
+    - CC livro II
+    - Lei 8.955/94
+    - Lei 13.874/19
   worker-lex-corporate:
     id: worker-lex-corporate
     skill: lex-corporate
     reports_to: lex-br-director
     security_tier: 2
     domain: societario_ma
-    legislation_primary: [Lei 6.404/76, CC livro II, CVM regulamentos]
-
+    legislation_primary:
+    - Lei 6.404/76
+    - CC livro II
+    - CVM regulamentos
   worker-lex-trabalhista:
     id: worker-lex-trabalhista
     skill: lex-trabalhista
     reports_to: lex-br-director
     security_tier: 3
     domain: trabalhista
-    legislation_primary: [CLT, Lei 13.467/17, Sumulas TST]
-
+    legislation_primary:
+    - CLT
+    - Lei 13.467/17
+    - Sumulas TST
   worker-lex-tributario:
     id: worker-lex-tributario
     skill: lex-tributario
     reports_to: lex-br-director
     security_tier: 2
     domain: tributario
-    legislation_primary: [CTN, EC 132/2023, LC 116/03]
-
+    legislation_primary:
+    - CTN
+    - EC 132/2023
+    - LC 116/03
   worker-lex-lgpd:
     id: worker-lex-lgpd
     skill: lex-lgpd
     reports_to: lex-br-director
     security_tier: 2
     domain: protecao_dados
-    legislation_primary: [Lei 13.709/18, Resoluções ANPD, GDPR (comparativo)]
-
+    legislation_primary:
+    - Lei 13.709/18
+    - Resoluções ANPD
+    - GDPR (comparativo)
   worker-lex-regulatorio:
     id: worker-lex-regulatorio
     skill: lex-regulatorio
     reports_to: lex-br-director
     security_tier: 2
     domain: regulatorio_setorial
-    legislation_primary: [BACEN, CVM, ANVISA, ANATEL, ANEEL, ANP, ANS]
-
+    legislation_primary:
+    - BACEN
+    - CVM
+    - ANVISA
+    - ANATEL
+    - ANEEL
+    - ANP
+    - ANS
   worker-lex-ai-governance:
     id: worker-lex-ai-governance
     skill: lex-ai-governance
     reports_to: lex-br-director
     security_tier: 2
     domain: ia_governance
-    legislation_primary: [PL 2338/2023, Lei 13.709/18, regulamentos UE comparativo]
-
+    legislation_primary:
+    - PL 2338/2023
+    - Lei 13.709/18
+    - regulamentos UE comparativo
   worker-lex-ip:
     id: worker-lex-ip
     skill: lex-ip
     reports_to: lex-br-director
     security_tier: 3
     domain: propriedade_intelectual
-    legislation_primary: [Lei 9.279/96, Lei 9.609/98, Lei 9.610/98]
-
+    legislation_primary:
+    - Lei 9.279/96
+    - Lei 9.609/98
+    - Lei 9.610/98
   worker-lex-litigation:
     id: worker-lex-litigation
     skill: lex-litigation
     reports_to: lex-br-director
     security_tier: 2
     domain: contencioso_civel
-    legislation_primary: [CPC/2015, Sumulas STJ, Sumulas STF]
-
+    legislation_primary:
+    - CPC/2015
+    - Sumulas STJ
+    - Sumulas STF
   worker-lex-consumidor:
     id: worker-lex-consumidor
     skill: lex-consumidor
     reports_to: lex-br-director
     security_tier: 3
     domain: consumo
-    legislation_primary: [CDC Lei 8.078/90, Decreto 7.962/13]
-
+    legislation_primary:
+    - CDC Lei 8.078/90
+    - Decreto 7.962/13
   worker-lex-administrativo:
     id: worker-lex-administrativo
     skill: lex-administrativo
     reports_to: lex-br-director
     security_tier: 2
     domain: administrativo
-    legislation_primary: [Lei 14.133/21, Lei 8.987/95, Lei 9.784/99]
-
+    legislation_primary:
+    - Lei 14.133/21
+    - Lei 8.987/95
+    - Lei 9.784/99
   worker-lex-imobiliario:
     id: worker-lex-imobiliario
     skill: lex-imobiliario
     reports_to: lex-br-director
     security_tier: 3
     domain: imobiliario
-    legislation_primary: [Lei 8.245/91, Lei 4.591/64, Lei 6.766/79]
-
+    legislation_primary:
+    - Lei 8.245/91
+    - Lei 4.591/64
+    - Lei 6.766/79
   worker-lex-familia:
     id: worker-lex-familia
     skill: lex-familia
     reports_to: lex-br-director
     security_tier: 2
     domain: familia_sucessoes
-    legislation_primary: [CC livro IV, Lei 5.478/68, Lei 11.340/06]
-
+    legislation_primary:
+    - CC livro IV
+    - Lei 5.478/68
+    - Lei 11.340/06
   worker-lex-criminal:
     id: worker-lex-criminal
     skill: lex-criminal
     reports_to: lex-br-director
     security_tier: 1
     domain: criminal
-    legislation_primary: [CP, CPP, Lei 13.964/19 (Anticrime), Lei 9.099/95]
-
-# Squads jurídicos (multi-skill chains)
+    legislation_primary:
+    - CP
+    - CPP
+    - Lei 13.964/19 (Anticrime)
+    - Lei 9.099/95
 squads_lex:
   contrato_completo:
-    description: "Análise + negociação + revisão final de contrato"
-    workers: [worker-lex-commercial, worker-lex-lgpd, worker-lex-civil]
-    chain_skill_order: [lex-commercial, lex-lgpd, lex-civil]
-
+    description: Análise + negociação + revisão final de contrato
+    workers:
+    - worker-lex-commercial
+    - worker-lex-lgpd
+    - worker-lex-civil
+    chain_skill_order:
+    - lex-commercial
+    - lex-lgpd
+    - lex-civil
   due_diligence_ma:
-    description: "Due diligence corporate completa"
-    workers: [worker-lex-corporate, worker-lex-tributario, worker-lex-trabalhista, worker-lex-lgpd, worker-lex-regulatorio]
-    chain_skill_order: [lex-corporate, lex-tributario, lex-trabalhista, lex-lgpd, lex-regulatorio]
-
+    description: Due diligence corporate completa
+    workers:
+    - worker-lex-corporate
+    - worker-lex-tributario
+    - worker-lex-trabalhista
+    - worker-lex-lgpd
+    - worker-lex-regulatorio
+    chain_skill_order:
+    - lex-corporate
+    - lex-tributario
+    - lex-trabalhista
+    - lex-lgpd
+    - lex-regulatorio
   lgpd_compliance_full:
-    description: "Programa LGPD end-to-end (RIPD + política + DPA + DSR)"
-    workers: [worker-lex-lgpd, worker-lex-commercial]
-    chain_skill_order: [lex-lgpd, lex-commercial]
-
+    description: Programa LGPD end-to-end (RIPD + política + DPA + DSR)
+    workers:
+    - worker-lex-lgpd
+    - worker-lex-commercial
+    chain_skill_order:
+    - lex-lgpd
+    - lex-commercial
   reclamacao_trabalhista_defesa:
-    description: "Defesa empresa em reclamação trabalhista"
-    workers: [worker-lex-trabalhista, worker-lex-litigation]
-    chain_skill_order: [lex-trabalhista, lex-litigation]
-
+    description: Defesa empresa em reclamação trabalhista
+    workers:
+    - worker-lex-trabalhista
+    - worker-lex-litigation
+    chain_skill_order:
+    - lex-trabalhista
+    - lex-litigation
   consumidor_recall:
-    description: "Recall + comunicação consumidor + defesa em ações"
-    workers: [worker-lex-consumidor, worker-lex-regulatorio, worker-lex-litigation]
-    chain_skill_order: [lex-consumidor, lex-regulatorio, lex-litigation]
-
-# MCP Connectors BR-native (a desenvolver — open-source dario-legal-br/*)
-mcp_servers_br:
-  - name: mcp-jusbrasil
-    api: api.jusbrasil.com.br/docs
-    domain: jurisprudencia
-    status: planned
-    repo: github.com/dario-legal-br/mcp-jusbrasil
-    priority: critical
-
-  - name: mcp-cnj-datajud
-    api: datajud-wiki.cnj.jus.br
-    domain: dados_processuais_oficiais
-    status: planned
-    repo: github.com/dario-legal-br/mcp-cnj-datajud
-    priority: critical
-
-  - name: mcp-stf
-    api: STF RSS + decisoes APIs
-    domain: precedentes_supremo
-    status: planned
-    repo: github.com/dario-legal-br/mcp-stf
-    priority: high
-
-  - name: mcp-diario-oficial
-    api: DOU + diarios estaduais (PDF parsing)
-    domain: alertas_legislativos
-    status: planned
-    repo: github.com/dario-legal-br/mcp-diario-oficial
-    priority: high
-
-  - name: mcp-anpd
-    api: site ANPD (scrape estruturado)
-    domain: sancoes_lgpd_orientacoes
-    status: planned
-    repo: github.com/dario-legal-br/mcp-anpd
-    priority: medium
-
-  - name: mcp-receita-federal
-    api: eCAC + Consulta CNPJ
-    domain: due_diligence_empresas
-    status: planned
-    repo: github.com/dario-legal-br/mcp-receita-federal
-    priority: medium
-
-  - name: mcp-advbox
-    api: api.softwareadvbox.com.br/docs
-    domain: gestao_processual
-    status: planned
-    repo: github.com/dario-legal-br/mcp-advbox
-    priority: medium
-
-  - name: mcp-projuris
-    api: projurishelp.atlassian.net
-    domain: gestao_processual
-    status: planned
-    repo: github.com/dario-legal-br/mcp-projuris
-    priority: medium
-
-# ═══════════════════════════════════════════════════════════════════════════
-# DEMETER — Data Engineering & Analytics Squad (v1.0.0, 2026-05-19)
-# 15 skills de data engineering profissional. Eleva todos os outros squads.
-# Manifesto: ~/.claude/orchestrator/demeter/manifesto.yaml
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_data:
-  demeter_director:
-    id: demeter-director
-    name: D.E.M.E.T.E.R.
-    title: Data Engineering Squad Lead
-    type: domain_specialist
-    adapter: demeter-agent
+    description: Recall + comunicação consumidor + defesa em ações
+    workers:
+    - worker-lex-consumidor
+    - worker-lex-regulatorio
+    - worker-lex-litigation
+    chain_skill_order:
+    - lex-consumidor
+    - lex-regulatorio
+    - lex-litigation
+agents_meta_evolution:
+  prometheus-director:
+    id: prometheus-director
+    name: PROMETHEUS Director
+    title: External Knowledge & Evolution Squad Lead
     parent: dario-ceo
     capabilities:
-      - etl_pipelines
-      - data_warehousing
-      - bi_dashboards
-      - data_quality
-      - ml_pipelines
-      - ab_testing_rigor
-      - cohort_analysis
-      - predictive_analytics
-      - realtime_streaming
-      - data_catalog_governance
-      - dataops
-      - dbt_expert
-      - metrics_layer
-      - event_tracking
-      - data_storytelling
-    language: pt-br-en
+    - external_monitoring
+    - repo_scanning
+    - mcp_discovery
+    - paper_tracking
+    - regulatory_watch
+    - signal_filtering
+    - weekly_digest
+    - change_impact_analysis
     compliance_required:
-      - lgpd_by_design
-      - pii_detection_anonimization
-      - data_lineage_tracking
-
-workers_demeter:
-  worker-demeter-etl:
-    id: worker-demeter-etl
-    skill: demeter-etl
-    reports_to: demeter-director
-    security_tier: 2
-  worker-demeter-warehouse:
-    id: worker-demeter-warehouse
-    skill: demeter-warehouse
-    reports_to: demeter-director
-    security_tier: 2
-  worker-demeter-bi-dashboard:
-    id: worker-demeter-bi-dashboard
-    skill: demeter-bi-dashboard
-    reports_to: demeter-director
-    security_tier: 3
-  worker-demeter-data-quality:
-    id: worker-demeter-data-quality
-    skill: demeter-data-quality
-    reports_to: demeter-director
-    security_tier: 2
-  worker-demeter-ml-pipelines:
-    id: worker-demeter-ml-pipelines
-    skill: demeter-ml-pipelines
-    reports_to: demeter-director
-    security_tier: 2
-  worker-demeter-ab-testing:
-    id: worker-demeter-ab-testing
-    skill: demeter-ab-testing
-    reports_to: demeter-director
-    security_tier: 3
-  worker-demeter-cohort-analysis:
-    id: worker-demeter-cohort-analysis
-    skill: demeter-cohort-analysis
-    reports_to: demeter-director
-    security_tier: 3
-  worker-demeter-predictive:
-    id: worker-demeter-predictive
-    skill: demeter-predictive
-    reports_to: demeter-director
-    security_tier: 2
-  worker-demeter-realtime-streaming:
-    id: worker-demeter-realtime-streaming
-    skill: demeter-realtime-streaming
-    reports_to: demeter-director
-    security_tier: 2
-  worker-demeter-data-catalog:
-    id: worker-demeter-data-catalog
-    skill: demeter-data-catalog
-    reports_to: demeter-director
-    security_tier: 3
-  worker-demeter-dataops:
-    id: worker-demeter-dataops
-    skill: demeter-dataops
-    reports_to: demeter-director
-    security_tier: 2
-  worker-demeter-dbt-workflows:
-    id: worker-demeter-dbt-workflows
-    skill: demeter-dbt-workflows
-    reports_to: demeter-director
-    security_tier: 2
-  worker-demeter-metrics-layer:
-    id: worker-demeter-metrics-layer
-    skill: demeter-metrics-layer
-    reports_to: demeter-director
-    security_tier: 2
-  worker-demeter-event-tracking:
-    id: worker-demeter-event-tracking
-    skill: demeter-event-tracking
-    reports_to: demeter-director
-    security_tier: 2
-  worker-demeter-data-storytelling:
-    id: worker-demeter-data-storytelling
-    skill: demeter-data-storytelling
-    reports_to: demeter-director
-    security_tier: 3
-
-squads_demeter:
-  full_analytics_stack:
-    description: "Stack analytics completo: data warehouse → dbt → BI dashboard"
-    workers: [worker-demeter-warehouse, worker-demeter-dbt-workflows, worker-demeter-metrics-layer, worker-demeter-bi-dashboard]
-  ab_testing_program:
-    description: "A/B testing rigoroso end-to-end"
-    workers: [worker-demeter-event-tracking, worker-demeter-ab-testing, worker-demeter-cohort-analysis, worker-demeter-data-storytelling]
-  ml_production:
-    description: "ML em produção: data → pipeline → model → monitoring"
-    workers: [worker-demeter-warehouse, worker-demeter-data-quality, worker-demeter-ml-pipelines, worker-demeter-predictive, worker-demeter-dataops]
-
-# ═══════════════════════════════════════════════════════════════════════════
-# ORION — Product Excellence Squad (v1.0.0, 2026-05-19)
-# 15 skills product management. Eleva agências/SaaS para outcome-driven.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_product:
-  orion_director:
-    id: orion-director
-    name: O.R.I.O.N.
-    title: Product Excellence Squad Lead
-    type: domain_specialist
-    adapter: orion-agent
-    parent: dario-ceo
-    capabilities: [product_strategy, product_discovery, prd_writing, user_research,
-      jobs_to_be_done, product_analytics, roadmap_planning, prioritization,
-      feature_flags, beta_program, product_launch, growth_product,
-      retention_engineering, pricing_strategy, product_ops]
-    language: en-pt-pt-br
-    compliance_required: [data_privacy_by_design, user_consent_explicit, no_dark_patterns]
-
-workers_orion:
-  worker-orion-strategy: {id: worker-orion-strategy, skill: orion-product-strategy, reports_to: orion-director}
-  worker-orion-discovery: {id: worker-orion-discovery, skill: orion-product-discovery, reports_to: orion-director}
-  worker-orion-prd: {id: worker-orion-prd, skill: orion-prd-writing, reports_to: orion-director}
-  worker-orion-research: {id: worker-orion-research, skill: orion-user-research, reports_to: orion-director}
-  worker-orion-jtbd: {id: worker-orion-jtbd, skill: orion-jobs-to-be-done, reports_to: orion-director}
-  worker-orion-analytics: {id: worker-orion-analytics, skill: orion-product-analytics, reports_to: orion-director}
-  worker-orion-roadmap: {id: worker-orion-roadmap, skill: orion-roadmap-planning, reports_to: orion-director}
-  worker-orion-prio: {id: worker-orion-prio, skill: orion-prioritization, reports_to: orion-director}
-  worker-orion-flags: {id: worker-orion-flags, skill: orion-feature-flags, reports_to: orion-director}
-  worker-orion-beta: {id: worker-orion-beta, skill: orion-beta-program, reports_to: orion-director}
-  worker-orion-launch: {id: worker-orion-launch, skill: orion-product-launch, reports_to: orion-director}
-  worker-orion-growth: {id: worker-orion-growth, skill: orion-growth-product, reports_to: orion-director}
-  worker-orion-retention: {id: worker-orion-retention, skill: orion-retention-engineering, reports_to: orion-director}
-  worker-orion-pricing: {id: worker-orion-pricing, skill: orion-pricing-strategy, reports_to: orion-director}
-  worker-orion-ops: {id: worker-orion-ops, skill: orion-product-ops, reports_to: orion-director}
-
-squads_orion:
-  product_discovery_to_launch:
-    workers: [worker-orion-discovery, worker-orion-jtbd, worker-orion-research, worker-orion-prd, worker-orion-launch]
-  product_strategy_planning:
-    workers: [worker-orion-strategy, worker-orion-roadmap, worker-orion-prio, worker-orion-pricing]
-  product_growth_retention:
-    workers: [worker-orion-analytics, worker-orion-growth, worker-orion-retention, worker-orion-flags]
-
-# ═══════════════════════════════════════════════════════════════════════════
-# OBSIDIAN-CORP — Knowledge Graph Squad (v1.0.0, 2026-05-19)
-# 15 skills knowledge management, RAG engineering, semantic search.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_knowledge:
-  obsidian_director:
-    id: obsidian-director
-    name: OBSIDIAN-CORP
-    title: Knowledge Graph Squad Lead
-    type: domain_specialist
-    adapter: obsidian-agent
-    parent: dario-ceo
-    capabilities: [knowledge_graph_design, second_brain, atomic_notes, moc_design,
-      para_organization, zettelkasten, rag_corpus, taxonomy, ontology,
-      search_relevance, semantic_search, embedding_models,
-      kb_curation, cross_referencing, knowledge_compaction]
-    compliance_required: [data_classification, access_control, audit_trail]
-
+    - audit_immutable
+    - responsible_disclosure
+    - regulatory_tracking
+    autonomy_tier: 0
+    no_auto_action: true
+workers_nomos:
+  worker-nomos-cmvm:
+    id: worker-nomos-cmvm
+    skill: nomos-cmvm-compliance
+    reports_to: nomos-director
+  worker-nomos-bdp:
+    id: worker-nomos-bdp
+    skill: nomos-bdp-banking-pt
+    reports_to: nomos-director
+  worker-nomos-asae:
+    id: worker-nomos-asae
+    skill: nomos-asae-food-safety
+    reports_to: nomos-director
+  worker-nomos-acss:
+    id: worker-nomos-acss
+    skill: nomos-acss-healthcare-pt
+    reports_to: nomos-director
+  worker-nomos-rgpd:
+    id: worker-nomos-rgpd
+    skill: nomos-rgpd-pt-marker
+    reports_to: nomos-director
+  worker-nomos-igac:
+    id: worker-nomos-igac
+    skill: nomos-igac-events-pt
+    reports_to: nomos-director
+  worker-nomos-anac:
+    id: worker-nomos-anac
+    skill: nomos-anac-aviation-pt
+    reports_to: nomos-director
+  worker-nomos-adc:
+    id: worker-nomos-adc
+    skill: nomos-concorrencia-pt
+    reports_to: nomos-director
+  worker-nomos-ai-act:
+    id: worker-nomos-ai-act
+    skill: nomos-eu-ai-act-pt
+    reports_to: nomos-director
+  worker-nomos-dora:
+    id: worker-nomos-dora
+    skill: nomos-dora-resilience
+    reports_to: nomos-director
+  worker-nomos-mifid:
+    id: worker-nomos-mifid
+    skill: nomos-mifid-ii-pt
+    reports_to: nomos-director
+  worker-nomos-psd2:
+    id: worker-nomos-psd2
+    skill: nomos-psd2-open-banking-pt
+    reports_to: nomos-director
+  worker-nomos-fraude:
+    id: worker-nomos-fraude
+    skill: nomos-anti-fraude-pt
+    reports_to: nomos-director
+  worker-nomos-aml:
+    id: worker-nomos-aml
+    skill: nomos-kyc-aml-pt
+    reports_to: nomos-director
+  worker-nomos-digital:
+    id: worker-nomos-digital
+    skill: nomos-dl-79-2024-digital
+    reports_to: nomos-director
+squads_nomos:
+  banking_finance_pt:
+    workers:
+    - worker-nomos-bdp
+    - worker-nomos-mifid
+    - worker-nomos-psd2
+    - worker-nomos-dora
+  capital_markets_pt:
+    workers:
+    - worker-nomos-cmvm
+    - worker-nomos-adc
+    - worker-nomos-mifid
+  ai_data_compliance:
+    workers:
+    - worker-nomos-ai-act
+    - worker-nomos-rgpd
+    - worker-nomos-dora
+  aml_fraud_pt:
+    workers:
+    - worker-nomos-aml
+    - worker-nomos-fraude
+    - worker-nomos-bdp
+  sector_compliance_pt:
+    workers:
+    - worker-nomos-asae
+    - worker-nomos-acss
+    - worker-nomos-igac
+    - worker-nomos-anac
+    - worker-nomos-digital
 workers_obsidian:
-  worker-obsidian-graph: {id: worker-obsidian-graph, skill: obsidian-knowledge-graph, reports_to: obsidian-director}
-  worker-obsidian-basb: {id: worker-obsidian-basb, skill: obsidian-second-brain, reports_to: obsidian-director}
-  worker-obsidian-atomic: {id: worker-obsidian-atomic, skill: obsidian-atomic-notes, reports_to: obsidian-director}
-  worker-obsidian-moc: {id: worker-obsidian-moc, skill: obsidian-moc-design, reports_to: obsidian-director}
-  worker-obsidian-para: {id: worker-obsidian-para, skill: obsidian-para-organization, reports_to: obsidian-director}
-  worker-obsidian-zettel: {id: worker-obsidian-zettel, skill: obsidian-zettelkasten-method, reports_to: obsidian-director}
-  worker-obsidian-rag: {id: worker-obsidian-rag, skill: obsidian-rag-corpus-engineering, reports_to: obsidian-director}
-  worker-obsidian-tax: {id: worker-obsidian-tax, skill: obsidian-taxonomy-design, reports_to: obsidian-director}
-  worker-obsidian-ont: {id: worker-obsidian-ont, skill: obsidian-ontology-modeling, reports_to: obsidian-director}
-  worker-obsidian-rel: {id: worker-obsidian-rel, skill: obsidian-search-relevance, reports_to: obsidian-director}
-  worker-obsidian-sem: {id: worker-obsidian-sem, skill: obsidian-semantic-search, reports_to: obsidian-director}
-  worker-obsidian-emb: {id: worker-obsidian-emb, skill: obsidian-embedding-models, reports_to: obsidian-director}
-  worker-obsidian-kbc: {id: worker-obsidian-kbc, skill: obsidian-knowledge-base-curation, reports_to: obsidian-director}
-  worker-obsidian-cite: {id: worker-obsidian-cite, skill: obsidian-cross-referencing, reports_to: obsidian-director}
-  worker-obsidian-comp: {id: worker-obsidian-comp, skill: obsidian-knowledge-compaction, reports_to: obsidian-director}
-
+  worker-obsidian-graph:
+    id: worker-obsidian-graph
+    skill: obsidian-knowledge-graph
+    reports_to: obsidian-director
+  worker-obsidian-basb:
+    id: worker-obsidian-basb
+    skill: obsidian-second-brain
+    reports_to: obsidian-director
+  worker-obsidian-atomic:
+    id: worker-obsidian-atomic
+    skill: obsidian-atomic-notes
+    reports_to: obsidian-director
+  worker-obsidian-moc:
+    id: worker-obsidian-moc
+    skill: obsidian-moc-design
+    reports_to: obsidian-director
+  worker-obsidian-para:
+    id: worker-obsidian-para
+    skill: obsidian-para-organization
+    reports_to: obsidian-director
+  worker-obsidian-zettel:
+    id: worker-obsidian-zettel
+    skill: obsidian-zettelkasten-method
+    reports_to: obsidian-director
+  worker-obsidian-rag:
+    id: worker-obsidian-rag
+    skill: obsidian-rag-corpus-engineering
+    reports_to: obsidian-director
+  worker-obsidian-tax:
+    id: worker-obsidian-tax
+    skill: obsidian-taxonomy-design
+    reports_to: obsidian-director
+  worker-obsidian-ont:
+    id: worker-obsidian-ont
+    skill: obsidian-ontology-modeling
+    reports_to: obsidian-director
+  worker-obsidian-rel:
+    id: worker-obsidian-rel
+    skill: obsidian-search-relevance
+    reports_to: obsidian-director
+  worker-obsidian-sem:
+    id: worker-obsidian-sem
+    skill: obsidian-semantic-search
+    reports_to: obsidian-director
+  worker-obsidian-emb:
+    id: worker-obsidian-emb
+    skill: obsidian-embedding-models
+    reports_to: obsidian-director
+  worker-obsidian-kbc:
+    id: worker-obsidian-kbc
+    skill: obsidian-knowledge-base-curation
+    reports_to: obsidian-director
+  worker-obsidian-cite:
+    id: worker-obsidian-cite
+    skill: obsidian-cross-referencing
+    reports_to: obsidian-director
+  worker-obsidian-comp:
+    id: worker-obsidian-comp
+    skill: obsidian-knowledge-compaction
+    reports_to: obsidian-director
 squads_obsidian:
-  pkm_setup: {workers: [worker-obsidian-basb, worker-obsidian-para, worker-obsidian-atomic, worker-obsidian-zettel]}
-  rag_engineering: {workers: [worker-obsidian-rag, worker-obsidian-sem, worker-obsidian-emb, worker-obsidian-rel]}
-  knowledge_graph_full: {workers: [worker-obsidian-graph, worker-obsidian-ont, worker-obsidian-tax, worker-obsidian-cite]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# MEDIK — Healthcare BR Squad (v1.0.0, 2026-05-20)
-# 15 skills saúde digital Brasil. ANS+ANVISA+CFM+LGPD-saúde compliance.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_healthcare:
-  medik_director:
-    id: medik-director
-    name: MEDIK
-    title: Healthcare BR Squad Lead
-    type: domain_specialist
-    adapter: medik-agent
-    parent: dario-ceo
-    jurisdiction: Brasil
-    capabilities: [ans_compliance, anvisa_regulatory, cfm_resolutions,
-      lgpd_healthcare, telemedicine, clinical_protocols, emr_integration,
-      medical_billing_tuss, clinical_decision_support, health_insurance_ops,
-      hospital_management, primary_care, mental_health_digital,
-      rcm_revenue_cycle, claim_management]
-    compliance_required: [cfm_205_2021_gate, lgpd_healthcare_marker,
-      zdr_healthcare, audit_cfm, privilege_clinical]
-
-workers_medik:
-  worker-medik-ans: {id: worker-medik-ans, skill: medik-ans-compliance, reports_to: medik-director}
-  worker-medik-anvisa: {id: worker-medik-anvisa, skill: medik-anvisa-regulatory, reports_to: medik-director}
-  worker-medik-cfm: {id: worker-medik-cfm, skill: medik-cfm-resolutions, reports_to: medik-director}
-  worker-medik-lgpd: {id: worker-medik-lgpd, skill: medik-lgpd-healthcare, reports_to: medik-director}
-  worker-medik-tele: {id: worker-medik-tele, skill: medik-telemedicine, reports_to: medik-director}
-  worker-medik-protocols: {id: worker-medik-protocols, skill: medik-clinical-protocols, reports_to: medik-director}
-  worker-medik-emr: {id: worker-medik-emr, skill: medik-emr-integration, reports_to: medik-director}
-  worker-medik-tuss: {id: worker-medik-tuss, skill: medik-medical-billing-tuss, reports_to: medik-director}
-  worker-medik-cdss: {id: worker-medik-cdss, skill: medik-clinical-decision-support, reports_to: medik-director}
-  worker-medik-insurance: {id: worker-medik-insurance, skill: medik-health-insurance-operations, reports_to: medik-director}
-  worker-medik-hosp: {id: worker-medik-hosp, skill: medik-hospital-management, reports_to: medik-director}
-  worker-medik-aps: {id: worker-medik-aps, skill: medik-primary-care, reports_to: medik-director}
-  worker-medik-mental: {id: worker-medik-mental, skill: medik-mental-health-digital, reports_to: medik-director}
-  worker-medik-rcm: {id: worker-medik-rcm, skill: medik-rcm-revenue-cycle, reports_to: medik-director}
-  worker-medik-claims: {id: worker-medik-claims, skill: medik-claim-management, reports_to: medik-director}
-
-squads_medik:
-  clinic_setup: {workers: [worker-medik-cfm, worker-medik-lgpd, worker-medik-emr, worker-medik-tele]}
-  hospital_excellence: {workers: [worker-medik-hosp, worker-medik-protocols, worker-medik-cdss, worker-medik-rcm]}
-  operadora_ops: {workers: [worker-medik-ans, worker-medik-insurance, worker-medik-tuss, worker-medik-claims]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# CAMPUS — Education BR Squad (v1.0.0, 2026-05-20)
-# 15 skills educação digital Brasil. MEC+LDB+BNCC+EAD compliance.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_education:
-  campus_director:
-    id: campus-director
-    name: CAMPUS
-    title: Education BR Squad Lead
-    type: domain_specialist
-    adapter: campus-agent
-    parent: dario-ceo
-    jurisdiction: Brasil
-    capabilities: [mec_regulation, ldb_compliance, bncc_alignment, enem_enade_prep,
-      ead_regulation, instructional_design, learning_experience, education_analytics,
-      lms_architecture, online_course_pedagogy, gamification, microlearning,
-      assessment_design, certification, corporate_learning]
-    compliance_required: [mec_credenciamento, lgpd_education_marker, certification_audit]
-
-workers_campus:
-  worker-campus-mec: {id: worker-campus-mec, skill: campus-mec-regulation, reports_to: campus-director}
-  worker-campus-ldb: {id: worker-campus-ldb, skill: campus-ldb-compliance, reports_to: campus-director}
-  worker-campus-bncc: {id: worker-campus-bncc, skill: campus-bncc-alignment, reports_to: campus-director}
-  worker-campus-enem: {id: worker-campus-enem, skill: campus-enem-enade-prep, reports_to: campus-director}
-  worker-campus-ead: {id: worker-campus-ead, skill: campus-ead-regulation, reports_to: campus-director}
-  worker-campus-id: {id: worker-campus-id, skill: campus-instructional-design, reports_to: campus-director}
-  worker-campus-lxd: {id: worker-campus-lxd, skill: campus-learning-experience, reports_to: campus-director}
-  worker-campus-analytics: {id: worker-campus-analytics, skill: campus-education-analytics, reports_to: campus-director}
-  worker-campus-lms: {id: worker-campus-lms, skill: campus-lms-architecture, reports_to: campus-director}
-  worker-campus-pedagogy: {id: worker-campus-pedagogy, skill: campus-online-course-pedagogy, reports_to: campus-director}
-  worker-campus-gamif: {id: worker-campus-gamif, skill: campus-gamification, reports_to: campus-director}
-  worker-campus-micro: {id: worker-campus-micro, skill: campus-microlearning, reports_to: campus-director}
-  worker-campus-assess: {id: worker-campus-assess, skill: campus-assessment-design, reports_to: campus-director}
-  worker-campus-cert: {id: worker-campus-cert, skill: campus-certification, reports_to: campus-director}
-  worker-campus-corp: {id: worker-campus-corp, skill: campus-corporate-learning, reports_to: campus-director}
-
-squads_campus:
-  ies_setup: {workers: [worker-campus-mec, worker-campus-ldb, worker-campus-ead, worker-campus-lms]}
-  course_design: {workers: [worker-campus-id, worker-campus-lxd, worker-campus-pedagogy, worker-campus-assess]}
-  edtech_growth: {workers: [worker-campus-gamif, worker-campus-micro, worker-campus-analytics, worker-campus-cert]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# AEGIS — Cybersecurity Squad (v1.0.0, 2026-05-20)
-# 15 skills cybersecurity defensive+offensive. ISO27001+SOC2+PCI compliance.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_security:
-  aegis_director:
-    id: aegis-director
-    name: AEGIS
-    title: Cybersecurity Squad Lead
-    type: domain_specialist
-    adapter: aegis-agent
-    parent: dario-ceo
-    capabilities: [threat_modeling, pentest_methodology, vulnerability_management,
-      soc_operations, siem_integration, edr_management, zero_trust_architecture,
-      iam_identity, secrets_management, incident_response, digital_forensics,
-      compliance_frameworks, security_awareness, secure_sdlc, cloud_security]
-    compliance_required: [iso27001_audit, soc2_type2, audit_immutable, responsible_disclosure]
-
-workers_aegis:
-  worker-aegis-tm: {id: worker-aegis-tm, skill: aegis-threat-modeling, reports_to: aegis-director}
-  worker-aegis-pt: {id: worker-aegis-pt, skill: aegis-pentest-methodology, reports_to: aegis-director}
-  worker-aegis-vm: {id: worker-aegis-vm, skill: aegis-vulnerability-management, reports_to: aegis-director}
-  worker-aegis-soc: {id: worker-aegis-soc, skill: aegis-soc-operations, reports_to: aegis-director}
-  worker-aegis-siem: {id: worker-aegis-siem, skill: aegis-siem-integration, reports_to: aegis-director}
-  worker-aegis-edr: {id: worker-aegis-edr, skill: aegis-edr-management, reports_to: aegis-director}
-  worker-aegis-zt: {id: worker-aegis-zt, skill: aegis-zero-trust-architecture, reports_to: aegis-director}
-  worker-aegis-iam: {id: worker-aegis-iam, skill: aegis-iam-identity, reports_to: aegis-director}
-  worker-aegis-secrets: {id: worker-aegis-secrets, skill: aegis-secrets-management, reports_to: aegis-director}
-  worker-aegis-ir: {id: worker-aegis-ir, skill: aegis-incident-response, reports_to: aegis-director}
-  worker-aegis-fo: {id: worker-aegis-fo, skill: aegis-digital-forensics, reports_to: aegis-director}
-  worker-aegis-comp: {id: worker-aegis-comp, skill: aegis-compliance-frameworks, reports_to: aegis-director}
-  worker-aegis-aware: {id: worker-aegis-aware, skill: aegis-security-awareness, reports_to: aegis-director}
-  worker-aegis-sdlc: {id: worker-aegis-sdlc, skill: aegis-secure-sdlc, reports_to: aegis-director}
-  worker-aegis-cloud: {id: worker-aegis-cloud, skill: aegis-cloud-security, reports_to: aegis-director}
-  worker-aegis-tpr: {id: worker-aegis-tpr, skill: aegis-third-party-risk, reports_to: aegis-director}
-  worker-aegis-supply: {id: worker-aegis-supply, skill: aegis-supply-chain-security, reports_to: aegis-director}
-  worker-aegis-bas: {id: worker-aegis-bas, skill: aegis-breach-simulation, reports_to: aegis-director}
-
-squads_aegis:
-  pentest_full: {workers: [worker-aegis-tm, worker-aegis-pt, worker-aegis-vm, worker-aegis-sdlc, worker-aegis-bas]}
-  soc_24x7: {workers: [worker-aegis-soc, worker-aegis-siem, worker-aegis-edr, worker-aegis-ir, worker-aegis-fo]}
-  ciso_office: {workers: [worker-aegis-zt, worker-aegis-iam, worker-aegis-comp, worker-aegis-aware, worker-aegis-cloud]}
-  trust_compliance: {workers: [worker-aegis-tpr, worker-aegis-supply, worker-aegis-comp, worker-aegis-bas]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# ZENITH — Executive Decision Support Squad (v1.0.0, 2026-05-20)
-# 15 skills C-level, founders, boards, PE. Strategy, M&A, war games, dashboards.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_executive:
-  zenith_director:
-    id: zenith-director
-    name: ZENITH
-    title: Executive Decision Support Squad Lead
-    type: domain_specialist
-    adapter: zenith-agent
-    parent: dario-ceo
-    capabilities: [strategic_planning, okr_design, board_pack, ma_evaluation,
-      scenario_planning, war_gaming, executive_dashboard, sensitivity_analysis,
-      monte_carlo, decision_intelligence, risk_assessment, strategic_options,
-      competitive_intelligence, capital_allocation, succession_planning]
-    compliance_required: [privilege_executive, insider_trading_safeguard,
-      board_confidentiality, audit_immutable]
-
-workers_zenith:
-  worker-zenith-strat: {id: worker-zenith-strat, skill: zenith-strategic-planning, reports_to: zenith-director}
-  worker-zenith-okr: {id: worker-zenith-okr, skill: zenith-okr-design, reports_to: zenith-director}
-  worker-zenith-board: {id: worker-zenith-board, skill: zenith-board-pack-generation, reports_to: zenith-director}
-  worker-zenith-ma: {id: worker-zenith-ma, skill: zenith-ma-evaluation, reports_to: zenith-director}
-  worker-zenith-scenario: {id: worker-zenith-scenario, skill: zenith-scenario-planning, reports_to: zenith-director}
-  worker-zenith-wargame: {id: worker-zenith-wargame, skill: zenith-war-gaming, reports_to: zenith-director}
-  worker-zenith-dash: {id: worker-zenith-dash, skill: zenith-executive-dashboard, reports_to: zenith-director}
-  worker-zenith-sens: {id: worker-zenith-sens, skill: zenith-sensitivity-analysis, reports_to: zenith-director}
-  worker-zenith-mc: {id: worker-zenith-mc, skill: zenith-monte-carlo, reports_to: zenith-director}
-  worker-zenith-decint: {id: worker-zenith-decint, skill: zenith-decision-intelligence, reports_to: zenith-director}
-  worker-zenith-risk: {id: worker-zenith-risk, skill: zenith-risk-assessment, reports_to: zenith-director}
-  worker-zenith-opt: {id: worker-zenith-opt, skill: zenith-strategic-options, reports_to: zenith-director}
-  worker-zenith-ci: {id: worker-zenith-ci, skill: zenith-competitive-intelligence, reports_to: zenith-director}
-  worker-zenith-cap: {id: worker-zenith-cap, skill: zenith-capital-allocation, reports_to: zenith-director}
-  worker-zenith-succ: {id: worker-zenith-succ, skill: zenith-succession-planning, reports_to: zenith-director}
-
-squads_zenith:
-  ceo_strategic_office: {workers: [worker-zenith-strat, worker-zenith-okr, worker-zenith-scenario, worker-zenith-opt, worker-zenith-dash]}
-  ma_diligence: {workers: [worker-zenith-ma, worker-zenith-mc, worker-zenith-sens, worker-zenith-risk, worker-zenith-cap]}
-  board_governance: {workers: [worker-zenith-board, worker-zenith-decint, worker-zenith-ci, worker-zenith-wargame, worker-zenith-succ]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# GAIA — Sustainability & ESG Squad (v1.0.0, 2026-05-20)
-# 15 skills CSRD/TCFD/GRI/SASB/SBTi/B-Corp. Premium compliance squad.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_sustainability:
-  gaia_director:
-    id: gaia-director
-    name: GAIA
-    title: Sustainability & ESG Squad Lead
-    type: domain_specialist
-    adapter: gaia-agent
-    parent: dario-ceo
-    capabilities: [carbon_accounting, csrd_reporting, esg_rating,
-      sustainability_strategy, supply_chain_esg, social_impact,
-      governance_frameworks, sbti_targets, climate_risk_tcfd,
-      ungc_reporting, sasb_standards, gri_reporting, b_corp_certification,
-      esg_due_diligence, transition_planning]
-    compliance_required: [csrd_disclosure_gate, tcfd_assurance_ready,
-      audit_immutable, ghg_protocol_verification, cdp_disclosure_ready]
-
-workers_gaia:
-  worker-gaia-carbon: {id: worker-gaia-carbon, skill: gaia-carbon-accounting, reports_to: gaia-director}
-  worker-gaia-csrd: {id: worker-gaia-csrd, skill: gaia-csrd-reporting, reports_to: gaia-director}
-  worker-gaia-rating: {id: worker-gaia-rating, skill: gaia-esg-rating, reports_to: gaia-director}
-  worker-gaia-strategy: {id: worker-gaia-strategy, skill: gaia-sustainability-strategy, reports_to: gaia-director}
-  worker-gaia-supply: {id: worker-gaia-supply, skill: gaia-supply-chain-esg, reports_to: gaia-director}
-  worker-gaia-social: {id: worker-gaia-social, skill: gaia-social-impact, reports_to: gaia-director}
-  worker-gaia-gov: {id: worker-gaia-gov, skill: gaia-governance-frameworks, reports_to: gaia-director}
-  worker-gaia-sbti: {id: worker-gaia-sbti, skill: gaia-sbti-targets, reports_to: gaia-director}
-  worker-gaia-tcfd: {id: worker-gaia-tcfd, skill: gaia-climate-risk-tcfd, reports_to: gaia-director}
-  worker-gaia-ungc: {id: worker-gaia-ungc, skill: gaia-ungc-reporting, reports_to: gaia-director}
-  worker-gaia-sasb: {id: worker-gaia-sasb, skill: gaia-sasb-standards, reports_to: gaia-director}
-  worker-gaia-gri: {id: worker-gaia-gri, skill: gaia-gri-reporting, reports_to: gaia-director}
-  worker-gaia-bcorp: {id: worker-gaia-bcorp, skill: gaia-b-corp-certification, reports_to: gaia-director}
-  worker-gaia-dd: {id: worker-gaia-dd, skill: gaia-esg-due-diligence, reports_to: gaia-director}
-  worker-gaia-transition: {id: worker-gaia-transition, skill: gaia-transition-planning, reports_to: gaia-director}
-
-squads_gaia:
-  csrd_compliance: {workers: [worker-gaia-csrd, worker-gaia-tcfd, worker-gaia-sasb, worker-gaia-gri]}
-  carbon_decarbonization: {workers: [worker-gaia-carbon, worker-gaia-sbti, worker-gaia-transition, worker-gaia-supply]}
-  esg_strategy_ratings: {workers: [worker-gaia-strategy, worker-gaia-rating, worker-gaia-gov, worker-gaia-ungc]}
-  ma_certification: {workers: [worker-gaia-dd, worker-gaia-bcorp, worker-gaia-social]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# NOMOS — Compliance Regulatório PT Squad (v1.0.0, 2026-05-20)
-# 15 skills CMVM/BdP/CNPD/ASAE/ACSS + EU AI Act + DORA + MiFID II + PSD2.
-# ═══════════════════════════════════════════════════════════════════════════
-
+  pkm_setup:
+    workers:
+    - worker-obsidian-basb
+    - worker-obsidian-para
+    - worker-obsidian-atomic
+    - worker-obsidian-zettel
+  rag_engineering:
+    workers:
+    - worker-obsidian-rag
+    - worker-obsidian-sem
+    - worker-obsidian-emb
+    - worker-obsidian-rel
+  knowledge_graph_full:
+    workers:
+    - worker-obsidian-graph
+    - worker-obsidian-ont
+    - worker-obsidian-tax
+    - worker-obsidian-cite
+workers_prometheus:
+  worker-prometheus-repos:
+    id: worker-prometheus-repos
+    skill: prometheus-repo-scanner
+    reports_to: prometheus-director
+    sensor_type: repos
+  worker-prometheus-mcp:
+    id: worker-prometheus-mcp
+    skill: prometheus-mcp-discovery
+    reports_to: prometheus-director
+    sensor_type: mcp_marketplaces
+  worker-prometheus-papers:
+    id: worker-prometheus-papers
+    skill: prometheus-paper-tracker
+    reports_to: prometheus-director
+    sensor_type: research
+  worker-prometheus-regulatory:
+    id: worker-prometheus-regulatory
+    skill: prometheus-regulatory-watch
+    reports_to: prometheus-director
+    sensor_type: regulatory
+squads_prometheus:
+  external_sensors:
+    workers:
+    - worker-prometheus-repos
+    - worker-prometheus-mcp
+    - worker-prometheus-papers
+    - worker-prometheus-regulatory
+    description: Wave 1 — 4 passive sensors
+dispatch_prometheus:
+  scan mundo:
+    chain: prometheus_weekly_scan
+  prometheus weekly:
+    chain: prometheus_weekly_scan
+  weekly digest:
+    chain: prometheus_weekly_scan
+  novidades semana:
+    chain: prometheus_weekly_scan
+  scan repos:
+    skill: prometheus-repo-scanner
+  novos releases:
+    skill: prometheus-repo-scanner
+  scan mcp:
+    skill: prometheus-mcp-discovery
+  novos mcp:
+    skill: prometheus-mcp-discovery
+  scan papers:
+    skill: prometheus-paper-tracker
+  arxiv weekly:
+    skill: prometheus-paper-tracker
+  novidades anthropic:
+    skill: prometheus-paper-tracker
+  scan regulatorio:
+    skill: prometheus-regulatory-watch
+  novas leis:
+    skill: prometheus-regulatory-watch
+  regulatory watch:
+    skill: prometheus-regulatory-watch
 agents_regulatory_pt:
   nomos_director:
     id: nomos-director
@@ -3644,458 +3871,26 @@ agents_regulatory_pt:
     adapter: nomos-agent
     parent: dario-ceo
     jurisdiction: Portugal + EU
-    capabilities: [cmvm_compliance, bdp_banking_pt, asae_food_safety,
-      acss_healthcare_pt, rgpd_pt_marker, igac_events_pt, anac_aviation_pt,
-      concorrencia_pt, eu_ai_act_pt, dora_resilience, mifid_ii_pt,
-      psd2_open_banking_pt, anti_fraude_pt, kyc_aml_pt, dl_79_2024_digital]
-    compliance_required: [cmvm_disclosure_gate, bdp_regulatory_reporting_gate,
-      ai_act_risk_classification, dora_testing_schedule,
-      cnpd_consultation_marker, audit_immutable]
-
-workers_nomos:
-  worker-nomos-cmvm: {id: worker-nomos-cmvm, skill: nomos-cmvm-compliance, reports_to: nomos-director}
-  worker-nomos-bdp: {id: worker-nomos-bdp, skill: nomos-bdp-banking-pt, reports_to: nomos-director}
-  worker-nomos-asae: {id: worker-nomos-asae, skill: nomos-asae-food-safety, reports_to: nomos-director}
-  worker-nomos-acss: {id: worker-nomos-acss, skill: nomos-acss-healthcare-pt, reports_to: nomos-director}
-  worker-nomos-rgpd: {id: worker-nomos-rgpd, skill: nomos-rgpd-pt-marker, reports_to: nomos-director}
-  worker-nomos-igac: {id: worker-nomos-igac, skill: nomos-igac-events-pt, reports_to: nomos-director}
-  worker-nomos-anac: {id: worker-nomos-anac, skill: nomos-anac-aviation-pt, reports_to: nomos-director}
-  worker-nomos-adc: {id: worker-nomos-adc, skill: nomos-concorrencia-pt, reports_to: nomos-director}
-  worker-nomos-ai-act: {id: worker-nomos-ai-act, skill: nomos-eu-ai-act-pt, reports_to: nomos-director}
-  worker-nomos-dora: {id: worker-nomos-dora, skill: nomos-dora-resilience, reports_to: nomos-director}
-  worker-nomos-mifid: {id: worker-nomos-mifid, skill: nomos-mifid-ii-pt, reports_to: nomos-director}
-  worker-nomos-psd2: {id: worker-nomos-psd2, skill: nomos-psd2-open-banking-pt, reports_to: nomos-director}
-  worker-nomos-fraude: {id: worker-nomos-fraude, skill: nomos-anti-fraude-pt, reports_to: nomos-director}
-  worker-nomos-aml: {id: worker-nomos-aml, skill: nomos-kyc-aml-pt, reports_to: nomos-director}
-  worker-nomos-digital: {id: worker-nomos-digital, skill: nomos-dl-79-2024-digital, reports_to: nomos-director}
-
-squads_nomos:
-  banking_finance_pt: {workers: [worker-nomos-bdp, worker-nomos-mifid, worker-nomos-psd2, worker-nomos-dora]}
-  capital_markets_pt: {workers: [worker-nomos-cmvm, worker-nomos-adc, worker-nomos-mifid]}
-  ai_data_compliance: {workers: [worker-nomos-ai-act, worker-nomos-rgpd, worker-nomos-dora]}
-  aml_fraud_pt: {workers: [worker-nomos-aml, worker-nomos-fraude, worker-nomos-bdp]}
-  sector_compliance_pt: {workers: [worker-nomos-asae, worker-nomos-acss, worker-nomos-igac, worker-nomos-anac, worker-nomos-digital]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# MERCURIUS — Sales Excellence Squad (v1.0.0, 2026-05-20)
-# 15 skills sales methodology + execution + ops. v12.0 release.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_sales:
-  mercurius_director:
-    id: mercurius-director
-    name: MERCURIUS
-    title: Sales Excellence Squad Lead
-    parent: dario-ceo
-    capabilities: [sales_methodology, prospecting, discovery_call, demo_script,
-      objection_handling, negotiation_prep, closing, account_management,
-      expansion_revenue, sales_enablement, pipeline_forecasting,
-      territory_design, comp_plan, sales_ops, customer_success_handoff]
-    compliance_required: [no_dark_patterns, lgpd_lead_data, audit_trail]
-
-workers_mercurius:
-  worker-mercurius-method: {id: worker-mercurius-method, skill: mercurius-sales-methodology, reports_to: mercurius-director}
-  worker-mercurius-prospecting: {id: worker-mercurius-prospecting, skill: mercurius-prospecting, reports_to: mercurius-director}
-  worker-mercurius-discovery: {id: worker-mercurius-discovery, skill: mercurius-discovery-call, reports_to: mercurius-director}
-  worker-mercurius-demo: {id: worker-mercurius-demo, skill: mercurius-demo-script, reports_to: mercurius-director}
-  worker-mercurius-objections: {id: worker-mercurius-objections, skill: mercurius-objection-handling, reports_to: mercurius-director}
-  worker-mercurius-negotiate: {id: worker-mercurius-negotiate, skill: mercurius-negotiation-prep, reports_to: mercurius-director}
-  worker-mercurius-close: {id: worker-mercurius-close, skill: mercurius-closing, reports_to: mercurius-director}
-  worker-mercurius-am: {id: worker-mercurius-am, skill: mercurius-account-management, reports_to: mercurius-director}
-  worker-mercurius-expansion: {id: worker-mercurius-expansion, skill: mercurius-expansion-revenue, reports_to: mercurius-director}
-  worker-mercurius-enable: {id: worker-mercurius-enable, skill: mercurius-sales-enablement, reports_to: mercurius-director}
-  worker-mercurius-forecast: {id: worker-mercurius-forecast, skill: mercurius-pipeline-forecasting, reports_to: mercurius-director}
-  worker-mercurius-territory: {id: worker-mercurius-territory, skill: mercurius-territory-design, reports_to: mercurius-director}
-  worker-mercurius-comp: {id: worker-mercurius-comp, skill: mercurius-comp-plan, reports_to: mercurius-director}
-  worker-mercurius-ops: {id: worker-mercurius-ops, skill: mercurius-sales-ops, reports_to: mercurius-director}
-  worker-mercurius-handoff: {id: worker-mercurius-handoff, skill: mercurius-customer-success-handoff, reports_to: mercurius-director}
-
-squads_mercurius:
-  prospecting_to_close: {workers: [worker-mercurius-method, worker-mercurius-prospecting, worker-mercurius-discovery, worker-mercurius-demo, worker-mercurius-close]}
-  account_expansion: {workers: [worker-mercurius-am, worker-mercurius-expansion, worker-mercurius-handoff]}
-  sales_ops_revops: {workers: [worker-mercurius-forecast, worker-mercurius-territory, worker-mercurius-comp, worker-mercurius-ops]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# ATLAS-FIN — Fintech Services Squad (v1.0.0, 2026-05-20)
-# 15 skills Open Banking BR + PSD2 + PIX + payments + AML + BaaS. v12.0 release.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_fintech:
-  atlas_fin_director:
-    id: atlas-fin-director
-    name: ATLAS-FIN
-    title: Fintech Services Squad Lead
-    parent: dario-ceo
-    jurisdiction: Brasil + EU
-    capabilities: [open_banking_br, pix_rules_bcb, psd2_eu, payment_orchestration,
-      fraud_prevention, chargeback_management, kyc_onboarding, aml_monitoring,
-      sanctions_screening, foreign_exchange, instant_payments, banking_as_a_service,
-      embedded_finance, regulatory_reporting_bcb, lgpd_financial]
-    compliance_required: [bcb_compliance_gate, ecb_compliance_gate, audit_immutable,
-      pci_dss_scope, sanctions_realtime]
-
-workers_atlas_fin:
-  worker-atlas-fin-ob-br: {id: worker-atlas-fin-ob-br, skill: atlas-fin-open-banking-br, reports_to: atlas-fin-director}
-  worker-atlas-fin-pix: {id: worker-atlas-fin-pix, skill: atlas-fin-pix-rules-bcb, reports_to: atlas-fin-director}
-  worker-atlas-fin-psd2: {id: worker-atlas-fin-psd2, skill: atlas-fin-psd2-eu, reports_to: atlas-fin-director}
-  worker-atlas-fin-orch: {id: worker-atlas-fin-orch, skill: atlas-fin-payment-orchestration, reports_to: atlas-fin-director}
-  worker-atlas-fin-fraud: {id: worker-atlas-fin-fraud, skill: atlas-fin-fraud-prevention, reports_to: atlas-fin-director}
-  worker-atlas-fin-cb: {id: worker-atlas-fin-cb, skill: atlas-fin-chargeback-management, reports_to: atlas-fin-director}
-  worker-atlas-fin-kyc: {id: worker-atlas-fin-kyc, skill: atlas-fin-kyc-onboarding, reports_to: atlas-fin-director}
-  worker-atlas-fin-aml: {id: worker-atlas-fin-aml, skill: atlas-fin-aml-monitoring, reports_to: atlas-fin-director}
-  worker-atlas-fin-sanctions: {id: worker-atlas-fin-sanctions, skill: atlas-fin-sanctions-screening, reports_to: atlas-fin-director}
-  worker-atlas-fin-fx: {id: worker-atlas-fin-fx, skill: atlas-fin-foreign-exchange, reports_to: atlas-fin-director}
-  worker-atlas-fin-instant: {id: worker-atlas-fin-instant, skill: atlas-fin-instant-payments, reports_to: atlas-fin-director}
-  worker-atlas-fin-baas: {id: worker-atlas-fin-baas, skill: atlas-fin-banking-as-a-service, reports_to: atlas-fin-director}
-  worker-atlas-fin-embed: {id: worker-atlas-fin-embed, skill: atlas-fin-embedded-finance, reports_to: atlas-fin-director}
-  worker-atlas-fin-bcb: {id: worker-atlas-fin-bcb, skill: atlas-fin-regulatory-reporting-bcb, reports_to: atlas-fin-director}
-  worker-atlas-fin-lgpd: {id: worker-atlas-fin-lgpd, skill: atlas-fin-lgpd-financial, reports_to: atlas-fin-director}
-
-squads_atlas_fin:
-  open_banking_full: {workers: [worker-atlas-fin-ob-br, worker-atlas-fin-psd2, worker-atlas-fin-instant, worker-atlas-fin-pix]}
-  payments_ops: {workers: [worker-atlas-fin-orch, worker-atlas-fin-fraud, worker-atlas-fin-cb, worker-atlas-fin-fx]}
-  kyc_aml_full: {workers: [worker-atlas-fin-kyc, worker-atlas-fin-aml, worker-atlas-fin-sanctions, worker-atlas-fin-lgpd]}
-  baas_embedded: {workers: [worker-atlas-fin-baas, worker-atlas-fin-embed, worker-atlas-fin-bcb]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# HELIOS — Energy & Utilities Squad (v1.0.0, 2026-05-20)
-# 15 skills mercado livre BR + ANEEL + PPA + BESS + H2. v12.0 release.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_energy:
-  helios_director:
-    id: helios-director
-    name: HELIOS
-    title: Energy & Utilities Squad Lead
-    parent: dario-ceo
-    capabilities: [mercado_livre_br, aneel_compliance, ppa_power_purchase,
-      energy_storage, grid_integration, hydrogen_strategy, carbon_credits_energy,
-      renewable_financing, smart_meter_data, demand_response,
-      ev_charging_strategy, microgrid_design, energy_efficiency_iso50001,
-      climate_pricing, utility_rate_design]
-    compliance_required: [aneel_compliance_gate, iso50001_certification_ready, audit_immutable]
-
-workers_helios:
-  worker-helios-acl: {id: worker-helios-acl, skill: helios-mercado-livre-br, reports_to: helios-director}
-  worker-helios-aneel: {id: worker-helios-aneel, skill: helios-aneel-compliance, reports_to: helios-director}
-  worker-helios-ppa: {id: worker-helios-ppa, skill: helios-ppa-power-purchase, reports_to: helios-director}
-  worker-helios-storage: {id: worker-helios-storage, skill: helios-energy-storage, reports_to: helios-director}
-  worker-helios-grid: {id: worker-helios-grid, skill: helios-grid-integration, reports_to: helios-director}
-  worker-helios-h2: {id: worker-helios-h2, skill: helios-hydrogen-strategy, reports_to: helios-director}
-  worker-helios-carbon: {id: worker-helios-carbon, skill: helios-carbon-credits-energy, reports_to: helios-director}
-  worker-helios-finance: {id: worker-helios-finance, skill: helios-renewable-financing, reports_to: helios-director}
-  worker-helios-meter: {id: worker-helios-meter, skill: helios-smart-meter-data, reports_to: helios-director}
-  worker-helios-dr: {id: worker-helios-dr, skill: helios-demand-response, reports_to: helios-director}
-  worker-helios-ev: {id: worker-helios-ev, skill: helios-ev-charging-strategy, reports_to: helios-director}
-  worker-helios-microgrid: {id: worker-helios-microgrid, skill: helios-microgrid-design, reports_to: helios-director}
-  worker-helios-eff: {id: worker-helios-eff, skill: helios-energy-efficiency-iso50001, reports_to: helios-director}
-  worker-helios-pricing: {id: worker-helios-pricing, skill: helios-climate-pricing, reports_to: helios-director}
-  worker-helios-tariff: {id: worker-helios-tariff, skill: helios-utility-rate-design, reports_to: helios-director}
-
-squads_helios:
-  industrial_migration: {workers: [worker-helios-acl, worker-helios-ppa, worker-helios-aneel, worker-helios-tariff]}
-  renewable_projects: {workers: [worker-helios-finance, worker-helios-carbon, worker-helios-grid, worker-helios-storage]}
-  energy_efficiency: {workers: [worker-helios-eff, worker-helios-meter, worker-helios-dr]}
-  emerging_tech: {workers: [worker-helios-h2, worker-helios-ev, worker-helios-microgrid, worker-helios-pricing]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# KIRION — Real Estate & PropTech Squad (v1.0.0, 2026-05-20)
-# 15 skills RE valuation, REITs/FIIs, golden visa, smart building. v12.0.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_realestate:
-  kirion_director:
-    id: kirion-director
-    name: KIRION
-    title: Real Estate & PropTech Squad Lead
-    parent: dario-ceo
-    jurisdiction: Portugal + Brasil + Global
-    capabilities: [real_estate_valuation, market_comparables, dcf_property,
-      reit_analysis, mortgage_underwriting, property_management, leasing_strategy,
-      build_to_rent, hospitality_management, golden_visa_pt,
-      portuguese_renda_vitalicia, fii_br, ifrs_16_leases, esg_real_estate,
-      smart_building]
-    compliance_required: [cvm_compliance, anbima_alignment, ifrs_16_reporting, audit_immutable]
-
-workers_kirion:
-  worker-kirion-valuation: {id: worker-kirion-valuation, skill: kirion-real-estate-valuation, reports_to: kirion-director}
-  worker-kirion-cma: {id: worker-kirion-cma, skill: kirion-market-comparables, reports_to: kirion-director}
-  worker-kirion-dcf: {id: worker-kirion-dcf, skill: kirion-dcf-property, reports_to: kirion-director}
-  worker-kirion-reit: {id: worker-kirion-reit, skill: kirion-reit-analysis, reports_to: kirion-director}
-  worker-kirion-mortgage: {id: worker-kirion-mortgage, skill: kirion-mortgage-underwriting, reports_to: kirion-director}
-  worker-kirion-pm: {id: worker-kirion-pm, skill: kirion-property-management, reports_to: kirion-director}
-  worker-kirion-lease: {id: worker-kirion-lease, skill: kirion-leasing-strategy, reports_to: kirion-director}
-  worker-kirion-btr: {id: worker-kirion-btr, skill: kirion-build-to-rent, reports_to: kirion-director}
-  worker-kirion-hotel: {id: worker-kirion-hotel, skill: kirion-hospitality-management, reports_to: kirion-director}
-  worker-kirion-gv: {id: worker-kirion-gv, skill: kirion-golden-visa-pt, reports_to: kirion-director}
-  worker-kirion-viager: {id: worker-kirion-viager, skill: kirion-portuguese-renda-vitalicia, reports_to: kirion-director}
-  worker-kirion-fii: {id: worker-kirion-fii, skill: kirion-fii-br, reports_to: kirion-director}
-  worker-kirion-ifrs16: {id: worker-kirion-ifrs16, skill: kirion-ifrs-16-leases, reports_to: kirion-director}
-  worker-kirion-esg: {id: worker-kirion-esg, skill: kirion-esg-real-estate, reports_to: kirion-director}
-  worker-kirion-smart: {id: worker-kirion-smart, skill: kirion-smart-building, reports_to: kirion-director}
-
-squads_kirion:
-  valuation_diligence: {workers: [worker-kirion-valuation, worker-kirion-cma, worker-kirion-dcf, worker-kirion-mortgage]}
-  reit_fii_investing: {workers: [worker-kirion-reit, worker-kirion-fii, worker-kirion-ifrs16]}
-  property_operations: {workers: [worker-kirion-pm, worker-kirion-lease, worker-kirion-btr, worker-kirion-hotel]}
-  pt_specific: {workers: [worker-kirion-gv, worker-kirion-viager]}
-  proptech_innovation: {workers: [worker-kirion-esg, worker-kirion-smart]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# SPHINX — Cybersecurity Advanced Squad (v1.0.0, 2026-05-20)
-# 15 skills TIER-1 cyber elite. Red team, APT, PQC, AI security. v12.0.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_cyber_advanced:
-  sphinx_director:
-    id: sphinx-director
-    name: SPHINX
-    title: Cybersecurity Advanced (TIER 1) Squad Lead
-    parent: dario-ceo
-    capabilities: [red_team_ops, threat_intel_platforms, osint_investigations,
-      deception_honeypots, mobile_forensics, malware_analysis, reverse_engineering,
-      dark_web_monitoring, social_engineering_defense, quantum_crypto_prep,
-      zero_day_management, advanced_persistent_threat, cloud_incident_response,
-      post_quantum_cryptography, ai_security]
-    compliance_required: [iso27001_audit, soc2_type2, audit_immutable,
-      responsible_disclosure, classified_handling]
-
-workers_sphinx:
-  worker-sphinx-redteam: {id: worker-sphinx-redteam, skill: sphinx-red-team-ops, reports_to: sphinx-director}
-  worker-sphinx-tip: {id: worker-sphinx-tip, skill: sphinx-threat-intel-platforms, reports_to: sphinx-director}
-  worker-sphinx-osint: {id: worker-sphinx-osint, skill: sphinx-osint-investigations, reports_to: sphinx-director}
-  worker-sphinx-deception: {id: worker-sphinx-deception, skill: sphinx-deception-honeypots, reports_to: sphinx-director}
-  worker-sphinx-mobile: {id: worker-sphinx-mobile, skill: sphinx-mobile-forensics, reports_to: sphinx-director}
-  worker-sphinx-malware: {id: worker-sphinx-malware, skill: sphinx-malware-analysis, reports_to: sphinx-director}
-  worker-sphinx-re: {id: worker-sphinx-re, skill: sphinx-reverse-engineering, reports_to: sphinx-director}
-  worker-sphinx-dark: {id: worker-sphinx-dark, skill: sphinx-dark-web-monitoring, reports_to: sphinx-director}
-  worker-sphinx-se: {id: worker-sphinx-se, skill: sphinx-social-engineering-defense, reports_to: sphinx-director}
-  worker-sphinx-qcrypto: {id: worker-sphinx-qcrypto, skill: sphinx-quantum-crypto-prep, reports_to: sphinx-director}
-  worker-sphinx-0day: {id: worker-sphinx-0day, skill: sphinx-zero-day-management, reports_to: sphinx-director}
-  worker-sphinx-apt: {id: worker-sphinx-apt, skill: sphinx-advanced-persistent-threat, reports_to: sphinx-director}
-  worker-sphinx-cloud-ir: {id: worker-sphinx-cloud-ir, skill: sphinx-cloud-incident-response, reports_to: sphinx-director}
-  worker-sphinx-pqc: {id: worker-sphinx-pqc, skill: sphinx-post-quantum-cryptography, reports_to: sphinx-director}
-  worker-sphinx-ai-sec: {id: worker-sphinx-ai-sec, skill: sphinx-ai-security, reports_to: sphinx-director}
-
-squads_sphinx:
-  offensive_research: {workers: [worker-sphinx-redteam, worker-sphinx-re, worker-sphinx-0day, worker-sphinx-malware]}
-  threat_intel_advanced: {workers: [worker-sphinx-tip, worker-sphinx-osint, worker-sphinx-dark, worker-sphinx-apt]}
-  forensics_ir_elite: {workers: [worker-sphinx-mobile, worker-sphinx-cloud-ir, worker-sphinx-deception]}
-  emerging_threats: {workers: [worker-sphinx-qcrypto, worker-sphinx-pqc, worker-sphinx-ai-sec, worker-sphinx-se]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# EUTERPE — Marketing Excellence Squad (v1.0.0, 2026-05-20)
-# 15 skills MMM, attribution, CRO, CDP, paid + programmatic. v12.0.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_marketing_advanced:
-  euterpe_director:
-    id: euterpe-director
-    name: EUTERPE
-    title: Marketing Excellence Squad Lead
-    parent: dario-ceo
-    capabilities: [mmm_modeling, attribution_multi_touch, cro_advanced,
-      brand_tracking, customer_data_platform, email_marketing_mass,
-      sms_marketing, push_marketing, viral_marketing, influencer_marketing,
-      content_distribution, paid_search, paid_social, programmatic,
-      affiliate_marketing]
-    compliance_required: [lgpd_marketing, gdpr_marketing, no_dark_patterns, audit_trail]
-
-workers_euterpe:
-  worker-euterpe-mmm: {id: worker-euterpe-mmm, skill: euterpe-mmm-modeling, reports_to: euterpe-director}
-  worker-euterpe-mta: {id: worker-euterpe-mta, skill: euterpe-attribution-multi-touch, reports_to: euterpe-director}
-  worker-euterpe-cro: {id: worker-euterpe-cro, skill: euterpe-cro-advanced, reports_to: euterpe-director}
-  worker-euterpe-brand: {id: worker-euterpe-brand, skill: euterpe-brand-tracking, reports_to: euterpe-director}
-  worker-euterpe-cdp: {id: worker-euterpe-cdp, skill: euterpe-customer-data-platform, reports_to: euterpe-director}
-  worker-euterpe-email: {id: worker-euterpe-email, skill: euterpe-email-marketing-mass, reports_to: euterpe-director}
-  worker-euterpe-sms: {id: worker-euterpe-sms, skill: euterpe-sms-marketing, reports_to: euterpe-director}
-  worker-euterpe-push: {id: worker-euterpe-push, skill: euterpe-push-marketing, reports_to: euterpe-director}
-  worker-euterpe-viral: {id: worker-euterpe-viral, skill: euterpe-viral-marketing, reports_to: euterpe-director}
-  worker-euterpe-influencer: {id: worker-euterpe-influencer, skill: euterpe-influencer-marketing, reports_to: euterpe-director}
-  worker-euterpe-content: {id: worker-euterpe-content, skill: euterpe-content-distribution, reports_to: euterpe-director}
-  worker-euterpe-search: {id: worker-euterpe-search, skill: euterpe-paid-search, reports_to: euterpe-director}
-  worker-euterpe-social: {id: worker-euterpe-social, skill: euterpe-paid-social, reports_to: euterpe-director}
-  worker-euterpe-prog: {id: worker-euterpe-prog, skill: euterpe-programmatic, reports_to: euterpe-director}
-  worker-euterpe-affiliate: {id: worker-euterpe-affiliate, skill: euterpe-affiliate-marketing, reports_to: euterpe-director}
-
-squads_euterpe:
-  measurement_analytics: {workers: [worker-euterpe-mmm, worker-euterpe-mta, worker-euterpe-cro, worker-euterpe-cdp]}
-  paid_media: {workers: [worker-euterpe-search, worker-euterpe-social, worker-euterpe-prog]}
-  owned_engagement: {workers: [worker-euterpe-email, worker-euterpe-sms, worker-euterpe-push, worker-euterpe-content]}
-  organic_partnerships: {workers: [worker-euterpe-viral, worker-euterpe-influencer, worker-euterpe-affiliate, worker-euterpe-brand]}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# ORACULO — AI Research & Frontier Squad (v1.0.0, 2026-05-20)
-# 15 skills paper reading, benchmarking, alignment, fine-tuning, AI safety. v12.0.
-# ═══════════════════════════════════════════════════════════════════════════
-
-agents_ai_research:
-  oraculo_director:
-    id: oraculo-director
-    name: ORACULO
-    title: AI Research & Frontier Squad Lead
-    parent: dario-ceo
-    capabilities: [paper_reading_extraction, replication_studies, model_evaluation,
-      benchmarking, alignment_research, agentic_research, multimodal_research,
-      llm_fine_tuning, rag_research, evaluation_frameworks, paper_writing,
-      peer_review, conference_tracking, model_card_generation, ai_safety_research]
-    compliance_required: [audit_immutable, research_integrity, responsible_disclosure, ai_governance]
-
-workers_oraculo:
-  worker-oraculo-paper: {id: worker-oraculo-paper, skill: oraculo-paper-reading-extraction, reports_to: oraculo-director}
-  worker-oraculo-replication: {id: worker-oraculo-replication, skill: oraculo-replication-studies, reports_to: oraculo-director}
-  worker-oraculo-eval: {id: worker-oraculo-eval, skill: oraculo-model-evaluation, reports_to: oraculo-director}
-  worker-oraculo-bench: {id: worker-oraculo-bench, skill: oraculo-benchmarking, reports_to: oraculo-director}
-  worker-oraculo-align: {id: worker-oraculo-align, skill: oraculo-alignment-research, reports_to: oraculo-director}
-  worker-oraculo-agent: {id: worker-oraculo-agent, skill: oraculo-agentic-research, reports_to: oraculo-director}
-  worker-oraculo-multimodal: {id: worker-oraculo-multimodal, skill: oraculo-multimodal-research, reports_to: oraculo-director}
-  worker-oraculo-ft: {id: worker-oraculo-ft, skill: oraculo-llm-fine-tuning, reports_to: oraculo-director}
-  worker-oraculo-rag: {id: worker-oraculo-rag, skill: oraculo-rag-research, reports_to: oraculo-director}
-  worker-oraculo-evalfx: {id: worker-oraculo-evalfx, skill: oraculo-evaluation-frameworks, reports_to: oraculo-director}
-  worker-oraculo-writing: {id: worker-oraculo-writing, skill: oraculo-paper-writing, reports_to: oraculo-director}
-  worker-oraculo-review: {id: worker-oraculo-review, skill: oraculo-peer-review, reports_to: oraculo-director}
-  worker-oraculo-conf: {id: worker-oraculo-conf, skill: oraculo-conference-tracking, reports_to: oraculo-director}
-  worker-oraculo-card: {id: worker-oraculo-card, skill: oraculo-model-card-generation, reports_to: oraculo-director}
-  worker-oraculo-safety: {id: worker-oraculo-safety, skill: oraculo-ai-safety-research, reports_to: oraculo-director}
-
-squads_oraculo:
-  research_to_paper: {workers: [worker-oraculo-paper, worker-oraculo-writing, worker-oraculo-review, worker-oraculo-conf]}
-  evaluation_benchmarks: {workers: [worker-oraculo-eval, worker-oraculo-bench, worker-oraculo-evalfx, worker-oraculo-replication]}
-  ml_engineering: {workers: [worker-oraculo-ft, worker-oraculo-rag, worker-oraculo-multimodal, worker-oraculo-agent]}
-  safety_alignment: {workers: [worker-oraculo-align, worker-oraculo-safety, worker-oraculo-card]}
-
-# ═══════════════════════════════════════════════════════════════
-# A360 — Business Acceleration Squad (battle-tested em SAQUEI, Cuidaí, Atrium)
-# Score patterns: nicho 90-99 · modelo 92 · validacao 93
-# 4 semantic excellence memories já promovidas (only squad com proof)
-# ═══════════════════════════════════════════════════════════════
-
-agents_acceleration:
-  a360-director:
-    id: a360-director
-    name: A360 Director
-    title: Business Acceleration Squad Lead
-    parent: dario-ceo
-    capabilities: [diagnostic_routing, lifecycle_phase_detection, niche_research, avatar_research,
-      idea_validation, business_modeling, offer_construction, funnel_design, launch_sequencing,
-      pitch_deck, metrics_dashboard, growth_engineering, scaling_roadmap, case_study_generation]
-    compliance_required: [audit_immutable]
-    bundle_anchor: founder
-    license_tier_min: starter  # R$ 297
-
-workers_a360:
-  # Phase 1 — Discovery
-  worker-a360-nicho: {id: worker-a360-nicho, skill: a360-nicho, reports_to: a360-director, phase: discovery}
-  worker-a360-avatar: {id: worker-a360-avatar, skill: a360-avatar, reports_to: a360-director, phase: discovery}
-  # Phase 2 — Validation
-  worker-a360-validacao: {id: worker-a360-validacao, skill: a360-validacao, reports_to: a360-director, phase: validation}
-  worker-a360-modelo: {id: worker-a360-modelo, skill: a360-modelo, reports_to: a360-director, phase: validation}
-  # Phase 3 — Offer
-  worker-a360-oferta: {id: worker-a360-oferta, skill: a360-oferta, reports_to: a360-director, phase: offer}
-  worker-a360-funil: {id: worker-a360-funil, skill: a360-funil, reports_to: a360-director, phase: offer}
-  # Phase 4 — Launch
-  worker-a360-lancamento: {id: worker-a360-lancamento, skill: a360-lancamento, reports_to: a360-director, phase: launch}
-  worker-a360-pitch: {id: worker-a360-pitch, skill: a360-pitch, reports_to: a360-director, phase: launch}
-  # Phase 5 — Growth
-  worker-a360-metricas: {id: worker-a360-metricas, skill: a360-metricas, reports_to: a360-director, phase: growth}
-  worker-a360-growth: {id: worker-a360-growth, skill: a360-growth, reports_to: a360-director, phase: growth}
-  # Phase 6 — Scale
-  worker-a360-scale: {id: worker-a360-scale, skill: a360-scale, reports_to: a360-director, phase: scale}
-  worker-a360-case-study: {id: worker-a360-case-study, skill: a360-case-study, reports_to: a360-director, phase: scale}
-
-squads_a360:
-  discovery: {workers: [worker-a360-nicho, worker-a360-avatar], description: "Niche research + ICP definition"}
-  validation: {workers: [worker-a360-validacao, worker-a360-modelo], description: "Smoke tests + business model design"}
-  offer: {workers: [worker-a360-oferta, worker-a360-funil], description: "Grand Slam Offer + acquisition funnel"}
-  launch: {workers: [worker-a360-lancamento, worker-a360-pitch, worker-a360-metricas], description: "PLF sequence + pitch deck + baseline metrics"}
-  growth: {workers: [worker-a360-metricas, worker-a360-growth, worker-a360-case-study], description: "Growth engine + retention + portfolio proof"}
-  scale: {workers: [worker-a360-scale, worker-a360-growth, worker-a360-metricas], description: "0-to-1M ARR roadmap"}
-
-dispatch_a360:
-  # Trigger keyword → preferred chain or skill
-  "valida minha ideia": {chain: a360_pre_pmf, fallback: a360-validacao}
-  "tenho uma ideia": {chain: a360_pre_pmf}
-  "qual o mercado": {skill: a360-nicho}
-  "quem e meu cliente": {skill: a360-avatar}
-  "modelo de negocio": {skill: a360-modelo}
-  "grand slam offer": {skill: a360-oferta}
-  "constroi minha oferta": {chain: a360_offer_pack}
-  "funil de aquisicao": {skill: a360-funil}
-  "lancamento plf": {chain: a360_launch_pack}
-  "pitch deck": {skill: a360-pitch}
-  "dashboard metricas saas": {skill: a360-metricas}
-  "growth engine": {skill: a360-growth}
-  "escalar para 1m arr": {chain: a360_scale_pack}
-  "case study cliente": {skill: a360-case-study}
-  "a360 completo": {chain: a360_full_lifecycle}
-  "diagnostica meu negocio": {skill: a360-director}
-  "ajuda com o meu negocio": {skill: a360-director}
-
-# ═══════════════════════════════════════════════════════════════
-# PROMETHEUS — External Knowledge & Evolution Squad (Wave 1)
-# Passive monitoring only. ZERO autonomous action.
-# Diferenciação: dream = internal consolidation · ORACULO = deep research · PROMETHEUS = breadth external sweep
-# ═══════════════════════════════════════════════════════════════
-
-agents_meta_evolution:
-  prometheus-director:
-    id: prometheus-director
-    name: PROMETHEUS Director
-    title: External Knowledge & Evolution Squad Lead
-    parent: dario-ceo
-    capabilities: [external_monitoring, repo_scanning, mcp_discovery, paper_tracking,
-      regulatory_watch, signal_filtering, weekly_digest, change_impact_analysis]
-    compliance_required: [audit_immutable, responsible_disclosure, regulatory_tracking]
-    autonomy_tier: 0  # T0 passive monitoring only — Waves 2-3 escalate
-    no_auto_action: true  # cannot write outside prometheus/digests + prometheus/state
-
-workers_prometheus:
-  worker-prometheus-repos: {id: worker-prometheus-repos, skill: prometheus-repo-scanner, reports_to: prometheus-director, sensor_type: repos}
-  worker-prometheus-mcp: {id: worker-prometheus-mcp, skill: prometheus-mcp-discovery, reports_to: prometheus-director, sensor_type: mcp_marketplaces}
-  worker-prometheus-papers: {id: worker-prometheus-papers, skill: prometheus-paper-tracker, reports_to: prometheus-director, sensor_type: research}
-  worker-prometheus-regulatory: {id: worker-prometheus-regulatory, skill: prometheus-regulatory-watch, reports_to: prometheus-director, sensor_type: regulatory}
-
-squads_prometheus:
-  external_sensors: {workers: [worker-prometheus-repos, worker-prometheus-mcp, worker-prometheus-papers, worker-prometheus-regulatory], description: "Wave 1 — 4 passive sensors"}
-  # decay_detectors: pending Wave 2
-  # experimenters: pending Wave 3
-  # curator_self_updater: pending Wave 3
-
-dispatch_prometheus:
-  "scan mundo": {chain: prometheus_weekly_scan}
-  "prometheus weekly": {chain: prometheus_weekly_scan}
-  "weekly digest": {chain: prometheus_weekly_scan}
-  "novidades semana": {chain: prometheus_weekly_scan}
-  "scan repos": {skill: prometheus-repo-scanner}
-  "novos releases": {skill: prometheus-repo-scanner}
-  "scan mcp": {skill: prometheus-mcp-discovery}
-  "novos mcp": {skill: prometheus-mcp-discovery}
-  "scan papers": {skill: prometheus-paper-tracker}
-  "arxiv weekly": {skill: prometheus-paper-tracker}
-  "novidades anthropic": {skill: prometheus-paper-tracker}
-  "scan regulatorio": {skill: prometheus-regulatory-watch}
-  "novas leis": {skill: prometheus-regulatory-watch}
-  "regulatory watch": {skill: prometheus-regulatory-watch}
-
-prometheus_governance:
-  wave: 1
-  autonomy_tier: 0
-  green_list_auto_actions: []  # Wave 1 = nothing auto
-  yellow_list_post_review: []  # Wave 2 introduction
-  red_list_always_user_approval:
-    - edit_any_skill
-    - edit_company_yaml
-    - edit_skill_chains_yaml
-    - delete_memory_entry
-    - push_to_repos
-    - modify_license_files
-  write_allowed_paths:
-    - "~/.claude/orchestrator/prometheus/digests/*.md"
-    - "~/.claude/orchestrator/prometheus/state/*.yaml"
-  read_only_paths_external:
-    - "https://api.github.com/*"
-    - "https://export.arxiv.org/*"
-    - "https://www.anthropic.com/*"
-    - "https://dre.pt/*"
-    - "https://eur-lex.europa.eu/*"
-    - "https://www.gov.br/anpd/*"
+    capabilities:
+    - cmvm_compliance
+    - bdp_banking_pt
+    - asae_food_safety
+    - acss_healthcare_pt
+    - rgpd_pt_marker
+    - igac_events_pt
+    - anac_aviation_pt
+    - concorrencia_pt
+    - eu_ai_act_pt
+    - dora_resilience
+    - mifid_ii_pt
+    - psd2_open_banking_pt
+    - anti_fraude_pt
+    - kyc_aml_pt
+    - dl_79_2024_digital
+    compliance_required:
+    - cmvm_disclosure_gate
+    - bdp_regulatory_reporting_gate
+    - ai_act_risk_classification
+    - dora_testing_schedule
+    - cnpd_consultation_marker
+    - audit_immutable

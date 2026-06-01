@@ -48,8 +48,8 @@ class TestLoaderRoundTrip:
     def test_squad_files_contribute_keys(self):
         """Each squad/<id>.yaml must add at least one top-level key (agents_X / workers_X / squads_X)."""
         cfg = load()
-        # Expected squads from v11.x / v12.x
-        expected_squad_prefixes = ["workers_lex", "workers_demeter", "workers_aegis"]
+        # Kept squads (industry squads demeter/aegis/etc archived 2026-06-01 — see VERTICALS_ARCHIVE.md)
+        expected_squad_prefixes = ["workers_lex", "workers_nomos", "workers_obsidian"]
         for k in expected_squad_prefixes:
             assert k in cfg, f"missing squad key from segments: {k}"
 
@@ -85,10 +85,12 @@ class TestSegmentFiles:
                 bad.append((fp.name, str(e)[:80]))
         assert not bad, f"invalid squad YAMLs: {bad}"
 
-    def test_at_least_15_squad_files(self):
+    def test_at_least_10_squad_files(self):
+        # Floor lowered 15->10 after archiving 13 industry squads (26 files)
+        # on 2026-06-01 — see orchestrator/VERTICALS_ARCHIVE.md.
         squads_dir = CONFIG_DIR / "squads"
         files = list(squads_dir.glob("*.yaml"))
-        assert len(files) >= 15, f"only {len(files)} squad files — expected 15+"
+        assert len(files) >= 10, f"only {len(files)} squad files — expected 10+"
 
 
 class TestRegeneration:
