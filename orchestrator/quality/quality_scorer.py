@@ -50,8 +50,25 @@ try:
             return yaml_engine.load(f)
 
     def dump_yaml(data, path):
-        with open(path, 'w', encoding='utf-8') as f:
-            yaml_engine.dump(data, f)
+        # Atomic write (2026-06-01): skill-metrics.yaml is written by multiple
+        # processes (scorer in tests, autodiag in the live runtime). A plain
+        # open('w') truncates then interleaves under concurrency, corrupting the
+        # file. Write to a temp file in the same dir, then os.replace (atomic on
+        # the same filesystem) — concurrent writers become last-writer-wins, never
+        # partial/interleaved.
+        import os, tempfile
+        d = os.path.dirname(path) or "."
+        fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
+        try:
+            with os.fdopen(fd, 'w', encoding='utf-8') as f:
+                yaml_engine.dump(data, f)
+            os.replace(tmp, path)
+        except BaseException:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
 
 except ImportError:
     import yaml
@@ -61,8 +78,19 @@ except ImportError:
             return yaml.safe_load(f)
 
     def dump_yaml(data, path):
-        with open(path, 'w', encoding='utf-8') as f:
-            yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+        import os, tempfile
+        d = os.path.dirname(path) or "."
+        fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
+        try:
+            with os.fdopen(fd, 'w', encoding='utf-8') as f:
+                yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+            os.replace(tmp, path)
+        except BaseException:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
 
 
 # --- Configuration ---

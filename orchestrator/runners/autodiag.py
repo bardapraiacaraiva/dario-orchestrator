@@ -36,16 +36,41 @@ try:
             return yaml_engine.load(f)
 
     def dump_yaml(data, path):
-        with open(path, 'w', encoding='utf-8') as f:
-            yaml_engine.dump(data, f)
+        # Atomic write (2026-06-01) — see quality_scorer.dump_yaml. Prevents
+        # interleaved/partial corruption of skill-metrics.yaml when the live
+        # runtime's autodiag and another writer (scorer/cron) race.
+        import os, tempfile
+        d = os.path.dirname(path) or "."
+        fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
+        try:
+            with os.fdopen(fd, 'w', encoding='utf-8') as f:
+                yaml_engine.dump(data, f)
+            os.replace(tmp, path)
+        except BaseException:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
 except ImportError:
     import yaml
     def load_yaml(path):
         with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
     def dump_yaml(data, path):
-        with open(path, 'w', encoding='utf-8') as f:
-            yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+        import os, tempfile
+        d = os.path.dirname(path) or "."
+        fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
+        try:
+            with os.fdopen(fd, 'w', encoding='utf-8') as f:
+                yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+            os.replace(tmp, path)
+        except BaseException:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
 
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
