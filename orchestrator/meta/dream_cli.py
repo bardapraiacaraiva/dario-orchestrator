@@ -57,10 +57,36 @@ def cmd_episodes(args) -> int:
 
 
 def cmd_workflows(args) -> int:
-    for wf in procedural.list_workflows():
-        print(f"  {wf.workflow_id}  ({wf.discovered_from})  sessions={wf.sessions_observed}  "
-              f"avg_score={wf.avg_score}  use_count={wf.use_count}")
-        print(f"    -> {' → '.join(wf.skills_sequence)}")
+    # Read raw YAML rather than procedural.list_workflows(): convergence-discovered
+    # workflows store their chain under `steps[]` / `convergence_evidence{}`, which the
+    # ProceduralWorkflow pydantic model drops on load — so the model-based view rendered
+    # them as empty. Fall back across both schemas here.
+    import yaml as _yaml
+    paths = sorted(procedural.PROCEDURAL_DIR.glob("PROC-*.yaml"))
+    if not paths:
+        print("  (no procedural workflows)")
+        return 0
+    for path in paths:
+        try:
+            with open(path, encoding="utf-8") as f:
+                d = _yaml.safe_load(f) or {}
+        except Exception:
+            continue
+        ce = d.get("convergence_evidence") or {}
+        wf_id = d.get("workflow_id") or path.stem
+        discovered = d.get("discovered_from") or ("convergence" if ce else "?")
+        # legacy schema uses skills_sequence; convergence schema uses steps[].skill
+        seq = d.get("skills_sequence") or [s.get("skill", "?") for s in (d.get("steps") or [])]
+        sessions = d.get("sessions_observed") or ce.get("runs", 0)
+        avg = d.get("avg_score") or ce.get("avg_score") or 0.0
+        line = (f"  {wf_id}  ({discovered})  sessions={sessions}  "
+                f"avg_score={avg}  use_count={d.get('use_count', 0)}")
+        if d.get("confidence") is not None:
+            line += f"  conf={d['confidence']}"
+        if d.get("client_validated") is not None:
+            line += f"  validated={d['client_validated']}"
+        print(line)
+        print(f"    -> {' → '.join(seq) if seq else '(no sequence)'}")
     return 0
 
 

@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 def utcnow() -> str:
@@ -85,6 +85,12 @@ class SemanticMemory(BaseModel):
 
 
 class ProceduralWorkflow(BaseModel):
+    # extra="allow" preserves the convergence schema (steps[], convergence_evidence{},
+    # confidence, client_validated, …) on load/round-trip. Without it, record_usage()'s
+    # read→write cycle would silently erase those fields the first time a convergence
+    # workflow is used.
+    model_config = ConfigDict(extra="allow")
+
     workflow_id: str
     name: str
     discovered_from: str = "convergence"
@@ -98,6 +104,34 @@ class ProceduralWorkflow(BaseModel):
     last_used: str | None = None
     use_count: int = 0
     success_rate: float = 0.0
+
+    @model_validator(mode="before")
+    @classmethod
+    def _unify_convergence_schema(cls, data):
+        """Materialize the legacy dispatch fields from the convergence schema.
+
+        Convergence-discovered workflows store their chain under `steps[]` and their
+        evidence under `convergence_evidence{}`. Dispatch matching (find_applicable,
+        detect_completed) reads `skills_sequence` / `project_hints` / `avg_score`, so
+        derive those here when the legacy fields are empty. Existing values win — once
+        materialized (and re-saved), this is a no-op.
+        """
+        if not isinstance(data, dict):
+            return data
+        steps = data.get("steps") or []
+        ce = data.get("convergence_evidence") or {}
+        if not data.get("skills_sequence") and steps:
+            seq = [s.get("skill") for s in steps
+                   if isinstance(s, dict) and s.get("skill")]
+            if seq:
+                data["skills_sequence"] = seq
+        if not data.get("project_hints") and ce.get("projects"):
+            data["project_hints"] = list(ce["projects"])
+        if not data.get("avg_score") and ce.get("avg_score"):
+            data["avg_score"] = ce["avg_score"]
+        if not data.get("sessions_observed") and ce.get("runs"):
+            data["sessions_observed"] = ce["runs"]
+        return data
 
 
 class CacheEntry(BaseModel):
