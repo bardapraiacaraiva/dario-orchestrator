@@ -17,7 +17,10 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 
-pytestmark = pytest.mark.slow  # Temporal test env takes ~5-10s to spin up
+pytestmark = [
+    pytest.mark.slow,  # Temporal test env takes ~5-10s to spin up
+    pytest.mark.skip(reason="durable/ DEPRECATED 2026-06-01 (see durable/DEPRECATED.md) — pilot kept for reference only"),
+]
 
 
 @pytest.mark.asyncio

@@ -27,6 +27,28 @@
 
 chains:
 
+  # ── FISCAL / CONTABILIDADE (added 2026-06-02 — projeto radar-fiscal) ──
+
+  radar_fiscal_producao:
+    name: "Radar Fiscal — produção white-label por cliente"
+    description: "Produz o Radar Fiscal de 1 cliente do gabinete (calendário de obrigações + prazos efetivos verificados + checklist), white-label, validado por quality gate bloqueante. Ver Downloads/radar-fiscal-demo/ e tasks RADAR-001..006."
+    trigger_keywords: ["radar fiscal", "produzir radar", "calendario fiscal cliente", "obrigacoes do mes cliente"]
+    steps:
+      - skill: cfo-tax-autopilot
+        receives: "enquadramento do cliente (forma_juridica, regime_iva, trabalhadores, nao_residentes) + mês alvo"
+        produces: "lista de obrigações do perfil (matriz RADAR-003) com prazos efetivos (engine RADAR-001: feriados + transição + exceções PPC)"
+        pass_to_next: [obrigacoes_com_prazos, enquadramento, mes]
+      - skill: conta-relatorios
+        receives: "obrigações com prazos + dados white-label do gabinete (logo, nome, contacto)"
+        produces: "entregável white-label preenchido (template RADAR-005)"
+        pass_to_next: [entregavel]
+      - skill: lucas-quality
+        receives: "entregável + perfil do cliente"
+        produces: "score do quality gate (RADAR-004); se NEEDS-VERIFICATION → verificar fonte AT → corrigir → re-gate; bloqueia envio se <70 ou pendências"
+        pass_to_next: [entregavel_aprovado, gate_report]
+    on_complete: "entregar ao gabinete (revisão humana) ou enviar ao cliente final"
+    notes: "Gate é BLOQUEANTE. Custo marginal ~zero sob Claude Max. Validado em 2 perfis (Sabores do Norte trimestral; TechFlow IVA mensal + Modelo 30)."
+
   # ── MARKETING ──
 
   # ═══════════════════════════════════════════════════════════

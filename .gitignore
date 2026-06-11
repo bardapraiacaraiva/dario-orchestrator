@@ -225,6 +225,7 @@ orchestrator/company.yaml
 orchestrator/last_pulse.yaml
 orchestrator/notifications.yaml
 orchestrator/open-dashboard.bat
+orchestrator/dashboard.html
 # orchestrator/license_manager.py  # v11.1.2: now safe to publish (secret in env)
 # v11.1.2 — Trial fingerprint, HMAC keys
 orchestrator/create_batch_tasks.py

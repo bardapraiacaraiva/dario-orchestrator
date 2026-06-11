@@ -8,6 +8,25 @@ license: MIT
 
 The missing piece that transforms the orchestrator from a planning tool into an autonomous execution system. Without heartbeat, tasks sit in YAML files forever. With heartbeat, the CEO wakes up, checks the board, and makes things happen.
 
+## Scripts do Heartbeat — localização e invocação (IMPORTANTE)
+
+Os scripts vivem em **packages**, não na raiz. Há **shims de compatibilidade** na raiz (criados 2026-06-03) que delegam para os módulos reais via `runpy`. **Corre SEMPRE com o venv do orchestrator** (o `python` global não tem as dependências nem os packages).
+
+| Função | Módulo real | Shim na raiz |
+|---|---|---|
+| state machine | `core/state_machine.py` | `state_machine.py` ✅ |
+| dispatch engine | `dispatch/dispatch_engine.py` | `dispatch_engine.py` ✅ |
+| autodiag | `core/autodiag_runner.py` | `autodiag_runner.py` ✅ |
+| budget tracker | `finance/budget_tracker.py` | `scripts/budget_tracker.py` ✅ |
+
+**Invocação (qualquer das formas funciona):**
+```bash
+cd ~/.claude/orchestrator
+.venv/Scripts/python.exe state_machine.py --evaluate --json        # via shim na raiz
+.venv/Scripts/python.exe -m core.state_machine --evaluate --json   # via módulo (canónico)
+```
+⚠️ Os comandos abaixo usam o caminho da raiz (funciona via shim), mas **com o venv** — nunca `python` global.
+
 ## When to activate
 
 - Automatically via scheduled trigger (every 30 minutes)
@@ -20,7 +39,7 @@ The missing piece that transforms the orchestrator from a planning tool into an 
 ```
 PULSE START
 │
-├── 0. STATE CHECK — python ~/.claude/orchestrator/state_machine.py --evaluate --json
+├── 0. STATE CHECK — ~/.claude/orchestrator/.venv/Scripts/python.exe ~/.claude/orchestrator/state_machine.py --evaluate --json
 │   ├── Returns: { state, autonomy_level, max_parallel, system_health }
 │   ├── If GUARDIAN → STOP pulse immediately (no execution allowed)
 │   ├── If REFLECTIVE_PAUSE → reduce max_parallel to 1, skip auto-execute
@@ -44,7 +63,7 @@ PULSE START
 │   └── Log cascade events to audit
 │
 ├── 4. AUTO-DISPATCH — Run the dispatch engine:
-│   ├── Execute: `python ~/.claude/orchestrator/dispatch_engine.py --json`
+│   ├── Execute: `~/.claude/orchestrator/.venv/Scripts/python.exe ~/.claude/orchestrator/dispatch_engine.py --json`
 │   ├── Engine handles: keyword→skill→worker lookup, workload check, sibling fallback, director escalation
 │   ├── Writes assignee + dispatch_reason to task YAML atomically
 │   ├── Logs decisions to audit/dispatch_{date}.log
@@ -70,7 +89,7 @@ PULSE START
 │   └── If >48h → escalate to CEO (mark as blocked, add reason)
 │
 ├── 8. AUTODIAG (via autodiag_runner.py) — Silent periodic audit:
-│   ├── Execute: `python ~/.claude/orchestrator/autodiag_runner.py --fix --json`
+│   ├── Execute: `~/.claude/orchestrator/.venv/Scripts/python.exe ~/.claude/orchestrator/autodiag_runner.py --fix --json`
 │   ├── 7 checks: coherence, orphans, dependencies, budget_drift, stale_review, quality_regression, memory_staleness
 │   ├── Auto-fixes: blocks invalid assignees, removes broken deps, clears orphan parents
 │   ├── Exit 0 = all OK (silent). Exit 2 = warnings (log). Exit 3 = critical (alert user).
@@ -212,7 +231,7 @@ If a heartbeat is already running when a new trigger fires:
 - Heartbeat moves completed tasks to done/
 
 ### With dario-dispatch (via dispatch_engine.py)
-- Heartbeat calls `python ~/.claude/orchestrator/dispatch_engine.py --json`
+- Heartbeat calls `~/.claude/orchestrator/.venv/Scripts/python.exe ~/.claude/orchestrator/dispatch_engine.py --json`
 - Engine reads company.yaml, matches capabilities, checks workload, assigns atomically
 - Returns JSON: { dispatched: N, queued: N, assignments: [...] }
 - Supports: --task ID (single), --dry-run (preview), --status (availability), --explain ID (reasoning chain)
@@ -651,22 +670,21 @@ score_result = invoke_lucas_quality(quality_input)
 
 **Invocation (after each pulse):**
 ```bash
-# Report token usage for a completed task
-python ~/.claude/orchestrator/scripts/budget_tracker.py add \
-    --tokens 2100 \
+cd ~/.claude/orchestrator   # correr a partir daqui, sempre com o venv
+
+# Registar tokens de uma task concluída (flags, NÃO subcomando)
+.venv/Scripts/python.exe scripts/budget_tracker.py --add-tokens 2100 \
     --project mar-brasa \
-    --agent worker-story-circle \
     --skill dario-story-circle \
-    --task-id MNB-004
+    --model opus
 
-# Check budget status (returns JSON to stdout)
-python ~/.claude/orchestrator/scripts/budget_tracker.py status
-# Output: {"percentage": 0.33, "total": 165500, "limit": 50000000, "alert_level": "ok"}
+# Relatório do budget do mês (texto formatado)
+.venv/Scripts/python.exe scripts/budget_tracker.py --report
 
-# Get remaining budget for a project
-python ~/.claude/orchestrator/scripts/budget_tracker.py remaining --project mar-brasa
-# Output: {"project": "mar-brasa", "used": 34000, "remaining": 49966000}
+# Verificar thresholds (80%/95%) — útil no Step 2 do pulso
+.venv/Scripts/python.exe scripts/budget_tracker.py --check
 ```
+> ⚠️ **Interface real usa flags** (`--add-tokens`, `--report`, `--check`, `--project`, `--skill`, `--model {opus,sonnet,haiku}`, `--month`), **NÃO** subcomandos (`add`/`status`/`remaining`, que não existem). Não há `--agent` nem `--task-id`.
 
 **Error Handling:**
 - If script not found → fallback to inline YAML read/write (see update_budget function above)
