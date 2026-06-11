@@ -181,6 +181,10 @@ class TestConvergencePromotion:
             # Write in reverse chronological order intentionally
             ep1 = _make_episode("skill-a", 80, project=proj, task_id=f"REV-{i}-1")
             ep2 = _make_episode("skill-b", 90, project=proj, task_id=f"REV-{i}-2")
+            # Pin to mid-day UTC: detect_convergence groups sessions by day
+            # (timestamp[:10]), so now()+10min straddles the day boundary when
+            # the suite runs 23:50-00:00 UTC and the pair lands in two sessions
+            ep1.timestamp = datetime.now(UTC).replace(hour=12, minute=0, second=0, microsecond=0).isoformat()
             # Force ep2 to have LATER timestamp than ep1
             ep2.timestamp = (datetime.fromisoformat(ep1.timestamp) + timedelta(minutes=10)).isoformat()
             episodic.write_episode(ep2)  # later timestamp written FIRST
