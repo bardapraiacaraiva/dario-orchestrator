@@ -42,6 +42,8 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
+import anthropic  # module-level: the except clauses in call_claude_api reference anthropic.* — a lazy import there raises NameError and kills retry/circuit-breaker
+
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 

@@ -618,7 +618,21 @@ def find_best_worker(task: dict, hierarchy: CompanyHierarchy, workload: dict, ex
 def assign_task(task: dict, worker_id: str, reasons: list) -> bool:
     """Atomically assign a task to a worker with file locking."""
     task_file = task.get("_file")
-    if not task_file or not os.path.exists(task_file):
+    if not task_file:
+        # DB-first task (no YAML file) — CAS assign via DB
+        reason = reasons[-1] if reasons else "direct_match"
+        try:
+            from core.db import DB
+            ok = DB().assign_task(task.get("id", ""), worker_id, reason)
+            if ok:
+                log.info(f"DISPATCHED (db): {task.get('id')} → {worker_id}")
+            else:
+                log.warning(f"DB assign skipped for {task.get('id')} (status changed or already assigned)")
+            return ok
+        except Exception as e:
+            log.error(f"DB assign failed for {task.get('id')}: {e}")
+            return False
+    if not os.path.exists(task_file):
         log.error(f"Task file not found: {task_file}")
         return False
 
