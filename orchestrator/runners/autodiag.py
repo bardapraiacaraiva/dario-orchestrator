@@ -367,11 +367,15 @@ def check_budget_drift(tasks: list, fix: bool) -> dict:
     budget = load_yaml(str(budget_file))
     recorded_total = int(budget.get("total_tokens_used") or 0)
 
-    # Sum actual tokens from tasks
+    # Sum actual tokens from tasks — ONLY the budget's month. Summing all-time
+    # tokens against a monthly budget fabricates drift and the auto-fix then
+    # writes the inflated cross-month total into the month file (audit 2026-06-12).
+    from finance.budget_tracker import _task_month
+    month = now.strftime("%Y-%m")
     task_sum = 0
     for t in tasks:
         tokens = t.get("actual_tokens")
-        if tokens and str(tokens).isdigit():
+        if tokens and str(tokens).isdigit() and _task_month(t) == month:
             task_sum += int(tokens)
 
     drift = abs(recorded_total - task_sum)

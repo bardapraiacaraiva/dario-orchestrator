@@ -28,6 +28,11 @@ log = logging.getLogger("budget_tracker")
 
 # === PATHS ===
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
+# When invoked as a script (python finance/budget_tracker.py), sys.path[0] is
+# finance/ and `from core...` fails → the DB-first reader silently fell back to
+# YAML. Root on sys.path keeps the data source identical across entry points.
+if str(ORCH_DIR) not in sys.path:
+    sys.path.insert(0, str(ORCH_DIR))
 BUDGET_DIR = ORCH_DIR / "budgets"
 TASKS_ACTIVE = ORCH_DIR / "tasks" / "active"
 TASKS_DONE = ORCH_DIR / "tasks" / "done"
@@ -126,18 +131,19 @@ def _load_tasks_from_yaml():
 def _load_budget_tasks():
     """DB-FIRST (2026-06-01): SQLite is the source of truth (CONVENTIONS.md).
 
-    The YAML tasks/ dirs are empty post-migration, so globbing them attributed
-    0 tokens while the DB held actual_tokens for 70+ tasks. Falls back to YAML
-    only when the DB is unavailable. Tests force the YAML path by monkeypatching
-    this function to _load_tasks_from_yaml.
+    Falls back to YAML only when the DB is unavailable — loudly, because the two
+    sources can diverge (2026-06: 61 tasks existed only in YAML) and a silent
+    fallback makes the same command report different numbers depending on the
+    entry point. Tests force the YAML path by monkeypatching this function to
+    _load_tasks_from_yaml.
     """
     try:
         from core.task_store import TaskStore
         tasks = TaskStore().get_all()
         if tasks:
             return tasks
-    except Exception:
-        pass
+    except Exception as e:
+        log.warning(f"DB unavailable ({e!r}) — falling back to YAML task scan; totals may diverge from DB-first readers")
     return _load_tasks_from_yaml()
 
 
@@ -161,8 +167,10 @@ def scan_tasks_for_tokens(month: str | None = None):
             if task_month != month:
                 totals["tasks_skipped_month"] += 1
                 continue
-        project = task.get("project", "unallocated")
-        skill = task.get("skill", "unknown")
+        # `or` (not get-default): a key present with YAML null yields None,
+        # which then crashes print_report's format spec downstream
+        project = task.get("project") or "unallocated"
+        skill = task.get("skill") or "unknown"
         totals["total"] += tokens
         totals["tasks_counted"] += 1
         totals["by_project"][project] = totals["by_project"].get(project, 0) + tokens
@@ -238,21 +246,23 @@ def print_report(budget):
     else:
         print("\n  Status: OK")
 
+    # str() guards: budget YAMLs in the wild contain null keys (e.g. a task with
+    # skill: null) and None has no __format__ for the alignment spec
     if budget.get("by_project"):
         print("\n  BY PROJECT:")
         for proj, tokens in sorted(budget["by_project"].items(), key=lambda x: -x[1]):
-            print(f"    {proj:<25} {tokens:>10,}")
+            print(f"    {str(proj):<25} {tokens:>10,}")
 
     if budget.get("by_skill"):
         print("\n  BY SKILL (top 10):")
         sorted_skills = sorted(budget["by_skill"].items(), key=lambda x: -x[1])[:10]
         for skill, tokens in sorted_skills:
-            print(f"    {skill:<25} {tokens:>10,}")
+            print(f"    {str(skill):<25} {tokens:>10,}")
 
     if budget.get("by_model"):
         print("\n  BY MODEL:")
         for model, tokens in budget["by_model"].items():
-            print(f"    {model:<25} {tokens:>10,}")
+            print(f"    {str(model):<25} {tokens:>10,}")
 
     print(f"{'='*50}\n")
 

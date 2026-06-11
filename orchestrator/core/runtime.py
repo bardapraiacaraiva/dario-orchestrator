@@ -107,10 +107,10 @@ class Scheduler:
         if self.pulse_count > 0 and self.pulse_count % 48 == 0:  # Every ~24h (48 * 30min)
             _run_engine("execution/evolution_runner.py", ["--json"])
             log.info("[EVOLUTION] Daily cycle executed")
-        # Budget tracker
-        _run_engine("budget_tracker.py", ["--check", "--quiet"])
+        # Budget tracker (root budget_tracker.py died in the 84→2 refactor; the scripts/ shim is the survivor)
+        _run_engine("scripts/budget_tracker.py", ["--check", "--quiet"])
         # Dashboard refresh (was ORPHAN — dashboard went stale between manual runs)
-        _run_engine("generate_dashboard.py", [])
+        _run_engine("observability/generate_dashboard.py", [])
         log.info(f"Pulse #{self.pulse_count + 1} complete")
 
     def _reap_zombies(self, max_age_minutes: int = 60):
@@ -148,6 +148,7 @@ def _run_engine(script: str, args: list) -> dict:
     """Run an orchestrator engine and return parsed JSON."""
     script_path = ORCH_DIR / script
     if not script_path.exists():
+        log.error(f"[ENGINE] {script} not found — pulse step silently skipped until path is fixed")
         return {"error": f"{script} not found"}
     try:
         result = subprocess.run(

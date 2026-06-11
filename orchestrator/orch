@@ -217,7 +217,8 @@ def cmd_tasks_create(args):
 # BUDGET — Financial tracking
 # ═══════════════════════════════════════════════════════════
 def cmd_budget(args):
-    script = ORCH / "budget_tracker.py"
+    # root budget_tracker.py died in the 84→2 refactor; scripts/ shim is the survivor
+    script = ORCH / "scripts" / "budget_tracker.py"
     if args and args[0] == "add":
         subprocess.run([sys.executable, str(script), "--add-tokens"] + args[1:])
     else:
