@@ -243,11 +243,14 @@ def aggregate_usage(messages: list[dict]) -> dict:
         model_totals["cost_usd"] = round(model_totals["cost_usd"] + cost, 6)
         totals["cost_usd"] = round(totals["cost_usd"] + cost, 6)
 
+    # cache_read EXCLUDED from the budget figure: at $0.50/M vs $5.00/M input it
+    # is ~10% of the cost but dominates raw volume (one review run read 13.1M
+    # cached tokens → 30% of the monthly budget if counted 1:1). Cost stays
+    # exact in cost_usd; raw volume stays visible in the breakdown.
     totals["total_tokens"] = (
         totals["input_tokens"]
         + totals["output_tokens"]
         + totals["cache_creation_input_tokens"]
-        + totals["cache_read_input_tokens"]
     )
     return totals
 

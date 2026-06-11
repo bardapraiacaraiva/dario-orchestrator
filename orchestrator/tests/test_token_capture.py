@@ -163,7 +163,8 @@ class TestAggregateUsage:
         assert totals["output_tokens"] == 300
         assert totals["cache_creation_input_tokens"] == 3000
         assert totals["cache_read_input_tokens"] == 30000
-        assert totals["total_tokens"] == 33330
+        # cache_read excluded from the budget figure (10% of input cost, dominates volume)
+        assert totals["total_tokens"] == 3330
         assert totals["message_count"] == 2
 
     def test_groups_by_model(self, isolated_capture):
