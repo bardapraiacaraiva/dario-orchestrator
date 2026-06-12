@@ -789,6 +789,21 @@ def cmd_dispatch(args):
             print()
         else:
             if worker_id:
+                # Ethical pre-gate before assignment (DD finding A12, 2026-06-12).
+                # The gate already ran on both EXECUTION paths via guardrails,
+                # but dispatch could assign a task that would only be rejected
+                # later, after a worker picked it up. FAIL → queue, never assign.
+                try:
+                    from safety.ethical_gate import evaluate as ethical_evaluate
+                    eg = ethical_evaluate(task)
+                    if eg["verdict"] == "FAIL":
+                        log.warning(f"Ethical gate blocked {task_id}: {eg['summary']}")
+                        reasons.append(f"ETHICAL_GATE_FAIL: {eg.get('reformulation_hint') or eg['summary']}")
+                        queued += 1
+                        log_dispatch(task_id, None, reasons, dry_run=False)
+                        continue
+                except ImportError:
+                    pass  # gate module unavailable — execution-path guardrails still cover it
                 # Validate the (task, candidate worker) pair before the atomic write
                 from enforcement.dispatch_validator import TaskValidationError, validate_task_or_raise
                 try:

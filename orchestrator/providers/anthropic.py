@@ -47,33 +47,17 @@ import anthropic  # noqa: F401 — used via anthropic.* in call_claude_api excep
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-from core.artifact_schemas import SchemaValidationFilter
 from core.db import DB
-from dispatch.model_router import ModelRouterFilter
-from reliability.output_guardrails import OutputGuardrailFilter
-from streaming.filter_pipeline import (
-    BudgetFilter,
-    FilterPipeline,
-    LoggingFilter,
-    QualityGateFilter,
-    TokenBudgetFilter,
-)
+from execution.pipeline import build_execution_pipeline
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("api_exec")
 
 PYTHON = sys.executable
 
-# Safety pipeline — same filters as executor.py (was: BYPASSED entirely)
-API_PIPELINE = FilterPipeline([
-    LoggingFilter(),
-    ModelRouterFilter(),
-    BudgetFilter(warn_pct=80, block_pct=95),
-    SchemaValidationFilter(),
-    OutputGuardrailFilter(),
-    QualityGateFilter(min_score=60),
-    TokenBudgetFilter(),
-])
+# Safety pipeline — shared factory, same composition as executor.py
+# (DD finding A7, 2026-06-12: two hand-copied lists drift; one source doesn't)
+API_PIPELINE = build_execution_pipeline()
 
 # Model config (pricing per million tokens as of 2026)
 MODELS = {
@@ -519,6 +503,24 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
         result["prompt_tokens_est"] = len(prompt) // 4
         return result
 
+    # 6.5. PROMPT SHIELD — input (DD finding A11, 2026-06-12: was dead code).
+    # The autonomous path is exactly where untrusted text reaches the API
+    # unsupervised: task descriptions and RAG context can carry injection
+    # attempts ("ignore previous instructions", exfiltration bait). Block
+    # BEFORE checkout so a poisoned task costs zero tokens and stays visible.
+    from safety.prompt_shield import inspect_input
+    shield_verdict = inspect_input(prompt)
+    result["steps"].append({"step": "prompt_shield", "block": shield_verdict.get("block", False)})
+    if shield_verdict.get("block"):
+        reason = shield_verdict.get("reason", "prompt injection pattern")
+        log.warning(f"[SHIELD] {task_id}: {reason}")
+        db.block_task(task_id, f"prompt_shield: {reason[:200]}")
+        db.log_event("api-executor", "task_blocked", task_id=task_id,
+                     details=f"prompt_shield: {reason[:200]}")
+        result["status"] = "blocked"
+        result["error"] = f"Prompt shield: {reason}"
+        return result
+
     # 7. Atomic checkout
     if not db.checkout_task(task_id):
         result["status"] = "already_running"
@@ -535,6 +537,31 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
         output_tokens = api_result["output_tokens"]
         total_tokens = input_tokens + output_tokens
         cost = api_result["cost"]
+
+        # 8.2. PROMPT SHIELD — output (DD finding A11). Masks leaked secrets/
+        # PII in place; SSH private keys block the output entirely. Hard
+        # exfiltration patterns still trip the OutputGuardrailFilter below.
+        try:
+            from safety.prompt_shield import inspect_output
+            out_verdict = inspect_output(output)
+            if out_verdict.get("block"):
+                reason = out_verdict.get("reason", "critical secret in output")
+                log.warning(f"[SHIELD] {task_id}: {reason}")
+                db.block_task(task_id, f"prompt_shield: {reason[:200]}")
+                if total_tokens > 0:
+                    db.update_budget(total_tokens)  # tokens were spent; quarantined output never reaches complete_task
+                db.log_event("api-executor", "task_tripwire", task_id=task_id,
+                             details=f"prompt_shield: {reason[:200]}")
+                result["status"] = "tripwire"
+                result["tripwire_reason"] = reason
+                return result
+            if out_verdict.get("sanitized") and out_verdict["sanitized"] != output:
+                kinds = sorted({m.get("kind", m.get("type", "?")) for m in out_verdict.get("matches", [])})
+                log.warning(f"[SHIELD] {task_id}: output sanitized ({', '.join(kinds)})")
+                output = out_verdict["sanitized"]
+                result["steps"].append({"step": "output_sanitized", "masked": kinds})
+        except Exception:
+            pass  # shield failure must not lose a paid-for output
 
         # 8.5. FILTER PIPELINE — AFTER (schema, guardrails, quality gate)
         # quality_score MUST be None here, not 0: the auto-score runs at step 9

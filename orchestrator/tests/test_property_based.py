@@ -6,7 +6,6 @@ Why property-based:
   Hypothesis is the de-facto Python lib for this (used by pip, attrs, etc.).
 
 Coverage focus:
-  - safety/sandbox.py — env handling, output capture, never-leak invariants
   - core/audit_signing.py — sign/verify symmetry, canonicalization stability
   - core/secrets.py — round-trip preserves value (covered by stateful test)
   - safety/prompt_shield.py — sanitize idempotency, deny-list completeness
@@ -18,7 +17,7 @@ import sys
 from pathlib import Path
 
 import pytest
-from hypothesis import HealthCheck, assume, given, settings
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -34,13 +33,6 @@ secret_value_strategy = st.text(
     min_size=8,
     max_size=128,
 )
-
-# Env var names (uppercase + underscores, conventional)
-env_name_strategy = st.text(
-    alphabet=string.ascii_uppercase + "_",
-    min_size=1,
-    max_size=40,
-).filter(lambda s: s[0].isalpha())  # must start with letter
 
 
 # ─── audit_signing: sign+verify symmetry ─────────────────────────────────
@@ -100,59 +92,9 @@ def test_chain_of_n_entries_verifies(n, day):
     assert result["verified"] == n
 
 
-# ─── safety/sandbox: env scoping invariants ──────────────────────────────
-
-
-from safety.sandbox import (
-    ENV_DENY_LIST,
-    run_sandboxed,
-)
-
-
-@pytest.mark.slow  # subprocess per example
-@given(
-    env_name=env_name_strategy,
-    env_value=secret_value_strategy,
-)
-@settings(max_examples=10, deadline=None,
-          suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
-def test_arbitrary_unlisted_env_var_never_leaks(env_name, env_value, monkeypatch):
-    """For ANY env var name not in allowlist, value must not reach subprocess.
-
-    This is the core invariant of the sandbox. Hypothesis tries random
-    names + random values to find any that bypass the filter.
-    """
-    # Skip names that ARE in our SAFE_ENV_DEFAULTS (would legitimately pass)
-    assume(env_name not in ("PATH", "PYTHONPATH", "PYTHONHOME", "PYTHONIOENCODING",
-                            "TEMP", "TMP", "TMPDIR", "LANG", "LC_ALL", "LC_CTYPE",
-                            "HOME", "USERPROFILE", "SYSTEMROOT", "WINDIR", "OS", "COMSPEC"))
-
-    monkeypatch.setenv(env_name, env_value)
-    result = run_sandboxed(
-        [sys.executable, "-c",
-         f"import os; print(repr(os.environ.get({env_name!r}, 'ABSENT')))"],
-        caller="hypothesis-test",
-        timeout_s=10,
-    )
-    assert env_value not in result.stdout, \
-        f"VALUE LEAKED for env_name={env_name!r}, value={env_value!r}"
-
-
-@pytest.mark.slow  # subprocess per example
-@given(env_name=st.sampled_from(ENV_DENY_LIST), value=secret_value_strategy)
-@settings(max_examples=10, deadline=None, suppress_health_check=[HealthCheck.too_slow])
-def test_deny_list_entries_never_pass_via_extra(env_name, value):
-    """For every deny-listed name, no value passes via env_extra either."""
-    result = run_sandboxed(
-        [sys.executable, "-c",
-         f"import os; print(repr(os.environ.get({env_name!r}, 'BLOCKED')))"],
-        caller="hypothesis-test",
-        env_extra={env_name: value},
-        timeout_s=10,
-    )
-    assert "BLOCKED" in result.stdout, f"{env_name} leaked"
-    assert value not in result.stdout, f"value {value!r} leaked via {env_name}"
-
+# safety/sandbox env-scoping invariants removed with the module (DD finding
+# A11, 2026-06-12): zero call-sites — the orchestrator never executes
+# untrusted code. Recoverable from git history if a real use case appears.
 
 # ─── prompt_shield: sanitize idempotency ─────────────────────────────────
 

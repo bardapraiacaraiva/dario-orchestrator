@@ -174,14 +174,15 @@ def evaluate_freedom(task: dict) -> tuple:
     description = (task.get("description") or "").lower()
     combined = f"{title} {description}"
 
-    # Destructive verb without explicit confirmation
+    # Destructive verb without explicit confirmation.
+    # Only structured fields count (DD finding A12, 2026-06-12): accepting the
+    # words "approved"/"confirmed" in free text let any task title bypass the
+    # destructive-action check by simply containing the word.
     for verb in DESTRUCTIVE_VERBS:
         if verb in combined:
             confirmed = bool(
                 task.get("confirmation_received")
                 or task.get("user_approved")
-                or "confirmed" in combined
-                or "approved" in combined
             )
             if not confirmed:
                 reasons.append(f"destructive verb '{verb}' without confirmation")

@@ -162,6 +162,27 @@ def release_slot(slot_id: str) -> bool:
         return released
 
 
+def release_by_caller(caller: str) -> int:
+    """Release every slot claimed under `caller`. Returns count released.
+
+    For claim/release pairs that span process boundaries (DD finding A9,
+    2026-06-12): executor.execute_task claims under "executor:<task_id>" at
+    checkout, but the matching record_execution_result may run in a different
+    process that never saw the slot_id. The caller string is the stable key.
+    """
+    if not caller:
+        return 0
+    _ensure_files()
+    with portalocker.Lock(str(LOCK_FILE), timeout=10) as _:
+        slots = _load_slots(datetime.now(UTC))
+        before = len(slots)
+        slots = [s for s in slots if s.get("caller") != caller]
+        released = before - len(slots)
+        if released:
+            _save_slots(slots)
+        return released
+
+
 def active_slots() -> list[dict[str, Any]]:
     """Read-only inspection — used by dashboard widget + tests."""
     _ensure_files()

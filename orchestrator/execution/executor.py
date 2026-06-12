@@ -72,21 +72,12 @@ import functools
 # configured deployment gets real distributed traces. Never affects execution.
 import os as _os_otel
 
-from core.artifact_schemas import SchemaValidationFilter
 from core.db import DB
-from dispatch.model_router import ModelRouterFilter
 from execution.checkpoint_interrupt import interrupt_task, should_interrupt
 from execution.completion_hooks import run_learning_writebacks
-from reliability.output_guardrails import OutputGuardrailFilter
 from safety.approval_gates import get_approval_level, request_approval
 from safety.guardrails import validate_task
-from streaming.filter_pipeline import (
-    BudgetFilter,
-    FilterPipeline,
-    LoggingFilter,
-    QualityGateFilter,
-    TokenBudgetFilter,
-)
+from execution.pipeline import build_execution_pipeline
 
 _OTEL_TARGET = (
     _os_otel.environ.get("DARIO_OTEL") == "1"
@@ -132,16 +123,9 @@ def _traced_task(fn):
 
 PYTHON = sys.executable
 
-# TIER 1 Filter Pipeline — composable middleware for every execution
-PIPELINE = FilterPipeline([
-    LoggingFilter(),            # 10: log start/end
-    ModelRouterFilter(),        # 15: select optimal model
-    BudgetFilter(),             # 20: check budget before execution
-    SchemaValidationFilter(),   # 65: validate output structure
-    OutputGuardrailFilter(),    # 70: check for secrets/PII/injection
-    QualityGateFilter(),        # 80: quality threshold gate
-    TokenBudgetFilter(),        # 90: update budget after execution
-])
+# TIER 1 Filter Pipeline — shared factory, same composition as the API engine
+# (DD finding A7, 2026-06-12: two hand-copied lists drift; one source doesn't)
+PIPELINE = build_execution_pipeline()
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("executor")
 
@@ -279,9 +263,27 @@ def execute_task(task_id: str, dry_run: bool = False) -> dict:
     except Exception:
         pass  # Approval gate failure should not block execution
 
+    # ─── Step 5.8: PARALLELISM SLOT (DD finding A9, 2026-06-12) ─────────
+    # The autonomous pulse already executes under a slot; this CLI/executor
+    # path did not, so two sessions could both believe they were under the
+    # "max parallel" limit. Claimed here, released by record_execution_result
+    # via release_by_caller (the record may run in a different process).
+    # Stale-slot reaping (1h) covers executions that never record.
+    from enforcement.parallelism_guard import ParallelismExceededError, claim_slot
+    try:
+        claim_slot(caller=f"executor:{task_id}")
+    except ParallelismExceededError as e:
+        result["status"] = "blocked"
+        result["error"] = f"Parallelism guard: {e}"
+        db.log_event("executor", "task_blocked", task_id=task_id,
+                     details=f"parallelism_guard: {e}")
+        return result
+
     # ─── Step 6: EXECUTE (atomic checkout in DB) ─────────────────────────
     checked_out = db.checkout_task(task_id)
     if not checked_out:
+        from enforcement.parallelism_guard import release_by_caller
+        release_by_caller(f"executor:{task_id}")
         result["status"] = "already_running"
         result["error"] = "Task could not be checked out (already in_progress or not todo)"
         return result
@@ -311,6 +313,14 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
     """
     db = DB()
     result = {"task_id": task_id, "steps": []}
+
+    # Free the parallelism slot claimed at checkout (DD finding A9) — the
+    # execution window is over regardless of how the recording goes below.
+    try:
+        from enforcement.parallelism_guard import release_by_caller
+        release_by_caller(f"executor:{task_id}")
+    except Exception:
+        pass  # stale-slot reaping (1h) is the backstop
 
     task = db.get_task(task_id)
     if not task:

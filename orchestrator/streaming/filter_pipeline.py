@@ -234,6 +234,11 @@ def default_pipeline() -> FilterPipeline:
     ])
 
 
+# The shared two-engine execution pipeline lives in execution/pipeline.py
+# (DD finding A7) — NOT here: streaming/ must not import dispatch/ or
+# reliability/, even lazily, or the import-cycle tripwire trips.
+
+
 if __name__ == "__main__":
     # Quick test
     logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
