@@ -136,32 +136,47 @@ class Scheduler:
                  f"executed={len(executed)} "
                  f"cost=${(res.get('totals') or {}).get('cost', 0)}")
 
-    def _reap_zombies(self, max_age_minutes: int = 60):
-        """Find tasks stuck in in_progress and block them (new: zombie reaper)."""
+    def _reap_zombies(self):
+        """SLA enforcement for in_progress tasks (audit 2026-06-12 Onda 4).
+
+        Replaces the fixed 60-minute reaper, which ignored execution policy —
+        a `default` task has 8h of SLA but was being blocked at 1h. Policy now
+        decides: breach blocks critical/financial immediately, warns the rest;
+        2x SLA blocks everything. Tasks without a checkout clock (founder
+        external actions) are never SLA-blocked.
+        """
         try:
             from core.db import DB
+            from core.sla import evaluate
             db = DB()
             tasks = db.get_tasks(status="in_progress")
             now = datetime.now(UTC)
-            reaped = 0
+            blocked = warned = 0
             for t in tasks:
-                checked_out = t.get("checked_out_at", "")
-                if not checked_out:
+                verdict = evaluate(t, now=now)
+                if verdict["status"] in ("ok", "no_clock"):
                     continue
-                try:
-                    co_time = datetime.fromisoformat(checked_out.replace("Z", "+00:00"))
-                    age_min = (now - co_time).total_seconds() / 60
-                    if age_min > max_age_minutes:
-                        db.block_task(t["id"], f"Zombie reaper: in_progress for {age_min:.0f} min (max {max_age_minutes})")
-                        db.log_event("zombie_reaper", "task_reaped", task_id=t["id"],
-                                    details=f"Stuck {age_min:.0f} min")
-                        reaped += 1
-                except Exception:
-                    pass
-            if reaped:
-                log.warning(f"[REAPER] Reaped {reaped} zombie tasks")
+                detail = (f"SLA {verdict['status']}: {verdict['age_hours']}h in_progress vs "
+                          f"{verdict['sla_hours']}h ({t.get('execution_policy') or 'default'})")
+                if verdict["should_block"]:
+                    db.block_task(t["id"], detail)
+                    db.log_event("sla_enforcer", "task_blocked_sla", task_id=t["id"], details=detail)
+                    blocked += 1
+                else:
+                    # one warning per task, not one per pulse (a long soft breach
+                    # would otherwise write 48 audit events/day)
+                    with db._conn() as conn:
+                        already = conn.execute(
+                            "SELECT COUNT(*) FROM audit WHERE action='sla_warning' AND task_id=?",
+                            (t["id"],),
+                        ).fetchone()[0]
+                    if not already:
+                        db.log_event("sla_enforcer", "sla_warning", task_id=t["id"], details=detail)
+                        warned += 1
+            if blocked or warned:
+                log.warning(f"[SLA] blocked={blocked} warned={warned}")
         except Exception as e:
-            log.error(f"[REAPER] Error: {e}")
+            log.error(f"[SLA] Error: {e}")
 
 
 scheduler = Scheduler()

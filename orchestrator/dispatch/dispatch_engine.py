@@ -667,6 +667,8 @@ def assign_task(task: dict, worker_id: str, reasons: list) -> bool:
             data["assignee"] = worker_id
             data["assigned_at"] = now
             data["dispatch_reason"] = reasons[-1] if reasons else "direct_match"
+            from core.sla import deadline_from
+            data["sla_deadline"] = deadline_from(now, data.get("execution_policy"))
 
             lock.write(data)
         log.info(f"DISPATCHED: {data.get('id')} → {worker_id}")

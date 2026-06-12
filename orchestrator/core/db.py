@@ -202,6 +202,15 @@ class DB:
                     pass  # column may already exist
             conn.execute("INSERT OR IGNORE INTO schema_versions (version, description) VALUES (4, 'Risk #10: model_used in polished_runs + model_drift_events table')")
 
+        if current < 5:
+            # v5: SLA enforcement (audit 2026-06-12 Onda 4) — deadline stamped at
+            # assignment, checked by the runtime pulse with policy-based escalation
+            try:
+                conn.execute("ALTER TABLE tasks ADD COLUMN sla_deadline TEXT")
+            except sqlite3.OperationalError:
+                pass  # column already exists
+            conn.execute("INSERT OR IGNORE INTO schema_versions (version, description) VALUES (5, 'SLA: tasks.sla_deadline column')")
+
     # ─── TASKS ───────────────────────────────────────────────────────────────
 
     def create_task(self, data: dict = None, **kwargs) -> dict:
@@ -249,11 +258,16 @@ class DB:
         """Atomically assign a task (CAS: only if todo and unassigned)."""
         now = datetime.now(UTC).isoformat()
         with self._conn() as conn:
+            policy_row = conn.execute(
+                "SELECT execution_policy FROM tasks WHERE id = ?", (task_id,)
+            ).fetchone()
+            from core.sla import deadline_from
+            sla = deadline_from(now, policy_row["execution_policy"] if policy_row else None)
             cursor = conn.execute("""
                 UPDATE tasks SET assignee = ?, assigned_at = ?, dispatch_reason = ?,
-                    updated_at = ?
+                    sla_deadline = ?, updated_at = ?
                 WHERE id = ? AND status = 'todo' AND (assignee IS NULL OR assignee = '')
-            """, (worker_id, now, reason, now, task_id))
+            """, (worker_id, now, reason, sla, now, task_id))
             if cursor.rowcount == 0:
                 return False
             self._log(conn, "dispatch", "task_assigned", task_id=task_id,
