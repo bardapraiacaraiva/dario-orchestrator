@@ -142,7 +142,13 @@ task:
 - **Every task MUST include schema v2 fields:** `revision_max_loops` (from execution_policy), `blocked_reason: null`, `watchers: []`
 - **Every task MUST set `sla_deadline`** based on execution_policy.sla_hours from company.yaml (critical: 1h, client_facing: 4h, financial: 2h, default: 8h). If task is created without going through dispatch, orchestrator sets this directly.
 
-**Save each task** to `~/.claude/orchestrator/tasks/active/PROJ-NNN.yaml`
+**Save each task** to `~/.claude/orchestrator/tasks/active/PROJ-NNN.yaml` — **and immediately sync it to the DB** (SQLite is the source of truth; YAML-only writes are how the DB↔YAML divergence reopened in June 2026 with 61 invisible tasks):
+
+```bash
+cd ~/.claude/orchestrator && .venv/Scripts/python.exe orch tasks sync tasks/active/PROJ-NNN.yaml
+```
+
+The same applies after EDITING any task YAML (status change, completion, notes): re-run `orch tasks sync <file>`. For bulk reconciliation use `orch tasks sync --all`. The autodiag check #11 `db_yaml_divergence` will flag you if you skip this.
 
 ### Phase 3: DISPATCH (Intelligent Routing)
 
