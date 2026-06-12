@@ -737,6 +737,19 @@ def cmd_dispatch(args):
             log.info("No unassigned tasks to dispatch.")
         return 0
 
+    # Budget gate — Python enforcement before any assignment (not the markdown honor system)
+    if not args.dry_run:
+        from enforcement.budget_gate import BudgetExceededError, check_budget_or_raise
+        try:
+            check_budget_or_raise()
+        except BudgetExceededError as e:
+            log.error(f"Dispatch blocked by budget gate: {e}")
+            if args.json:
+                import json
+                print(json.dumps({"dispatched": 0, "queued": len(targets), "total_analyzed": len(targets),
+                                  "assignments": [], "blocked": f"budget_gate: {e}"}))
+            return 3
+
     dispatched = 0
     queued = 0
     assignments_log = []
@@ -760,6 +773,16 @@ def cmd_dispatch(args):
             print()
         else:
             if worker_id:
+                # Validate the (task, candidate worker) pair before the atomic write
+                from enforcement.dispatch_validator import TaskValidationError, validate_task_or_raise
+                try:
+                    validate_task_or_raise({**task, "assignee": worker_id})
+                except TaskValidationError as e:
+                    log.warning(f"Validation blocked {task_id} → {worker_id}: {e}")
+                    reasons.append(f"VALIDATION_BLOCKED: {e}")
+                    queued += 1
+                    log_dispatch(task_id, None, reasons, dry_run=False)
+                    continue
                 success = assign_task(task, worker_id, reasons)
                 if success:
                     dispatched += 1

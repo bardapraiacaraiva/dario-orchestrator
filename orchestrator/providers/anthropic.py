@@ -780,6 +780,16 @@ def autonomous_pulse(dry_run: bool = False, max_tasks: int = 3) -> dict:
     db = DB()
     pulse = {"timestamp": datetime.now(UTC).isoformat(), "steps": {}, "tasks_executed": []}
 
+    # Budget gate FIRST — Python enforcement, not markdown honor system
+    from enforcement.budget_gate import BudgetExceededError, check_budget_or_raise
+    try:
+        check_budget_or_raise()
+    except BudgetExceededError as e:
+        pulse["status"] = "budget_stop"
+        pulse["error"] = str(e)
+        db.log_event("api-executor", "autonomous_pulse_blocked", details=f"budget gate: {e}")
+        return pulse
+
     # State check
     state = run_engine("core/state_machine.py", ["--evaluate", "--json"])
     pulse["steps"]["state"] = {"state": state.get("state"), "health": state.get("system_health")}
@@ -802,9 +812,23 @@ def autonomous_pulse(dry_run: bool = False, max_tasks: int = 3) -> dict:
 
     pulse["steps"]["wave_size"] = len(wave)
 
-    # Execute each task via API
+    # Execute each task via API — validated + under a cross-process parallelism slot
+    from enforcement.dispatch_validator import TaskValidationError, validate_task_or_raise
+    from enforcement.parallelism_guard import ParallelismExceededError, slot
     for task in wave:
-        task_result = execute_task(task["id"], dry_run=dry_run)
+        try:
+            validate_task_or_raise(task)
+        except TaskValidationError as e:
+            pulse["tasks_executed"].append({"task_id": task["id"], "status": "validation_failed", "error": str(e)})
+            db.log_event("api-executor", "task_validation_failed", task_id=task["id"], details=str(e))
+            continue
+        try:
+            with slot(caller=f"autonomous_pulse/{task['id']}"):
+                task_result = execute_task(task["id"], dry_run=dry_run)
+        except ParallelismExceededError as e:
+            # Slots are shared with interactive sessions — stop the wave, next pulse retries
+            pulse["steps"]["parallelism_stop"] = str(e)
+            break
         pulse["tasks_executed"].append({
             "task_id": task["id"],
             "status": task_result.get("status"),
