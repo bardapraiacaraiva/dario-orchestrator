@@ -26,7 +26,11 @@ from dream.orient import orient
 from dream.prune import prune
 from dream.reorganize import reorganize
 from memory import cache, retrieval, semantic
+from memory.config import get as _cfg
 from memory.schemas import DreamReport, utcnow
+
+# Default episode window — configurable (DD finding A13, 2026-06-12)
+DEFAULT_WINDOW_DAYS = int(_cfg("dream_window_days"))
 
 REPORTS_DIR = ORCH_DIR / "dream" / "reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -41,7 +45,7 @@ LEGACY_MIRROR_UNTIL = "2026-06-22"  # 30d grace period from v12.1 migration
 
 
 class DreamEngine:
-    def __init__(self, window_days: int = 7, agent: str = "dario-ceo", dry_run: bool = False):
+    def __init__(self, window_days: int = DEFAULT_WINDOW_DAYS, agent: str = "dario-ceo", dry_run: bool = False):
         self.window_days = window_days
         self.agent = agent
         self.dry_run = dry_run
@@ -211,13 +215,13 @@ class DreamEngine:
             (LEGACY_DREAMS_DIR / filename).write_text(content, encoding="utf-8")
 
 
-def run_dream(window_days: int = 7, agent: str = "dario-ceo", dry_run: bool = False) -> DreamReport:
+def run_dream(window_days: int = DEFAULT_WINDOW_DAYS, agent: str = "dario-ceo", dry_run: bool = False) -> DreamReport:
     return DreamEngine(window_days=window_days, agent=agent, dry_run=dry_run).run()
 
 
 def main():
     parser = argparse.ArgumentParser(description="DARIO Dream Engine — 4-phase memory consolidation")
-    parser.add_argument("--window", type=int, default=7, help="Days of episode history to process")
+    parser.add_argument("--window", type=int, default=DEFAULT_WINDOW_DAYS, help="Days of episode history to process")
     parser.add_argument("--agent", default="dario-ceo")
     parser.add_argument("--dry-run", action="store_true", help="Don't write changes, just report")
     parser.add_argument("--json", action="store_true", help="JSON output")

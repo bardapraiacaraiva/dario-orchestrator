@@ -36,6 +36,7 @@ def run_learning_writebacks(
     output: str,
     model: str = "opus",
     duration_seconds: float = 0.0,
+    retrieved_memories: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Fire all cognitive write-backs for a finished task.
 
@@ -115,6 +116,16 @@ def run_learning_writebacks(
     # ── Episodic memory (Memory & Dreaming subsystem) ──────────────────────
     try:
         from memory import hooks as mem_hooks
+        # Consume memories staged at context-injection time so retrieval_count /
+        # last_retrieved actually move and the dream prune can tell useful
+        # memories from junk (DD finding A13, 2026-06-12).
+        rms = retrieved_memories
+        if rms is None:
+            try:
+                from memory import retrieval as mem_retrieval
+                rms = mem_retrieval.pop_pending(task_id)
+            except Exception:
+                rms = []
         mem_hooks.on_task_complete(
             task_id=task_id,
             skill=skill,
@@ -125,8 +136,11 @@ def run_learning_writebacks(
             tokens_used=int(tokens or 0),
             model=model,
             output_summary=out[:500],
+            retrieved_memories=rms or None,
         )
         info["episode_recorded"] = True
+        if rms:
+            info["retrieved_memories_tracked"] = len(rms)
     except Exception:
         log.debug("episodic memory skipped", exc_info=True)
 

@@ -13,6 +13,16 @@ from collections import Counter, defaultdict
 from statistics import mean
 from typing import Any
 
+# Thresholds live in config/memory_dream.yaml — single source instead of
+# magic numbers (DD finding A13, 2026-06-12).
+try:
+    from memory.config import get as _cfg
+    TREND_MIN_RUNS = int(_cfg("pattern_trend_min_runs"))
+    FAILURE_MIN = int(_cfg("pattern_failure_min"))
+    CONVERGENCE_MIN_SESSIONS = int(_cfg("convergence_min_sessions"))
+except Exception:  # pragma: no cover - memory package always present in installs
+    TREND_MIN_RUNS, FAILURE_MIN, CONVERGENCE_MIN_SESSIONS = 3, 2, 2
+
 
 def detect_patterns(episodes: list[Any]) -> list[str]:
     """Return list of human-readable pattern descriptions."""
@@ -33,7 +43,7 @@ def detect_patterns(episodes: list[Any]) -> list[str]:
             correction_skills[ep.skill] += 1
 
     for skill, scores in by_skill_scores.items():
-        if len(scores) >= 4:
+        if len(scores) >= TREND_MIN_RUNS:
             first_half = mean(scores[: len(scores) // 2])
             second_half = mean(scores[len(scores) // 2 :])
             if first_half - second_half >= 10:
@@ -47,11 +57,11 @@ def detect_patterns(episodes: list[Any]) -> list[str]:
                 )
 
     for skill, n in by_skill_failures.items():
-        if n >= 3:
+        if n >= FAILURE_MIN:
             patterns.append(f"`{skill}` failed {n} times in this window — investigate root cause")
 
     for tool, n in tool_failures.most_common(5):
-        if n >= 3:
+        if n >= FAILURE_MIN:
             patterns.append(f"Tool `{tool}` failed {n} times — possibly unstable or misused")
 
     for skill, n in correction_skills.most_common(5):
@@ -61,12 +71,14 @@ def detect_patterns(episodes: list[Any]) -> list[str]:
     return patterns
 
 
-def detect_convergence(episodes: list[Any], min_sessions: int = 3, min_len: int = 2) -> list[dict]:
+def detect_convergence(episodes: list[Any], min_sessions: int | None = None, min_len: int = 2) -> list[dict]:
     """Detect skill sequences that recur across multiple sessions.
 
     Groups episodes by project + day, extracts skill sequence, then finds
     n-grams that appear in >= min_sessions distinct days.
     """
+    if min_sessions is None:
+        min_sessions = CONVERGENCE_MIN_SESSIONS
     by_session: dict[str, list[str]] = defaultdict(list)
     for ep in sorted(episodes, key=lambda e: e.timestamp):
         day = ep.timestamp[:10]

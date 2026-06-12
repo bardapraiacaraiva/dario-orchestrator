@@ -1,0 +1,17 @@
+# Memory & Dream tunables — single source (DD finding A13, 2026-06-12).
+# Loaded by memory/config.py; any key omitted falls back to code defaults.
+
+# ── Confidence decay (semantic memories) ──
+decay_half_life_days: 60.0      # confidence halves every N days without retrieval
+decay_retrieval_bonus: 0.5      # each retrieval extends half-life by this fraction
+decay_retrieval_bonus_cap: 10   # retrievals counted toward the bonus (cap)
+decay_prune_floor: 0.15         # below this effective confidence -> prune candidate
+
+# ── Pattern detection / convergence (calibrated for ~150 episodes) ──
+convergence_min_sessions: 2     # distinct sessions for a sequence to converge (was 3)
+convergence_min_score: 60.0     # avg score gate for promotion (was 70)
+pattern_trend_min_runs: 3       # runs of the same skill to detect a quality trend (was 4)
+pattern_failure_min: 2          # repeated failures worth surfacing (was 3)
+
+# ── Dream cycle ──
+dream_window_days: 14           # default episode window for the dream engine (was 7)

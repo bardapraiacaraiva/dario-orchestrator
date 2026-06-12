@@ -16,10 +16,13 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 from memory import procedural
+from memory.config import get as _cfg
 from memory.schemas import ProceduralWorkflow
 
-MIN_SESSIONS = 3
-MIN_SCORE = 70.0
+# Calibrated to real volume via config/memory_dream.yaml — the old hardcoded
+# 3 sessions / score 70 never fired (DD finding A13, 2026-06-12).
+MIN_SESSIONS = int(_cfg("convergence_min_sessions"))
+MIN_SCORE = float(_cfg("convergence_min_score"))
 
 
 def promote_convergent(episodes: list[Any], candidates: list[dict], dry_run: bool = False) -> list[str]:

@@ -157,11 +157,16 @@ def search_memories(query: str, top_k: int = DEFAULT_TOP_K,
                 increment_retrieval(memory_id)
             except Exception:
                 pass
+        try:
+            from memory.decay import effective_confidence
+            conf = round(effective_confidence(mem), 3)  # decayed, not static (DD finding A13)
+        except Exception:
+            conf = getattr(mem, "confidence", 0.7)
         results.append({
             "memory_id": memory_id,
             "name": getattr(mem, "name", memory_id),
             "score": round(score, 4),
-            "confidence": getattr(mem, "confidence", 0.7),
+            "confidence": conf,
             "content": getattr(mem, "content", "") or getattr(mem, "description", ""),
         })
     return results

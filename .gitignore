@@ -65,6 +65,9 @@ orchestrator/.license
 # --- Allow project type classification (dev vs client budget breakdown) ---
 !orchestrator/config/project_types.yaml
 
+# --- Allow memory/dream tunables (DD finding A13, 2026-06-12) ---
+!orchestrator/config/memory_dream.yaml
+
 # --- Allow versioned git hooks (used via core.hooksPath) ---
 !orchestrator/scripts/hooks/
 !orchestrator/scripts/hooks/*

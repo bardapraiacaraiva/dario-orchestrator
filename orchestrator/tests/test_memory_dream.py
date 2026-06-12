@@ -209,15 +209,15 @@ class TestConvergencePromotion:
         from dream.convergence import promote_convergent
         from memory import episodic
 
-        # Only 2 sessions — should NOT promote
+        # Only 1 session — should NOT promote (MIN_SESSIONS=2, DD finding A13)
         episodes = []
-        for proj in ["a", "b"]:
+        for proj in ["a"]:
             for skill, score in [("x", 85), ("y", 90)]:
                 ep = _make_episode(skill, score, project=proj)
                 episodic.write_episode(ep)
                 episodes.append(ep)
 
-        candidates = [{"sequence": ["x", "y"], "session_count": 2, "projects": ["a", "b"]}]
+        candidates = [{"sequence": ["x", "y"], "session_count": 1, "projects": ["a"]}]
         promoted = promote_convergent(episodes, candidates, dry_run=False)
         assert promoted == []
 

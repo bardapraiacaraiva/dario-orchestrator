@@ -33,8 +33,10 @@ SCRIPT_MODULE = {
 def run(script, args):
     module = SCRIPT_MODULE.get(script)
     assert module is not None, f"Unmapped engine script: {script}"
+    # 30s: context_injector does live RAG/Ollama round-trips in a subprocess
+    # and sat right at the old 15s limit, flaking (DD finding A13, 2026-06-12).
     r = subprocess.run([PY, "-m", module] + args,
-                       capture_output=True, text=True, timeout=15, cwd=str(ORCH_DIR))
+                       capture_output=True, text=True, timeout=30, cwd=str(ORCH_DIR))
     return r
 
 

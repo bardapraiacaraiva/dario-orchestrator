@@ -380,8 +380,19 @@ def assemble_context(task_id: str, skill: str = "", project: str = "") -> dict:
     # them. Silent no-op if Ollama/embeddings are unavailable (never blocks).
     try:
         from memory.semantic_search import search_memories
-        sem_hits = search_memories(task_desc, top_k=3)
+        # bump_retrieval=False: counting moved to the completion path so
+        # retrieval_count means "used by a completed task", not "injected"
+        # (DD finding A13, 2026-06-12).
+        sem_hits = search_memories(task_desc, top_k=3, bump_retrieval=False)
         if sem_hits:
+            try:
+                from memory import retrieval as _mem_ret
+                _mem_ret.record_pending(task_id, [
+                    {"memory_id": h["memory_id"], "layer": "semantic", "relevance": "high"}
+                    for h in sem_hits
+                ])
+            except Exception:
+                pass
             content = "\n".join(
                 f"- ({h['score']:.2f}, conf {h['confidence']}) {h['name']}: {(h['content'] or '')[:200]}"
                 for h in sem_hits

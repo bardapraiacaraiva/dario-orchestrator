@@ -7,6 +7,7 @@ and high-value memories (candidates for promotion).
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -17,6 +18,10 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 RETRIEVAL_DIR = ORCH_DIR / "memory" / "retrieval"
 RETRIEVAL_DIR.mkdir(parents=True, exist_ok=True)
 LOG_FILE = RETRIEVAL_DIR / "retrieval_log.jsonl"
+# Per-task staging of memories injected at context time, consumed at completion
+# (DD finding A13, 2026-06-12 — retrieval_count was always 0 because nothing
+# carried retrieved memory ids from context injection to the completion hooks).
+PENDING_DIR = RETRIEVAL_DIR / "pending"
 
 
 def log_retrieval(episode_id: str, memory_id: str, layer: str = "semantic", relevance: str = "medium") -> None:
@@ -28,6 +33,57 @@ def log_retrieval(episode_id: str, memory_id: str, layer: str = "semantic", rele
     )
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry.model_dump(mode="json")) + "\n")
+
+
+def _pending_path(task_id: str) -> Path:
+    safe = re.sub(r"[^A-Za-z0-9._-]+", "_", task_id)[:80]
+    return PENDING_DIR / f"{safe}.json"
+
+
+def record_pending(task_id: str, memories: list[dict]) -> None:
+    """Stage memories retrieved for a task; merged by memory_id (idempotent)."""
+    if not task_id or not memories:
+        return
+    PENDING_DIR.mkdir(parents=True, exist_ok=True)
+    path = _pending_path(task_id)
+    existing: list[dict] = []
+    if path.exists():
+        try:
+            existing = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(existing, list):
+                existing = []
+        except Exception:
+            existing = []
+    seen = {m.get("memory_id") for m in existing if isinstance(m, dict)}
+    for m in memories:
+        mid = m.get("memory_id") if isinstance(m, dict) else None
+        if not mid or mid in seen:
+            continue
+        existing.append({
+            "memory_id": mid,
+            "layer": m.get("layer", "semantic"),
+            "relevance": m.get("relevance", "medium"),
+        })
+        seen.add(mid)
+    path.write_text(json.dumps(existing, ensure_ascii=False), encoding="utf-8")
+
+
+def pop_pending(task_id: str) -> list[dict]:
+    """Consume (read + delete) staged retrievals for a task. Returns []."""
+    if not task_id:
+        return []
+    path = _pending_path(task_id)
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        data = []
+    try:
+        path.unlink()
+    except OSError:
+        pass
+    return data if isinstance(data, list) else []
 
 
 def iter_log(window_days: int = 30):

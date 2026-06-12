@@ -33,7 +33,8 @@ def reorganize(state: dict, dry_run: bool = False) -> tuple[PhaseReport, dict]:
     state["patterns_detected"] = patterns
 
     convergent = detect_convergence(episodes)
-    actions.append(f"Detected {len(convergent)} convergent skill sequences (>=3 sessions)")
+    from dream.pattern_detector import CONVERGENCE_MIN_SESSIONS as _min_sessions
+    actions.append(f"Detected {len(convergent)} convergent skill sequences (>={_min_sessions} sessions)")
     promoted_workflows = promote_convergent(episodes, convergent, dry_run=dry_run)
     actions.append(f"Promoted {len(promoted_workflows)} workflows to procedural memory")
     state["promoted_workflows"] = promoted_workflows
