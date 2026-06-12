@@ -229,7 +229,7 @@ async def lifespan(app: FastAPI):
 
     # STARTUP: Resume suspended tasks
     try:
-        _run_engine("suspend_resume.py", ["--restart-all", "--json"])
+        _run_engine("execution/suspend_resume.py", ["--restart-all", "--json"])
         log.info("[STARTUP] Suspended tasks resumed")
     except Exception as e:
         log.warning(f"[STARTUP] Resume failed: {e}")
@@ -241,7 +241,7 @@ async def lifespan(app: FastAPI):
 
     # SHUTDOWN: Suspend all in_progress tasks (new: was not wired)
     try:
-        _run_engine("suspend_resume.py", ["--suspend-all", "--json"])
+        _run_engine("execution/suspend_resume.py", ["--suspend-all", "--json"])
         log.info("[SHUTDOWN] Active tasks suspended")
     except Exception as e:
         log.warning(f"[SHUTDOWN] Suspend failed: {e}")
@@ -674,7 +674,7 @@ async def compose_chain(req: ComposeRequest):
 @app.get("/context/{task_id}")
 async def get_smart_context(task_id: str, token_budget: int = 4000):
     """Get relevance-ranked context for a task, trimmed to token budget."""
-    result = _run_engine("context_injector.py", ["--task", task_id, "--json"])
+    result = _run_engine("cognitive/context_injector.py", ["--task", task_id, "--json"])
 
     if not isinstance(result, dict) or "sections" not in result:
         return result
@@ -809,7 +809,7 @@ async def dashboard_data():
 
 @app.get("/templates", response_model=TemplateListResponse)
 async def list_templates():
-    result = _run_engine("task_templates.py", ["--list", "--json"])
+    result = _run_engine("core/task_templates.py", ["--list", "--json"])
     if isinstance(result, list):
         return TemplateListResponse(count=len(result), templates=result)
     return result
@@ -821,7 +821,7 @@ async def instantiate_template(name: str, variables: dict = {}, create: bool = F
     if create:
         args.append("--create")
     args.append("--json")
-    result = _run_engine("task_templates.py", args)
+    result = _run_engine("core/task_templates.py", args)
     return result
 
 
@@ -902,7 +902,7 @@ async def parse_bank_statement(file_path: str, bank: str = None):
     args = ["--file", file_path, "--output", "json"]
     if bank:
         args.extend(["--bank", bank])
-    result = _run_engine("bank_parser.py", args)
+    result = _run_engine("parsers/bank_parser.py", args)
     if "parsed" not in result:
         result["parsed"] = "error" not in result
     result.setdefault("document_type", "bank_statement")
@@ -915,7 +915,7 @@ async def parse_saft(file_path: str, update: bool = False):
     args = ["--file", file_path, "--json"]
     if update:
         args.append("--update")
-    result = _run_engine("saft_parser.py", args)
+    result = _run_engine("parsers/saft_parser.py", args)
     if "parsed" not in result:
         result["parsed"] = "error" not in result
     result.setdefault("document_type", "saft")
@@ -925,7 +925,7 @@ async def parse_saft(file_path: str, update: bool = False):
 @app.get("/prod/tax-alerts", response_model=TaxAlertResponse)
 async def tax_alerts():
     """Get current tax calendar alerts."""
-    result = _run_engine("tax_calendar.py", ["--alerts", "--json"])
+    result = _run_engine("parsers/tax_calendar.py", ["--alerts", "--json"])
     if isinstance(result, list):
         return TaxAlertResponse(count=len(result), alerts=result)
     result.setdefault("count", len(result.get("alerts", [])))
@@ -935,7 +935,7 @@ async def tax_alerts():
 @app.post("/prod/validate-pt", response_model=ValidationCheckResponse)
 async def validate_pt(data: dict):
     """Validate Portuguese financial data (NIF, ATCUD, SNC, IVA, IBAN)."""
-    result = _run_engine("pt_validators.py", ["--validate-all", json.dumps(data)])
+    result = _run_engine("parsers/pt_validators.py", ["--validate-all", json.dumps(data)])
     return ValidationCheckResponse(
         valid=bool(result.get("valid", False)),
         field=str(result.get("field", "")),
@@ -963,7 +963,7 @@ async def cfo_dashboard():
     """CFO Financial Dashboard — unified 360 view."""
     try:
         result = subprocess.run(
-            [sys.executable, str(ORCH_DIR / "financial_dashboard.py"), "--html"],
+            [sys.executable, str(ORCH_DIR / "finance" / "financial_dashboard.py"), "--html"],
             capture_output=True, text=True, timeout=15
         )
         if result.returncode == 0 and result.stdout.strip():
@@ -982,7 +982,7 @@ async def cfo_data():
     """CFO data API — JSON for integrations."""
     try:
         result = subprocess.run(
-            [sys.executable, str(ORCH_DIR / "financial_dashboard.py"), "--json"],
+            [sys.executable, str(ORCH_DIR / "finance" / "financial_dashboard.py"), "--json"],
             capture_output=True, text=True, timeout=15
         )
         if result.returncode == 0 and result.stdout.strip():
