@@ -161,11 +161,56 @@ def _parse_frontmatter(content: str) -> dict:
     return out
 
 
+_MAPPED_SKILLS_CACHE: set | None = None
+
+
+def worker_mapped_skills() -> set:
+    """Skills that some worker in company.yaml can actually execute.
+
+    Routing surface guard (audit 2026-06-12 Onda 3): the skills dir holds ~292
+    SKILL.md but only ~139 map to a worker — matching against the rest is how
+    unrelated industry skills hijack agency tasks (the medik misroute). Skills
+    without a worker stay invocable explicitly (task.skill wins in
+    infer_skill_from_task); they just stop being semantic-match candidates.
+    Empty set on failure → callers skip the filter (graceful degradation).
+    """
+    global _MAPPED_SKILLS_CACHE
+    if _MAPPED_SKILLS_CACHE is not None:
+        return _MAPPED_SKILLS_CACHE
+    skills: set = set()
+    try:
+        if yaml is None:
+            return set()
+        company = yaml.safe_load((ORCH_DIR / "company.yaml").read_text(encoding="utf-8")) or {}
+        # Squad verticals live in their own top-level sections (workers_lex,
+        # workers_nomos, workers_a360, …) — only reading `workers` silently
+        # dropped 15 lex-* skills from the corpus (caught by the pre-push gate).
+        for section, body in company.items():
+            if not (section == "workers" or section.startswith("workers_")):
+                continue
+            for w in (body or {}).values():
+                if isinstance(w, dict):
+                    for key in ("skill", "skill_client_facing"):
+                        if w.get(key):
+                            skills.add(str(w[key]))
+                    for s in (w.get("skills") or []):
+                        skills.add(str(s))
+    except Exception:
+        return set()
+    _MAPPED_SKILLS_CACHE = skills
+    return skills
+
+
 def extract_skill_corpus() -> dict:
-    """Walk skills directory and extract name -> description from SKILL.md frontmatter."""
+    """Walk skills directory and extract name -> description from SKILL.md frontmatter.
+
+    Restricted to worker-mapped skills (see worker_mapped_skills) — unmapped
+    skills would fail the skill->worker lookup downstream anyway.
+    """
     corpus = {}
     if not SKILLS_DIR.exists():
         return corpus
+    mapped = worker_mapped_skills()
     for entry in SKILLS_DIR.iterdir():
         try:
             skill_md = entry / "SKILL.md"
@@ -176,6 +221,8 @@ def extract_skill_corpus() -> dict:
             name = meta.get("name")
             desc = meta.get("description")
             if name and desc and isinstance(name, str) and isinstance(desc, str):
+                if mapped and name not in mapped:
+                    continue
                 corpus[name] = desc.strip()
         except Exception:
             continue
@@ -193,7 +240,15 @@ def bootstrap_embeddings(verbose: bool = False) -> dict:
         "SELECT skill_name, description_hash FROM skill_embeddings"
     )}
 
-    stats = {"corpus_size": len(corpus), "generated": 0, "skipped": 0, "failed": 0}
+    stats = {"corpus_size": len(corpus), "generated": 0, "skipped": 0, "failed": 0, "pruned": 0}
+
+    # Prune rows that fell out of the corpus (archived squads, unmapped skills)
+    # — semantic_match scans the whole table, so stale rows still win matches.
+    if corpus:
+        stale = [name for name in existing if name not in corpus]
+        for name in stale:
+            conn.execute("DELETE FROM skill_embeddings WHERE skill_name = ?", (name,))
+        stats["pruned"] = len(stale)
 
     for name, desc in corpus.items():
         augmented = _augment_description(name, desc, keyword_index)
@@ -268,12 +323,15 @@ def semantic_match(task_text: str, top_k: int = TOP_K) -> list:
     keyword_boosts = _keyword_rerank_boost(task_text.lower(), keyword_index)
 
     try:
+        mapped = worker_mapped_skills()  # belt-and-braces vs stale table rows
         conn = sqlite3.connect(str(DB_PATH))
         _ensure_schema(conn)
         results = []
         for skill, blob in conn.execute(
             "SELECT skill_name, vector FROM skill_embeddings"
         ):
+            if mapped and skill not in mapped:
+                continue
             base = _cosine(task_vec, _blob_to_vec(blob))
             final = base + keyword_boosts.get(skill, 0.0)
             results.append((skill, final))

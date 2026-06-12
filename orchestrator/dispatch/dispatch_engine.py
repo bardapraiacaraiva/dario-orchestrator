@@ -530,7 +530,7 @@ def find_best_worker(task: dict, hierarchy: CompanyHierarchy, workload: dict, ex
     # The CoT writes to dispatch_cot/{task_id}.yaml; legacy infer_skill_from_task
     # still drives the actual selection so behaviour stays backwards-compatible.
     try:
-        from dispatch.dispatch_cot import reason as _cot_reason
+        from dispatch.dispatch_cot import LOW_CONF_THRESHOLD, reason as _cot_reason
         _cot = _cot_reason(task, persist=bool(task.get("id")))
         _decision = _cot.get("decision", {})
         if _decision.get("winner"):
@@ -539,6 +539,17 @@ def find_best_worker(task: dict, hierarchy: CompanyHierarchy, workload: dict, ex
                 f"conf={_decision['confidence']}({_decision['level']}) "
                 f"agreement={_decision['agreement']}"
             )
+            # GATE (audit 2026-06-12 Onda 3): advisory→enforced. A low-confidence
+            # semantic verdict over the skill surface is how unrelated industry
+            # skills hijacked tasks (medik misroute). Explicit task.skill is
+            # exempt — most-specific-wins, the user named the route.
+            if (not task.get("skill")
+                    and _decision.get("confidence", 1.0) < LOW_CONF_THRESHOLD):
+                reasons.append(
+                    f"COT_LOW_CONFIDENCE: conf={_decision['confidence']} < {LOW_CONF_THRESHOLD} "
+                    f"— queued for human routing instead of auto-assign"
+                )
+                return None, reasons
     except Exception as _e:
         log.debug(f"COT_FALLBACK: {_e}")
 
