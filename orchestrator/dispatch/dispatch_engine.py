@@ -524,13 +524,18 @@ def find_best_worker(task: dict, hierarchy: CompanyHierarchy, workload: dict, ex
     """
     reasons = []
 
-    # Pre-dispatch deliberation (Upgrade 9 — cognitive audit Sprint 4)
-    # Run the Chain-of-Thought layer to surface why each signal voted as it
-    # did, and persist the trace for post-mortem if the task underperforms.
-    # The CoT writes to dispatch_cot/{task_id}.yaml; legacy infer_skill_from_task
-    # still drives the actual selection so behaviour stays backwards-compatible.
+    # Pre-dispatch deliberation (Upgrade 9 + Fase 3, 2026-06-12).
+    # The Chain-of-Thought layer weighs all four signals (explicit, semantic,
+    # keyword, Q-value) PLUS auto-rule, crystallized-star and synaptic-affinity
+    # boosts, with a disagreement penalty. As of Fase 3 its winner DRIVES the
+    # selection (closing F-05/F-06: the synaptic boost and star patterns now
+    # actuate, instead of being computed and discarded). The legacy priority-
+    # order infer_skill_from_task remains the fallback when the CoT yields no
+    # winner or is unavailable. The low-confidence gate still queues misroutes.
+    cot_winner = None
     try:
-        from dispatch.dispatch_cot import LOW_CONF_THRESHOLD, reason as _cot_reason
+        from dispatch.dispatch_cot import LOW_CONF_THRESHOLD
+        from dispatch.dispatch_cot import reason as _cot_reason
         _cot = _cot_reason(task, persist=bool(task.get("id")))
         _decision = _cot.get("decision", {})
         if _decision.get("winner"):
@@ -539,10 +544,9 @@ def find_best_worker(task: dict, hierarchy: CompanyHierarchy, workload: dict, ex
                 f"conf={_decision['confidence']}({_decision['level']}) "
                 f"agreement={_decision['agreement']}"
             )
-            # GATE (audit 2026-06-12 Onda 3): advisory→enforced. A low-confidence
-            # semantic verdict over the skill surface is how unrelated industry
-            # skills hijacked tasks (medik misroute). Explicit task.skill is
-            # exempt — most-specific-wins, the user named the route.
+            # GATE: a low-confidence semantic verdict over the 584-skill surface
+            # is how unrelated industry skills hijacked tasks (medik misroute).
+            # Explicit task.skill is exempt — most-specific-wins.
             if (not task.get("skill")
                     and _decision.get("confidence", 1.0) < LOW_CONF_THRESHOLD):
                 reasons.append(
@@ -550,17 +554,16 @@ def find_best_worker(task: dict, hierarchy: CompanyHierarchy, workload: dict, ex
                     f"— queued for human routing instead of auto-assign"
                 )
                 return None, reasons
+            cot_winner = _decision["winner"]
     except Exception as _e:
         log.debug(f"COT_FALLBACK: {_e}")
 
-    skill = infer_skill_from_task(task)
-
-    # Load evolution weights for dispatch boosting
-    weights = load_synaptic_weights()
-    boost = get_weight_boost(skill, weights) if skill else 1.0
-    if boost > 1.0:
-        reasons.append(f"WEIGHT_BOOST: {boost:.3f}x (evolution affinity)")
-
+    # CoT winner decides; fall back to the legacy inference if it had none.
+    skill = cot_winner or infer_skill_from_task(task)
+    if skill:
+        reasons.append(
+            f"SKILL_DECIDER: {'cot_winner' if cot_winner else 'infer_fallback'}"
+        )
 
     if not skill:
         reasons.append("NO_SKILL_MATCH: Could not infer skill from task title/description")
@@ -856,7 +859,7 @@ def cmd_suggest(args):
             "reasons": reasons,
         }))
     else:
-        print(f"=== ROUTING SUGGESTION (read-only) ===\n")
+        print("=== ROUTING SUGGESTION (read-only) ===\n")
         print(f"Title: {args.suggest}")
         print(f"Inferred skill: {inferred_skill}")
         print(f"Routing decision: {'→ ' + worker_id if worker_id else 'QUEUED (no available worker)'}")

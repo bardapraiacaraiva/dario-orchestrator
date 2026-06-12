@@ -43,6 +43,8 @@ import logging
 import os
 from collections.abc import Iterator
 from contextlib import contextmanager
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 from opentelemetry import trace
@@ -52,12 +54,55 @@ from opentelemetry.sdk.trace.export import (
     BatchSpanProcessor,
     ConsoleSpanExporter,
     SimpleSpanProcessor,
+    SpanExporter,
+    SpanExportResult,
 )
 
 log = logging.getLogger("dario.otel")
 
+_ORCH_DIR = Path.home() / ".claude" / "orchestrator"
+_TRACES_DIR = _ORCH_DIR / "traces"
+
 _PROVIDER_INSTALLED = False
 _TRACER: trace.Tracer | None = None
+
+
+class FileSpanExporter(SpanExporter):
+    """Append finished spans as JSONL to traces/otel-YYYY-MM-DD.jsonl.
+
+    The default exporter when no OTLP/Langfuse endpoint is configured (Fase 4,
+    2026-06-12). It replaces ConsoleSpanExporter, whose output evaporated to
+    stdout — every span (agent/tool/guard/dispatch) is now captured to an
+    inspectable local file, turning the existing instrumentation into a real
+    zero-infrastructure trace store. Point OTEL_EXPORTER_OTLP_ENDPOINT at a
+    collector to ship to Grafana/Jaeger/Tempo instead, or set DARIO_OTEL_CONSOLE
+    to fall back to stdout.
+    """
+
+    def __init__(self, directory: Path | None = None) -> None:
+        self._dir = directory or _TRACES_DIR
+        try:
+            self._dir.mkdir(parents=True, exist_ok=True)
+        except Exception:
+            pass
+
+    def _path(self) -> Path:
+        return self._dir / f"otel-{datetime.now(UTC).strftime('%Y-%m-%d')}.jsonl"
+
+    def export(self, spans) -> SpanExportResult:
+        try:
+            with self._path().open("a", encoding="utf-8") as fh:
+                for span in spans:
+                    fh.write(span.to_json(indent=None) + "\n")
+            return SpanExportResult.SUCCESS
+        except Exception:
+            return SpanExportResult.FAILURE
+
+    def shutdown(self) -> None:
+        return None
+
+    def force_flush(self, timeout_millis: int = 30000) -> bool:
+        return True
 
 
 # ─── Setup ───────────────────────────────────────────────────────────────────
@@ -90,8 +135,12 @@ def _resolve_exporter() -> tuple[str, Any]:
         # OTel SDK reads OTEL_* env vars natively
         return "otlp", OTLPSpanExporter()
 
-    # 3) Console (dev mode)
-    return "console", ConsoleSpanExporter()
+    # 3) Console (only if explicitly requested)
+    if os.getenv("DARIO_OTEL_CONSOLE"):
+        return "console", ConsoleSpanExporter()
+
+    # 4) File-based local trace store (default — replaces evaporating console)
+    return "file", FileSpanExporter()
 
 
 def setup_tracing(service_name: str = "dario-orchestrator") -> trace.Tracer:
@@ -112,8 +161,8 @@ def setup_tracing(service_name: str = "dario-orchestrator") -> trace.Tracer:
 
     mode, exporter = _resolve_exporter()
     processor: BatchSpanProcessor | SimpleSpanProcessor
-    if mode == "console":
-        processor = SimpleSpanProcessor(exporter)  # immediate flush in dev
+    if mode in ("console", "file"):
+        processor = SimpleSpanProcessor(exporter)  # immediate flush for local stores
     else:
         processor = BatchSpanProcessor(exporter, max_export_batch_size=64)
     provider.add_span_processor(processor)

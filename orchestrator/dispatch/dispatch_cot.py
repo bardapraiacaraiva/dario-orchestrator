@@ -187,6 +187,31 @@ def _gather_signals(task: dict) -> dict:
     except Exception:
         pass
 
+    # Crystallized "star" patterns (Fase 3, 2026-06-12) — previously generated
+    # by the evolution cycle and never consumed by dispatch. Each marks a skill
+    # that scored 90+ across N evolution cycles; we feed it as a small additive
+    # prior so proven excellence nudges the vote. The skill name is the first
+    # token of the `pattern` ("<skill> consistently scores 90+ ...").
+    signals["star_rules"] = []
+    try:
+        if RULES_DIR.exists():
+            for rf in RULES_DIR.glob("rule_star_*.yaml"):
+                rule = _load_yaml(str(rf))
+                if not isinstance(rule, dict) or rule.get("type") != "crystallized_pattern":
+                    continue
+                pattern = str(rule.get("pattern", "")).strip()
+                star_skill = pattern.split()[0] if pattern else None
+                if not star_skill:
+                    continue
+                evidence = int(rule.get("evidence_count", 1) or 1)
+                signals["star_rules"].append({
+                    "skill": star_skill,
+                    "boost": round(min(0.05 * evidence, 0.20), 3),
+                    "evidence": evidence,
+                })
+    except Exception:
+        pass
+
     return signals
 
 
@@ -220,6 +245,34 @@ def _synthesise(signals: dict) -> dict:
             continue  # don't introduce skills not already in vote
         votes[skill]["score"] += boost
         votes[skill]["details"]["auto_rule_boost"] = boost
+
+    # Apply crystallized "star" pattern boosts (Fase 3) — same additive,
+    # already-in-votes-only guard as auto-rules. Proven-excellence prior.
+    for rule in signals.get("star_rules", []):
+        skill = rule.get("skill")
+        boost = rule.get("boost", 0)
+        if not skill or skill not in votes:
+            continue
+        votes[skill]["score"] += boost
+        votes[skill]["details"]["star_boost"] = boost
+
+    # Apply synaptic affinity boost (Fase 3 — closes F-05: previously computed
+    # in dispatch_engine and discarded). get_weight_boost returns a 1.0–1.3x
+    # multiplier per skill from the co-activation graph; we fold it in additively
+    # ((boost-1.0) → 0..0.3) so a skill with strong proven affinity to recently
+    # successful skills is nudged up. Lazy import avoids the dispatch import cycle.
+    try:
+        from dispatch.dispatch_engine import get_weight_boost, load_synaptic_weights
+        _weights = load_synaptic_weights()
+        if _weights:
+            for skill, vdata in votes.items():
+                mult = get_weight_boost(skill, _weights)
+                if mult > 1.0:
+                    add = round(mult - 1.0, 3)
+                    vdata["score"] += add
+                    vdata["details"]["synaptic_boost"] = add
+    except Exception:
+        pass
 
     if not votes:
         return {

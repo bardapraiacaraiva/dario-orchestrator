@@ -71,11 +71,21 @@ class TestSetup:
         mode, _ = otel_setup._resolve_exporter()
         assert mode == "langfuse"
 
-    def test_exporter_picks_console_in_dev(self, monkeypatch):
+    def test_exporter_picks_file_in_dev(self, monkeypatch):
+        # Fase 4: default is now the file-based local trace store, not console.
         monkeypatch.delenv("LANGFUSE_HOST", raising=False)
         monkeypatch.delenv("LANGFUSE_PUBLIC_KEY", raising=False)
         monkeypatch.delenv("LANGFUSE_SECRET_KEY", raising=False)
         monkeypatch.delenv("OTEL_EXPORTER_OTLP_ENDPOINT", raising=False)
+        monkeypatch.delenv("DARIO_OTEL_CONSOLE", raising=False)
+        mode, exporter = otel_setup._resolve_exporter()
+        assert mode == "file"
+        assert isinstance(exporter, otel_setup.FileSpanExporter)
+
+    def test_exporter_picks_console_when_forced(self, monkeypatch):
+        monkeypatch.delenv("LANGFUSE_HOST", raising=False)
+        monkeypatch.delenv("OTEL_EXPORTER_OTLP_ENDPOINT", raising=False)
+        monkeypatch.setenv("DARIO_OTEL_CONSOLE", "1")
         mode, _ = otel_setup._resolve_exporter()
         assert mode == "console"
 
