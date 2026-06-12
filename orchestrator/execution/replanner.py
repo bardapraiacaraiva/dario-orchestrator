@@ -26,6 +26,9 @@ import logging
 import sys
 from pathlib import Path
 
+ORCH_DIR = Path.home() / ".claude" / "orchestrator"
+sys.path.insert(0, str(ORCH_DIR))  # script-mode runs need core.db importable
+
 try:
     from ruamel.yaml import YAML
     yaml_engine = YAML()
@@ -47,7 +50,6 @@ except ImportError:
             yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
 
 
-ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 TASKS_DIR = ORCH_DIR / "tasks" / "active"
 FALLBACK_FILE = ORCH_DIR / "fallback_matrix.yaml"
 COMPANY_FILE = ORCH_DIR / "company.yaml"
@@ -71,16 +73,111 @@ FAILURE_STRATEGIES = {
 }
 
 
+# ─── Persistence: DB-first with YAML mirror (DD finding A8, 2026-06-12) ─────
+# The replanner was the last YAML-only task writer. Convention since Onda 2:
+# SQLite (core/db.py) is the authority, tasks/active/*.yaml is a mirror kept
+# for session tools. Every mutation must hit BOTH or the db_yaml_divergence
+# tripwire reopens.
+
+# DB columns the replanner mutates. revision_count / notes / watchers have no
+# DB column (schema gap) — they live only in the YAML mirror, by design.
+_DB_AUTHORITATIVE_COLUMNS = (
+    "status", "assignee", "skill", "priority", "dispatch_reason", "blocked_reason",
+)
+
+_DB = None  # cached handle; tests inject a tmp-path DB here. False = unavailable.
+
+
+def _get_db():
+    global _DB
+    if _DB is None:
+        try:
+            from core.db import DB
+            _DB = DB()
+        except Exception as e:  # degraded mode: YAML-only, same as orch CLI
+            log.warning(f"DB unavailable ({e}) — YAML-only mode, run backfill to reconcile")
+            _DB = False
+    return _DB or None
+
+
+def _db_fields(data: dict) -> dict:
+    """Project a task dict onto DB-writable columns (JSON-encode containers)."""
+    try:
+        from core.db import ALLOWED_TASK_COLUMNS as allowed
+    except Exception:
+        allowed = set(_DB_AUTHORITATIVE_COLUMNS)
+    out = {}
+    for k, v in data.items():
+        if k in allowed:
+            out[k] = json.dumps(list(v) if isinstance(v, (list, tuple)) else dict(v)) \
+                if isinstance(v, (list, tuple, dict)) else v
+    return out
+
+
 def load_task(task_id: str) -> dict:
+    """DB-first read, merged over the YAML mirror.
+
+    YAML keeps the rich fields the DB schema lacks (revision_count, notes,
+    watchers); the DB overrides the columns it owns. YAML-only tasks (legacy)
+    still load — save_task() heals them into the DB.
+    """
+    yaml_task = None
     task_file = TASKS_DIR / f"{task_id}.yaml"
-    if not task_file.exists():
-        return None
-    return load_yaml(str(task_file))
+    if task_file.exists():
+        yaml_task = load_yaml(str(task_file))
+
+    db_task = None
+    db = _get_db()
+    if db:
+        try:
+            db_task = db.get_task(task_id)
+        except Exception as e:
+            log.warning(f"DB read failed for {task_id} ({e}) — falling back to YAML")
+
+    if db_task and isinstance(yaml_task, dict):
+        for col in _DB_AUTHORITATIVE_COLUMNS:
+            if col in db_task:
+                yaml_task[col] = db_task[col]
+        return yaml_task
+    if db_task:
+        return dict(db_task)
+    return yaml_task if isinstance(yaml_task, dict) else None
 
 
-def save_task(task_id: str, data: dict):
-    task_file = TASKS_DIR / f"{task_id}.yaml"
-    dump_yaml(data, str(task_file))
+def save_task(task_id: str, data: dict, dry_run: bool = False):
+    """Dual-write: DB (authority) + YAML mirror, in the same operation."""
+    if dry_run:
+        log.info(f"[dry-run] {task_id}: skipping DB + YAML write")
+        return
+
+    db = _get_db()
+    if db:
+        try:
+            fields = _db_fields(data)
+            if not db.update_task(task_id, fields):
+                # Legacy YAML-only task: create the row so DB-first readers
+                # (dispatch/budget/dashboard) see it, then apply the mutation
+                # (create_task forces status='todo').
+                db.create_task({
+                    "id": task_id,
+                    "title": data.get("title") or task_id,
+                    "description": data.get("description", ""),
+                    "project": data.get("project", ""),
+                    "skill": data.get("skill") or "",
+                    "priority": data.get("priority", "medium"),
+                    "assignee": data.get("assignee"),
+                    "execution_policy": data.get("execution_policy", "default"),
+                    "depends_on": data.get("depends_on") or [],
+                    "estimated_tokens": data.get("estimated_tokens") or 0,
+                    "parent": data.get("parent"),
+                })
+                if fields:
+                    db.update_task(task_id, fields)
+        except Exception as e:
+            log.warning(f"DB write failed for {task_id} ({e}) — YAML-only, run backfill to reconcile")
+
+    TASKS_DIR.mkdir(parents=True, exist_ok=True)
+    dump_yaml(data, str(TASKS_DIR / f"{task_id}.yaml"))
 
 
 def get_fallback_skill(skill: str) -> str:
@@ -125,14 +222,18 @@ def get_sibling_worker(worker_id: str, skill: str) -> str:
 
 
 def replan(task_id: str, failure_type: str, score: int = 0,
-           error_msg: str = "") -> dict:
-    """Create a recovery plan for a failed task."""
+           error_msg: str = "", dry_run: bool = False) -> dict:
+    """Create a recovery plan for a failed task.
+
+    dry_run=True computes the plan without persisting (no DB, no YAML).
+    """
     result = {
         "task_id": task_id,
         "failure": failure_type,
         "action": "escalate",
         "details": "",
         "applied": False,
+        "dry_run": dry_run,
     }
 
     task = load_task(task_id)
@@ -154,10 +255,10 @@ def replan(task_id: str, failure_type: str, score: int = 0,
             task["notes"] = task.get("notes") or []
             if isinstance(task["notes"], list):
                 task["notes"].append(f"REPLAN: retry #{retry_count+1} after {failure_type}")
-            save_task(task_id, task)
+            save_task(task_id, task, dry_run=dry_run)
             result["action"] = "retry_same"
             result["details"] = f"Retry #{retry_count+1} with {worker}"
-            result["applied"] = True
+            result["applied"] = not dry_run
             return result
 
         elif strategy == "retry_with_feedback" and retry_count < MAX_RETRIES:
@@ -170,10 +271,10 @@ def replan(task_id: str, failure_type: str, score: int = 0,
                     f"REPLAN: retry with feedback. Score was {score}. "
                     f"Improve specificity and accuracy. {error_msg}"
                 )
-            save_task(task_id, task)
+            save_task(task_id, task, dry_run=dry_run)
             result["action"] = "retry_with_feedback"
             result["details"] = f"Retry with quality feedback (score was {score})"
-            result["applied"] = True
+            result["applied"] = not dry_run
             return result
 
         elif strategy == "retry_sibling":
@@ -185,10 +286,10 @@ def replan(task_id: str, failure_type: str, score: int = 0,
                 task["notes"] = task.get("notes") or []
                 if isinstance(task["notes"], list):
                     task["notes"].append(f"REPLAN: rerouted to {sibling} (original: {worker})")
-                save_task(task_id, task)
+                save_task(task_id, task, dry_run=dry_run)
                 result["action"] = "retry_sibling"
                 result["details"] = f"Rerouted to {sibling}"
-                result["applied"] = True
+                result["applied"] = not dry_run
                 return result
 
         elif strategy == "fallback_skill":
@@ -200,19 +301,19 @@ def replan(task_id: str, failure_type: str, score: int = 0,
                 task["notes"] = task.get("notes") or []
                 if isinstance(task["notes"], list):
                     task["notes"].append(f"REPLAN: skill fallback {skill} → {fallback}")
-                save_task(task_id, task)
+                save_task(task_id, task, dry_run=dry_run)
                 result["action"] = "fallback_skill"
                 result["details"] = f"Skill changed: {skill} → {fallback}"
-                result["applied"] = True
+                result["applied"] = not dry_run
                 return result
 
         elif strategy == "queue_for_next_pulse":
             task["status"] = "todo"
             task["assignee"] = None
-            save_task(task_id, task)
+            save_task(task_id, task, dry_run=dry_run)
             result["action"] = "queue_for_next_pulse"
             result["details"] = "Released assignment, will be re-dispatched next pulse"
-            result["applied"] = True
+            result["applied"] = not dry_run
             return result
 
         elif strategy == "escalate":
@@ -221,10 +322,10 @@ def replan(task_id: str, failure_type: str, score: int = 0,
             task["watchers"] = task.get("watchers") or []
             if isinstance(task["watchers"], list) and "dario-ceo" not in task["watchers"]:
                 task["watchers"].append("dario-ceo")
-            save_task(task_id, task)
+            save_task(task_id, task, dry_run=dry_run)
             result["action"] = "escalate"
             result["details"] = f"Blocked + escalated to CEO (retries exhausted: {retry_count})"
-            result["applied"] = True
+            result["applied"] = not dry_run
             return result
 
     return result
@@ -237,13 +338,16 @@ def main():
                         help=f"Failure type: {list(FAILURE_STRATEGIES.keys())}")
     parser.add_argument("--score", type=int, default=0, help="Quality score (for quality failures)")
     parser.add_argument("--error", default="", help="Error message")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Compute the recovery plan without writing DB/YAML")
     parser.add_argument("--json", "-j", action="store_true", help="JSON output")
 
     args = parser.parse_args()
     if args.json:
         logging.getLogger().setLevel(logging.ERROR)
 
-    result = replan(args.task, args.failure, args.score, args.error)
+    result = replan(args.task, args.failure, args.score, args.error,
+                    dry_run=args.dry_run)
 
     if args.json:
         print(json.dumps(result, indent=2))
