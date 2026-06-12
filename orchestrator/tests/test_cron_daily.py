@@ -38,6 +38,7 @@ def test_dry_run_returns_skipped_jobs():
 
 # Single source of truth for the test, mirrors cron_daily.run_all's job list.
 EXPECTED_JOBS = {
+    "episodic_capture",  # Onda 3 2026-06-12: feeds episodes upstream of promotion
     "promote_episodes", "regression_check", "dispatch_cot_stats",
     "state_snapshot", "integrity_gate", "prompt_hints_promote",
     "delivery_rate_recompute", "auto_capture_obsidian",

@@ -142,6 +142,27 @@ def _run_job(name: str, fn):
         }
 
 
+def job_episodic_capture() -> dict:
+    """Completed tasks → Episodes (idempotent via episode_exists_for_task).
+
+    The episodic loop died 2026-05-21 when task writes moved to the session/
+    YAML path — nothing fed episodes, so Q-values/synaptic/dream ran on an
+    empty stream (Episodes: 0 = theater). The DB is reconciled since Onda 2;
+    this keeps episodes flowing from real completed work, daily, upstream of
+    promote_episodes.
+    """
+    sys.path.insert(0, str(ORCH_DIR))
+    from memory.backfill_from_audit import backfill, backfill_from_done
+    done_stats = backfill_from_done(dry_run=False)
+    audit_stats = backfill(days=2, dry_run=False)  # small window — yesterday's audit events
+    return {
+        "from_done": done_stats.get("episodes_written", 0),
+        "from_audit": audit_stats.get("episodes_written", 0),
+        "skipped_existing": (done_stats.get("skipped_already_existed", 0)
+                             + audit_stats.get("skipped_already_existed", 0)),
+    }
+
+
 def job_promote_episodes() -> dict:
     """Episode → Semantic promotion (last 24h window)."""
     sys.path.insert(0, str(ORCH_DIR))
@@ -509,6 +530,7 @@ def run_all(dry_run: bool = False) -> dict:
     # iterate this list, so dry-run can never again under-report what runs.
     # Previously dry-run hardcoded 6 jobs while real execution ran 10.
     jobs = [
+        ("episodic_capture", job_episodic_capture),  # upstream of promotion — feeds the stream
         ("promote_episodes", job_promote_episodes),
         ("regression_check", job_regression_check),
         ("dispatch_cot_stats", job_dispatch_cot_stats),
