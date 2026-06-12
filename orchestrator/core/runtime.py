@@ -601,6 +601,25 @@ async def sse_stats():
     return _sse_bus.stats()
 
 
+# ─── Next-Gen N3: live execution timeline (journal-backed) ──────────────────
+
+from fastapi.responses import HTMLResponse
+
+
+@app.get("/api/timeline")
+async def api_timeline(hours: int = 24, limit: int = 60):
+    """Recent execution activity with per-step journal timestamps (N2 data)."""
+    from observability.timeline import get_timeline
+    return get_timeline(db, hours=hours, limit=limit)
+
+
+@app.get("/timeline", response_class=HTMLResponse)
+async def timeline_page():
+    """Zero-dependency live page: polls /api/timeline + subscribes /events."""
+    from observability.timeline import TIMELINE_HTML
+    return HTMLResponse(TIMELINE_HTML)
+
+
 # Override task endpoints to emit SSE events
 _orig_complete = complete_task
 @app.post("/tasks/{task_id}/complete", response_model=None)
