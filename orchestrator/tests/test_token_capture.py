@@ -431,23 +431,26 @@ class TestCaptureEndToEnd:
 class TestMainEntrypoint:
 
     def test_main_handles_malformed_stdin(self, isolated_capture, monkeypatch, capsys):
-        from enforcement import token_capture as tc
         import io
+
+        from enforcement import token_capture as tc
         monkeypatch.setattr("sys.stdin", io.StringIO("not json"))
         rc = tc.main()
         assert rc == 0  # Never fails even with bad input
 
     def test_main_handles_valid_empty_payload(self, isolated_capture, monkeypatch):
-        from enforcement import token_capture as tc
         import io
+
+        from enforcement import token_capture as tc
         monkeypatch.setattr("sys.stdin", io.StringIO(json.dumps({})))
         rc = tc.main()
         assert rc == 0
 
     def test_main_does_not_raise_on_internal_error(self, isolated_capture, monkeypatch):
         """Even if internals throw, main returns 0 to not block Claude Code."""
-        from enforcement import token_capture as tc
         import io
+
+        from enforcement import token_capture as tc
         def boom(_payload):
             raise RuntimeError("internal explosion")
         monkeypatch.setattr(tc, "capture", boom)

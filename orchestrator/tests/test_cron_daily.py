@@ -43,6 +43,7 @@ EXPECTED_JOBS = {
     "state_snapshot", "integrity_gate", "prompt_hints_promote",
     "delivery_rate_recompute", "auto_capture_obsidian",
     "compute_client_stats", "snapshot_quality_daily",
+    "budget_check", "audit_seal",  # Fase 4 2026-06-12: budget alerts + audit seal/verify
 }
 
 

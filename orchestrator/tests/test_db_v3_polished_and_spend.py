@@ -284,6 +284,7 @@ class TestConcurrentInsertsSafe:
     def test_concurrent_inserts_via_threads(self, fresh_db, tmp_path):
         """Multiple threads writing concurrently — sanity check WAL mode."""
         import threading
+
         from core.db import DB
 
         def worker(thread_id: int):

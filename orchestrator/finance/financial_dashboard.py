@@ -186,9 +186,16 @@ def get_security_compliance():
 
 
 def estimate_token_cost(tokens_used):
-    """Estimate cost in EUR from tokens (assumes mixed model usage)."""
-    # Weighted average: 10% Opus, 60% Sonnet, 30% Haiku
-    cost_per_1m = 0.10 * (15 + 75) / 2 + 0.60 * (3 + 15) / 2 + 0.30 * (0.80 + 4) / 2
+    """Rough EUR estimate from a raw token count (assumes a mixed model blend).
+
+    NOTE: this is a coarse estimate, not the billed cost — it ignores the
+    input/output split and cache pricing. The exact per-run cost_usd lives in
+    subagent_runs/*.json; prefer summing those when accuracy matters.
+    Prices corrected 2026-06-12 (Fase 2) to the canonical model_pricing.yaml:
+    Opus $5/$25 (was 15/75), Haiku $1/$5 (was 0.80/4).
+    """
+    # Weighted blend: 10% Opus, 60% Sonnet, 30% Haiku; (input+output)/2 each.
+    cost_per_1m = 0.10 * (5 + 25) / 2 + 0.60 * (3 + 15) / 2 + 0.30 * (1 + 5) / 2
     cost_usd = (tokens_used / 1_000_000) * cost_per_1m
     return round(cost_usd * USD_EUR, 2)
 

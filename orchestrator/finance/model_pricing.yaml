@@ -1,56 +1,82 @@
-# DARIO CFO — Model Pricing Registry
-# Auto-updatable pricing for all models used by the orchestrator.
-# Inspired by AgentOps/tokencost pattern but without external dependency bugs.
-# Prices in USD per 1M tokens. Last updated: 2026-05-08.
-# Source: https://docs.anthropic.com/en/docs/about-claude/models
+# DARIO CFO — Model Pricing Registry  ·  SINGLE SOURCE OF TRUTH for model pricing
+# ---------------------------------------------------------------------------
+# Every component that needs per-token pricing MUST read this file:
+#   - enforcement/token_capture.py   (capture path → budget)
+#   - observability/token_meter.py   (SQLite spend)
+#   - finance/financial_dashboard.py (CFO dashboard)
+# Do NOT hard-code prices anywhere else; hard-coded fallbacks must match this file.
+#
+# Prices in USD per 1M tokens. Verified against the claude-api skill table
+# (cached 2026-06-04). Last updated: 2026-06-12 (Fase 2 — fixed Opus 5/25 not 15/75,
+# Haiku 1/5 not 0.80/4; added cache_write/cache_read + Opus 4.7/4.8 + Fable 5).
+# Source: https://platform.claude.com/docs/en/pricing
+#
+# cache_write = 1.25x input (5-min TTL) · cache_read = 0.10x input.
 
 pricing:
-  # === Anthropic Claude 4.6 ===
+  # === Anthropic Claude Opus (4.6 / 4.7 / 4.8 all share $5/$25) ===
+  claude-opus-4-8:
+    input: 5.00
+    output: 25.00
+    cache_write: 6.25
+    cached_input: 0.50   # cache_read
+    context: 1000000
+  claude-opus-4-7:
+    input: 5.00
+    output: 25.00
+    cache_write: 6.25
+    cached_input: 0.50
+    context: 1000000
   claude-opus-4-6:
-    input: 15.00
-    output: 75.00
-    cached_input: 1.50
-    batch_input: 7.50
-    batch_output: 37.50
-    context: 1048576
+    input: 5.00
+    output: 25.00
+    cache_write: 6.25
+    cached_input: 0.50
+    context: 1000000
 
-  # === Anthropic Claude 4.5 ===
-  claude-sonnet-4-5-20250514:
+  # === Anthropic Claude Sonnet 4.6 ===
+  claude-sonnet-4-6:
     input: 3.00
     output: 15.00
+    cache_write: 3.75
     cached_input: 0.30
-    batch_input: 1.50
-    batch_output: 7.50
-    context: 1048576
+    context: 1000000
 
-  claude-haiku-4-5-20251001:
-    input: 0.80
-    output: 4.00
-    cached_input: 0.08
-    batch_input: 0.40
-    batch_output: 2.00
-    context: 1048576
+  # === Anthropic Claude Haiku 4.5 ===
+  claude-haiku-4-5:
+    input: 1.00
+    output: 5.00
+    cache_write: 1.25
+    cached_input: 0.10
+    context: 200000
 
-  # === Aliases (for dispatch_engine compatibility) ===
+  # === Claude Fable 5 (most capable; above Opus tier) ===
+  claude-fable-5:
+    input: 10.00
+    output: 50.00
+    cache_write: 12.50
+    cached_input: 1.00
+    context: 1000000
+
+  # === Aliases (for dispatch_engine / short-name compatibility) ===
   opus:
-    alias: claude-opus-4-6
+    alias: claude-opus-4-8
   sonnet:
-    alias: claude-sonnet-4-5-20250514
+    alias: claude-sonnet-4-6
   haiku:
-    alias: claude-haiku-4-5-20251001
+    alias: claude-haiku-4-5
+  fable:
+    alias: claude-fable-5
 
 # Exchange rate for EUR conversion
 exchange:
   usd_eur: 0.92
-  last_updated: "2026-05-08"
+  last_updated: "2026-06-12"
 
 # Model routing cost thresholds
 routing:
-  # Use Haiku if predicted quality impact < 5 points
   haiku_quality_threshold: 5
-  # Use Sonnet for most tasks (default)
   default_model: sonnet
-  # Use Opus only for critical/complex tasks
   opus_triggers:
     - execution_policy: critical
     - predicted_score_delta: ">15"

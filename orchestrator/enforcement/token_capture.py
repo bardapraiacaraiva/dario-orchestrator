@@ -29,15 +29,54 @@ RUNS_DIR = ORCH_DIR / "subagent_runs"
 STATE_FILE = ORCH_DIR / "state" / "last_subagent_capture.json"
 DEBUG_LOG = ORCH_DIR / "state" / "token_capture_debug.jsonl"
 
-# Pricing per million tokens (Anthropic public pricing, verified 2026-05).
-# Mirrored from scripts/anthropic_spend_wrapper.py to avoid import cycle.
-PRICING_PER_M = {
+# Pricing per million tokens. Canonical source: finance/model_pricing.yaml.
+# This hook is best-effort and must never raise, so we load the YAML once at
+# import and fall back to a hard-coded table that MUST stay in sync with it.
+# (Fase 2, 2026-06-12: deduplicated against model_pricing.yaml; corrected Haiku
+# to $1/$5 — was $0.80/$4 — which is the figure the YAML now also carries.)
+DEFAULT_PRICING = {"input": 5.00, "output": 25.00, "cache_write": 6.25, "cache_read": 0.50}
+
+# Fallback table — kept identical to model_pricing.yaml for when PyYAML or the
+# file is unavailable in the interpreter that runs the hook.
+_FALLBACK_PRICING = {
+    "claude-opus-4-8":   {"input": 5.00, "output": 25.00, "cache_write": 6.25, "cache_read": 0.50},
     "claude-opus-4-7":   {"input": 5.00, "output": 25.00, "cache_write": 6.25, "cache_read": 0.50},
     "claude-opus-4-6":   {"input": 5.00, "output": 25.00, "cache_write": 6.25, "cache_read": 0.50},
     "claude-sonnet-4-6": {"input": 3.00, "output": 15.00, "cache_write": 3.75, "cache_read": 0.30},
-    "claude-haiku-4-5":  {"input": 0.80, "output": 4.00,  "cache_write": 1.00, "cache_read": 0.08},
+    "claude-haiku-4-5":  {"input": 1.00, "output": 5.00,  "cache_write": 1.25, "cache_read": 0.10},
+    "claude-fable-5":    {"input": 10.00, "output": 50.00, "cache_write": 12.50, "cache_read": 1.00},
 }
-DEFAULT_PRICING = {"input": 5.00, "output": 25.00, "cache_write": 6.25, "cache_read": 0.50}
+
+
+def _load_pricing() -> dict:
+    """Load per-model pricing from the canonical model_pricing.yaml.
+
+    Adapts that file's schema (cached_input == cache_read; cache_write derived
+    as 1.25x input when absent) to the {input, output, cache_write, cache_read}
+    shape this module uses. Returns the hard-coded fallback on any error so the
+    SubagentStop hook never fails on a pricing-config problem.
+    """
+    try:
+        import yaml  # noqa: PLC0415 — optional dep; hook degrades gracefully without it
+        path = ORCH_DIR / "finance" / "model_pricing.yaml"
+        raw = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("pricing", {})
+        out: dict = {}
+        for model, info in raw.items():
+            if not isinstance(info, dict) or "input" not in info:
+                continue  # skip alias entries
+            inp = float(info["input"])
+            out[model] = {
+                "input": inp,
+                "output": float(info["output"]),
+                "cache_write": float(info.get("cache_write", inp * 1.25)),
+                "cache_read": float(info.get("cached_input", inp * 0.10)),
+            }
+        return out or dict(_FALLBACK_PRICING)
+    except Exception:  # noqa: BLE001 — hook must never raise
+        return dict(_FALLBACK_PRICING)
+
+
+PRICING_PER_M = _load_pricing()
 
 TASK_ID_RE = re.compile(r"\b([A-Z][A-Z0-9]{1,9}-\d{3,4})\b")
 # Prefixes that match the pattern but are NOT task IDs.

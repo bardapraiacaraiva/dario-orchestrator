@@ -11,8 +11,8 @@ import pytest
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-from scripts.record_polished_run import VALID_GATE_DECISIONS, append_run
 from scripts.aggregate_polished_metrics import aggregate, load_runs
+from scripts.record_polished_run import VALID_GATE_DECISIONS, append_run
 
 
 @pytest.fixture
@@ -175,6 +175,7 @@ class TestAggregator:
     def test_window_filters_old_runs(self, temp_runs_file):
         # Insert one entry with a manually-old timestamp
         from datetime import UTC, datetime, timedelta
+
         import yaml
         old_ts = (datetime.now(UTC) - timedelta(days=60)).isoformat(timespec="seconds")
         data = {

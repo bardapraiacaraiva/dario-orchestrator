@@ -516,6 +516,75 @@ def _push_to_pulse(alerts: list, warnings: list):
         pass
 
 
+def job_budget_check() -> dict:
+    """Budget threshold check (Fase 4, 2026-06-12).
+
+    Previously the 80%/95% alerts only fired when a human ran budget_tracker —
+    no cron job watched the budget, so the warning/critical thresholds were
+    effectively never raised automatically. Recomputes the percentage from the
+    stored token total and flips the alert flags so they surface in the report.
+    """
+    from finance import budget_tracker
+    budget = budget_tracker.load_budget()
+    limit = budget.get("limit", 50_000_000) or 50_000_000
+    used = budget.get("total_tokens_used", budget.get("tokens_used", 0)) or 0
+    budget["percentage"] = round(used / limit * 100, 2)
+    alerts = budget_tracker.check_thresholds(budget)
+    if alerts:
+        try:
+            budget_tracker.save_budget(budget)  # persist alert_80/95_sent flags
+        except Exception:
+            pass
+    return {
+        "percentage": budget["percentage"],
+        "tokens_used": used,
+        "limit": limit,
+        "alerts": [a["message"] for a in alerts],
+    }
+
+
+def job_audit_seal() -> dict:
+    """Daily audit seal + chain verification (Fase 4, 2026-06-12).
+
+    Seals today's signed audit chain into audit/seal-YYYY-MM-DD.json (a
+    Merkle-root equivalent an external auditor can pin) and verifies the chain.
+    seal_day/verify_chain existed but nothing scheduled them, so no seals were
+    ever written and tampering could go unnoticed. Flags a broken chain or
+    unsigned gaps in the report.
+    """
+    import json as _json
+
+    import yaml as _yaml
+
+    from core import audit_logger, audit_signing
+    log_file = audit_logger.get_today_file()
+    day = log_file.stem  # filename is the date — keeps path and day consistent
+    entries: list = []
+    if log_file.exists():
+        try:
+            data = _yaml.safe_load(log_file.read_text(encoding="utf-8"))
+            if isinstance(data, list):
+                entries = data
+        except Exception:
+            pass
+    verify = audit_signing.verify_chain(entries, day=day)
+    seal_path = ORCH_DIR / "audit" / f"seal-{day}.json"
+    try:
+        seal = audit_signing.seal_day(entries, day)
+        seal_path.write_text(_json.dumps(seal, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+    return {
+        "day": day,
+        "entries": verify.get("total", 0),
+        "verified": verify.get("verified", 0),
+        "unsigned": verify.get("unsigned", 0),
+        "chain_ok": verify.get("ok", False),
+        "warning": verify.get("warning", ""),
+        "sealed": seal_path.exists(),
+    }
+
+
 def run_all(dry_run: bool = False) -> dict:
     """Execute all daily jobs and produce a structured report."""
     _ensure_dirs()
@@ -541,6 +610,8 @@ def run_all(dry_run: bool = False) -> dict:
         ("auto_capture_obsidian", job_auto_capture_obsidian),
         ("compute_client_stats", job_compute_client_stats),
         ("snapshot_quality_daily", job_snapshot_quality_daily),
+        ("budget_check", job_budget_check),      # Fase 4: auto 80/95 alerts
+        ("audit_seal", job_audit_seal),          # Fase 4: seal + verify audit chain
     ]
 
     if dry_run:

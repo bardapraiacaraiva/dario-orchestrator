@@ -26,7 +26,6 @@ import argparse
 import json
 import logging
 import sys
-from datetime import UTC, datetime
 from pathlib import Path
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
@@ -65,11 +64,12 @@ def _load_pricing():
             return costs
         except Exception as e:
             log.warning(f"Failed to load model_pricing.yaml: {e}")
-    # Fallback
+    # Fallback — MUST match finance/model_pricing.yaml (canonical source).
+    # Corrected 2026-06-12 (Fase 2): Opus 5/25 (was 15/75), Haiku 1/5 (was 0.80/4).
     return {
-        "opus":   {"input": 15.00, "output": 75.00},
-        "sonnet": {"input": 3.00,  "output": 15.00},
-        "haiku":  {"input": 0.80,  "output": 4.00},
+        "opus":   {"input": 5.00, "output": 25.00},
+        "sonnet": {"input": 3.00, "output": 15.00},
+        "haiku":  {"input": 1.00, "output": 5.00},
     }
 
 MODEL_COSTS = _load_pricing()
@@ -84,17 +84,14 @@ def record_usage(input_tokens: int, output_tokens: int, model: str = "sonnet",
     cost = (input_tokens / 1_000_000 * costs["input"] +
             output_tokens / 1_000_000 * costs["output"])
 
-    # Update budget via DB
-    month = datetime.now(UTC).strftime("%Y-%m")
-    with db._conn() as conn:
-        conn.execute("""
-            INSERT INTO budget (month, tokens_used) VALUES (?, ?)
-            ON CONFLICT(month) DO UPDATE SET
-                tokens_used = tokens_used + ?,
-                updated_at = ?
-        """, (month, total, total, datetime.now(UTC).isoformat()))
+    # NOTE (Fase 4, 2026-06-12): token_meter no longer writes the shared `budget`
+    # counter — core.db.complete_task is its single source of truth. In the live
+    # executor path this function runs right AFTER complete_task, so the old
+    # `INSERT INTO budget` here double-counted every task's tokens in SQLite.
+    # token_meter remains the per-model/per-skill SPEND LEDGER: the audit entry
+    # below carries the cost breakdown that get_report() aggregates.
 
-    # Record in audit with full breakdown
+    # Record in audit with full breakdown (the spend ledger)
     db.log_event("token-meter", "usage_recorded",
                  task_id=task_id,
                  details=f"in={input_tokens} out={output_tokens} model={model} skill={skill} cost=${cost:.4f}")

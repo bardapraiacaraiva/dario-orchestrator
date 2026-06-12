@@ -211,6 +211,21 @@ class DB:
                 pass  # column already exists
             conn.execute("INSERT OR IGNORE INTO schema_versions (version, description) VALUES (5, 'SLA: tasks.sla_deadline column')")
 
+            # v6: Revenue instrumentation (2026-06-12) — close the cfo-token-roi
+            # gap: tasks could be costed but never valued, so ROI was incomputable.
+            # valor_eur = billable value attributed to this task (optional; most
+            # value lives at project level in finance/revenue.yaml). billing_status
+            # ∈ none|quoted|invoiced|paid|written_off.
+            for stmt in (
+                "ALTER TABLE tasks ADD COLUMN valor_eur REAL",
+                "ALTER TABLE tasks ADD COLUMN billing_status TEXT DEFAULT 'none'",
+            ):
+                try:
+                    conn.execute(stmt)
+                except sqlite3.OperationalError:
+                    pass  # column already exists
+            conn.execute("INSERT OR IGNORE INTO schema_versions (version, description) VALUES (6, 'Revenue: tasks.valor_eur + billing_status')")
+
     # ─── TASKS ───────────────────────────────────────────────────────────────
 
     def create_task(self, data: dict = None, **kwargs) -> dict:
@@ -330,7 +345,7 @@ class DB:
                 UPDATE tasks SET status = 'todo', quality_score = NULL, actual_tokens = NULL,
                     completion_comment = NULL, completed_at = NULL, checked_out_at = NULL,
                     blocked_reason = ?, updated_at = ?
-                WHERE id = ? AND status IN ('blocked', 'done', 'in_review', 'suspended')
+                WHERE id = ? AND status IN ('blocked', 'done', 'in_review', 'suspended', 'in_progress')
             """, (reason, now, task_id))
             if cursor.rowcount > 0:
                 self._log(conn, "system", "task_reset", task_id=task_id, details=reason[:200])
@@ -843,6 +858,21 @@ CREATE INDEX IF NOT EXISTS idx_tasks_skill ON tasks(skill);
 CREATE INDEX IF NOT EXISTS idx_audit_timestamp ON audit(timestamp);
 CREATE INDEX IF NOT EXISTS idx_audit_task ON audit(task_id);
 CREATE INDEX IF NOT EXISTS idx_scores_skill ON scores(skill);
+
+-- Append-only enforcement for the audit log (Fase 2, 2026-06-12).
+-- The trail was "append-only" by convention only; any process could UPDATE or
+-- DELETE rows. These triggers make tamper attempts fail at the DB layer, so the
+-- SQLite audit trail is now genuinely immutable (INSERT remains allowed).
+CREATE TRIGGER IF NOT EXISTS audit_no_update
+BEFORE UPDATE ON audit
+BEGIN
+    SELECT RAISE(ABORT, 'audit log is append-only: UPDATE forbidden');
+END;
+CREATE TRIGGER IF NOT EXISTS audit_no_delete
+BEFORE DELETE ON audit
+BEGIN
+    SELECT RAISE(ABORT, 'audit log is append-only: DELETE forbidden');
+END;
 CREATE INDEX IF NOT EXISTS idx_scores_task ON scores(task_id);
 """
 
