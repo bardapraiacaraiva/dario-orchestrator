@@ -7,6 +7,7 @@ Usage:
   orch status              System health overview
   orch tasks               List active tasks
   orch tasks create        Create a new task
+  orch tasks sync          Upsert task YAML file(s) into the DB
   orch budget              Budget report
   orch budget add          Add tokens
   orch quality             Quality dashboard
@@ -142,6 +143,8 @@ def check_service(name, host, port):
 def cmd_tasks(args):
     if args and args[0] == "create":
         return cmd_tasks_create(args[1:])
+    if args and args[0] == "sync":
+        return cmd_tasks_sync(args[1:])
 
     print(header("Tasks"))
 
@@ -226,6 +229,24 @@ def cmd_tasks_create(args):
 
     where = "DB + YAML" if db_ok else "YAML only"
     print(f"\n  {GREEN}✓{RESET} Task {c(task_id, CYAN)} created ({where}): {title}\n")
+
+def cmd_tasks_sync(args):
+    """Non-interactive YAML->DB upsert — the dual-write path for session
+    skills (/dario-orchestrator) that write task YAML directly."""
+    sys.path.insert(0, str(ORCH))
+    from core.task_sync import sync_file, sync_all
+    from pathlib import Path as _P
+
+    if args and args[0] == "--all":
+        counts = sync_all()
+        print(f"  {GREEN}✓{RESET} sync --all: " + ", ".join(f"{k} {v}" for k, v in counts.items()))
+        return
+    if not args:
+        print(f"  {RED}Usage: orch tasks sync <file.yaml> | --all{RESET}")
+        return
+    outcome, detail = sync_file(_P(args[0]))
+    color = GREEN if outcome in ("inserted", "updated", "unchanged") else RED
+    print(f"  {c(outcome, color)}: {detail}")
 
 # ═══════════════════════════════════════════════════════════
 # BUDGET — Financial tracking
@@ -419,6 +440,7 @@ def cmd_help():
   {BOLD}Tasks{RESET}
     orch tasks             List active tasks
     orch tasks create      Create a new task interactively
+    orch tasks sync <f|--all>  Upsert task YAML into DB (dual-write for skills)
 
   {BOLD}Finance{RESET}
     orch budget            Budget report
