@@ -206,12 +206,26 @@ def cmd_tasks_create(args):
         "notes": []
     }
 
+    # DB first — SQLite is the source of truth (CONVENTIONS.md). Writing only
+    # YAML was how the DB<->YAML divergence reopened in June 2026 (61 tasks
+    # invisible to every DB-first reader).
+    db_ok = False
+    try:
+        sys.path.insert(0, str(ORCH))
+        from core.task_store import TaskStore
+        TaskStore().create(task)
+        db_ok = True
+    except Exception as e:
+        print(f"  {RED}DB write failed ({e}) — YAML-only task, run the backfill to reconcile.{RESET}")
+
+    # YAML mirror kept for session tools (lucas-heartbeat & co. still read the dirs)
     TASKS_ACTIVE.mkdir(parents=True, exist_ok=True)
     path = TASKS_ACTIVE / f"{task_id}.yaml"
     with open(path, "w", encoding="utf-8") as f:
         yaml.dump(task, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
 
-    print(f"\n  {GREEN}✓{RESET} Task {c(task_id, CYAN)} created: {title}\n")
+    where = "DB + YAML" if db_ok else "YAML only"
+    print(f"\n  {GREEN}✓{RESET} Task {c(task_id, CYAN)} created ({where}): {title}\n")
 
 # ═══════════════════════════════════════════════════════════
 # BUDGET — Financial tracking

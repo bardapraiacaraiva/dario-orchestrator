@@ -631,7 +631,50 @@ CHECK_NAMES = (
     "skill_regression",
     "metrics_invariant",
     "memory_staleness",
+    "db_yaml_divergence",
 )
+
+
+def check_db_yaml_divergence(fix: bool) -> dict:
+    """Writers invariant: every YAML task must also exist in the DB.
+
+    The 2026-06-01 fix covered READERS (DB-first) but a YAML-only writer
+    reopened the divergence — 61 June tasks were invisible to dispatch,
+    budget and dashboard. DB-only tasks are fine (DB is the superset);
+    YAML-only tasks mean a writer is bypassing the DB again.
+    No auto-fix: run scripts/backfill_yaml_tasks_to_db.py to reconcile.
+    """
+    issues = []
+    try:
+        import sqlite3
+        db_path = Path.home() / ".claude" / "orchestrator" / "orchestrator.db"
+        conn = sqlite3.connect(str(db_path))
+        db_ids = {r[0] for r in conn.execute("SELECT id FROM tasks").fetchall()}
+        conn.close()
+
+        yaml_only = []
+        for sub in ("active", "done"):
+            d = Path.home() / ".claude" / "orchestrator" / "tasks" / sub
+            if not d.exists():
+                continue
+            for f in d.glob("*.yaml"):
+                try:
+                    t = load_yaml(f)  # module helper (ruamel) — there is no `yaml` name here
+                except Exception:
+                    continue
+                if isinstance(t, dict) and t.get("id") and t["id"] not in db_ids:
+                    yaml_only.append(str(t["id"]))
+
+        if yaml_only:
+            issues.append({
+                "yaml_only_count": len(yaml_only),
+                "sample": sorted(yaml_only)[:10],
+                "action": "run scripts/backfill_yaml_tasks_to_db.py (a writer is bypassing the DB)",
+            })
+    except Exception as e:
+        issues.append({"error": f"check failed: {e}"})
+
+    return {"id": "db_yaml_divergence", "severity": "warning", "passed": len(issues) == 0, "issues": issues}
 
 
 def run_all_checks(fix: bool = False, single: str = None) -> list:
@@ -650,6 +693,7 @@ def run_all_checks(fix: bool = False, single: str = None) -> list:
         "skill_regression": lambda: check_skill_regression(tasks, fix),
         "metrics_invariant": lambda: check_metrics_invariant(tasks, fix),
         "memory_staleness": lambda: check_memory_staleness(fix),
+        "db_yaml_divergence": lambda: check_db_yaml_divergence(fix),
     }
     # Enforce registry <-> CHECK_NAMES sync (cheap, catches future drift)
     assert tuple(all_checks.keys()) == CHECK_NAMES, "autodiag registry drifted from CHECK_NAMES"
