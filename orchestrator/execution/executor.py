@@ -55,7 +55,6 @@ Exit codes:
 import argparse
 import json
 import logging
-import subprocess
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -73,11 +72,8 @@ import functools
 import os as _os_otel
 
 from core.db import DB
-from execution.checkpoint_interrupt import interrupt_task, should_interrupt
-from execution.completion_hooks import run_learning_writebacks
-from safety.approval_gates import get_approval_level, request_approval
-from safety.guardrails import validate_task
-from execution.pipeline import build_execution_pipeline
+from execution import lifecycle
+from execution.lifecycle import build_execution_prompt, run_engine  # noqa: F401 — re-exported; single source is lifecycle.py
 
 _OTEL_TARGET = (
     _os_otel.environ.get("DARIO_OTEL") == "1"
@@ -123,31 +119,12 @@ def _traced_task(fn):
 
 PYTHON = sys.executable
 
-# TIER 1 Filter Pipeline — shared factory, same composition as the API engine
-# (DD finding A7, 2026-06-12: two hand-copied lists drift; one source doesn't)
-PIPELINE = build_execution_pipeline()
+# The ONE pipeline + lifecycle (Next-Gen N1, 2026-06-12): this module is now a
+# thin adapter over execution/lifecycle.py — the full prepare/finalize cycle
+# lives there, shared verbatim with the autonomous API engine.
+PIPELINE = lifecycle.PIPELINE
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("executor")
-
-
-def run_engine(script: str, args: list) -> dict:
-    """Run an orchestrator engine, return parsed JSON."""
-    path = ORCH_DIR / script
-    if not path.exists():
-        return {"error": f"{script} not found"}
-    try:
-        r = subprocess.run([PYTHON, str(path)] + args,
-                           capture_output=True, text=True, timeout=30, cwd=str(ORCH_DIR))
-        if r.stdout.strip():
-            try:
-                return json.loads(r.stdout.strip())
-            except json.JSONDecodeError:
-                return {"raw": r.stdout.strip()[:300], "exit_code": r.returncode}
-        return {"exit_code": r.returncode, "stderr": r.stderr.strip()[:200]}
-    except subprocess.TimeoutExpired:
-        return {"error": "timeout"}
-    except Exception as e:
-        return {"error": str(e)[:200]}
 
 
 # =============================================================================
@@ -157,151 +134,55 @@ def run_engine(script: str, args: list) -> dict:
 @_traced_task
 def execute_task(task_id: str, dry_run: bool = False) -> dict:
     """
-    Full lifecycle execution of a single task.
-    This is the ATOMIC UNIT of the durable execution engine.
+    Full lifecycle execution of a single task (session path).
+
+    Thin adapter over execution/lifecycle.prepare (Next-Gen N1) — the shared
+    cycle is pre-conditions -> filter -> guardrails -> context -> rubric ->
+    trace -> prompt -> approval gate -> slot -> atomic checkout. This adapter
+    only maps the result to the legacy shape the autopilot/CLI consume.
     """
     db = DB()
+    prep = lifecycle.prepare(
+        task_id, db=db, source="session", dry_run=dry_run,
+        claim_slot=not dry_run,           # per-task slot; released by record_execution_result
+        shield_input=False,               # interactive path is human-supervised
+    )
+
     result = {
         "task_id": task_id,
-        "status": "pending",
-        "steps": [],
+        "status": prep["status"],
+        "steps": prep.get("steps", []),
     }
+    for key in ("recommended_model", "model_id", "prompt_tokens_est",
+                "approval_level", "error"):
+        if key in prep:
+            result[key] = prep[key]
 
-    # Load task from DB (single source of truth)
-    task = db.get_task(task_id)
-    if not task:
-        result["status"] = "error"
-        result["error"] = "Task not found in DB"
+    task = prep.get("task") or {}
+    if task:
+        _span_set(skill=task.get("skill", ""), project=task.get("project", ""),
+                  worker=task.get("assignee", ""),
+                  model=prep.get("model_id", ""),
+                  recommended_model=prep.get("recommended_model", ""))
+
+    if prep["status"] == "dry_run":
+        result["prompt_preview"] = prep.get("prompt_preview", "")
         return result
 
-    skill = task.get("skill", "")
-    project = task.get("project", "")
-    worker = task.get("assignee", "")
-
-    # P0-4: enrich the OTel span now that we know the task's real attributes.
-    _span_set(skill=skill, project=project, worker=worker)
-
-    # ─── Step 0: FILTER PIPELINE — BEFORE ────────────────────────────────
-    # Runs: LoggingFilter → ModelRouter → BudgetFilter
-    filter_ctx = PIPELINE.before(task)
-    result["steps"].append({
-        "step": "filter_pipeline_before",
-        "blocked": filter_ctx.get("blocked", False),
-        "model": filter_ctx.get("recommended_model", "sonnet"),
-        "savings_pct": filter_ctx.get("model_routing", {}).get("savings_vs_opus_pct", 0),
-    })
-
-    if filter_ctx.get("blocked"):
-        result["status"] = "blocked"
-        result["error"] = f"Filter pipeline blocked: {filter_ctx.get('block_reason', '?')}"
-        db.log_event("executor", "task_blocked", task_id=task_id,
-                     details=f"Pipeline: {filter_ctx.get('block_reason', '?')}")
+    if not prep.get("ok"):
+        # blocked / pending_approval / already_running / error — shape as-is.
+        if prep["status"] == "pending":
+            result["status"] = "error"
         return result
 
-    # Store recommended model for API execution
-    result["recommended_model"] = filter_ctx.get("recommended_model", "sonnet")
-    result["model_id"] = filter_ctx.get("model_id", "claude-sonnet-4-6")
-    result["_filter_ctx"] = filter_ctx  # Pass to after-pipeline
-    _span_set(model=result["model_id"], recommended_model=result["recommended_model"])  # P0-4
-
-    # ─── Step 0.9: LIFECYCLE HOOK — task_start (was ORPHAN) ────────────
-    try:
-        from core.lifecycle_hooks import get_registry
-        get_registry().emit("task_start", task=task)
-    except Exception:
-        pass
-
-    # ─── Step 1: GUARDRAILS (now direct import, was subprocess) ────────
-    guard = validate_task(task_id)
-    verdict = guard.get("verdict", "FAIL")
-    result["steps"].append({"step": "guardrails", "result": verdict, "checks": guard.get("checks", {})})
-
-    if verdict == "FAIL":
-        result["status"] = "blocked"
-        result["error"] = f"Guardrails FAIL: {guard.get('errors', [])}"
-        db.log_event("executor", "task_blocked", task_id=task_id,
-                     details=f"Guardrails: {guard.get('errors', [])}")
-        return result
-
-    # ─── Step 2: CONTEXT INJECTION ───────────────────────────────────────
-    context = run_engine("cognitive/context_injector.py", ["--task", task_id, "--json"])
-    context_block = context.get("context_block", "")
-    result["steps"].append({"step": "context", "sources": context.get("sources_used", 0),
-                            "tokens_est": context.get("total_tokens_est", 0)})
-
-    # ─── Step 3: ADAPTIVE RUBRIC ────────────────────────────────────────
-    rubric = run_engine("quality/adaptive_rubric.py", ["--task", task_id, "--json"])
-    result["steps"].append({"step": "rubric", "dimensions": rubric.get("dimensions_count", 5),
-                            "threshold": rubric.get("pass_threshold", 60)})
-
-    # ─── Step 4: TRACE START ─────────────────────────────────────────────
-    run_engine("observability/tracer.py", ["--start", "--task", task_id, "--skill", skill,
-                             "--worker", worker, "--project", project,
-                             "--context", context_block[:200]])
-    result["steps"].append({"step": "trace_start"})
-
-    # ─── Step 5: BUILD EXECUTION PROMPT ──────────────────────────────────
-    # This is the structured prompt that Claude (or any LLM) would receive
-    prompt = build_execution_prompt(task, context_block, rubric)
-    result["prompt_tokens_est"] = len(prompt) // 4
-    result["steps"].append({"step": "prompt_built", "tokens": result["prompt_tokens_est"]})
-
-    if dry_run:
-        result["status"] = "dry_run"
-        result["prompt_preview"] = prompt[:500] + "..."
-        return result
-
-    # ─── Step 5.5: APPROVAL GATE (new: was not wired) ─────────────────────
-    try:
-        approval = get_approval_level(task)
-        if approval.get("needs_approval"):
-            request_approval(task_id, reason=f"Skill '{skill}' requires {approval['level']} approval")
-            result["status"] = "pending_approval"
-            result["approval_level"] = approval["level"]
-            result["steps"].append({"step": "approval_gate", "level": approval["level"]})
-            return result
-    except Exception:
-        pass  # Approval gate failure should not block execution
-
-    # ─── Step 5.8: PARALLELISM SLOT (DD finding A9, 2026-06-12) ─────────
-    # The autonomous pulse already executes under a slot; this CLI/executor
-    # path did not, so two sessions could both believe they were under the
-    # "max parallel" limit. Claimed here, released by record_execution_result
-    # via release_by_caller (the record may run in a different process).
-    # Stale-slot reaping (1h) covers executions that never record.
-    from enforcement.parallelism_guard import ParallelismExceededError, claim_slot
-    try:
-        claim_slot(caller=f"executor:{task_id}")
-    except ParallelismExceededError as e:
-        result["status"] = "blocked"
-        result["error"] = f"Parallelism guard: {e}"
-        db.log_event("executor", "task_blocked", task_id=task_id,
-                     details=f"parallelism_guard: {e}")
-        return result
-
-    # ─── Step 6: EXECUTE (atomic checkout in DB) ─────────────────────────
-    checked_out = db.checkout_task(task_id)
-    if not checked_out:
-        from enforcement.parallelism_guard import release_by_caller
-        release_by_caller(f"executor:{task_id}")
-        result["status"] = "already_running"
-        result["error"] = "Task could not be checked out (already in_progress or not todo)"
-        return result
-
-    # The actual execution happens via Claude Agent tool in the autopilot.
-    # This executor PREPARES everything and RECORDS the result.
-    # In autonomous mode, this would call the Claude API directly.
+    # Ready: the actual execution happens via the Claude Agent tool in the
+    # autopilot (or the API engine in autonomous mode). This path PREPARES
+    # everything and RECORDS the result later via record_execution_result.
     result["status"] = "ready_for_execution"
-    result["execution_prompt"] = prompt
-    result["skill"] = skill
-    result["worker"] = worker
-    result["rubric"] = rubric
-    result["steps"].append({"step": "checked_out"})
-
-    # Log to audit
-    db.log_event("executor", "task_executing", task_id=task_id,
-                 details=f"skill={skill} worker={worker} prompt_tokens={result['prompt_tokens_est']}")
-
+    result["execution_prompt"] = prep["prompt"]
+    result["skill"] = task.get("skill", "")
+    result["worker"] = task.get("assignee", "")
+    result["rubric"] = prep.get("rubric", {})
     return result
 
 
@@ -309,258 +190,43 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
                             tokens: int = 0, score: int = 0, error: str = "") -> dict:
     """
     Record the result of an execution (called AFTER Claude finishes).
-    Handles scoring, tracing, replanning, and state advancement.
+
+    Thin adapter over lifecycle.finalize_success/finalize_failure (Next-Gen
+    N1). Session-path semantics, expressed as explicit parameters:
+      - the autopilot's score feeds the after-pipeline (low score -> tripwire
+        -> replan), unlike the API path which scores after the pipeline;
+      - unscored (score == 0) completes as done (the session reviewer already
+        saw the output);
+      - tokens are ESTIMATED into the meter (70/30) — exact metering only
+        exists on the API path.
     """
     db = DB()
-    result = {"task_id": task_id, "steps": []}
-
-    # Free the parallelism slot claimed at checkout (DD finding A9) — the
-    # execution window is over regardless of how the recording goes below.
-    try:
-        from enforcement.parallelism_guard import release_by_caller
-        release_by_caller(f"executor:{task_id}")
-    except Exception:
-        pass  # stale-slot reaping (1h) is the backstop
+    slot_caller = f"executor:{task_id}"
 
     task = db.get_task(task_id)
     if not task:
+        try:
+            from enforcement.parallelism_guard import release_by_caller
+            release_by_caller(slot_caller)
+        except Exception:
+            pass
         return {"error": "Task not found"}
 
-    skill = task.get("skill", "")
-    project = task.get("project", "")
-
     if success:
-        # ─── FILTER PIPELINE — AFTER ────────────────────────────────────
-        # Runs: SchemaValidation → OutputGuardrails → QualityGate → TokenBudget
-        filter_ctx = {"actual_tokens": tokens, "quality_score": score}
-        after_result = PIPELINE.after(task, output, filter_ctx)
-        result["steps"].append({
-            "step": "filter_pipeline_after",
-            "tripwire": after_result.get("tripwire", False),
-            "tripwire_reason": after_result.get("tripwire_reason", ""),
-            "schema_valid": after_result.get("schema_valid", True),
-        })
-
-        # If tripwire fired, quarantine output and route to replanner
-        if after_result.get("tripwire"):
-            log.warning(f"[TRIPWIRE] {task_id}: {after_result.get('tripwire_reason', '?')}")
-            run_engine("observability/tracer.py", ["--end", "--task", task_id, "--status", "tripwire",
-                                      "--error", after_result.get("tripwire_reason", "")[:300]])
-            failure_type = "output_guardrail_tripwire"
-            replan = run_engine("execution/replanner.py", [
-                "--task", task_id, "--failure", failure_type,
-                "--score", str(score),
-                "--error", after_result.get("tripwire_reason", "")[:200], "--json"
-            ])
-            result["steps"].append({"step": "replanned_tripwire", "action": replan.get("action", "?")})
-            result["status"] = "tripwire"
-            db.log_event("executor", "task_tripwire", task_id=task_id,
-                         details=f"Tripwire: {after_result.get('tripwire_reason', '')[:100]}")
-            return result
-
-        # ─── TRACE END (success) ─────────────────────────────────────────
-        run_engine("observability/tracer.py", ["--end", "--task", task_id, "--status", "success",
-                                  "--tokens", str(tokens), "--score", str(score),
-                                  "--output", output[:300]])
-        result["steps"].append({"step": "trace_end", "status": "success"})
-
-        # ─── QUALITY SCORE ───────────────────────────────────────────────
-        if score > 0:
-            run_engine("quality/quality_scorer.py", [
-                "--task", task_id, "--score", str(score),
-                "--skill", skill, "--project", project, "--json"
-            ])
-            result["steps"].append({"step": "scored", "score": score})
-
-        # ─── HUMAN-IN-THE-LOOP CHECK (new: was dead code) ────────────────
-        try:
-            interrupt_check = should_interrupt(task, output=output, score=score)
-            if interrupt_check.get("interrupt"):
-                interrupt_task(task_id, reason=interrupt_check["reason"],
-                              checkpoint_data={"score": score, "tokens": tokens, "partial_output": output[:500]})
-                result["status"] = "awaiting_human"
-                result["interrupt_reason"] = interrupt_check["reason"]
-                result["steps"].append({"step": "interrupted", "reason": interrupt_check["reason"]})
-                db.log_event("executor", "task_interrupted", task_id=task_id,
-                            details=interrupt_check["reason"][:200])
-                # Capture Episode even when interrupted — the work happened, just pending review
-                try:
-                    from memory import hooks as mem_hooks
-                    mem_hooks.on_task_complete(
-                        task_id=task_id,
-                        skill=skill,
-                        outcome="revision",
-                        score=score if score else None,
-                        project=project,
-                        duration_seconds=float(result.get("duration_seconds", 0.0)),
-                        tokens_used=int(tokens or 0),
-                        model=result.get("recommended_model", "opus"),
-                        output_summary=(output or "")[:500] + " [AWAITING HUMAN]",
-                    )
-                except Exception:
-                    pass
-                return result
-        except Exception:
-            pass  # Interrupt failure should not block completion
-
-        # ─── COMPLETE TASK (DB state advance) ────────────────────────────
-        status = "done" if score >= 60 or score == 0 else "in_review"
-        db.complete_task(task_id, score=score, tokens=tokens, output=output[:2000], status=status)
-        result["steps"].append({"step": "completed", "final_status": status})
-        result["status"] = status
-
-        # ─── LEARNING WRITE-BACKS (shared with the autonomous API path) ──────
-        # Synaptic weights, Q-values, CoT post-mortem, auto-learn/episode
-        # promotion, reactive subscriptions, lifecycle hooks and episodic memory
-        # now live in execution.completion_hooks so providers.anthropic fires the
-        # exact same set (closes audit finding F-08). Budget/token accounting is
-        # intentionally NOT in there — see that module's docstring.
-        try:
-            _task = task if isinstance(task, dict) else {}
-            _wb = run_learning_writebacks(
-                task=_task, task_id=task_id, skill=skill, project=project,
-                score=score, tokens=int(tokens or 0), status=status, output=output,
-                model=result.get("recommended_model", "opus"),
-                duration_seconds=float(result.get("duration_seconds", 0.0)),
-            )
-            result.update({k: v for k, v in _wb.items()
-                           if k in ("synaptic_updates", "reactive_tasks_created")})
-        except Exception:
-            pass
-
-        # ─── TOKEN METER (per-model spend ledger — path-specific) ──────────
-        if tokens > 0:
-            try:
-                model = result.get("recommended_model", "sonnet")
-                run_engine("observability/token_meter.py", [
-                    "--input", str(int(tokens * 0.7)),
-                    "--output", str(int(tokens * 0.3)),
-                    "--model", model,
-                    "--skill", skill,
-                    "--project", project or "unknown",
-                ])
-            except Exception:
-                pass
-
-        # ─── AUDIT ───────────────────────────────────────────────────────
-        db.log_event("executor", "task_completed", task_id=task_id,
-                     details=f"score={score} tokens={tokens} status={status}")
-
-    else:
-        # ─── TRACE END (failed) ──────────────────────────────────────────
-        run_engine("observability/tracer.py", ["--end", "--task", task_id, "--status", "failed",
-                                  "--error", error[:300]])
-        result["steps"].append({"step": "trace_end", "status": "failed"})
-
-        # ─── ERROR HANDLERS (was ORPHAN — per-skill recovery) ────────────
-        try:
-            from reliability.error_handlers import get_error_registry
-            handler = get_error_registry().get(skill)
-            recovery = handler.handle(Exception(error), task, {"_retry_count": 0})
-            result["steps"].append({"step": "error_handler", "action": recovery.action, "recovered": recovery.recovered})
-            if recovery.recovered and recovery.action == "skip":
-                result["status"] = "skipped"
-                db.log_event("executor", "task_skipped", task_id=task_id, details=recovery.reason[:200])
-                return result
-        except Exception:
-            pass
-
-        # ─── REPLAN (auto-recovery fallback) ─────────────────────────────
-        failure_type = "agent_timeout" if "timeout" in error.lower() else "quality_below_50" if score < 50 and score > 0 else "unknown"
-        replan = run_engine("execution/replanner.py", [
-            "--task", task_id, "--failure", failure_type,
-            "--score", str(score), "--error", error[:200], "--json"
-        ])
-        result["steps"].append({"step": "replanned", "action": replan.get("action", "?")})
-        result["status"] = "replanned"
-        result["replan_action"] = replan.get("action")
-
-        # ─── LIFECYCLE HOOK — task_fail ──────────────────────────────────
-        try:
-            from core.lifecycle_hooks import get_registry
-            get_registry().emit("task_fail", task=task, error=error[:200])
-        except Exception:
-            pass
-
-        # ─── AUDIT ───────────────────────────────────────────────────────
-        db.log_event("executor", "task_failed", task_id=task_id,
-                     details=f"error={error[:100]} replan={replan.get('action','?')}")
-
-    return result
-
-
-# =============================================================================
-# PROMPT BUILDER — Structured communication
-# =============================================================================
-
-def build_execution_prompt(task: dict, context_block: str, rubric: dict) -> str:
-    """
-    Build the complete execution prompt with all context.
-    This is the "structured communication" that eliminates ambiguity.
-    """
-    skill = task.get("skill", "")
-    title = task.get("title", "")
-    description = task.get("description", "")
-    project = task.get("project", "")
-    policy = task.get("execution_policy", "default")
-
-    # Rubric as scoring guide
-    rubric_text = ""
-    if rubric.get("dimensions"):
-        rubric_text = "## Scoring Rubric (how this output will be evaluated):\n"
-        for d in rubric.get("dimensions", []):
-            rubric_text += f"- **{d.get('name')}** ({d.get('weight',0):.0%}): {d.get('description','')}\n"
-        rubric_text += f"\nPass threshold: {rubric.get('pass_threshold', 60)}/100\n"
-
-    # Determine context richness to adjust instructions
-    has_context = bool(context_block and context_block.strip() and "###" in context_block)
-
-    if has_context:
-        context_instruction = (
-            "You have real project data in the Context section below. "
-            "USE IT — reference specific names, numbers, and facts from the context. "
-            "Do NOT invent data when real data is provided. "
-            "Do NOT add [CONFIRMAR] or placeholder tags for information already in the context."
+        final_status = "done" if score >= 60 or score == 0 else "in_review"
+        return lifecycle.finalize_success(
+            task_id, task, output, tokens, score,
+            db=db, source="session", model="opus", final_status=final_status,
+            quality_score_for_filter=score,
+            count_budget_on_tripwire=False,   # session tokens are captured by the transcript hook
+            release_slot_caller=slot_caller,
+            meter_tokens=True,
         )
-    else:
-        context_instruction = (
-            "No project-specific data was provided. To maximize usefulness:\n"
-            "- Use REALISTIC invented examples clearly marked as [EXEMPLO]\n"
-            "- Base assumptions on the Portuguese market and the business type described\n"
-            "- Make the output a READY-TO-EDIT DRAFT, not a template with blanks\n"
-            "- Include a short 'Dados a Confirmar' section at the end listing what the client must verify"
-        )
+    return lifecycle.finalize_failure(
+        task_id, task, error, score,
+        db=db, source="session", release_slot_caller=slot_caller,
+    )
 
-    prompt = f"""# Task Execution: {task.get('id', '')}
-
-## Assignment
-- **Title:** {title}
-- **Skill:** /{skill}
-- **Project:** {project}
-- **Priority:** {task.get('priority', 'medium')}
-- **Policy:** {policy}
-
-## Description
-{description}
-
-## Context Guidance
-{context_instruction}
-
-{context_block}
-
-{rubric_text}
-
-## Quality Targets
-1. **Specificity** — Every recommendation must name the client, the market, or the specific situation. Zero generic advice.
-2. **Actionability** — Every section ends with a concrete next step. The client should be able to act on Day 1.
-3. **Completeness** — Cover ALL aspects mentioned in the description. Missing sections = points lost.
-4. **Professional format** — Tables, numbered lists, clear headings. Ready to present to a client.
-
-## Output Format
-Provide your response as a structured deliverable appropriate for the skill.
-End with a brief `## Summary` section (2-3 sentences) for the quality scorer.
-"""
-    return prompt
 
 
 # =============================================================================

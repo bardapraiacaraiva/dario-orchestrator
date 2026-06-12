@@ -48,16 +48,17 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 from core.db import DB
-from execution.pipeline import build_execution_pipeline
+from execution import lifecycle
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("api_exec")
 
 PYTHON = sys.executable
 
-# Safety pipeline — shared factory, same composition as executor.py
-# (DD finding A7, 2026-06-12: two hand-copied lists drift; one source doesn't)
-API_PIPELINE = build_execution_pipeline()
+# The ONE pipeline + lifecycle (Next-Gen N1, 2026-06-12): this engine is now a
+# thin adapter over execution/lifecycle.py — identical prepare/finalize cycle
+# as the session executor, same pipeline INSTANCE (not just same composition).
+API_PIPELINE = lifecycle.PIPELINE
 
 # Model config (pricing per million tokens as of 2026)
 MODELS = {
@@ -419,249 +420,110 @@ def run_engine(script: str, args: list) -> dict:
 # =============================================================================
 
 def execute_task(task_id: str, model_override: str = None, dry_run: bool = False) -> dict:
-    """Full lifecycle: guardrails → context → prompt → API call → score → advance."""
+    """Full lifecycle via Claude API (autonomous path).
+
+    Thin adapter over execution/lifecycle (Next-Gen N1): prepare -> API call
+    -> Haiku auto-score -> finalize. API-path semantics, expressed as explicit
+    lifecycle parameters:
+      - shield_input=True: untrusted text reaches the API unsupervised, so the
+        assembled prompt is inspected BEFORE checkout (poisoned task = 0 tokens);
+      - claim_slot=False: the autonomous pulse already holds a pulse-level slot;
+      - quality_score_for_filter=None: output is unscored at pipeline time (the
+        C1 fix) — the real gate is final_status after the Haiku auto-score;
+      - count_budget_on_tripwire=True: quarantined outputs already spent API
+        tokens and never reach complete_task (the sole budget writer);
+      - meter_tokens=False: TrackedAnthropic already meters every call exactly.
+
+    Convergence wins vs the pre-N1 copy: this path now runs the approval gate,
+    the human-in-the-loop interrupt check, per-skill error handlers and the
+    task_fail hook — all of which it silently lacked.
+    """
     db = DB()
     result = {"task_id": task_id, "steps": [], "status": "pending"}
 
-    # Load task from DB
-    task = db.get_task(task_id)
-    if not task:
-        result["status"] = "error"
-        result["error"] = "Task not found"
+    # API-path pre-step: enrich the task spec before the shared lifecycle
+    # (the session path receives already-enriched tasks from dispatch).
+    spec_enrich = run_engine("core/task_spec.py", ["--enrich", task_id, "--json"])
+    result["steps"].append({"step": "spec_enrich",
+                            "fields": spec_enrich.get("enriched_fields", [])})
+
+    prep = lifecycle.prepare(
+        task_id, db=db, source="api", model_override=model_override,
+        dry_run=dry_run, claim_slot=False, shield_input=True,
+    )
+    result["steps"].extend(prep.get("steps", []))
+    result["status"] = prep["status"]
+    for key in ("recommended_model", "model_id", "prompt_tokens_est",
+                "approval_level", "error"):
+        if key in prep:
+            result[key] = prep[key]
+
+    if prep["status"] == "dry_run":
+        result["prompt_preview"] = prep.get("prompt", "")[:500]
+        return result
+    if not prep.get("ok"):
+        if prep["status"] == "pending":
+            result["status"] = "error"
         return result
 
+    task = prep["task"]
     skill = task.get("skill", "")
     project = task.get("project", "")
+    rubric = prep.get("rubric", {})
+    prompt = prep["prompt"]
 
-    # 0. TASK-FORMAT-SPEC-V1: Enrich + Pre-conditions
-    spec_enrich = run_engine("core/task_spec.py", ["--enrich", task_id, "--json"])
-    result["steps"].append({"step": "spec_enrich", "fields": spec_enrich.get("enriched_fields", [])})
-
-    spec_pre = run_engine("core/task_spec.py", ["--check-pre", task_id, "--json"])
-    if not spec_pre.get("pass", True) and spec_pre.get("blockers"):
-        result["status"] = "blocked"
-        result["error"] = f"Pre-conditions: {spec_pre['blockers']}"
-        return result
-    result["steps"].append({"step": "pre_conditions", "pass": spec_pre.get("pass", True)})
-
-    # Reload task after enrichment (may have new fields)
-    task = db.get_task(task_id)
-
-    # 0.5. FILTER PIPELINE — BEFORE (budget, model routing, logging)
-    filter_ctx = API_PIPELINE.before(task)
-    result["steps"].append({
-        "step": "filter_pipeline_before",
-        "blocked": filter_ctx.get("blocked", False),
-        "model": filter_ctx.get("recommended_model", "sonnet"),
-    })
-    if filter_ctx.get("blocked"):
-        result["status"] = "blocked"
-        result["error"] = f"Pipeline: {filter_ctx.get('block_reason', '?')}"
-        return result
-
-    # Use model router's recommendation instead of hardcoded select_model
-    if not model_override:
-        model_override = filter_ctx.get("recommended_model", "sonnet")
-
-    # 1. Guardrails
-    guard = run_engine("safety/guardrails.py", ["--task", task_id, "--json"])
-    verdict = guard.get("verdict", "FAIL")
-    result["steps"].append({"step": "guardrails", "verdict": verdict})
-
-    if verdict == "FAIL":
-        result["status"] = "blocked"
-        result["error"] = f"Guardrails: {guard.get('errors', [])}"
-        return result
-
-    # 2. Context injection
-    context = run_engine("cognitive/context_injector.py", ["--task", task_id, "--json"])
-    context_block = context.get("context_block", "")
-    result["steps"].append({"step": "context", "sources": context.get("sources_used", 0)})
-
-    # 3. Adaptive rubric
-    rubric = run_engine("quality/adaptive_rubric.py", ["--task", task_id, "--json"])
-    result["steps"].append({"step": "rubric", "dimensions": rubric.get("dimensions_count", 5)})
-
-    # 4. Build prompt
-    from execution.executor import build_execution_prompt
-    prompt = build_execution_prompt(task, context_block, rubric)
-
-    # 5. Select model
-    model = model_override or select_model(task)
+    model = prep.get("recommended_model", "sonnet")
     model_config = MODELS.get(model, MODELS["sonnet"])
     result["model"] = model
     result["model_id"] = model_config["id"]
     result["steps"].append({"step": "model_selected", "model": model})
 
-    # 6. Trace start
-    run_engine("observability/tracer.py", ["--start", "--task", task_id, "--skill", skill,
-                              "--worker", task.get("assignee", ""), "--project", project])
-
-    if dry_run:
-        result["status"] = "dry_run"
-        result["prompt_preview"] = prompt[:500]
-        result["prompt_tokens_est"] = len(prompt) // 4
-        return result
-
-    # 6.5. PROMPT SHIELD — input (DD finding A11, 2026-06-12: was dead code).
-    # The autonomous path is exactly where untrusted text reaches the API
-    # unsupervised: task descriptions and RAG context can carry injection
-    # attempts ("ignore previous instructions", exfiltration bait). Block
-    # BEFORE checkout so a poisoned task costs zero tokens and stays visible.
-    from safety.prompt_shield import inspect_input
-    shield_verdict = inspect_input(prompt)
-    result["steps"].append({"step": "prompt_shield", "block": shield_verdict.get("block", False)})
-    if shield_verdict.get("block"):
-        reason = shield_verdict.get("reason", "prompt injection pattern")
-        log.warning(f"[SHIELD] {task_id}: {reason}")
-        db.block_task(task_id, f"prompt_shield: {reason[:200]}")
-        db.log_event("api-executor", "task_blocked", task_id=task_id,
-                     details=f"prompt_shield: {reason[:200]}")
-        result["status"] = "blocked"
-        result["error"] = f"Prompt shield: {reason}"
-        return result
-
-    # 7. Atomic checkout
-    if not db.checkout_task(task_id):
-        result["status"] = "already_running"
-        return result
-
-    # 8. CALL CLAUDE API
+    # CALL CLAUDE API
     result["steps"].append({"step": "api_call_start"})
     api_result = call_claude_api(prompt, skill, model)
-    result["steps"].append({"step": "api_call_end", "success": api_result.get("success", False)})
+    result["steps"].append({"step": "api_call_end",
+                            "success": api_result.get("success", False)})
 
-    if api_result.get("success"):
-        output = api_result["output"]
-        input_tokens = api_result["input_tokens"]
-        output_tokens = api_result["output_tokens"]
-        total_tokens = input_tokens + output_tokens
-        cost = api_result["cost"]
+    if not api_result.get("success"):
+        fin = lifecycle.finalize_failure(
+            task_id, task, api_result.get("error", "Unknown API error"),
+            db=db, source="api")
+        result["steps"].extend(fin.get("steps", []))
+        result.update(status="failed", error=fin.get("error", ""),
+                      replan=fin.get("replan_action", "escalate"))
+        return result
 
-        # 8.2. PROMPT SHIELD — output (DD finding A11). Masks leaked secrets/
-        # PII in place; SSH private keys block the output entirely. Hard
-        # exfiltration patterns still trip the OutputGuardrailFilter below.
-        try:
-            from safety.prompt_shield import inspect_output
-            out_verdict = inspect_output(output)
-            if out_verdict.get("block"):
-                reason = out_verdict.get("reason", "critical secret in output")
-                log.warning(f"[SHIELD] {task_id}: {reason}")
-                db.block_task(task_id, f"prompt_shield: {reason[:200]}")
-                if total_tokens > 0:
-                    db.update_budget(total_tokens)  # tokens were spent; quarantined output never reaches complete_task
-                db.log_event("api-executor", "task_tripwire", task_id=task_id,
-                             details=f"prompt_shield: {reason[:200]}")
-                result["status"] = "tripwire"
-                result["tripwire_reason"] = reason
-                return result
-            if out_verdict.get("sanitized") and out_verdict["sanitized"] != output:
-                kinds = sorted({m.get("kind", m.get("type", "?")) for m in out_verdict.get("matches", [])})
-                log.warning(f"[SHIELD] {task_id}: output sanitized ({', '.join(kinds)})")
-                output = out_verdict["sanitized"]
-                result["steps"].append({"step": "output_sanitized", "masked": kinds})
-        except Exception:
-            pass  # shield failure must not lose a paid-for output
+    output = api_result["output"]
+    input_tokens = api_result["input_tokens"]
+    output_tokens = api_result["output_tokens"]
+    total_tokens = input_tokens + output_tokens
+    cost = api_result["cost"]
 
-        # 8.5. FILTER PIPELINE — AFTER (schema, guardrails, quality gate)
-        # quality_score MUST be None here, not 0: the auto-score runs at step 9
-        # (below), so at this point the output is *unscored*. The QualityGateFilter
-        # treats `score is not None and score < min_score` as a tripwire — passing
-        # 0 made every autonomous run trip the gate, pay the API cost, and block.
-        # None = unscored → gate is a no-op here; the real gate is `final_status`
-        # at step 12 (done if score >= 60 else in_review). (Fase 1 fix, 2026-06-12.)
-        after_ctx = {"actual_tokens": total_tokens, "quality_score": None}
-        after_result = API_PIPELINE.after(task, output, after_ctx)
-        result["steps"].append({
-            "step": "filter_pipeline_after",
-            "tripwire": after_result.get("tripwire", False),
-        })
-        if after_result.get("tripwire"):
-            log.warning(f"[TRIPWIRE] {task_id}: {after_result.get('tripwire_reason', '?')}")
-            db.block_task(task_id, f"Tripwire: {after_result.get('tripwire_reason', '')[:200]}")
-            # The API call already spent these tokens even though the output is
-            # quarantined — count them once here, since the blocked task never
-            # reaches complete_task (the sole budget writer). (Fase 2, 2026-06-12.)
-            if total_tokens > 0:
-                db.update_budget(total_tokens)
-            result["status"] = "tripwire"
-            result["tripwire_reason"] = after_result.get("tripwire_reason", "")
-            db.log_event("api-executor", "task_tripwire", task_id=task_id,
-                        details=after_result.get("tripwire_reason", "")[:200])
-            return result
+    # Auto-score via Haiku BEFORE finalize, so final_status reflects quality.
+    score_result = auto_score_output(output, rubric, task)
+    score = score_result.get("score", 0)
+    result["steps"].append({"step": "scored", "score": score, "cost": cost})
 
-        # 9. Auto-score via Haiku
-        score_result = auto_score_output(output, rubric, task)
-        score = score_result.get("score", 0)
+    fin = lifecycle.finalize_success(
+        task_id, task, output, total_tokens, score,
+        db=db, source="api", model=model,
+        final_status=("done" if score >= 60 else "in_review"),
+        quality_score_for_filter=None,
+        count_budget_on_tripwire=True,
+        meter_tokens=False,
+    )
+    result["steps"].extend(fin.get("steps", []))
+    result["status"] = fin.get("status", "error")
+    if fin.get("status") == "tripwire":
+        result["tripwire_reason"] = fin.get("tripwire_reason", "")
+        return result
+    if "learning" not in result and any(k in fin for k in ("synaptic_updates", "reactive_tasks_created")):
+        result["learning"] = {k: fin[k] for k in ("synaptic_updates", "reactive_tasks_created") if k in fin}
 
-        result["steps"].append({"step": "scored", "score": score, "cost": cost})
-
-        # 10. Record in quality scorer
-        run_engine("quality/quality_scorer.py", [
-            "--task", task_id, "--score", str(score),
-            "--skill", skill, "--project", project, "--json"
-        ])
-
-        # 11. Trace end
-        run_engine("observability/tracer.py", ["--end", "--task", task_id, "--status", "success",
-                                  "--tokens", str(total_tokens), "--score", str(score),
-                                  "--output", output[:200]])
-
-        # 12. Complete task in DB
-        final_status = "done" if score >= 60 else "in_review"
-        db.complete_task(task_id, score=score, tokens=total_tokens,
-                         output=output, status=final_status)
-
-        # 12.4 LEARNING WRITE-BACKS — close the learning loop on the autonomous
-        # path too (audit F-08). Same shared hooks the interactive executor runs:
-        # synaptic weights, Q-values, CoT post-mortem, episodes, etc. Best-effort.
-        try:
-            from execution.completion_hooks import run_learning_writebacks
-            _wb = run_learning_writebacks(
-                task=task if isinstance(task, dict) else {},
-                task_id=task_id, skill=skill, project=project, score=score,
-                tokens=int(total_tokens or 0), status=final_status, output=output,
-                model=model,
-            )
-            if _wb:
-                result["learning"] = _wb
-        except Exception as _e:
-            log.debug(f"learning write-backs skipped for {task_id}: {_e}")
-
-        # 12.5 TASK-FORMAT-SPEC-V1: Post-conditions check
-        spec_post = run_engine("core/task_spec.py", ["--check-post", task_id, "--json"])
-        result["steps"].append({"step": "post_conditions", "pass": spec_post.get("pass", True),
-                                "issues": spec_post.get("issues", [])})
-
-        # 13. Audit
-        db.log_event("api-executor", "task_completed", task_id=task_id,
-                     details=f"model={model} score={score} tokens={total_tokens} cost=${cost:.4f}")
-
-        result["status"] = final_status
-        result["output_preview"] = output[:300]
-        result["tokens"] = {"input": input_tokens, "output": output_tokens, "total": total_tokens}
-        result["cost"] = cost
-        result["score"] = score
-
-    else:
-        error = api_result.get("error", "Unknown API error")
-
-        # Trace end (failed)
-        run_engine("observability/tracer.py", ["--end", "--task", task_id, "--status", "failed",
-                                  "--error", error[:200]])
-
-        # Replan
-        replan = run_engine("execution/replanner.py", [
-            "--task", task_id, "--failure", "agent_timeout", "--error", error[:200], "--json"
-        ])
-
-        result["status"] = "failed"
-        result["error"] = error
-        result["replan"] = replan.get("action", "escalate")
-
-        db.log_event("api-executor", "task_failed", task_id=task_id,
-                     details=f"error={error[:100]} replan={replan.get('action','?')}")
-
+    result["output_preview"] = (fin.get("sanitized_output") or output)[:300]
+    result["tokens"] = {"input": input_tokens, "output": output_tokens, "total": total_tokens}
+    result["cost"] = cost
+    result["score"] = score
     return result
 
 
