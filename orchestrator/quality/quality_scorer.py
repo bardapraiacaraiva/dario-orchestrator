@@ -56,7 +56,8 @@ try:
         # file. Write to a temp file in the same dir, then os.replace (atomic on
         # the same filesystem) — concurrent writers become last-writer-wins, never
         # partial/interleaved.
-        import os, tempfile
+        import os
+        import tempfile
         d = os.path.dirname(path) or "."
         fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
         try:
@@ -78,7 +79,8 @@ except ImportError:
             return yaml.safe_load(f)
 
     def dump_yaml(data, path):
-        import os, tempfile
+        import os
+        import tempfile
         d = os.path.dirname(path) or "."
         fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
         try:

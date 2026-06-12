@@ -260,9 +260,14 @@ def update_weights() -> dict:
         co_activated = (domain_a == domain_b and domain_a != "" and exec_a >= 1 and exec_b >= 1)
 
         if co_activated:
-            # Update co_activations
+            # Count this co-occurrence. Each evolution cycle where both skills
+            # co-activate adds one. The previous `min(old+1, exec_a+exec_b)` cap
+            # was meaningless — it ceilinged the counter at the sum of the two
+            # skills' individual executions, so a genuinely frequent pair could
+            # never register more co-activations than that sum (Fase 3 fix,
+            # 2026-06-12). co_activations is a frequency counter, not a ratio.
             old_co = int(pair_data.get("co_activations", 0))
-            new_co = min(old_co + 1, exec_a + exec_b)  # Estimate from total executions
+            new_co = old_co + 1
             pair_data["co_activations"] = new_co
             pair_data["avg_combined_score"] = combined_avg
 

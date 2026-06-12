@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import argparse
 import re
-import sys
 import time
 from pathlib import Path
 
@@ -165,7 +164,7 @@ def main():
             print(f"              ✗ ERROR: {str(e)[:120]}")
             failed += 1
 
-    print(f"\n=== Done ===")
+    print("\n=== Done ===")
     print(f"  Success: {success}")
     print(f"  Failed:  {failed}")
     print(f"  Time:    {(time.time()-start)/60:.1f} min")

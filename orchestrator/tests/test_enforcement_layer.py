@@ -57,23 +57,23 @@ class TestBudgetGate:
         assert result["percentage"] == 50.0
 
     def test_at_hardstop_raises(self, isolated_budget):
-        from enforcement.budget_gate import check_budget_or_raise
         from enforcement import BudgetExceededError
+        from enforcement.budget_gate import check_budget_or_raise
         self._write_budget(isolated_budget, "2099-03", pct=95.0)
         with pytest.raises(BudgetExceededError, match="hard-stop"):
             check_budget_or_raise(month="2099-03")
 
     def test_above_hardstop_raises(self, isolated_budget):
-        from enforcement.budget_gate import check_budget_or_raise
         from enforcement import BudgetExceededError
+        from enforcement.budget_gate import check_budget_or_raise
         self._write_budget(isolated_budget, "2099-04", pct=99.5)
         with pytest.raises(BudgetExceededError):
             check_budget_or_raise(month="2099-04")
 
     def test_custom_threshold(self, isolated_budget):
         """Custom hardstop_pct kwarg overrides default."""
-        from enforcement.budget_gate import check_budget_or_raise
         from enforcement import BudgetExceededError
+        from enforcement.budget_gate import check_budget_or_raise
         self._write_budget(isolated_budget, "2099-05", pct=50.0)
         # Default would pass (50 < 95); custom 40 fails
         with pytest.raises(BudgetExceededError):
@@ -86,8 +86,8 @@ class TestBudgetGate:
 
     def test_picks_higher_source_value(self, isolated_budget):
         """Defensive: YAML says 50%, SQLite says 99% → must use 99%."""
-        from enforcement.budget_gate import current_budget_state
         from core.db import DB
+        from enforcement.budget_gate import current_budget_state
         self._write_budget(isolated_budget, "2099-07", pct=50.0)
         with DB()._conn() as conn:
             conn.execute(
@@ -235,8 +235,8 @@ class TestDispatchValidator:
         assert skill == "dario-pitch"
 
     def test_validate_or_raise_raises_on_bad(self, isolated_validator):
-        from enforcement.dispatch_validator import validate_task_or_raise
         from enforcement import TaskValidationError
+        from enforcement.dispatch_validator import validate_task_or_raise
         with pytest.raises(TaskValidationError):
             validate_task_or_raise({"id": "X-001"})  # no assignee/skill
 
@@ -266,14 +266,16 @@ def isolated_slots(tmp_path, monkeypatch):
 class TestParallelismGuard:
 
     def test_first_slot_claimable(self, isolated_slots):
-        from enforcement.parallelism_guard import claim_slot, active_count
+        from enforcement.parallelism_guard import active_count, claim_slot
         slot_id = claim_slot(caller="test1", max_parallel=3)
         assert slot_id
         assert active_count() == 1
 
     def test_release_decrements(self, isolated_slots):
         from enforcement.parallelism_guard import (
-            claim_slot, release_slot, active_count,
+            active_count,
+            claim_slot,
+            release_slot,
         )
         slot_id = claim_slot(caller="test", max_parallel=3)
         assert active_count() == 1
@@ -281,8 +283,8 @@ class TestParallelismGuard:
         assert active_count() == 0
 
     def test_exceed_max_raises(self, isolated_slots):
-        from enforcement.parallelism_guard import claim_slot
         from enforcement import ParallelismExceededError
+        from enforcement.parallelism_guard import claim_slot
         claim_slot(caller="a", max_parallel=2)
         claim_slot(caller="b", max_parallel=2)
         with pytest.raises(ParallelismExceededError):
@@ -293,13 +295,13 @@ class TestParallelismGuard:
         assert release_slot("nonexistent-id") is False
 
     def test_context_manager_auto_releases(self, isolated_slots):
-        from enforcement.parallelism_guard import slot, active_count
+        from enforcement.parallelism_guard import active_count, slot
         with slot(caller="ctx-test", max_parallel=3):
             assert active_count() == 1
         assert active_count() == 0
 
     def test_context_manager_releases_on_exception(self, isolated_slots):
-        from enforcement.parallelism_guard import slot, active_count
+        from enforcement.parallelism_guard import active_count, slot
         with pytest.raises(RuntimeError, match="forced"):
             with slot(caller="exc-test", max_parallel=3):
                 assert active_count() == 1
@@ -332,8 +334,9 @@ class TestParallelismGuard:
     def test_concurrent_claims_via_threads(self, isolated_slots):
         """5 threads racing to claim slots when max=3 — exactly 3 succeed."""
         import threading
-        from enforcement.parallelism_guard import claim_slot
+
         from enforcement import ParallelismExceededError
+        from enforcement.parallelism_guard import claim_slot
 
         successes: list[str] = []
         failures: list[Exception] = []
@@ -388,8 +391,8 @@ class TestIntegratedDispatchPreflight:
 
     def test_full_preflight_budget_blocks(self, isolated_budget,
                                            isolated_validator, isolated_slots):
-        from enforcement.budget_gate import check_budget_or_raise
         from enforcement import BudgetExceededError
+        from enforcement.budget_gate import check_budget_or_raise
 
         (isolated_budget / "2099-09.yaml").write_text(
             yaml.safe_dump({"percentage": 98.0, "month": "2099-09"}),
@@ -400,7 +403,7 @@ class TestIntegratedDispatchPreflight:
 
     def test_full_preflight_validation_blocks(self, isolated_budget,
                                                isolated_validator, isolated_slots):
-        from enforcement.dispatch_validator import validate_task_or_raise
         from enforcement import TaskValidationError
+        from enforcement.dispatch_validator import validate_task_or_raise
         with pytest.raises(TaskValidationError):
             validate_task_or_raise({"id": "X"})  # missing skill+assignee

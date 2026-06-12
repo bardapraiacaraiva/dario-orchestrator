@@ -37,10 +37,8 @@ Cost: ~$0.10-0.15 per bundle (Sonnet 4.6 generation + Haiku judge).
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import sys
-import textwrap
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -205,7 +203,7 @@ def assemble(client: str, briefing: str, components: list[str], out_path: Path,
         print(f"         {len(out)} chars")
 
     # Step 3: Generate one-pager INDEX
-    print(f"\n[3/3] Generating Bundle Index (one-pager)...")
+    print("\n[3/3] Generating Bundle Index (one-pager)...")
     voice_summary = "\n".join(
         line for line in voice_spec.split("\n")
         if "frase-bandeira" in line.lower() or "Frase" in line
@@ -224,7 +222,7 @@ def assemble(client: str, briefing: str, components: list[str], out_path: Path,
     print(f"      Index generated ({len(index)} chars)")
 
     # Assemble final output
-    print(f"\nAssembling final bundle file...")
+    print("\nAssembling final bundle file...")
     parts = [
         f"<!-- DARIO Bundle — assembled {datetime.now(UTC).isoformat()} -->",
         index,

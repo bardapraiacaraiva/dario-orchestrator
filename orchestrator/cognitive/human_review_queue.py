@@ -52,7 +52,6 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 import uuid
 from datetime import UTC, datetime
@@ -121,7 +120,7 @@ def cmd_add(args) -> int:
     }
     dump_y(meta, QUEUE_DIR / f"{base}.meta.yaml")
 
-    print(f"[OK] Added to review queue:")
+    print("[OK] Added to review queue:")
     print(f"     id={item_id}")
     print(f"     skill={args.skill}")
     print(f"     ai_score={args.ai_score} [{meta['ai_verdict']}]")
@@ -218,7 +217,7 @@ def cmd_stats(args) -> int:
     pending = [m for m in items if m.get("state") == "pending"]
     resolved = [m for m in items if m.get("state") == "resolved"]
 
-    print(f"=== Human Review Queue Stats ===")
+    print("=== Human Review Queue Stats ===")
     print(f"  Pending:           {len(pending)}")
     print(f"  Resolved:          {len(resolved)}")
     print(f"  Total processed:   {len(items)}")
@@ -234,7 +233,7 @@ def cmd_stats(args) -> int:
             print(f"  Avg polished score:     {avg_polished:.1f}/100")
 
         # Per-skill breakdown
-        print(f"\n  Per-skill (resolved):")
+        print("\n  Per-skill (resolved):")
         from collections import defaultdict
         by_skill = defaultdict(list)
         for m in resolved:

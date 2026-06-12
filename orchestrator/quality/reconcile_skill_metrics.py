@@ -18,8 +18,11 @@ Usage:
     python reconcile_skill_metrics.py            # dry-run (default, no writes)
     python reconcile_skill_metrics.py --apply    # write, after timestamped backup
 """
-import sys, shutil, datetime
+import datetime
+import shutil
+import sys
 from pathlib import Path
+
 import yaml
 
 SHIP_THRESHOLD = 60
@@ -75,7 +78,7 @@ def main():
         meta["best_score"] = max(scores)
         meta["worst_score"] = min(scores)
         meta["tier"] = new_tier
-        meta["reconciled_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        meta["reconciled_at"] = datetime.datetime.now(datetime.UTC).isoformat()
 
     # Recompute global avg from corrected per-skill avgs (real scored skills only).
     scored = [m["avg_quality_score"] for m in skills.values()

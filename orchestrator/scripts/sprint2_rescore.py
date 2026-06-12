@@ -202,7 +202,7 @@ def main() -> int:
     B = sum(1 for _, s in scored if 70 <= s < 90)
     C = sum(1 for _, s in scored if 50 <= s < 70)
 
-    print(f"\n=== Sprint 2 results ===")
+    print("\n=== Sprint 2 results ===")
     print(f"  Mean: 83.6 -> {all_avg:.2f}  (delta {all_avg - 83.6:+.2f})")
     print(f"  A (>=90): {A}  (was 2)")
     print(f"  B (70-89): {B}")

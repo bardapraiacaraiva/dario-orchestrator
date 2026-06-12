@@ -37,12 +37,11 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 from core.secrets import (
+    get_keyring_backend,
     get_secret,
     is_keyring_available,
-    get_keyring_backend,
     set_secret,
 )
-
 
 # (env_var, keyring_name, fallback_file_relative_to_orch, description)
 MIGRATIONS = [
@@ -97,7 +96,7 @@ def main():
         print(f"── {keyring_name} ({desc})")
         existing_in_keyring = get_secret(keyring_name, caller="migrator")
         if existing_in_keyring and not args.force:
-            print(f"   SKIP: already in keyring (use --force to overwrite)")
+            print("   SKIP: already in keyring (use --force to overwrite)")
             skipped += 1
             continue
 
@@ -110,11 +109,11 @@ def main():
         print(f"   Found in {source} ({len(value)} chars)")
 
         if not args.apply:
-            print(f"   [dry-run] would store in keyring")
+            print("   [dry-run] would store in keyring")
             continue
 
         set_secret(keyring_name, value, caller="migrator")
-        print(f"   ✓ Stored in keyring")
+        print("   ✓ Stored in keyring")
         migrated += 1
 
         # Handle source file

@@ -39,7 +39,8 @@ try:
         # Atomic write (2026-06-01) — see quality_scorer.dump_yaml. Prevents
         # interleaved/partial corruption of skill-metrics.yaml when the live
         # runtime's autodiag and another writer (scorer/cron) race.
-        import os, tempfile
+        import os
+        import tempfile
         d = os.path.dirname(path) or "."
         fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
         try:
@@ -58,7 +59,8 @@ except ImportError:
         with open(path, encoding='utf-8') as f:
             return yaml.safe_load(f)
     def dump_yaml(data, path):
-        import os, tempfile
+        import os
+        import tempfile
         d = os.path.dirname(path) or "."
         fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
         try:

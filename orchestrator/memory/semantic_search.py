@@ -35,13 +35,13 @@ DB_PATH = ORCH_DIR / "orchestrator.db"
 
 # Reuse the dispatcher's embedding primitives (single source of truth).
 try:
-    from dispatch.semantic_dispatch import _embed, _cosine, _vec_to_blob, _blob_to_vec, _hash
+    from dispatch.semantic_dispatch import _blob_to_vec, _cosine, _embed, _hash, _vec_to_blob
     _EMBED_OK = True
 except Exception:
     _EMBED_OK = False
 
 try:
-    from memory.semantic import list_semantic, read_semantic, increment_retrieval
+    from memory.semantic import increment_retrieval, list_semantic, read_semantic
 except Exception:  # pragma: no cover - memory package must exist in real installs
     list_semantic = lambda: []  # type: ignore
     read_semantic = lambda _id: None  # type: ignore

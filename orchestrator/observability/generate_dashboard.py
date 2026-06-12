@@ -8,24 +8,41 @@ Opens: dashboard.html with real data from orchestrator files.
 import os
 import sys
 from datetime import UTC, datetime
-from pathlib import Path
 
 import yaml  # generate() still reads quality_daily.yaml inline for the sparkline
 
 # Data layer extracted to dashboard_data.py (audit Onda 4) — renderer-only module.
 try:
     from observability.dashboard_data import (
-        DARIO_VERSION, DASHBOARD, HOME, ORCH, SKILLS,
-        count_skills, get_budget, get_company, get_padrao_a_metrics,
-        get_pulse, get_quality, get_tasks, git_head_short,
-        load_yaml_safe, status_badge,
+        DARIO_VERSION,
+        DASHBOARD,
+        ORCH,
+        count_skills,
+        get_budget,
+        get_company,
+        get_padrao_a_metrics,
+        get_pulse,
+        get_quality,
+        get_tasks,
+        git_head_short,
+        load_yaml_safe,
+        status_badge,
     )
 except ImportError:  # run as a script: sys.path[0] is observability/
     from dashboard_data import (
-        DARIO_VERSION, DASHBOARD, HOME, ORCH, SKILLS,
-        count_skills, get_budget, get_company, get_padrao_a_metrics,
-        get_pulse, get_quality, get_tasks, git_head_short,
-        load_yaml_safe, status_badge,
+        DARIO_VERSION,
+        DASHBOARD,
+        ORCH,
+        count_skills,
+        get_budget,
+        get_company,
+        get_padrao_a_metrics,
+        get_pulse,
+        get_quality,
+        get_tasks,
+        git_head_short,
+        load_yaml_safe,
+        status_badge,
     )
 
 
@@ -44,7 +61,9 @@ def generate():
     try:
         sys.path.insert(0, str(ORCH))
         from scripts.budget_breakdown_by_type import (
-            aggregate_month, load_budget_file, load_types_config,
+            aggregate_month,
+            load_budget_file,
+            load_types_config,
         )
         _cfg = load_types_config()
         _bm = datetime.now().strftime("%Y-%m")
@@ -117,6 +136,7 @@ def generate():
     drift_coverage = None  # (runs_with_model, runs_total)
     try:
         import sqlite3
+
         from core.db import DB
         _db = DB()
         drift_events = _db.get_drift_events()
@@ -247,8 +267,8 @@ def generate():
     # Enforcement layer state (Risk #1 thin layer)
     enforcement_state = None
     try:
-        from enforcement.parallelism_guard import active_slots, _get_max_parallel
-        from enforcement.budget_gate import is_budget_safe, DEFAULT_HARDSTOP_PCT
+        from enforcement.budget_gate import DEFAULT_HARDSTOP_PCT, is_budget_safe
+        from enforcement.parallelism_guard import _get_max_parallel, active_slots
         slots = active_slots()
         enforcement_state = {
             "active_slots": len(slots),

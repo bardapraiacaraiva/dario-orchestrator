@@ -28,7 +28,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -211,7 +210,7 @@ def main() -> int:
     if args.json:
         print(json.dumps(result, indent=2))
     else:
-        print(f"=== Model Drift Scan ===")
+        print("=== Model Drift Scan ===")
         print(f"  Window: {result.get('since')}")
         print(f"  Wrappers with declaration: {result['wrappers_with_declaration']}")
         print(f"  Runs scanned: {result['runs_scanned']}")

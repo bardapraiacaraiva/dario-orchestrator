@@ -12,7 +12,6 @@ Run:
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 
 SKILLS_DIR = Path.home() / ".claude" / "skills"
@@ -135,7 +134,7 @@ def main():
         results.append((skill, len(refactor)))
 
     if not args.dry_run:
-        print(f"\n=== Done ===")
+        print("\n=== Done ===")
         print(f"  Refactored: {len(results)}/{len(TARGETS)}")
         total_chars = sum(r[1] for r in results)
         print(f"  Total chars added: {total_chars:,}")

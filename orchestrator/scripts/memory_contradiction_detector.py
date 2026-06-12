@@ -30,7 +30,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sys
 from collections import defaultdict
@@ -241,7 +240,7 @@ def main() -> int:
             print(json.dumps(c, ensure_ascii=False))
         return 0 if not contradictions else 2
 
-    print(f"=== Memory Contradiction Scan ===")
+    print("=== Memory Contradiction Scan ===")
     print(f"  Memory dirs: {[str(d) for d in dirs]}")
     print(f"  Files scanned: {files_scanned}")
     print(f"  Total labeled numbers: {len(all_findings)}")

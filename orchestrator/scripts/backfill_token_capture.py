@@ -62,7 +62,9 @@ def main() -> int:
         if args.dry_run:
             # Just parse, don't write state
             from enforcement.token_capture import (
-                aggregate_usage, find_task_id, parse_transcript_sidechains,
+                aggregate_usage,
+                find_task_id,
+                parse_transcript_sidechains,
             )
             msgs = parse_transcript_sidechains(transcript, None, set())
             if not msgs:

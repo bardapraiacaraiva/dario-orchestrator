@@ -16,12 +16,12 @@ Override threshold for tests: pass kwargs to check_budget_or_raise().
 """
 
 from __future__ import annotations
-from typing import Any
 
 import logging
 import os
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import yaml
 

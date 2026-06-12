@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import subprocess
 import sys
@@ -152,14 +151,14 @@ def main():
     yes = [r for r in ok if r.get("deliverable") == "yes"]
     review = [r for r in ok if r.get("deliverable") == "needs-review"]
     no = [r for r in ok if r.get("deliverable") == "no"]
-    print(f"\n=== Summary ===")
+    print("\n=== Summary ===")
     print(f"  Scored: {len(ok)}/{len(results)}")
     print(f"  Yes:    {len(yes)}")
     print(f"  Review: {len(review)}")
     print(f"  No:     {len(no)}")
     if ok:
         last = ok[-1]
-        print(f"\n  Final state:")
+        print("\n  Final state:")
         print(f"    Global avg quality:  {last.get('global_avg_quality')}")
         print(f"    Delivery-ready rate: {last.get('delivery_ready_rate_pct')}%  ({last.get('delivery_ready_yes')}/{last.get('delivery_ready_total')})")
 

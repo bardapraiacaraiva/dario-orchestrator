@@ -22,8 +22,6 @@ Tier rules:
 from __future__ import annotations
 
 import json
-import os
-import re
 import sys
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta

@@ -45,10 +45,13 @@ from pathlib import Path
 
 # Optional server client (fail-soft if not present)
 try:
-    from licensing.license_client import is_enabled as server_enabled
     from licensing.license_client import (
-        init_trial_remote, report_activation, report_check, revalidate,
+        init_trial_remote,
+        report_activation,
+        report_check,
+        revalidate,
     )
+    from licensing.license_client import is_enabled as server_enabled
 except ImportError:
     def server_enabled() -> bool:
         return False

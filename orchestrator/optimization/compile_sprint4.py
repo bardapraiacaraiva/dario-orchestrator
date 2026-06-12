@@ -39,8 +39,6 @@ sys.path.insert(0, str(ORCH_DIR))
 import dspy
 from dspy.teleprompt import MIPROv2
 
-from scripts.anthropic_spend_wrapper import TrackedAnthropic
-
 from optimization.compile_sprint3 import (
     FUNNEL_GOLDENS,
     OFFER_GOLDENS,
@@ -49,6 +47,7 @@ from optimization.compile_sprint3 import (
     OfferGenerationProgram,
     PitchDeckProgram,
 )
+from scripts.anthropic_spend_wrapper import TrackedAnthropic
 
 try:
     from ruamel.yaml import YAML

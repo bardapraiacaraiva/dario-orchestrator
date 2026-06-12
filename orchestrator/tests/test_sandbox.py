@@ -20,7 +20,6 @@ from safety.sandbox import (
     run_sandboxed,
 )
 
-
 PYTHON = sys.executable
 
 

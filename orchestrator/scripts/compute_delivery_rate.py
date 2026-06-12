@@ -45,7 +45,8 @@ try:
         # Atomic write (2026-06-02): cron_daily uses this to write skill-metrics.yaml;
         # under the parallel pre-push gate it raced quality_scorer's writes and
         # corrupted the file. temp + os.replace makes it last-writer-wins, never partial.
-        import os, tempfile
+        import os
+        import tempfile
         dd = os.path.dirname(str(p)) or "."
         fd, tmp = tempfile.mkstemp(dir=dd, suffix=".tmp")
         try:
@@ -66,7 +67,8 @@ except ImportError:
             return yaml.safe_load(f)
 
     def dump_y(d, p):
-        import os, tempfile
+        import os
+        import tempfile
         dd = os.path.dirname(str(p)) or "."
         fd, tmp = tempfile.mkstemp(dir=dd, suffix=".tmp")
         try:
@@ -160,7 +162,7 @@ def main() -> int:
         print(json.dumps(result, indent=2, default=str))
         return 0
 
-    print(f"=== Delivery-ready rate ===")
+    print("=== Delivery-ready rate ===")
     print(f"  Rate:                  {result['delivery_ready_rate_pct']:.1f}%")
     print(f"  Yes (ready as-is):     {result['delivery_ready_yes_count']}")
     print(f"  Needs review:          {result['delivery_ready_needs_review_count']}")

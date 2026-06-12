@@ -194,7 +194,12 @@ def check_embeddings_freshness() -> dict:
     try:
         import sqlite3
 
-        from dispatch.semantic_dispatch import _augment_description, _hash, _load_keyword_index, extract_skill_corpus
+        from dispatch.semantic_dispatch import (
+            _augment_description,
+            _hash,
+            _load_keyword_index,
+            extract_skill_corpus,
+        )
         corpus = extract_skill_corpus()
         keyword_index = _load_keyword_index()
         conn = sqlite3.connect(str(ORCH_DIR / "orchestrator.db"))

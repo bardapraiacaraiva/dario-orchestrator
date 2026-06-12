@@ -40,7 +40,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import subprocess
 import sys
@@ -323,7 +322,7 @@ def cmd_capture(args) -> int:
         registry["captured"] = captured
         save_registry(registry)
 
-    print(f"\n=== Done ===")
+    print("\n=== Done ===")
     print(f"  Captured: {success}")
     print(f"  Skipped (errors): {skipped}")
     print(f"  Total registry entries: {len(captured)}")
@@ -334,7 +333,7 @@ def cmd_stats(args) -> int:
     registry = load_registry()
     captured = registry.get("captured", {})
 
-    print(f"=== Auto-capture Registry Stats ===\n")
+    print("=== Auto-capture Registry Stats ===\n")
     print(f"  Total captured:    {len(captured)}")
     print(f"  Last scan:         {registry.get('last_scan', 'never')}")
 
@@ -347,11 +346,11 @@ def cmd_stats(args) -> int:
             s = entry.get("skill", "unknown")
             skills[s] = skills.get(s, 0) + 1
 
-        print(f"\n  Verdict distribution:")
+        print("\n  Verdict distribution:")
         for v, n in verdicts.items():
             if n: print(f"    {v:15s} {n}")
 
-        print(f"\n  Per skill (top 10):")
+        print("\n  Per skill (top 10):")
         for s, n in sorted(skills.items(), key=lambda x: -x[1])[:10]:
             print(f"    {s:25s} {n}")
 
@@ -360,7 +359,7 @@ def cmd_stats(args) -> int:
     uncaptured = [f.name for f in files if f.name not in captured]
     print(f"\n  Uncaptured files in Outputs/: {len(uncaptured)}")
     if uncaptured[:5]:
-        print(f"  Sample (5 newest):")
+        print("  Sample (5 newest):")
         for n in uncaptured[:5]:
             skill = find_skill(OBS_OUTPUTS / n) or "(unknown — skip)"
             print(f"    [{skill:25s}] {n[:70]}")

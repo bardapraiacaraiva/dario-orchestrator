@@ -202,7 +202,7 @@ def compute() -> dict:
 
 
 def print_summary(stats: dict):
-    print(f"=== Per-Client Stats ===\n")
+    print("=== Per-Client Stats ===\n")
     sorted_clients = sorted(stats.items(), key=lambda x: -(x[1].get("total_outputs_obsidian") or 0))
     for client_id, s in sorted_clients:
         name = (s["name"] or client_id)[:33]

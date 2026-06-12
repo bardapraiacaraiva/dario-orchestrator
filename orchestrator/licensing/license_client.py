@@ -28,7 +28,6 @@ import os
 import urllib.error
 import urllib.parse
 import urllib.request
-from typing import Any
 
 log = logging.getLogger("license_client")
 

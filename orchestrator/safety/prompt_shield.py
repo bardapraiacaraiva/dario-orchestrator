@@ -44,9 +44,10 @@ Usage:
 from __future__ import annotations
 
 import re
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Iterator
+from typing import Any
 
 # ─── Patterns: prompt injection (BLOCK on match) ─────────────────────────
 
@@ -228,7 +229,7 @@ class SecretLeakageDetected(Exception):
 
 
 @contextmanager
-def shield(skill: str = "<unknown>") -> "Iterator[_Shield]":
+def shield(skill: str = "<unknown>") -> Iterator[_Shield]:
     """Context manager that wraps skill execution with input + output checks.
 
     Usage:

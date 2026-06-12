@@ -17,7 +17,6 @@ from safety.prompt_shield import (
     shield,
 )
 
-
 # ─── inspect_input ───────────────────────────────────────────────────────
 
 

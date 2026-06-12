@@ -41,11 +41,11 @@ import contextlib
 import json
 import logging
 import os
-import time
 import uuid
+from collections.abc import Iterator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 import portalocker
 
@@ -174,7 +174,7 @@ def active_count() -> int:
 
 
 @contextlib.contextmanager
-def slot(caller: str = "anonymous", max_parallel: int | None = None) -> "Iterator[str]":
+def slot(caller: str = "anonymous", max_parallel: int | None = None) -> Iterator[str]:
     """Context manager — auto-claim and auto-release a slot.
 
     Raises ParallelismExceededError if no slot available.

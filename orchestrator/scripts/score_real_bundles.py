@@ -91,7 +91,7 @@ def score_one_bundle(b):
         m = re.search(r"\{[\s\S]+\}", out.stdout)
         if m:
             return json.loads(m.group(0))
-        return {"error": f"no JSON in output", "stdout": out.stdout[:300], "stderr": out.stderr[:300]}
+        return {"error": "no JSON in output", "stdout": out.stdout[:300], "stderr": out.stderr[:300]}
     except subprocess.TimeoutExpired:
         return {"error": "timeout"}
 
@@ -114,7 +114,7 @@ def main():
     yes = [r for r in ok if r.get("verdict") == "yes"]
     review = [r for r in ok if r.get("verdict") == "needs-review"]
     no = [r for r in ok if r.get("verdict") == "no"]
-    print(f"\n=== Summary ===")
+    print("\n=== Summary ===")
     print(f"  Scored: {len(ok)}/{len(results)}")
     print(f"  Yes:    {len(yes)}")
     print(f"  Review: {len(review)}")
@@ -122,9 +122,9 @@ def main():
     if ok:
         avg = sum(r["score"] for r in ok) / len(ok)
         print(f"  Avg:    {avg:.1f}/100")
-        print(f"\n  Bundle-level vs single-skill comparison:")
-        print(f"    Single-skill avg:  83.5 (mean across 55 outputs)")
-        print(f"    Single-skill yes:  14.5% (8/55)")
+        print("\n  Bundle-level vs single-skill comparison:")
+        print("    Single-skill avg:  83.5 (mean across 55 outputs)")
+        print("    Single-skill yes:  14.5% (8/55)")
         print(f"    BUNDLE avg:        {avg:.1f}")
         print(f"    BUNDLE yes:        {100*len(yes)/len(ok):.1f}% ({len(yes)}/{len(ok)})")
 

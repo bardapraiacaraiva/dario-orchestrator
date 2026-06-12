@@ -17,7 +17,7 @@ import json
 import subprocess
 import sys
 import time
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 
 try:
@@ -221,7 +221,7 @@ def main():
     print(f"\n  Summary: {summary['ok']}/{summary['total_slos']} ok · "
           f"{summary['violations']} violations · {summary['no_data']} no-data · "
           f"{summary['errors']} errors")
-    print(f"  Written: quality/slo_status.yaml")
+    print("  Written: quality/slo_status.yaml")
     if violations:
         print(f"  Logged:  quality/slo_violations.jsonl (+{len(violations)} entries)")
     return 1 if summary["violations"] else 0

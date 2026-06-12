@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
 """Tests for Upgrade 14 integrity gate."""
 
+import os
 import sys
 from pathlib import Path
 
-ORCH_DIR = Path.home() / ".claude" / "orchestrator"
+# Resolve like tests/conftest.py: env override → this repo (tests/ -> orchestrator/)
+# → legacy ~/.claude. Hard-anchoring to Path.home() killed CI collection on Linux
+# (path absent → `import integrity_gate` fails → whole suite errors). (Fase 1, 2026-06-12.)
+_env_dir = os.environ.get("DARIO_ORCH_DIR")
+if _env_dir:
+    ORCH_DIR = Path(_env_dir)
+elif (Path(__file__).resolve().parent.parent / "core").is_dir():
+    ORCH_DIR = Path(__file__).resolve().parent.parent
+else:
+    ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 sys.path.insert(0, str(ORCH_DIR / "tools"))
 

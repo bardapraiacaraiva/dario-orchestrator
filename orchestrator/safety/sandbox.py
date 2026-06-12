@@ -57,6 +57,7 @@ from __future__ import annotations
 
 import logging
 import os
+
 try:
     import resource  # POSIX only — Windows raises ModuleNotFoundError
 except ModuleNotFoundError:
@@ -68,8 +69,6 @@ import tempfile
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
-
 
 # Whether POSIX `resource` module is functional. On Windows it imports but
 # rlimit calls raise OSError, so we sniff the platform.
@@ -142,7 +141,7 @@ class SandboxResult:
         }
 
 
-def _build_env(allowlist: list[str], extra: Optional[dict[str, str]] = None) -> tuple[dict[str, str], list[str]]:
+def _build_env(allowlist: list[str], extra: dict[str, str] | None = None) -> tuple[dict[str, str], list[str]]:
     """Build scoped env. Returns (env_dict, list_of_keys_used)."""
     env: dict[str, str] = {}
     keys_used: list[str] = []
@@ -181,12 +180,12 @@ def _apply_posix_limits(cpu_seconds: int, memory_mb: int) -> None:
     if not _POSIX or resource is None:
         return
     try:
-        rlimit_cpu = getattr(resource, "RLIMIT_CPU")
+        rlimit_cpu = resource.RLIMIT_CPU
         resource.setrlimit(rlimit_cpu, (cpu_seconds, cpu_seconds))  # type: ignore[attr-defined]
     except (ValueError, OSError, AttributeError):
         pass
     try:
-        rlimit_as = getattr(resource, "RLIMIT_AS")
+        rlimit_as = resource.RLIMIT_AS
         mem_bytes = memory_mb * 1024 * 1024
         resource.setrlimit(rlimit_as, (mem_bytes, mem_bytes))  # type: ignore[attr-defined]
     except (ValueError, OSError, AttributeError):
@@ -212,13 +211,13 @@ def run_sandboxed(
     cmd: list[str],
     *,
     caller: str = "unknown",
-    env_allowlist: Optional[list[str]] = None,
-    env_extra: Optional[dict[str, str]] = None,
+    env_allowlist: list[str] | None = None,
+    env_extra: dict[str, str] | None = None,
     timeout_s: float = 60.0,
-    cpu_seconds: Optional[int] = None,
+    cpu_seconds: int | None = None,
     memory_mb: int = 512,
     capture_output: bool = True,
-    input_data: Optional[str] = None,
+    input_data: str | None = None,
     cleanup_dir: bool = True,
 ) -> SandboxResult:
     """Run a subprocess in a sandboxed context.
