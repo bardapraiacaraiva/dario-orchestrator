@@ -104,6 +104,22 @@ def build_execution_prompt(task: dict, context_block: str, rubric: dict) -> str:
             "- Include a short 'Dados a Confirmar' section at the end listing what the client must verify"
         )
 
+    # N4/G5: client-facing work must end with a machine-readable confidence
+    # block — the adversarial verifier and the timeline both consume it.
+    confidence_instruction = ""
+    if policy in ("client_facing", "financial"):
+        confidence_instruction = """
+## Confidence Block (MANDATORY — machine-read)
+End the deliverable with exactly one fenced json block:
+```json
+{"confidence": {"mode": "HIGH_CONFIDENCE|UNCERTAINTY|EXPLORATION", "score": 0-100,
+  "verified_facts": ["facts backed by provided context"],
+  "assumed_facts": ["plausible assumptions made"],
+  "needs_client_confirmation": ["items the client must verify"]}}
+```
+Be honest: prefer UNCERTAINTY with explicit assumptions over inflated confidence.
+"""
+
     prompt = f"""# Task Execution: {task.get('id', '')}
 
 ## Assignment
@@ -122,7 +138,7 @@ def build_execution_prompt(task: dict, context_block: str, rubric: dict) -> str:
 
 ## Context
 {context_block if context_block else '(none provided)'}
-"""
+{confidence_instruction}"""
     return prompt
 
 
@@ -416,6 +432,40 @@ def finalize_success(task_id: str, task: dict, output: str, tokens: int, score: 
 
     # Complete in DB (the adapter decides the status rule for its path).
     status = final_status or ("done" if score >= 60 else "in_review")
+
+    # Adversarial verification (N4) — independent skeptic for client-facing
+    # work. The Padrão A critique runs inside the generating context; this
+    # one never saw the generation. Critical findings (placeholder leakage,
+    # broken totals, contradictions) DOWNGRADE done -> in_review with the
+    # issues attached, so errors stop arriving at the human as "done".
+    if task.get("execution_policy") in ("client_facing", "financial"):
+        try:
+            from quality.adversarial_verify import enqueue_for_review, verify_output
+            verdict = verify_output(task, output, use_llm_judge=(source == "api"))
+            result["steps"].append({
+                "step": "adversarial_verify", "verdict": verdict["verdict"],
+                "critical": verdict["critical"],
+                "issues": [i["reason"] for i in verdict["issues"][:5]],
+            })
+            result["confidence"] = verdict.get("confidence")
+            try:
+                db.journal_step(task_id, "verified",
+                                status=("flag" if verdict["issues"] else "pass"),
+                                payload={"critical": verdict["critical"],
+                                         "issues": verdict["issues"][:8],
+                                         "confidence": verdict.get("confidence")})
+            except Exception:
+                pass
+            if verdict["critical"] and status == "done":
+                status = "in_review"
+                item_id = enqueue_for_review(task, output, verdict)
+                db.log_event(actor, "task_verifier_flagged", task_id=task_id,
+                             details=f"downgraded done->in_review: "
+                                     f"{verdict['issues'][0]['reason'][:120]}"
+                                     + (f" (queue {item_id})" if item_id else ""))
+        except Exception:
+            pass  # verifier failure must not block completion
+
     db.complete_task(task_id, score=score, tokens=tokens, output=output[:2000], status=status)
     result["steps"].append({"step": "completed", "final_status": status})
     result["status"] = status

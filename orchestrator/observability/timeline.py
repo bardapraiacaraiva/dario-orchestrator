@@ -122,8 +122,9 @@ TIMELINE_HTML = """<!DOCTYPE html>
   .chip { font-size: 11px; font-family: Consolas, monospace;
           border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px;
           color: var(--dim); }
-  .chip.done { border-color: #2c5237; color: var(--ok); }
+  .chip.done, .chip.pass { border-color: #2c5237; color: var(--ok); }
   .chip.tripwire, .chip.failed { border-color: #5b2a2e; color: var(--bad); }
+  .chip.flag { border-color: #5b4a1e; color: var(--warn); }
   .resume { color: var(--violet); font-size: 11px; margin-top: 8px; }
   #ticker { background: var(--panel); border: 1px solid var(--line);
             border-radius: 10px; padding: 10px 16px; margin-bottom: 18px;
