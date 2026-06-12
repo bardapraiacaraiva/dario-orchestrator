@@ -51,7 +51,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Optional
 
 try:
     import keyring
@@ -74,7 +73,17 @@ def _audit(action: str, secret_name: str, caller: str, ok: bool = True) -> None:
     Records: who accessed which secret, when, success/fail. Never logs
     the secret value itself. This lets you answer "what did skill X read
     in the last hour?" — critical for breach forensics.
+
+    Reentrancy guard (Fase 1 fix, 2026-06-12): the audit logger signs every
+    event, and signing loads the audit private key via get_secret(
+    caller="audit_signing"). Auditing THAT access would recurse
+    (get_secret → _audit → log_event → sign_entry → _ensure_keypair →
+    get_secret …), which measured ~52s per signature. Reading the audit
+    key for the purpose of signing the audit log cannot itself be audited —
+    it is circular by definition — so we skip it.
     """
+    if caller == "audit_signing":
+        return
     try:
         from core.audit_logger import log_event
         log_event(
@@ -144,8 +153,8 @@ def set_secret(name: str, value: str, caller: str = "unknown") -> None:
 
 
 def get_secret(name: str, caller: str = "unknown",
-               fallback_env: Optional[str] = None,
-               fallback_file: Optional[str] = None) -> Optional[str]:
+               fallback_env: str | None = None,
+               fallback_file: str | None = None) -> str | None:
     """Retrieve a secret from the keyring.
 
     Args:
@@ -159,7 +168,7 @@ def get_secret(name: str, caller: str = "unknown",
     Returns:
         Secret value or None if not found in any source.
     """
-    value: Optional[str] = None
+    value: str | None = None
 
     if is_keyring_available():
         try:

@@ -82,15 +82,30 @@ GENESIS_PREFIX = "DARIO-AUDIT-CHAIN-2026-05-25"
 
 # ─── Key management ──────────────────────────────────────────────────────
 
+# Module-level keypair cache. Loading the private key hits the OS keyring,
+# which is slow (~tens of ms) and — critically — re-enters the audit/sign
+# cycle (get_secret → _audit → log_event → sign_entry → _ensure_keypair).
+# Without this cache each signature paid that full round-trip, measured at
+# ~52s per sign_entry (Fase 1 audit fix, 2026-06-12). The reentrancy guard
+# in core.secrets._audit (caller == "audit_signing") breaks the loop on the
+# first load; this cache makes every subsequent signature O(1).
+_KEYPAIR_CACHE: tuple[Ed25519PrivateKey, Ed25519PublicKey] | None = None
+
 
 def _ensure_keypair() -> tuple[Ed25519PrivateKey, Ed25519PublicKey]:
     """Load existing keypair or generate + persist a new one.
 
     Resolution order for private key (Faixa 1 #2 update 2026-05-25):
-      1. OS keyring as AUDIT_PRIVKEY_PEM (preferred — OS-encrypted)
-      2. file PRIVATE_KEY_PATH (legacy, chmod 600)
-      3. generate new + persist (defaults to keyring if available, file fallback)
+      1. process cache (set after first successful load — avoids keyring I/O
+         and the audit reentrancy cycle)
+      2. OS keyring as AUDIT_PRIVKEY_PEM (preferred — OS-encrypted)
+      3. file PRIVATE_KEY_PATH (legacy, chmod 600)
+      4. generate new + persist (defaults to keyring if available, file fallback)
     """
+    global _KEYPAIR_CACHE
+    if _KEYPAIR_CACHE is not None:
+        return _KEYPAIR_CACHE
+
     SECURITY_DIR.mkdir(parents=True, exist_ok=True)
 
     # 1. Keyring
@@ -126,6 +141,7 @@ def _ensure_keypair() -> tuple[Ed25519PrivateKey, Ed25519PublicKey]:
                     format=PublicFormat.SubjectPublicKeyInfo,
                 )
             )
+        _KEYPAIR_CACHE = (priv, pub)
         return priv, pub
 
     # 3. Generate new
@@ -154,6 +170,7 @@ def _ensure_keypair() -> tuple[Ed25519PrivateKey, Ed25519PublicKey]:
         )
     )
 
+    _KEYPAIR_CACHE = (priv, pub)
     return priv, pub
 
 
@@ -189,7 +206,7 @@ def entry_hash(entry: dict[str, Any]) -> str:
 
 def genesis_hash(day: str) -> str:
     """Per-day chain root. day = 'YYYY-MM-DD'."""
-    return hashlib.sha256(f"{GENESIS_PREFIX}|{day}".encode("utf-8")).hexdigest()
+    return hashlib.sha256(f"{GENESIS_PREFIX}|{day}".encode()).hexdigest()
 
 
 # ─── Sign / verify ───────────────────────────────────────────────────────
@@ -235,27 +252,46 @@ def verify_entry(entry: dict[str, Any], expected_prev_hash: str) -> tuple[bool, 
 def verify_chain(entries: list[dict[str, Any]], day: str | None = None) -> dict[str, Any]:
     """Verify entire chain. Returns summary dict.
 
-    If day given, expects first entry's prev_hash to equal genesis_hash(day).
-    Otherwise, first entry's prev_hash is used as-is.
+    If day given, expects the first SIGNED entry's prev_hash to equal
+    genesis_hash(day). Otherwise the first signed entry's prev_hash is the root.
+
+    Tolerant to unsigned entries (Fase 2 fix, 2026-06-12). The writer
+    (core.audit_logger) is fail-soft: if signing is unavailable it appends an
+    UNSIGNED entry and chains the *next* signed entry to the last SIGNED one,
+    skipping the gap. The old verify_chain rejected the whole file at the first
+    unsigned row, so almost every real audit file reported FAIL even when no
+    signed entry had been tampered with. This version mirrors the writer:
+      - unsigned entries are counted (`unsigned`) and skipped, NOT chained;
+      - signed entries are verified against the last verified signed hash;
+      - `ok` is False only on genuine tampering of a SIGNED entry (bad
+        signature or a broken signed→signed chain link).
+    `warning` is set when unsigned entries are present so the gap is visible.
     """
     if not entries:
-        return {"ok": True, "total": 0, "verified": 0, "broken_at": None, "reason": ""}
+        return {"ok": True, "total": 0, "verified": 0, "unsigned": 0,
+                "broken_at": None, "reason": "", "warning": ""}
 
-    if day:
-        expected_prev = genesis_hash(day)
-    else:
-        expected_prev = entries[0].get("prev_hash", "")
-
+    expected_prev = genesis_hash(day) if day else None
     verified = 0
+    unsigned = 0
+
     for i, entry in enumerate(entries):
+        if "sig" not in entry:
+            unsigned += 1
+            continue  # legacy/fail-soft row: skip, do not advance the chain
+        # First signed entry sets the root when no explicit day was given.
+        if expected_prev is None:
+            expected_prev = entry.get("prev_hash", "")
         ok, reason = verify_entry(entry, expected_prev)
         if not ok:
             return {
                 "ok": False,
                 "total": len(entries),
                 "verified": verified,
+                "unsigned": unsigned,
                 "broken_at": i,
                 "reason": reason,
+                "warning": f"{unsigned} unsigned entr{'y' if unsigned == 1 else 'ies'}" if unsigned else "",
             }
         verified += 1
         expected_prev = entry_hash(entry)
@@ -264,8 +300,11 @@ def verify_chain(entries: list[dict[str, Any]], day: str | None = None) -> dict[
         "ok": True,
         "total": len(entries),
         "verified": verified,
+        "unsigned": unsigned,
         "broken_at": None,
         "reason": "",
+        "warning": (f"{unsigned} unsigned entr{'y' if unsigned == 1 else 'ies'} skipped"
+                    if unsigned else ""),
     }
 
 

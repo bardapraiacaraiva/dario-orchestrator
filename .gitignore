@@ -30,7 +30,11 @@
 !orchestrator/*.py
 !orchestrator/*.html
 !orchestrator/*.md
-!orchestrator/.license
+# NOTE (Fase 1 fix, 2026-06-12): `.license` is a per-machine CREDENTIAL dotfile,
+# never a product artifact. Whitelisting it here forced it into git and would
+# auto-commit any future PRO/ENT key. It is now explicitly denied below, in the
+# same block as .master_secret / .audit_privkey. Ship `.license.example` instead.
+orchestrator/.license
 !orchestrator/LICENSE
 !orchestrator/COPYING
 !orchestrator/NOTICE

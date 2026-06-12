@@ -32,13 +32,26 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sys
 from pathlib import Path
 
 import pytest
 
-# Add orchestrator to path
-ORCH_DIR = Path.home() / ".claude" / "orchestrator"
+# Add orchestrator to path.
+# Resolve in priority order so the suite runs both locally AND in CI
+# (where the checkout lives in /home/runner/work/..., not ~/.claude):
+#   1. DARIO_ORCH_DIR env var (explicit override)
+#   2. the repo this conftest lives in (tests/ -> orchestrator/)
+#   3. ~/.claude/orchestrator (legacy local-install default)
+# (Fase 1 fix, 2026-06-12 — was hard-anchored to Path.home(), red CI.)
+_env_dir = os.environ.get("DARIO_ORCH_DIR")
+if _env_dir:
+    ORCH_DIR = Path(_env_dir)
+elif (Path(__file__).resolve().parent.parent / "core").is_dir():
+    ORCH_DIR = Path(__file__).resolve().parent.parent
+else:
+    ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 

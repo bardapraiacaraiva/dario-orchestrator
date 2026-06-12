@@ -21,7 +21,6 @@ from core.audit_signing import (
     verify_seal,
 )
 
-
 # ─── Hashing primitives ──────────────────────────────────────────────────
 
 
