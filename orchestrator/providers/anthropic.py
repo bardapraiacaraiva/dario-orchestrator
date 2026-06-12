@@ -499,6 +499,19 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
     total_tokens = input_tokens + output_tokens
     cost = api_result["cost"]
 
+    # Execution journal (N2): persist the PAID-FOR output the moment it
+    # exists. A crash anywhere after this line no longer loses it —
+    # resume_interrupted() replays finalize from this payload instead of
+    # re-executing (and re-paying) the API call.
+    try:
+        db.journal_step(task_id, "executed", payload={
+            "output": output, "input_tokens": input_tokens,
+            "output_tokens": output_tokens, "total_tokens": total_tokens,
+            "cost": cost, "model": model, "rubric": rubric,
+        })
+    except Exception:
+        pass
+
     # Auto-score via Haiku BEFORE finalize, so final_status reflects quality.
     score_result = auto_score_output(output, rubric, task)
     score = score_result.get("score", 0)
@@ -697,8 +710,59 @@ Respond with ONLY a JSON object:
 # AUTONOMOUS PULSE — Full cycle via API
 # =============================================================================
 
+def resume_interrupted(db: DB | None = None, dry_run: bool = False) -> dict:
+    """Replay finalize for tasks whose API execution completed but whose
+    finalize never ran (Next-Gen N2, 2026-06-12).
+
+    A crash between the API call and finalize used to lose the paid-for
+    output: the SLA reaper reset the task to todo and the next wave paid the
+    API a second time. The 'executed' journal step persists the output the
+    moment it exists; this function finds in_progress tasks with an
+    executed-but-not-finalized journal and re-runs ONLY the finalize half —
+    re-scoring via Haiku (cheap) but never re-paying the main call.
+    """
+    db = db or DB()
+    out = {"resumed": [], "skipped": []}
+    for task in db.get_tasks(status="in_progress"):
+        tid = task.get("id")
+        if not tid:
+            continue
+        executed = db.last_journal_step(tid, "executed")
+        if not executed:
+            continue  # not ours — the SLA reaper handles journal-less orphans
+        finalized = db.last_journal_step(tid, "finalized")
+        if finalized and finalized["id"] > executed["id"]:
+            continue  # already finalized after the last execution
+        payload = executed.get("payload") or {}
+        output = payload.get("output", "")
+        if not output:
+            out["skipped"].append({"task_id": tid, "reason": "empty journal payload"})
+            continue
+        if dry_run:
+            out["resumed"].append({"task_id": tid, "status": "dry_run"})
+            continue
+
+        total_tokens = int(payload.get("total_tokens", 0) or 0)
+        model = payload.get("model", "sonnet")
+        rubric = payload.get("rubric") or {}
+        score = auto_score_output(output, rubric, task).get("score", 0)
+        fin = lifecycle.finalize_success(
+            tid, task, output, total_tokens, score,
+            db=db, source="api", model=model,
+            final_status=("done" if score >= 60 else "in_review"),
+            quality_score_for_filter=None,
+            count_budget_on_tripwire=True,
+            meter_tokens=False,
+        )
+        db.log_event("api-executor", "task_resumed_from_journal", task_id=tid,
+                     details=f"replayed finalize: status={fin.get('status')} score={score} "
+                             f"(API tokens NOT re-spent)")
+        out["resumed"].append({"task_id": tid, "status": fin.get("status"), "score": score})
+    return out
+
+
 def autonomous_pulse(dry_run: bool = False, max_tasks: int = 3) -> dict:
-    """Complete autonomous pulse: state → dispatch → execute wave via API."""
+    """Complete autonomous pulse: resume → state → dispatch → execute wave via API."""
     db = DB()
     pulse = {"timestamp": datetime.now(UTC).isoformat(), "steps": {}, "tasks_executed": []}
 
@@ -711,6 +775,16 @@ def autonomous_pulse(dry_run: bool = False, max_tasks: int = 3) -> dict:
         pulse["error"] = str(e)
         db.log_event("api-executor", "autonomous_pulse_blocked", details=f"budget gate: {e}")
         return pulse
+
+    # Step 0 (N2): replay any execution interrupted by a crash — finalize
+    # from the journal BEFORE dispatching new work, so the wave never
+    # re-pays for outputs that already exist.
+    try:
+        resumed = resume_interrupted(db=db, dry_run=dry_run)
+        if resumed["resumed"] or resumed["skipped"]:
+            pulse["steps"]["resumed_from_journal"] = resumed
+    except Exception as e:
+        pulse["steps"]["resumed_from_journal"] = {"error": str(e)[:200]}
 
     # State check
     state = run_engine("core/state_machine.py", ["--evaluate", "--json"])
@@ -785,6 +859,7 @@ def main():
     parser.add_argument("--task", "-t", help="Execute single task via API")
     parser.add_argument("--model", "-m", choices=["haiku", "sonnet", "opus"], help="Force model")
     parser.add_argument("--pulse", action="store_true", help="Autonomous pulse (dispatch + execute wave)")
+    parser.add_argument("--resume", action="store_true", help="Replay finalize for crash-interrupted executions (N2 journal)")
     parser.add_argument("--max-tasks", type=int, default=3, help="Max tasks per pulse")
     parser.add_argument("--dry-run", "-n", action="store_true", help="Show without calling API")
     parser.add_argument("--json", "-j", action="store_true", help="JSON output")
@@ -806,6 +881,17 @@ def main():
             if result.get("prompt_preview"):
                 print(f"\n  Prompt: {result['prompt_preview'][:200]}...")
         return 0 if result["status"] in ("done", "dry_run") else 2 if result["status"] == "blocked" else 3
+
+    elif args.resume:
+        result = resume_interrupted(dry_run=args.dry_run)
+        if args.json:
+            print(json.dumps(result, indent=2, default=str))
+        else:
+            print(f"=== RESUME FROM JOURNAL: {len(result['resumed'])} resumed, "
+                  f"{len(result['skipped'])} skipped ===")
+            for r in result["resumed"]:
+                print(f"  [{r.get('status')}] {r['task_id']} score={r.get('score')}")
+        return 0
 
     elif args.pulse:
         result = autonomous_pulse(dry_run=args.dry_run, max_tasks=args.max_tasks)

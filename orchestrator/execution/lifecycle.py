@@ -272,6 +272,13 @@ def prepare(task_id: str, *, db: DB | None = None, pipeline=None,
         return result
 
     result["steps"].append({"step": "checked_out"})
+    try:
+        # Execution journal (N2): marks the start of the at-risk window.
+        db.journal_step(task_id, "checked_out",
+                        payload={"source": source,
+                                 "model": result.get("recommended_model", "")})
+    except Exception:
+        pass
     db.log_event(actor, "task_executing", task_id=task_id,
                  details=f"skill={skill} worker={worker} prompt_tokens={result['prompt_tokens_est']}")
     result.update(ok=True, status="ready")
@@ -315,6 +322,11 @@ def finalize_success(task_id: str, task: dict, output: str, tokens: int, score: 
             db.block_task(task_id, f"prompt_shield: {reason[:200]}")
             if count_budget_on_tripwire and tokens > 0:
                 db.update_budget(tokens)
+            try:
+                db.journal_step(task_id, "finalized", status="tripwire",
+                                payload={"reason": f"prompt_shield: {reason[:200]}"})
+            except Exception:
+                pass
             db.log_event(actor, "task_tripwire", task_id=task_id,
                          details=f"prompt_shield: {reason[:200]}")
             result.update(status="tripwire", tripwire_reason=reason)
@@ -354,6 +366,11 @@ def finalize_success(task_id: str, task: dict, output: str, tokens: int, score: 
                 "--score", str(score), "--error", reason[:200], "--json"])
             result["steps"].append({"step": "replanned_tripwire",
                                     "action": replan.get("action", "?")})
+        try:
+            db.journal_step(task_id, "finalized", status="tripwire",
+                            payload={"reason": reason[:200]})
+        except Exception:
+            pass
         db.log_event(actor, "task_tripwire", task_id=task_id, details=f"Tripwire: {reason[:100]}")
         result.update(status="tripwire", tripwire_reason=reason)
         return result
@@ -432,6 +449,11 @@ def finalize_success(task_id: str, task: dict, output: str, tokens: int, score: 
     result["steps"].append({"step": "post_conditions", "pass": spec_post.get("pass", True),
                             "issues": spec_post.get("issues", [])})
 
+    try:
+        db.journal_step(task_id, "finalized", status=status,
+                        payload={"score": score, "tokens": tokens})
+    except Exception:
+        pass
     db.log_event(actor, "task_completed", task_id=task_id,
                  details=f"score={score} tokens={tokens} status={status}")
     result["sanitized_output"] = output
@@ -490,6 +512,12 @@ def finalize_failure(task_id: str, task: dict, error: str, score: int = 0, *,
     except Exception:
         pass
 
+    try:
+        db.journal_step(task_id, "finalized", status="failed",
+                        payload={"error": error[:200],
+                                 "replan": replan.get("action", "?")})
+    except Exception:
+        pass
     db.log_event(actor, "task_failed", task_id=task_id,
                  details=f"error={error[:100]} replan={replan.get('action', '?')}")
     return result

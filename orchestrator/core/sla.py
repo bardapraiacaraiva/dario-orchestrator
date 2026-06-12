@@ -79,12 +79,25 @@ def recover_orphaned(db=None, dry_run: bool = False) -> dict:
     from core.db import DB  # lazy — db.py imports sla, avoid the cycle
     db = db or DB()
     reclaimed = []
+    resumable = []
     for task in db.get_tasks(status="in_progress"):
         verdict = evaluate(task)
         if verdict["status"] in ("breach", "critical_breach"):
             tid = task.get("id")
             if not tid:
                 continue
+            # N2 (2026-06-12): a task whose API execution COMPLETED but whose
+            # finalize never ran has its paid-for output in the journal.
+            # Resetting it would make the next wave re-pay the API call —
+            # leave it for resume_interrupted() (pulse step 0 / --resume).
+            try:
+                executed = db.last_journal_step(tid, "executed")
+                finalized = db.last_journal_step(tid, "finalized")
+                if executed and (not finalized or finalized["id"] < executed["id"]):
+                    resumable.append({"id": tid, "age_hours": verdict["age_hours"]})
+                    continue
+            except Exception:
+                pass  # journal unavailable → fall through to the reset path
             if not dry_run:
                 db.reset_task(
                     tid,
@@ -96,4 +109,4 @@ def recover_orphaned(db=None, dry_run: bool = False) -> dict:
                 "age_hours": verdict["age_hours"],
                 "status": verdict["status"],
             })
-    return {"reclaimed": len(reclaimed), "tasks": reclaimed}
+    return {"reclaimed": len(reclaimed), "tasks": reclaimed, "resumable": resumable}

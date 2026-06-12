@@ -62,6 +62,12 @@ def main():
         from core.sla import recover_orphaned
         rec = recover_orphaned()
         output["resumed_tasks"] = rec.get("reclaimed", 0)
+        # N2: tasks with a paid-for output in the execution journal are NOT
+        # reset — replay their finalize now (subprocess: core/ must not
+        # import providers/, and the replay needs the API engine's scorer).
+        if rec.get("resumable"):
+            replay = run_engine("providers/anthropic.py", ["--resume", "--json"])
+            output["resumed_from_journal"] = len(replay.get("resumed", []))
     except Exception:
         output["resumed_tasks"] = 0
 

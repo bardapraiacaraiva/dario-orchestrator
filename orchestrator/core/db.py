@@ -226,6 +226,25 @@ class DB:
                     pass  # column already exists
             conn.execute("INSERT OR IGNORE INTO schema_versions (version, description) VALUES (6, 'Revenue: tasks.valor_eur + billing_status')")
 
+        if current < 7:
+            # v7: per-step execution journal (Next-Gen N2, 2026-06-12).
+            # Append-only: a crash mid-wave used to lose the paid-for API
+            # output of any in_progress task; the journal persists the output
+            # at the 'executed' step so recovery can REPLAY finalize instead
+            # of re-executing (and re-paying) from scratch.
+            conn.execute(
+                """CREATE TABLE IF NOT EXISTS task_steps (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    task_id TEXT NOT NULL,
+                    step TEXT NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'done',
+                    payload TEXT,
+                    created_at TEXT NOT NULL
+                )"""
+            )
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_task_steps_task ON task_steps(task_id, id)")
+            conn.execute("INSERT OR IGNORE INTO schema_versions (version, description) VALUES (7, 'N2: task_steps execution journal')")
+
     # ─── TASKS ───────────────────────────────────────────────────────────────
 
     def create_task(self, data: dict = None, **kwargs) -> dict:
@@ -350,6 +369,52 @@ class DB:
             if cursor.rowcount > 0:
                 self._log(conn, "system", "task_reset", task_id=task_id, details=reason[:200])
             return cursor.rowcount > 0
+
+    # ─── EXECUTION JOURNAL (Next-Gen N2) ─────────────────────────────────────
+
+    def journal_step(self, task_id: str, step: str, status: str = "done",
+                     payload: dict | None = None) -> None:
+        """Append one step to the execution journal (append-only by design)."""
+        now = datetime.now(UTC).isoformat()
+        with self._conn() as conn:
+            conn.execute(
+                "INSERT INTO task_steps (task_id, step, status, payload, created_at) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (task_id, step, status,
+                 json.dumps(payload, default=str) if payload is not None else None, now))
+
+    def get_journal(self, task_id: str) -> list[dict]:
+        """All journal entries for a task, oldest first."""
+        with self._conn() as conn:
+            rows = conn.execute(
+                "SELECT * FROM task_steps WHERE task_id = ? ORDER BY id",
+                (task_id,)).fetchall()
+        out = []
+        for r in rows:
+            d = dict(r)
+            if d.get("payload"):
+                try:
+                    d["payload"] = json.loads(d["payload"])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            out.append(d)
+        return out
+
+    def last_journal_step(self, task_id: str, step: str) -> dict | None:
+        """Most recent journal entry of a given step type, or None."""
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM task_steps WHERE task_id = ? AND step = ? "
+                "ORDER BY id DESC LIMIT 1", (task_id, step)).fetchone()
+        if not row:
+            return None
+        d = dict(row)
+        if d.get("payload"):
+            try:
+                d["payload"] = json.loads(d["payload"])
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return d
 
     def delete_task(self, task_id: str) -> bool:
         """Delete a task permanently (new: was missing)."""
