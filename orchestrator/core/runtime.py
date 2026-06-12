@@ -38,6 +38,7 @@ Port: 8422 (to not conflict with RAG on 8420, Runtime on 8421)
 import asyncio
 import json
 import logging
+import os
 import subprocess
 import sys
 from contextlib import asynccontextmanager
@@ -111,7 +112,29 @@ class Scheduler:
         _run_engine("scripts/budget_tracker.py", ["--check", "--quiet"])
         # Dashboard refresh (was ORPHAN — dashboard went stale between manual runs)
         _run_engine("observability/generate_dashboard.py", [])
+        # Autonomous execution (OPT-IN): until enabled, the runtime monitors but
+        # produces nothing — all value creation stays human-gated by sessions.
+        self._autonomous_step()
         log.info(f"Pulse #{self.pulse_count + 1} complete")
+
+    def _autonomous_step(self):
+        """Run autonomous_pulse if opted in. Gates: flag, API key, then (inside
+        providers/anthropic.py) budget gate, GUARDIAN state, validation, slots."""
+        flag_file = ORCH_DIR / "AUTONOMOUS_PULSE.on"
+        enabled = os.environ.get("DARIO_AUTONOMOUS_PULSE", "").lower() in ("1", "true", "on") or flag_file.exists()
+        if not enabled:
+            return
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            log.warning("[AUTONOMOUS] enabled but ANTHROPIC_API_KEY missing in runtime env — skipping")
+            return
+        max_tasks = os.environ.get("DARIO_AUTONOMOUS_MAX_TASKS", "1")
+        # 15 min budget: an API-executed task takes minutes; default engine timeout (30s) would kill it
+        res = _run_engine("providers/anthropic.py",
+                          ["--pulse", "--max-tasks", str(max_tasks), "--json"], timeout=900)
+        executed = res.get("tasks_executed", []) if isinstance(res, dict) else []
+        log.info(f"[AUTONOMOUS] pulse status={res.get('status', res.get('error', '?'))} "
+                 f"executed={len(executed)} "
+                 f"cost=${(res.get('totals') or {}).get('cost', 0)}")
 
     def _reap_zombies(self, max_age_minutes: int = 60):
         """Find tasks stuck in in_progress and block them (new: zombie reaper)."""
@@ -144,7 +167,7 @@ class Scheduler:
 scheduler = Scheduler()
 
 
-def _run_engine(script: str, args: list) -> dict:
+def _run_engine(script: str, args: list, timeout: int = 30) -> dict:
     """Run an orchestrator engine and return parsed JSON."""
     script_path = ORCH_DIR / script
     if not script_path.exists():
@@ -153,7 +176,7 @@ def _run_engine(script: str, args: list) -> dict:
     try:
         result = subprocess.run(
             [PYTHON, str(script_path)] + args,
-            capture_output=True, text=True, timeout=30, cwd=str(ORCH_DIR)
+            capture_output=True, text=True, timeout=timeout, cwd=str(ORCH_DIR)
         )
         if result.stdout.strip():
             try:
