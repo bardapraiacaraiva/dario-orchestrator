@@ -165,50 +165,25 @@ For each task, determine the best executor:
    carries the CoT confidence, e.g. `COT: winner=... conf=0.883(HIGH) ...`.
 
    **Confidence gate (prevents misroutes like WordPress→medik):**
-   - **HIGH (conf ≥ 0.70):** trust the engine's `worker` + `inferred_skill`. Skip the table.
-   - **MEDIUM (0.45–0.70):** use the engine's pick but note it as 🟡 assumed in the dispatch log; sanity-check against the table.
+   - **HIGH (conf ≥ 0.70):** trust the engine's `worker` + `inferred_skill`.
+   - **MEDIUM (0.45–0.70):** use the engine's pick but note it as 🟡 assumed in the dispatch log; sanity-check against `company.yaml`.
    - **LOW (< 0.45) OR `queued: true` OR `worker: null`:** DO NOT auto-assign.
-     Fall back to the static table (steps 1–2). If the table is also
+     Fall back to a manual `company.yaml` lookup (steps 1–2). If that is also
      ambiguous, ask the user to disambiguate the skill. A low-confidence
      semantic match across the 584-skill surface is how unrelated industry
      skills (medik/campus/helios) hijack agency tasks — never ship it silently.
 
 1. **Read company.yaml** — Match task capabilities to agent capabilities (FALLBACK path when step 0 is low-confidence)
-2. **Apply routing rules:**
+2. **Apply routing rules** — read the routing from `company.yaml`, never from a
+   hardcoded table. The full surface is 208 worker-mapped skills across the
+   `workers` + `workers_{a360,atlas_fin,lex,nomos,obsidian,prometheus}` +
+   `agents_*` sections; any table embedded here would be (and was) a stale
+   subset. Quick lookup for a single domain:
 
-| Task Domain | Primary Agent | Fallback | Parallel Squad |
-|---|---|---|---|
-| Brand/positioning | worker-brand | dir-marketing | Brand Squad |
-| Offer/pricing | worker-offer | dir-marketing | Hormozi Squad |
-| Copy/sales letter | worker-sales-letter | dir-marketing | Copy Squad |
-| Paid traffic | worker-ads | dir-marketing | Traffic Masters |
-| Funnel design | worker-funnel | dir-marketing | Sales Squad |
-| WordPress audit | worker-wp-audit | dir-technical | Cybersecurity Squad |
-| WooCommerce | worker-woo-audit | dir-technical | - |
-| Performance | worker-cwv-fix | dir-technical | - |
-| Security | worker-pentest | dir-technical | Cybersecurity Squad |
-| Full SEO audit | worker-seo-audit | dir-seo | Data Squad |
-| Technical SEO | worker-seo-technical | dir-seo | - |
-| Content SEO | worker-seo-content | dir-seo | - |
-| Local SEO | worker-seo-local | dir-seo | - |
-| AI/GEO | worker-seo-geo | dir-seo | - |
-| Schema | worker-seo-schema | dir-seo | - |
-| Keywords | worker-kw-cluster | dir-seo | - |
-| Financial model | worker-financial-model | dir-finance | CFO Squad |
-| Pricing | worker-pricing-calculator | dir-finance | - |
-| SaaS metrics | worker-saas-metrics | dir-finance | - |
-| Client onboard | worker-client-onboard | dir-client-success | - |
-| Diagnostic | worker-diagnose | dir-client-success | Advisory Board |
-| Interior design | worker-diva-moodboard | dir-design | Interior Design Squad |
-| Materials | worker-diva-materials | dir-design | - |
-| Floor plan | worker-diva-floor-plan | dir-design | Architecture Masters |
-| Renders | worker-diva-render | dir-design | - |
-| Budget (constr.) | worker-diva-budget | dir-construction | Budget Squad |
-| Timeline | worker-diva-timeline | dir-construction | - |
-| Inspection | worker-diva-inspection | dir-construction | - |
-| Contract | worker-diva-contract | dir-construction | - |
-| Licensing | worker-diva-licensing | dir-regulatory | Regulation Squad |
-| Energy cert | worker-diva-energy | dir-regulatory | - |
+   ```bash
+   grep -A3 "<domain keyword>" ~/.claude/orchestrator/company.yaml
+   ```
+
 
 3. **Resolve skill by execution_policy (Padrão A routing, added 2026-05-24):**
 
@@ -363,52 +338,33 @@ Agent({ description: "PROJ-002: SEO audit", ... })    # In parallel
 Agent({ description: "PROJ-003: CRO audit", ... })    # In parallel
 ```
 
-**Coalescing rules:**
-- If a worker is already processing a similar task, coalesce (merge) instead of duplicating
-- If a heartbeat is running, queue new work for the next window
-- Cooldown: minimum 2 minutes between heartbeats for the same worker
+**Duplicate-work rule:** if a worker is already processing a similar task, merge the new request into it instead of creating a duplicate.
 
-### Phase 4.5: ERROR RECOVERY
+### Phase 4.5: ERROR RECOVERY (delegated to the replanner)
 
-When a task execution fails (Agent tool timeout, error, or empty output):
+Failure recovery is CODE, not orchestrator prose — when a task execution
+fails (timeout, error, empty output, quality < 40), invoke the replanner:
 
-**Retry Protocol (exponential backoff):**
-```
-max_retries = 3
-for attempt in 1..max_retries:
-  wait = min(30 * (2 ^ attempt), 270)  # 60s, 120s, 240s — stay in cache window
-  execute(task)
-  if success:
-    break
-  if attempt == max_retries:
-    ESCALATE to dead-letter
+```bash
+cd ~/.claude/orchestrator && .venv/Scripts/python.exe -m execution.replanner \
+    --task <TASK-ID> --failure <type> --score <n> --error "<summary>" --json
 ```
 
-**Dead-Letter Queue:**
-Tasks that fail after all retries:
-1. Set status → `blocked`
-2. Set `blocked_reason: "execution_failed — {error_summary}. Retried {N} times."`
-3. Add note with full error context
-4. Move to dead-letter list in report
-5. Continue with other tasks (don't block the wave)
+It applies cascading strategies per failure type (retry_same, retry_with_feedback,
+retry_sibling, fallback_skill, queue_for_next_pulse, escalate), persists
+mutations DB+YAML (dual-write, 2026-06-12), and supports `--dry-run` to preview
+the plan. Tasks that exhaust strategies are escalated with `blocked_reason` set —
+list them in the report and continue the wave.
 
-**Mid-Execution Crash Recovery:**
-If the session ends unexpectedly (compaction, timeout):
-1. On next heartbeat, scan `tasks/active/` for tasks with:
-   - `status: "in_progress"` AND `checked_out_at` older than SLA timeout
-2. Apply SLA timeouts per execution policy:
-   - `critical` → 1h
-   - `client_facing` → 4h  
-   - `default` → 8h
-   - `financial` → 2h
-3. If past SLA: reset status → `todo`, clear `checked_out_at`, increment `notes[]` with recovery entry
-4. Task is now available for re-dispatch
+**Mid-Execution Crash Recovery:** handled by `core/sla.py:recover_orphaned()`
+at session boot (policy-aware SLA: critical 1h · financial 2h · client_facing 4h ·
+default 8h; founder tasks have no clock). SLA-breached `in_progress` tasks reset
+to `todo` automatically. Suspend/resume across restarts: `execution/suspend_resume.py`.
 
 **Idempotency Guard:**
 Before executing a task, check:
 - Is this task already `done`? → Skip (don't double-execute)
 - Is this task `in_progress` by another agent? → Skip (atomic checkout)
-- Did this task run in the last 5 minutes? → Skip (prevent rapid re-execution after crash)
 
 ### Phase 5: REVIEW (Execution Policies)
 
@@ -422,7 +378,9 @@ After each task completes, enforce the applicable execution policy:
 **Layer 2 — Review (when policy requires it):**
 - Director-level agent reviews the output
 - Can: approve (→ done), request revision (→ back to worker), escalate (→ CEO)
-- Maximum revision loops defined per policy (default: 3)
+- Maximum revision loops defined per policy (default: 3). HONEST NOTE: no code
+  enforces this limit — the orchestrating model must count `revision_count`
+  against `revision_max_loops` itself and escalate when exceeded.
 
 **Layer 3 — Approval (for critical/financial tasks):**
 - CEO or user explicitly approves
@@ -532,6 +490,11 @@ alert_95_sent: false
 ```
 
 ## Task Templates
+
+The templates below are ILLUSTRATIVE decomposition shapes for the orchestrating
+model — they are not loaded from disk. Programmatic templates live in
+`core/task_templates.py` (used by the runtime); `tasks/templates/` is not a
+source of truth.
 
 ### Template: Full Client Audit
 ```yaml
@@ -770,11 +733,8 @@ Result: complete package without CEO re-dispatching between steps.
 - Composite Modes = parallel (all at once, merge)
 - Skill Chains = sequential (each feeds the next, automatic handoff)
 
-**Log codes:**
-- `DARIO_CHAIN_START_{name}` — chain activated
-- `DARIO_CHAIN_STEP_{n}_{skill}_DONE` — step completed
-- `DARIO_CHAIN_COMPLETE_{name}_{score}` — chain finished
-- `DARIO_CHAIN_FAIL_{name}_AT_STEP_{n}` — chain failed at step
+**Logging:** chain progress is recorded through the normal audit trail
+(`db.log_event` + `audit/YYYY-MM-DD.yaml`) — there is no separate chain log format.
 
 ---
 
@@ -860,9 +820,8 @@ Step 4: BUDGET CHECK
   - Report percentage, enforce limits (80%/95%)
 
 Step 5: INTEGRITY SEAL
-  - If all 4 steps pass: log DARIO_REACTIVATION_OK_{timestamp}
-  - If any step fails: log DARIO_REACTIVATION_DEGRADED_{step}
-  - Report status to user in compact format
+  - If all 4 steps pass: append a reactivation_ok entry to audit/YYYY-MM-DD.yaml
+  - If any step fails: report the degraded step to the user (format below)
 ```
 
 **Output format (only on degraded state):**
@@ -902,7 +861,9 @@ When multiple skills or agents could handle a task, or when instructions conflic
 
 ## Fallback Protocol (Per-Skill Resilience) — ASIMO Pattern
 
-Every skill invocation must have a defined fallback path:
+Fallback EXECUTION is the replanner's job (`execution/replanner.py`,
+strategy `fallback_skill`) — the matrix below is the routing guidance the
+orchestrating model uses when deciding what to suggest:
 
 ```yaml
 fallback_matrix:
@@ -959,10 +920,8 @@ confidence_modes:
     when: "Creative task (brand, naming, content) OR user asks 'o que achas?'"
 ```
 
-**Integration with Quality Scoring:**
-- HIGH_CONFIDENCE outputs penalized harder for errors (expected to be right)
-- UNCERTAINTY outputs get bonus for flagging assumptions correctly
-- EXPLORATION outputs scored on variety and rationale quality
+These modes are OUTPUT GUIDANCE for the orchestrating model — the quality
+scorer does not read them (no automated penalty/bonus exists).
 
 ---
 
@@ -977,30 +936,25 @@ The orchestrator is ALWAYS in one of 4 states defined in `~/.claude/orchestrator
 | **GUARDIAN** | 0 | Audit, Report only | Budget >= 95%, Ethical gate fail, Health < 0.50 |
 | **EXPANSION** | 1 | Audit, Score, Learn | No pending work, weekly cycle |
 
-**State transitions are logged:** `DARIO_STATE_{from}→{to}_{reason}`
+State transitions are recorded by `core/state_machine.py` in the audit trail.
 
-## Ethical Pre-Gate (DARIO v1.0 "Filtro Triplice")
+## Ethical Pre-Gate (DARIO v1.0 "Filtro Triplice") — ENFORCED IN CODE
 
-Before EVERY dispatch decision, apply 3 questions:
-1. **Clarity:** Is the task clearly defined with unambiguous success criteria?
-2. **Freedom:** Does this respect user autonomy and informed consent?
-3. **Coherence:** Is this aligned with project objectives and manifesto values?
+The 3-question gate (clarity / freedom / coherence) is real code:
+`safety/ethical_gate.py`, invoked automatically (a) as Check 0 of
+`safety/guardrails.py` on BOTH execution engines, and (b) inside
+`cmd_dispatch` before any assignment (2026-06-12) — a FAIL queues the task
+instead of assigning it. Destructive tasks require the structured fields
+`confirmation_received` or `user_approved`; the words "approved"/"confirmed"
+in free text do NOT count. When the gate fails, propose a reformulated task
+using the `reformulation_hint` it returns.
 
-If ANY answer is `false`: do NOT dispatch. Instead:
-- Propose reformulated task that passes all 3 checks
-- Log `DARIO_ETHICAL_GATE_FAIL_{question}_{task_id}`
-- If repeated failures: enter GUARDIAN state
+## Synaptic Weights (Inter-Agent Affinity) — APPLIED IN DISPATCH
 
-## Synaptic Weights (Inter-Agent Affinity)
-
-Skills that co-activate frequently with high scores build "synaptic weight" — stored in `~/.claude/orchestrator/synaptic_weights.yaml`.
-
-**Dispatch enhancement:** When a complex task needs 2+ skills:
-1. Check affinity graph for highest-weight pairs
-2. Prefer proven combinations over untested ones
-3. After task completion, update weights:
-   - Score >= 80: weight += 0.05
-   - Score < 50: weight -= 0.03
+Skills that co-activate frequently with high scores build "synaptic weight"
+(`synaptic_weights.yaml`). Since 2026-06-12 the dispatch engine applies these
+boosts automatically to CoT votes (`dispatch/dispatch_cot.py`), alongside the
+crystallized `rule_star_*.yaml` patterns — no manual affinity lookup needed.
 
 ## Evolutionary Delta (Meta-Learning)
 
