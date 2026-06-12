@@ -4,6 +4,8 @@
 import sys
 from pathlib import Path
 
+import pytest
+
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
@@ -11,6 +13,21 @@ from quality import golden_eval
 
 # Use a sandbox eval id so we don't pollute real goldens
 TEST_EVAL_ID = "test-eval-golden-xyz-123"
+
+
+@pytest.fixture(autouse=True)
+def _isolated_golden_dirs(tmp_path, monkeypatch):
+    """Every test runs against a private GOLDEN_DIR + CALIBRATION_LOG.
+
+    These tests used to share the REAL golden dir and calibration log with a
+    single TEST_EVAL_ID: a mid-test failure left state for the next run, xdist
+    interleaved the shared log, and every run appended test entries to the
+    real calibration history (order-flake found by audit 2026-06-12). The
+    module functions resolve both constants at call time, so monkeypatching
+    the module attributes is sufficient.
+    """
+    monkeypatch.setattr(golden_eval, "GOLDEN_DIR", tmp_path / "golden")
+    monkeypatch.setattr(golden_eval, "CALIBRATION_LOG", tmp_path / "calibration_log.yaml")
 
 
 def _cleanup():
