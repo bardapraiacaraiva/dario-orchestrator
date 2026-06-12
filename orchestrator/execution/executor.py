@@ -63,15 +63,6 @@ from pathlib import Path
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
-from safety.approval_gates import get_approval_level, request_approval
-from core.artifact_schemas import SchemaValidationFilter
-from execution.checkpoint_interrupt import interrupt_task, should_interrupt
-from core.db import DB
-from streaming.filter_pipeline import BudgetFilter, FilterPipeline, LoggingFilter, QualityGateFilter, TokenBudgetFilter
-from safety.guardrails import validate_task
-from dispatch.model_router import ModelRouterFilter
-from reliability.output_guardrails import OutputGuardrailFilter
-
 import functools
 
 # ─── OpenTelemetry tracing (P0-4: wire real spans into the execution path) ───
@@ -80,6 +71,23 @@ import functools
 # so a default install gets a silent no-op (no console span spam) while a
 # configured deployment gets real distributed traces. Never affects execution.
 import os as _os_otel
+
+from core.artifact_schemas import SchemaValidationFilter
+from core.db import DB
+from dispatch.model_router import ModelRouterFilter
+from execution.checkpoint_interrupt import interrupt_task, should_interrupt
+from execution.completion_hooks import run_learning_writebacks
+from reliability.output_guardrails import OutputGuardrailFilter
+from safety.approval_gates import get_approval_level, request_approval
+from safety.guardrails import validate_task
+from streaming.filter_pipeline import (
+    BudgetFilter,
+    FilterPipeline,
+    LoggingFilter,
+    QualityGateFilter,
+    TokenBudgetFilter,
+)
+
 _OTEL_TARGET = (
     _os_otel.environ.get("DARIO_OTEL") == "1"
     or _os_otel.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT")
@@ -87,8 +95,9 @@ _OTEL_TARGET = (
 )
 if _OTEL_TARGET:
     try:
-        from observability.otel_setup import setup_tracing, trace_agent_invoke
         from opentelemetry import trace as _otel_trace
+
+        from observability.otel_setup import setup_tracing, trace_agent_invoke
         setup_tracing("dario-orchestrator")
         _OTEL_OK = True
     except Exception:
@@ -390,81 +399,26 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
         result["steps"].append({"step": "completed", "final_status": status})
         result["status"] = status
 
-        # ─── SYNAPTIC WEIGHTS WRITE-BACK (Upgrade 3 — cognitive audit Sprint 1)
-        # Previously synaptic_weights.yaml was read-only at dispatch time and
-        # only updated by offline evolution cycles. Now closes the loop by
-        # updating co-activation weights immediately after task completion.
-        if status == "done" and score > 0 and skill and project:
-            try:
-                from cognitive.synaptic_update import process_completion as _synaptic_update
-                _deltas = _synaptic_update(task_id=task_id, skill=skill,
-                                            project=project, score=score)
-                if _deltas:
-                    result["synaptic_updates"] = len(_deltas)
-            except Exception:
-                pass
+        # ─── LEARNING WRITE-BACKS (shared with the autonomous API path) ──────
+        # Synaptic weights, Q-values, CoT post-mortem, auto-learn/episode
+        # promotion, reactive subscriptions, lifecycle hooks and episodic memory
+        # now live in execution.completion_hooks so providers.anthropic fires the
+        # exact same set (closes audit finding F-08). Budget/token accounting is
+        # intentionally NOT in there — see that module's docstring.
+        try:
+            _task = task if isinstance(task, dict) else {}
+            _wb = run_learning_writebacks(
+                task=_task, task_id=task_id, skill=skill, project=project,
+                score=score, tokens=int(tokens or 0), status=status, output=output,
+                model=result.get("recommended_model", "opus"),
+                duration_seconds=float(result.get("duration_seconds", 0.0)),
+            )
+            result.update({k: v for k, v in _wb.items()
+                           if k in ("synaptic_updates", "reactive_tasks_created")})
+        except Exception:
+            pass
 
-        # ─── Q-VALUE MEMORY (Upgrade 5 — cognitive audit Sprint 2)
-        # Records this task as a Q-learning episode. The Q-value updates with
-        # TD-learning; future dispatch decisions consult this memory when
-        # semantic and keyword matching are inconclusive.
-        if status == "done" and score > 0 and skill:
-            try:
-                from cognitive.qvalue_memory_wire import record_outcome as _qvm_record
-                _task = task if isinstance(task, dict) else {}
-                _ctx = f"{_task.get('title', '')} {_task.get('description', '')}".strip()
-                if _ctx:
-                    _qvm_record(
-                        context=_ctx[:500],
-                        skill=skill,
-                        score=score,
-                        tokens_used=int(tokens or 0),
-                        project=project,
-                    )
-            except Exception:
-                pass
-
-        # ─── DISPATCH COT POST-MORTEM (Upgrade 9 — cognitive audit Sprint 4)
-        # If a CoT trace exists for this task, evaluate it against actual
-        # outcome. Catches overconfident dispatches (HIGH confidence + bad
-        # outcome) so signals get recalibrated over time.
-        if score > 0:
-            try:
-                from dispatch.dispatch_cot import postmortem as _cot_postmortem
-                _outcome = "success" if status == "done" else "revision"
-                _cot_postmortem(task_id, score, _outcome)
-            except Exception:
-                pass
-
-        # ─── AUTO-LEARN (capture insights from high-quality tasks) ────────
-        if score >= 90:
-            try:
-                from cognitive.memory_blocks import auto_learn
-                auto_learn(output[:200], scope=project or "global", skill=skill, score=score)
-            except Exception:
-                pass
-
-            # Episode → Semantic promotion (Upgrade 8 — cognitive audit Sprint 3)
-            # When a task hits excellence, scan the recent episodes window and
-            # promote new candidates to semantic memory. Idempotent: existing
-            # SEM-*.yaml entries are skipped, so re-runs are safe.
-            try:
-                from cognitive.episode_promoter import promote as _promote_episodes
-                _promote_episodes(days=7, generate_rules=True, verbose=False)
-            except Exception:
-                pass
-
-        # ─── REACTIVE SUBSCRIPTIONS (trigger downstream tasks) ───────────
-        if status == "done":
-            try:
-                from reliability.reactive_subscriptions import on_task_completed
-                created = on_task_completed(task, score=score, tokens=tokens)
-                if created:
-                    result["reactive_tasks_created"] = len(created)
-            except Exception:
-                pass
-
-        # ─── TOKEN METER (was ORPHAN — costs never tracked) ────────────
+        # ─── TOKEN METER (per-model spend ledger — path-specific) ──────────
         if tokens > 0:
             try:
                 model = result.get("recommended_model", "sonnet")
@@ -477,33 +431,6 @@ def record_execution_result(task_id: str, success: bool, output: str = "",
                 ])
             except Exception:
                 pass
-
-        # ─── LIFECYCLE HOOKS (was ORPHAN — events never emitted) ──────
-        try:
-            from core.lifecycle_hooks import get_registry
-            registry = get_registry()
-            registry.emit("task_complete", task=task, output=output[:200], score=score)
-            if score >= 90:
-                registry.emit("quality_scored", task=task, score=score)
-        except Exception:
-            pass
-
-        # ─── EPISODIC MEMORY (Memory & Dreaming subsystem) ────────────────
-        try:
-            from memory import hooks as mem_hooks
-            mem_hooks.on_task_complete(
-                task_id=task_id,
-                skill=skill,
-                outcome="success" if status == "done" else "revision",
-                score=score if score else None,
-                project=project,
-                duration_seconds=float(result.get("duration_seconds", 0.0)),
-                tokens_used=int(tokens or 0),
-                model=result.get("recommended_model", "opus"),
-                output_summary=output[:500],
-            )
-        except Exception:
-            pass
 
         # ─── AUDIT ───────────────────────────────────────────────────────
         db.log_event("executor", "task_completed", task_id=task_id,

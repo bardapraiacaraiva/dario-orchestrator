@@ -124,7 +124,7 @@ class TestWrapper:
         from scripts.anthropic_spend_wrapper import TrackedAnthropic
         # Force _append_entry to raise
         def _broken(_):
-            raise IOError("disk full")
+            raise OSError("disk full")
         monkeypatch.setattr("scripts.anthropic_spend_wrapper._append_entry", _broken)
         client = TrackedAnthropic(caller="test/broken-log")
         # Call should still succeed

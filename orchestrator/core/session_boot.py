@@ -53,9 +53,17 @@ def main():
     except Exception:
         pass
 
-    # 0.5. Resume suspended tasks from previous session (new: was not wired)
-    resume_result = run_engine("suspend_resume.py", ["--restart-all", "--json"])
-    output["resumed_tasks"] = resume_result.get("resumed", 0)
+    # 0.5. Reclaim tasks orphaned by a crashed worker (Fase 4, 2026-06-12).
+    # Was wired to a non-existent suspend_resume.py (audit F-01) and silently
+    # did nothing — orphaned in_progress tasks waited for a running pulse to be
+    # reaped. Now reclaims SLA-breached tasks in-process at boot. SLA-respecting,
+    # so concurrent live sessions within the window are never disturbed.
+    try:
+        from core.sla import recover_orphaned
+        rec = recover_orphaned()
+        output["resumed_tasks"] = rec.get("reclaimed", 0)
+    except Exception:
+        output["resumed_tasks"] = 0
 
     # 1. State machine evaluation
     state_result = run_engine("core/state_machine.py", ["--evaluate", "--json"])

@@ -200,21 +200,23 @@ class QualityGateFilter(ExecutionFilter):
 
 
 class TokenBudgetFilter(ExecutionFilter):
-    """Tracks token usage per execution and updates budget."""
+    """Observes token usage per execution. Does NOT write the budget.
+
+    Budget writes are owned solely by core.db.complete_task (which adds tokens
+    in the same transaction as the task-status update). This filter previously
+    also called DB().update_budget(tokens), so every successful task was
+    counted twice — inflating spend ~2x and tripping the GUARDIAN/95% hard-stop
+    prematurely (Fase 2 fix, 2026-06-12). It now only logs, so the figure has a
+    single source of truth. Tripwired tasks are counted by their block path, not
+    here (this filter has order 90 and never runs once an earlier filter trips).
+    """
     name = "token_budget"
     order = 90
 
     def after(self, task: dict, output: str, context: dict) -> dict:
         tokens = context.get("actual_tokens", 0)
         if tokens > 0:
-            try:
-                import sys
-                sys.path.insert(0, str(ORCH_DIR))
-                from core.db import DB
-                DB().update_budget(tokens)
-                log.info(f"[BUDGET] +{tokens} tokens recorded")
-            except Exception as e:
-                log.error(f"[BUDGET] Failed to update: {e}")
+            log.info(f"[BUDGET] observed +{tokens} tokens (written by complete_task)")
         return {"output": output}
 
 

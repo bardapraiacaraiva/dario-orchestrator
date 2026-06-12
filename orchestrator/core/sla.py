@@ -59,3 +59,41 @@ def evaluate(task: dict, now: datetime | None = None) -> dict:
         block = (policy or "default") in BLOCK_ON_FIRST_BREACH
         return {"status": "breach", "age_hours": round(age, 1), "sla_hours": hours, "should_block": block}
     return {"status": "ok", "age_hours": round(age, 1), "sla_hours": hours, "should_block": False}
+
+
+def recover_orphaned(db=None, dry_run: bool = False) -> dict:
+    """Reclaim tasks left `in_progress` by a crashed worker (Fase 4, 2026-06-12).
+
+    Boot-time crash recovery: a task whose worker died mid-execution stays
+    `in_progress` forever until a running pulse happens to reap it. This resets
+    such tasks to `todo` so they re-dispatch on the next wave.
+
+    SLA-respecting by design — only tasks already PAST their SLA deadline are
+    reclaimed, so a concurrent live session working a task *within* its window is
+    never disturbed (no liveness/heartbeat tracking required to stay safe).
+    Founder/human tasks have no SLA clock (`no_clock`) and are never touched.
+
+    Replaces the boot call to the non-existent suspend_resume.py (audit F-01),
+    which silently did nothing. Returns {reclaimed, tasks: [...]}.
+    """
+    from core.db import DB  # lazy — db.py imports sla, avoid the cycle
+    db = db or DB()
+    reclaimed = []
+    for task in db.get_tasks(status="in_progress"):
+        verdict = evaluate(task)
+        if verdict["status"] in ("breach", "critical_breach"):
+            tid = task.get("id")
+            if not tid:
+                continue
+            if not dry_run:
+                db.reset_task(
+                    tid,
+                    reason=(f"orphan-recovery: SLA {verdict['status']} "
+                            f"(age {verdict['age_hours']}h > {verdict['sla_hours']}h)"),
+                )
+            reclaimed.append({
+                "id": tid,
+                "age_hours": verdict["age_hours"],
+                "status": verdict["status"],
+            })
+    return {"reclaimed": len(reclaimed), "tasks": reclaimed}

@@ -173,7 +173,7 @@ def test_enforcement_modules_importable_and_callable():
         ParallelismExceededError,
         TaskValidationError,
     )
-    from enforcement.budget_gate import is_budget_safe, current_budget_state
+    from enforcement.budget_gate import current_budget_state, is_budget_safe
     from enforcement.dispatch_validator import validate_task
     from enforcement.parallelism_guard import slot
 

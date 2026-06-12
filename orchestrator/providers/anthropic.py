@@ -42,16 +42,22 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
-import anthropic  # module-level: the except clauses in call_claude_api reference anthropic.* — a lazy import there raises NameError and kills retry/circuit-breaker
+import anthropic  # noqa: F401 — used via anthropic.* in call_claude_api except clauses; a lazy import there raises NameError and kills retry/circuit-breaker
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 from core.artifact_schemas import SchemaValidationFilter
 from core.db import DB
-from streaming.filter_pipeline import BudgetFilter, FilterPipeline, LoggingFilter, QualityGateFilter, TokenBudgetFilter
 from dispatch.model_router import ModelRouterFilter
 from reliability.output_guardrails import OutputGuardrailFilter
+from streaming.filter_pipeline import (
+    BudgetFilter,
+    FilterPipeline,
+    LoggingFilter,
+    QualityGateFilter,
+    TokenBudgetFilter,
+)
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("api_exec")
@@ -531,7 +537,13 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
         cost = api_result["cost"]
 
         # 8.5. FILTER PIPELINE — AFTER (schema, guardrails, quality gate)
-        after_ctx = {"actual_tokens": total_tokens, "quality_score": 0}
+        # quality_score MUST be None here, not 0: the auto-score runs at step 9
+        # (below), so at this point the output is *unscored*. The QualityGateFilter
+        # treats `score is not None and score < min_score` as a tripwire — passing
+        # 0 made every autonomous run trip the gate, pay the API cost, and block.
+        # None = unscored → gate is a no-op here; the real gate is `final_status`
+        # at step 12 (done if score >= 60 else in_review). (Fase 1 fix, 2026-06-12.)
+        after_ctx = {"actual_tokens": total_tokens, "quality_score": None}
         after_result = API_PIPELINE.after(task, output, after_ctx)
         result["steps"].append({
             "step": "filter_pipeline_after",
@@ -540,6 +552,11 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
         if after_result.get("tripwire"):
             log.warning(f"[TRIPWIRE] {task_id}: {after_result.get('tripwire_reason', '?')}")
             db.block_task(task_id, f"Tripwire: {after_result.get('tripwire_reason', '')[:200]}")
+            # The API call already spent these tokens even though the output is
+            # quarantined — count them once here, since the blocked task never
+            # reaches complete_task (the sole budget writer). (Fase 2, 2026-06-12.)
+            if total_tokens > 0:
+                db.update_budget(total_tokens)
             result["status"] = "tripwire"
             result["tripwire_reason"] = after_result.get("tripwire_reason", "")
             db.log_event("api-executor", "task_tripwire", task_id=task_id,
@@ -567,6 +584,22 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
         final_status = "done" if score >= 60 else "in_review"
         db.complete_task(task_id, score=score, tokens=total_tokens,
                          output=output, status=final_status)
+
+        # 12.4 LEARNING WRITE-BACKS — close the learning loop on the autonomous
+        # path too (audit F-08). Same shared hooks the interactive executor runs:
+        # synaptic weights, Q-values, CoT post-mortem, episodes, etc. Best-effort.
+        try:
+            from execution.completion_hooks import run_learning_writebacks
+            _wb = run_learning_writebacks(
+                task=task if isinstance(task, dict) else {},
+                task_id=task_id, skill=skill, project=project, score=score,
+                tokens=int(total_tokens or 0), status=final_status, output=output,
+                model=model,
+            )
+            if _wb:
+                result["learning"] = _wb
+        except Exception as _e:
+            log.debug(f"learning write-backs skipped for {task_id}: {_e}")
 
         # 12.5 TASK-FORMAT-SPEC-V1: Post-conditions check
         spec_post = run_engine("core/task_spec.py", ["--check-post", task_id, "--json"])
@@ -701,7 +734,7 @@ def call_claude_api(prompt: str, skill: str, model: str, retries: int = 2) -> di
 def auto_score_output(output: str, rubric: dict, task: dict) -> dict:
     """Score task output using Haiku as judge. Cheap, fast, consistent."""
     try:
-        import anthropic
+        import anthropic  # noqa: F401 — availability guard: graceful exit if SDK absent
     except ImportError:
         return {"score": 0, "error": "SDK not installed"}
 
