@@ -17,7 +17,6 @@ sys.path.insert(0, str(ORCH_DIR))
 
 import pytest
 
-
 # ─── A12: ethical gate — no free-text confirmation bypass ─────────────────
 
 

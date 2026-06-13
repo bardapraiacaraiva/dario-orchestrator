@@ -56,7 +56,7 @@ jobs:
           required_files=(
             "orchestrator/install.sh"
             "orchestrator/orch"
-            "orchestrator/budget_tracker.py"
+            "orchestrator/finance/budget_tracker.py"
             "orchestrator/quality/eval-baseline.yaml"
           )
           for f in "${required_files[@]}"; do

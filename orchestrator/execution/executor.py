@@ -73,7 +73,10 @@ import os as _os_otel
 
 from core.db import DB
 from execution import lifecycle
-from execution.lifecycle import build_execution_prompt, run_engine  # noqa: F401 — re-exported; single source is lifecycle.py
+from execution.lifecycle import (  # noqa: F401 — re-exported; single source is lifecycle.py
+    build_execution_prompt,
+    run_engine,
+)
 
 _OTEL_TARGET = (
     _os_otel.environ.get("DARIO_OTEL") == "1"

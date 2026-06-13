@@ -269,7 +269,8 @@ def prepare(task_id: str, *, db: DB | None = None, pipeline=None,
 
     # Parallelism slot (session path; the pulse holds its own slot).
     if claim_slot:
-        from enforcement.parallelism_guard import ParallelismExceededError, claim_slot as _claim
+        from enforcement.parallelism_guard import ParallelismExceededError
+        from enforcement.parallelism_guard import claim_slot as _claim
         try:
             _claim(caller=f"executor:{task_id}")
         except ParallelismExceededError as e:
