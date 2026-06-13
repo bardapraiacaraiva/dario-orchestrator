@@ -304,3 +304,56 @@ class TestRealisticPatternThresholds:
         assert TREND_MIN_RUNS == int(cfg("pattern_trend_min_runs"))
         assert FAILURE_MIN == int(cfg("pattern_failure_min"))
         assert CONVERGENCE_MIN_SESSIONS == int(cfg("convergence_min_sessions"))
+
+
+class TestOrphanEmbeddingPrune:
+    """prune_orphan_embeddings removes vectors for archived/merged memories.
+
+    Regression for the retrieval_count starvation found 2026-06-13: Dream archived
+    memories but left their embeddings behind (54 rows for 14 live memories), and
+    high-similarity orphans stole top_k slots so search_memories returned [] even
+    when a live memory was relevant — so retrieval_count never moved and the prune
+    saw useful memories as never-retrieved.
+    """
+
+    def _make_table(self, tmp_path):
+        import sqlite3
+        from memory import semantic_search as ss
+        db = tmp_path / "orch.db"
+        conn = sqlite3.connect(str(db))
+        ss._ensure_schema(conn)
+        for mid in ("SEM-live-1", "SEM-live-2", "SEM-dead-1", "SEM-dead-2", "SEM-dead-3"):
+            conn.execute(
+                "INSERT INTO memory_embeddings (memory_id, content_hash, vec, updated_at) "
+                "VALUES (?, 'h', ?, datetime('now'))",
+                (mid, b"\x00\x00\x00\x00"),
+            )
+        conn.commit()
+        return conn
+
+    def test_removes_only_orphans(self, tmp_path):
+        from memory import semantic_search as ss
+        conn = self._make_table(tmp_path)
+        removed = ss.prune_orphan_embeddings(conn, {"SEM-live-1", "SEM-live-2"})
+        assert removed == 3
+        remaining = {r[0] for r in conn.execute("SELECT memory_id FROM memory_embeddings").fetchall()}
+        assert remaining == {"SEM-live-1", "SEM-live-2"}
+        conn.close()
+
+    def test_noop_when_all_live(self, tmp_path):
+        from memory import semantic_search as ss
+        conn = self._make_table(tmp_path)
+        live = {"SEM-live-1", "SEM-live-2", "SEM-dead-1", "SEM-dead-2", "SEM-dead-3"}
+        assert ss.prune_orphan_embeddings(conn, live) == 0
+        assert conn.execute("SELECT COUNT(*) FROM memory_embeddings").fetchone()[0] == 5
+        conn.close()
+
+    def test_empty_live_set_is_refused(self, tmp_path):
+        """An empty live set means a wrong/isolated context (e.g. a test that
+        redirects SEMANTIC_DIR but not DB_PATH), not total archival. Deleting on
+        it would wipe every real embedding — the safety guard must refuse."""
+        from memory import semantic_search as ss
+        conn = self._make_table(tmp_path)
+        assert ss.prune_orphan_embeddings(conn, set()) == 0
+        assert conn.execute("SELECT COUNT(*) FROM memory_embeddings").fetchone()[0] == 5
+        conn.close()

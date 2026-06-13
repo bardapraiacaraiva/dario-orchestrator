@@ -478,11 +478,30 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
     result["model_id"] = model_config["id"]
     result["steps"].append({"step": "model_selected", "model": model})
 
-    # CALL CLAUDE API
-    result["steps"].append({"step": "api_call_start"})
-    api_result = call_claude_api(prompt, skill, model)
-    result["steps"].append({"step": "api_call_end",
-                            "success": api_result.get("success", False)})
+    # Cache lookup — only skills the spec marked cacheable (enrich sets cache_key;
+    # legal/diagnose/seo-audit are cacheable=False and never reach here). The key
+    # is the full prompt hash, so a hit means a byte-identical prompt: the cached
+    # output is legitimately reusable (retries, deterministic re-runs) and never
+    # stale, because any context change alters the prompt and misses the cache.
+    cacheable = bool(task.get("cache_key"))
+    cached_output = None
+    if cacheable:
+        try:
+            from memory import hooks as mem_hooks
+            cached_output = mem_hooks.try_cache(skill, prompt)
+        except Exception:
+            cached_output = None
+
+    if cached_output is not None:
+        result["steps"].append({"step": "cache_hit"})
+        api_result = {"success": True, "output": cached_output,
+                      "input_tokens": 0, "output_tokens": 0, "cost": 0.0}
+    else:
+        # CALL CLAUDE API
+        result["steps"].append({"step": "api_call_start"})
+        api_result = call_claude_api(prompt, skill, model)
+        result["steps"].append({"step": "api_call_end",
+                                "success": api_result.get("success", False)})
 
     if not api_result.get("success"):
         fin = lifecycle.finalize_failure(
@@ -530,6 +549,15 @@ def execute_task(task_id: str, model_override: str = None, dry_run: bool = False
     if fin.get("status") == "tripwire":
         result["tripwire_reason"] = fin.get("tripwire_reason", "")
         return result
+
+    # Populate cache for future byte-identical prompts. Only on a clean done
+    # (passed shield + pipeline + quality gate >= 60), never re-saving a hit.
+    if cacheable and cached_output is None and fin.get("status") == "done":
+        try:
+            from memory import hooks as mem_hooks
+            mem_hooks.save_cache(skill, prompt, output, tokens_saved=total_tokens)
+        except Exception:
+            pass
     if "learning" not in result and any(k in fin for k in ("synaptic_updates", "reactive_tasks_created")):
         result["learning"] = {k: fin[k] for k in ("synaptic_updates", "reactive_tasks_created") if k in fin}
 

@@ -70,6 +70,28 @@ def _memory_text(mem) -> str:
     return f"{getattr(mem, 'name', '')}\n{getattr(mem, 'description', '')}\n{getattr(mem, 'content', '')}".strip()
 
 
+def prune_orphan_embeddings(conn: sqlite3.Connection, live_ids: set[str]) -> int:
+    """Drop embeddings whose memory no longer exists.
+
+    Dream's prune/merge archive memories but never touched this table, so dead
+    vectors accumulated (54 rows for 14 live memories). Worse, orphans with high
+    similarity stole top_k slots from live memories — search_memories returned []
+    even when a relevant live memory existed below them. Removing them is the
+    actual fix for the retrieval_count==0 starvation, not lowering the threshold.
+    """
+    # Safety: an empty live set means list_semantic() found nothing — almost
+    # always a wrong/isolated context (e.g. a test redirecting SEMANTIC_DIR while
+    # DB_PATH still points at the real db), NOT genuine total archival. Deleting
+    # on an empty set would wipe every real embedding, so refuse it.
+    if not live_ids:
+        return 0
+    rows = conn.execute("SELECT memory_id FROM memory_embeddings").fetchall()
+    orphans = [r[0] for r in rows if r[0] not in live_ids]
+    for oid in orphans:
+        conn.execute("DELETE FROM memory_embeddings WHERE memory_id = ?", (oid,))
+    return len(orphans)
+
+
 def bootstrap_memory_embeddings(verbose: bool = False) -> dict:
     """Embed any new/changed semantic memories. Idempotent (content-hash gated)."""
     if not _EMBED_OK:
@@ -79,6 +101,7 @@ def bootstrap_memory_embeddings(verbose: bool = False) -> dict:
     conn = sqlite3.connect(str(DB_PATH))
     try:
         _ensure_schema(conn)
+        orphans_removed = prune_orphan_embeddings(conn, {m.memory_id for m in memories})
         existing = dict(conn.execute("SELECT memory_id, content_hash FROM memory_embeddings").fetchall())
         for mem in memories:
             text = _memory_text(mem)
@@ -107,7 +130,7 @@ def bootstrap_memory_embeddings(verbose: bool = False) -> dict:
     finally:
         conn.close()
     return {"ok": True, "embedded": embedded, "skipped": skipped, "failed": failed,
-            "total_memories": len(memories)}
+            "orphans_removed": orphans_removed, "total_memories": len(memories)}
 
 
 def search_memories(query: str, top_k: int = DEFAULT_TOP_K,
