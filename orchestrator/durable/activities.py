@@ -23,6 +23,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import Any
 
 from temporalio import activity
 
@@ -34,12 +35,12 @@ class StepInput:
     chain_name: str
     skill: str
     step_index: int
-    upstream_artifacts: dict
+    upstream_artifacts: dict[str, Any]
     # Onda 7 #5: optional prompt + model hints for live mode
     prompt: str | None = None
     model: str = "claude-haiku-4-5"
     max_tokens: int = 800
-    extras: dict = field(default_factory=dict)
+    extras: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -47,7 +48,7 @@ class StepOutput:
     """Activity output contract."""
 
     skill: str
-    artifact: dict
+    artifact: dict[str, Any]
     score: int
     completed_at: str
     mode: str = "stub"  # "stub" | "live"
@@ -58,7 +59,7 @@ def _live_mode_enabled() -> bool:
     return os.getenv("DARIO_TEMPORAL_LIVE", "").lower() in ("1", "true", "yes")
 
 
-async def _invoke_anthropic(req: StepInput) -> dict:
+async def _invoke_anthropic(req: StepInput) -> dict[str, Any]:
     """Call Anthropic via the SDK directly (deferred import keeps stub fast)."""
     import anthropic
 

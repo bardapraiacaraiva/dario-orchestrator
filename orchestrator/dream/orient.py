@@ -13,12 +13,13 @@ ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
 
 import time
+from typing import Any
 
 from memory import episodic, procedural, retrieval, semantic
 from memory.schemas import PhaseReport
 
 
-def orient(window_days: int = 7) -> tuple[PhaseReport, dict]:
+def orient(window_days: int = 7) -> tuple[PhaseReport, dict[str, Any]]:
     """Load state. Returns (report, state_dict)."""
     t0 = time.monotonic()
     episodes = list(episodic.iter_episodes(window_days))

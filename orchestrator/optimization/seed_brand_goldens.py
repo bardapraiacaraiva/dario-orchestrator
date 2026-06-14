@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Any
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
@@ -115,7 +116,7 @@ Direto, técnico, com humor seco. Engenheiro para engenheiro.
 ]
 
 
-def seed() -> dict:
+def seed() -> dict[str, Any]:
     results = []
     for g in GOLDENS:
         r = capture_golden(

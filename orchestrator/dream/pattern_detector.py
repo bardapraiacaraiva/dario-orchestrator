@@ -71,7 +71,7 @@ def detect_patterns(episodes: list[Any]) -> list[str]:
     return patterns
 
 
-def detect_convergence(episodes: list[Any], min_sessions: int | None = None, min_len: int = 2) -> list[dict]:
+def detect_convergence(episodes: list[Any], min_sessions: int | None = None, min_len: int = 2) -> list[dict[str, Any]]:
     """Detect skill sequences that recur across multiple sessions.
 
     Groups episodes by project + day, extracts skill sequence, then finds
@@ -85,7 +85,7 @@ def detect_convergence(episodes: list[Any], min_sessions: int | None = None, min
         session_key = f"{ep.project or 'global'}::{day}"
         by_session[session_key].append(ep.skill)
 
-    ngram_sessions: dict[tuple, set[str]] = defaultdict(set)
+    ngram_sessions: dict[tuple[Any, ...], set[str]] = defaultdict(set)
     for session_key, skills in by_session.items():
         for size in range(min_len, min(6, len(skills) + 1)):
             for i in range(len(skills) - size + 1):

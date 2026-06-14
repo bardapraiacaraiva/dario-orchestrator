@@ -25,7 +25,7 @@ MIN_SESSIONS = int(_cfg("convergence_min_sessions"))
 MIN_SCORE = float(_cfg("convergence_min_score"))
 
 
-def promote_convergent(episodes: list[Any], candidates: list[dict], dry_run: bool = False) -> list[str]:
+def promote_convergent(episodes: list[Any], candidates: list[dict[str, Any]], dry_run: bool = False) -> list[str]:
     """For each detected convergent sequence, check quality and create/update procedural workflow."""
     by_session: dict[str, list[Any]] = defaultdict(list)
     for ep in sorted(episodes, key=lambda e: e.timestamp):

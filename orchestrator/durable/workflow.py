@@ -36,8 +36,8 @@ class ChainWorkflow:
         steps = payload.get("steps", [])
         context = payload.get("context", "")
 
-        artifacts: dict[str, dict] = {}
-        scores: list[dict] = []
+        artifacts: dict[str, dict[str, Any]] = {}
+        scores: list[dict[str, Any]] = []
 
         for idx, step_def in enumerate(steps):
             skill = step_def.get("skill", f"step_{idx}")

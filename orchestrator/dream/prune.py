@@ -10,6 +10,7 @@ from __future__ import annotations
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
@@ -37,7 +38,7 @@ def _age_days(ts: str) -> float:
         return 0.0
 
 
-def prune(state: dict, dry_run: bool = False) -> tuple[PhaseReport, dict]:
+def prune(state: dict[str, Any], dry_run: bool = False) -> tuple[PhaseReport, dict[str, Any]]:
     t0 = time.monotonic()
     actions: list[str] = []
 

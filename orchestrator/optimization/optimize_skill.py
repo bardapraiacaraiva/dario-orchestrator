@@ -14,6 +14,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
@@ -39,7 +40,7 @@ def configure_lm(provider: str = "anthropic", model: str = "claude-haiku-4-5"):
     dspy.configure(lm=lm)
 
 
-def compile_brand(min_examples: int = 2) -> dict:
+def compile_brand(min_examples: int = 2) -> dict[str, Any]:
     """Compile BrandPositioningProgram against existing goldens.
 
     Returns a small report with the example count, baseline vs compiled

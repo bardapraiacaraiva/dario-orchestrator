@@ -11,6 +11,7 @@ import sys
 import time
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
 ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 sys.path.insert(0, str(ORCH_DIR))
@@ -32,7 +33,7 @@ def _similarity(a: str, b: str) -> float:
     return len(ta & tb) / len(ta | tb)
 
 
-def merge(state: dict, dry_run: bool = False, threshold: float = 0.55) -> tuple[PhaseReport, dict]:
+def merge(state: dict[str, Any], dry_run: bool = False, threshold: float = 0.55) -> tuple[PhaseReport, dict[str, Any]]:
     t0 = time.monotonic()
     actions: list[str] = []
 
