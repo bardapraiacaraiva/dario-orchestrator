@@ -77,6 +77,37 @@ def pytest_configure(config):
     )
 
 
+# Tests that depend on a populated ~/.claude (runtime tasks/, seeded goldens,
+# promoted episodes, the orch CLI driving a real state DB). They pass locally
+# (pre-push) where that environment exists, but a clean CI checkout has none of
+# it. Marked requires_live_env here and excluded in CI; see pytest.ini.
+# TODO(2026-06-14): make these hermetic (tmp_path fixtures + seeded fixtures)
+# and drop them from this list so CI regains the coverage.
+_LIVE_ENV_TESTS = (
+    "test_engines.py::TestDispatchEngine::test_status_runs",
+    "test_engines.py::TestDispatchEngine::test_dry_run",
+    "test_engines.py::TestDispatchEngine::test_json_output",
+    "test_engines.py::TestStateMachine::test_show_state",
+    "test_engines.py::TestStateMachine::test_evaluate",
+    "test_engines.py::TestQualityScorer::test_dashboard",
+    "test_goldens_seeded.py::test_all_eval_cases_have_golden",
+    "test_goldens_seeded.py::test_calibration_log_has_entries",
+    "test_goldens_seeded.py::test_drift_simulation_triggers_alert",
+    "test_episode_promoter.py::test_stats_returns_counts",
+    "test_episode_promoter.py::test_existing_semantic_names_includes_promoted",
+    "test_db_yaml_divergence.py::test_detects_yaml_only_task",
+    "test_lex_br.py::test_semantic_dispatch_routes_to_lex_trabalhista",
+    "test_pulse_e2e.py::test_cron_daily_dry_run_executes_all_jobs",
+)
+
+
+def pytest_collection_modifyitems(config, items):
+    """Auto-tag the known live-env-dependent tests so CI can exclude them."""
+    for item in items:
+        if any(key in item.nodeid for key in _LIVE_ENV_TESTS):
+            item.add_marker(pytest.mark.requires_live_env)
+
+
 @pytest.fixture(autouse=True)
 def mock_ollama_embed(request, monkeypatch):
     """Replace `semantic_dispatch._embed` with a deterministic mock by default.

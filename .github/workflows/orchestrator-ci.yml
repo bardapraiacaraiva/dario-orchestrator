@@ -147,7 +147,7 @@ jobs:
         run: |
           # Marker filter MUST match scripts/hooks/pre-push to avoid CI/local drift.
           # vip_only marker deprecated 2026-05-25 (Risk #7 open-everything).
-          python -m pytest tests/ -m "not slow" \
+          python -m pytest tests/ -m "not slow and not requires_live_env" \
               --maxfail=5 \
               --tb=short \
               -q
@@ -185,7 +185,7 @@ jobs:
           DARIO_ORCH_DIR: ${{ github.workspace }}/orchestrator
           PYTHON_KEYRING_BACKEND: keyrings.alt.file.PlaintextKeyring
         run: |
-          python -m pytest tests/ -m "slow" \
+          python -m pytest tests/ -m "slow and not requires_live_env" \
               --maxfail=5 \
               --tb=short \
               -q

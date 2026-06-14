@@ -111,6 +111,11 @@ class TestDocReferences:
         assert doc_path in skill_text, f"Doc reference missing from skill: {doc_path}"
         # And the file actually exists
         actual = Path(doc_path.replace("~", str(Path.home())))
+        # Personal/runtime artefacts that live outside the repo (e.g. the
+        # ~/.claude/projects memory file) are absent in a clean checkout / CI —
+        # skip rather than fail. Repo-tracked docs (orchestrator/) must exist.
+        if "/projects/" in doc_path and not actual.exists():
+            pytest.skip(f"Personal artefact not present in this environment: {doc_path}")
         assert actual.exists(), (
             f"Skill references {doc_path} but file not found at {actual}. "
             "Either restore the doc or update the skill."
