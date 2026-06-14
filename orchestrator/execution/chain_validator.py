@@ -27,6 +27,7 @@ CLI:
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -45,7 +46,18 @@ except ImportError:
             return _pyaml.safe_load(f)
 
 
-ORCH_DIR = Path.home() / ".claude" / "orchestrator"
+# Resolve ORCH_DIR robustly so loaders find skill_chains.yaml both locally
+# (legacy ~/.claude/orchestrator install) AND in CI (checkout lives elsewhere):
+#   1. DARIO_ORCH_DIR env var (explicit override)
+#   2. the repo this module lives in (execution/ -> orchestrator/)
+#   3. ~/.claude/orchestrator (legacy local-install default)
+_env_dir = os.environ.get("DARIO_ORCH_DIR")
+if _env_dir:
+    ORCH_DIR = Path(_env_dir)
+elif (Path(__file__).resolve().parent.parent / "core").is_dir():
+    ORCH_DIR = Path(__file__).resolve().parent.parent
+else:
+    ORCH_DIR = Path.home() / ".claude" / "orchestrator"
 CHAINS_FILE = ORCH_DIR / "skill_chains.yaml"
 
 
