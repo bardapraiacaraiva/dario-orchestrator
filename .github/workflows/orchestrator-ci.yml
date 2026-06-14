@@ -144,6 +144,9 @@ jobs:
           # Headless runners have no OS keyring backend → core/secrets.py tests
           # raise NoKeyringError. Use the keyrings.alt file backend. (2026-06-14)
           PYTHON_KEYRING_BACKEND: keyrings.alt.file.PlaintextKeyring
+          # Windows defaults stdout to cp1252 → subprocess CLIs that print
+          # Unicode (→, ✓) raise UnicodeEncodeError. Force UTF-8. (2026-06-14)
+          PYTHONIOENCODING: utf-8
         run: |
           # Marker filter MUST match scripts/hooks/pre-push to avoid CI/local drift.
           # vip_only marker deprecated 2026-05-25 (Risk #7 open-everything).
@@ -184,6 +187,7 @@ jobs:
           DARIO_TEST_MODE: "1"
           DARIO_ORCH_DIR: ${{ github.workspace }}/orchestrator
           PYTHON_KEYRING_BACKEND: keyrings.alt.file.PlaintextKeyring
+          PYTHONIOENCODING: utf-8
         run: |
           python -m pytest tests/ -m "slow and not requires_live_env" \
               --maxfail=5 \

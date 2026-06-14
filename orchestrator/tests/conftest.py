@@ -98,6 +98,9 @@ _LIVE_ENV_TESTS = (
     "test_db_yaml_divergence.py::test_detects_yaml_only_task",
     "test_lex_br.py::test_semantic_dispatch_routes_to_lex_trabalhista",
     "test_pulse_e2e.py::test_cron_daily_dry_run_executes_all_jobs",
+    # Slow suite: integrity gate inspects the live production state
+    # (embeddings coverage, chain→skill resolution) — absent in clean CI.
+    "test_integrity_gate.py::test_production_state_is_clean",
 )
 
 
