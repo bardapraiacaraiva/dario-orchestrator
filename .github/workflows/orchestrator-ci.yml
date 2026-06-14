@@ -129,7 +129,8 @@ jobs:
         run: |
           pip install -e ".[test,observability]" \
               "langgraph-checkpoint-sqlite>=2.0" "temporalio>=1.10" \
-              "dspy>=2.5" "deepeval>=3.9"
+              "dspy>=2.5" "deepeval>=3.9" \
+              "keyrings.alt>=5.0"
 
       - name: Run fast tests (aligned with pre-push hook markers)
         shell: bash
@@ -140,6 +141,9 @@ jobs:
           # does not exist on the runner — point them at the checkout so config
           # YAML (skill_chains.yaml, config/project_types.yaml) resolves. (2026-06-14)
           DARIO_ORCH_DIR: ${{ github.workspace }}/orchestrator
+          # Headless runners have no OS keyring backend → core/secrets.py tests
+          # raise NoKeyringError. Use the keyrings.alt file backend. (2026-06-14)
+          PYTHON_KEYRING_BACKEND: keyrings.alt.file.PlaintextKeyring
         run: |
           # Marker filter MUST match scripts/hooks/pre-push to avoid CI/local drift.
           # vip_only marker deprecated 2026-05-25 (Risk #7 open-everything).
@@ -172,12 +176,14 @@ jobs:
         run: |
           pip install -e ".[test,observability]" \
               "langgraph-checkpoint-sqlite>=2.0" "temporalio>=1.10" \
-              "dspy>=2.5" "deepeval>=3.9"
+              "dspy>=2.5" "deepeval>=3.9" \
+              "keyrings.alt>=5.0"
 
       - name: Run slow tests
         env:
           DARIO_TEST_MODE: "1"
           DARIO_ORCH_DIR: ${{ github.workspace }}/orchestrator
+          PYTHON_KEYRING_BACKEND: keyrings.alt.file.PlaintextKeyring
         run: |
           python -m pytest tests/ -m "slow" \
               --maxfail=5 \
