@@ -23,8 +23,8 @@ GENERATED = "## Deliverable\nGenerated client-ready content.\n"
 
 def _wire(monkeypatch, tmp_path, *, cache_key):
     """Stub execute_task's heavy collaborators; return the API-call recorder."""
-    from providers import anthropic as api
     import memory.cache as cache
+    from providers import anthropic as api
 
     cache_dir = tmp_path / "cache"
     cache_dir.mkdir()

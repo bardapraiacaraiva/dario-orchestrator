@@ -318,6 +318,7 @@ class TestOrphanEmbeddingPrune:
 
     def _make_table(self, tmp_path):
         import sqlite3
+
         from memory import semantic_search as ss
         db = tmp_path / "orch.db"
         conn = sqlite3.connect(str(db))
